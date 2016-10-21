@@ -46,6 +46,26 @@
     color: #000000;
 }
 
+.middle{
+    margin-left: auto;
+    margin-right: auto;
+    z-index:2;
+}
+
+#large-header {
+    background-image: url('../images/background.jpg');
+    background-size:cover;
+    clear:both;
+}
+
+#demo-canvas {
+    display: inline-block;
+    position:absolute;
+    z-index:1
+}
+
+
+/*------------------------------------------------------------------------------------------*/
 .zoomimg {
     background: white;
     border: 1px solid #bfbfbf;

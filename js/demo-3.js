@@ -23,7 +23,7 @@
 
         // create particles
         triangles = [];
-        for(var x = 0; x < 480; x++) {
+        for(var x = 0; x < 600; x++) {
             addTriangle(x*10);
         }
     }
@@ -42,8 +42,8 @@
 
     function tweenTriangle(tri) {
         var t = Math.random()*(2*Math.PI);
-        var x = (200+Math.random()*100)*Math.cos(t) + width*0.5;
-        var y = (200+Math.random()*100)*Math.sin(t) + height*0.5-20;
+        var x = (screen.width/2+Math.random()*100)*Math.cos(t) + width*0.5;
+        var y = (screen.height/2+Math.random()*100)*Math.sin(t) + height*0.5-20;
         var time = 4+3*Math.random();
 
         TweenLite.to(tri.pos, time, {x: x,
