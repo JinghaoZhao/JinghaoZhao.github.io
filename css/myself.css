@@ -49,6 +49,7 @@
 .middle{
     margin-left: auto;
     margin-right: auto;
+    position:relative;
     z-index:2;
 }
 
@@ -58,8 +59,8 @@
     clear:both;
 }
 
-#demo-canvas {
-    display: inline-block;
+
+.canvas {
     position:absolute;
     z-index:1
 }
