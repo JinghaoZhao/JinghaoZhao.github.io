@@ -38,7 +38,56 @@
     text-decoration:none;
 }
 
+.icon :visited{
+    text-decoration:none;
+}
+
 .black {
     color: #000000;
 }
 
+.zoomimg {
+    background: white;
+    border: 1px solid #bfbfbf;
+    display: block;
+    float: left;
+    height: 125px;
+    width: 125px;
+    margin: 0 10px 0 0;
+    padding: 5px;
+    position: relative;
+    -webkit-box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    -moz-box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    -o-transition: all 1s ease-in-out;
+}
+
+.zoomimg:hover{
+    background: #ff414b;
+    border: 1px solid #bf1211;
+    -webkit-transform: rotate(360deg) scale(2);
+    -moz-transform: rotate(0deg) scale(2);
+    -o-transform: rotate(0deg) scale(2);
+    -ms-transform: rotate(0deg) scale(2);
+    transform: rotate(360deg) scale(10) skew(0deg,0deg);
+    transform-origin: center;
+    z-index: 2;
+}
+
+.zoomimg:hover:after{
+    background: #343eff;
+    border: 10px solid #1e3abf;
+    content: attr(alt);
+    display: block;
+    position: absolute;
+    bottom: -45px;
+    left: 0px;
+    z-index: 2;
+    text-align: center;
+}
+
+canvas{
+    border: 2px double #000;
+}
