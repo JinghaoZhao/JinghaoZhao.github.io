@@ -1,42 +1,77 @@
-<!DOCTYPE html><head>
+<!DOCTYPE html><html lang="en">
+<head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="imagetoolbar" content="no" />
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 <link rel="stylesheet" href="css/myself.css" type="text/css" />
 <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
 <title>Zhaojh|Homepage</title><script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/plotly-gl3d.js"></script>
 </head>
 <body id="top">
-  <script type="text/javascript">
-    $(function () {
-        $('[data-toggle="popover"]').popover()
-    })
-  </script>
   <div id="large-header" class="embed-responsive">
     <div class="canvas">
       <canvas id="demo-canvas"></canvas>
     </div>
-    <div class="middle"><br><br><br><br><br><br>
-      <h1 class="mainName">Jinghao Zhao</h1><br>
-      <h3 class="mainins0">ENGINEER & DESIGNER</h3>
-      <h3 class="mainins1 text-uppercase">To be an observer.</h3>
-      <h3 class="mainins1 icon"><a href="https://github.com/anonymous-slave" class="icon">&nbsp;&nbsp;<i class="icon-github">&nbsp;&nbsp;&nbsp;&nbsp;</i></a><a href="http://www.linkedin.com/in/%E7%92%9F%E6%B5%A9-%E8%B5%B5-2aa646b1?trk=nav_responsive_tab_profile" class="icon"><i class="icon-linkedin-sign">&nbsp;&nbsp;&nbsp;&nbsp;</i></a><a href="http://zhaojinghao.lofter.com/" class="icon"><i class="icon-book">&nbsp;&nbsp;&nbsp;&nbsp;</i></a><a href="mailto:zhaojinghao1996@gmail.com" class="icon"><i class="icon-envelope">&nbsp;&nbsp;&nbsp;&nbsp;</i></a></h3>
+    <div class="information">
+      <article class="information">
+        <h1 class="mainName">Jinghao Zhao</h1><br>
+        <h3 class="mainins0">ENGINEER & DESIGNER</h3>
+        <h3 class="mainins1 text-uppercase">To be an observer.</h3><span><a href="https://github.com/anonymous-slave" target="_blank" class="icon"><i class="icon-github"></i></a><a href="http://www.linkedin.com/in/%E7%92%9F%E6%B5%A9-%E8%B5%B5-2aa646b1?trk=nav_responsive_tab_profile" target="_blank" class="icon"><i class="icon-linkedin-sign"></i></a><a href="http://zhaojinghao.lofter.com/" target="_blank" class="icon"><i class="icon-book"></i></a><a href="mailto:zhaojinghao1996@gmail.com" class="icon"><i class="icon-envelope"></i></a></span>
+      </article>
     </div>
   </div>
-  <!--block footer
-  div(style="background-image: url('images/background.jpg');").container-fluid.navbar-bottom
-      div.pull-right
-          p(style="font-size: 16px;color:white;").fl_right <br>Copyright &copy; 2016 Jinghao Zhao
-  
-  
-  
-  --><script src="js/TweenLite.min.js"></script>
+  <div id="Bio" class="wrapper">
+    <section class="row container-fluid"><span class="col-md-7">
+        <article>
+          <h1>Bio</h1>
+          <p>I'm an undergraduate from Shanghai Jiao Tong University,majoring in Electronic Engineering.I'm trying to learn more interesting things and make life colorful and convinent by program.</p>
+          <p>I have been learning about website for years and enjoy design the front-end and whole structure of websites by PHP , HTML , CSS and JavaScript.</p>
+          <p>I also finish some projects by Java & Python, you can see these projects if you scroll down.</p>
+        </article></span><span class="col-md-4 col-md-push-1"><img id="biophoto" src="images/bio.png" class="img-responsive img-rounded"></span></section>
+  </div>
+  <div class="wrapper">
+    <div class="btn-group btn-group-lg btn-group-justified bio-nav middle hidden-xs"><a class="btn btn-primary">Android App</a><a href="#doubancrawler" class="btn btn-success">Python Crawler</a><a href="#acemap" class="btn btn-info">Web</a><a href="#color3d" class="btn btn-warning">Visualization</a></div>
+    <div class="btn-group btn-group-lg btn-group-vertical bio-nav middle visible-xs"><a class="btn btn-primary">Android App</a><a href="#doubancrawler" class="btn btn-success">Python Crawler</a><a href="#acemap" class="btn btn-info">Web</a><a href="#color3d" class="btn btn-warning">Visualization</a></div>
+  </div>
+  <h1>Projects</h1>
+  <hr>
+  <div id="acemap" class="wrapper">
+    <section class="row blur container-fluid">
+      <article class="col-md-8">
+        <h1>Acemap</h1>
+        <p>It is a special scholar search engine which can show you the academic map, as well as the topics information.This search engine & recommendation system can help you to find the best paper you want.</p><br><a href="//acemap.sjtu.edu.cn" target="_blank" class="btn-lg btn-info">Go To Acemap</a>
+      </article>
+    </section>
+    <section class="row container-fluid hidden-xs">
+      <div id="topicmap" class="topicmap col-md-8"></div>
+    </section>
+  </div>
+  <div id="doubancrawler" class="wrapper shadow">
+    <section class="row container-fluid"><span class="col-md-4"><img src="images/douban.jpg"></span><span class="col-md-8">
+        <article>
+          <h1>Douban Reading Crawler</h1>
+          <p>Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.</p>
+          <p>It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.</p><a href="https://github.com/anonymous-slave/doubanCrawler" target="_blank" class="btn-lg btn-success">View on Github</a>
+        </article></span></section>
+  </div>
+  <div id="color3d" class="wrapper">
+    <section class="row container-fluid"><span class="col-md-5">
+        <article>
+          <h1>Color Cube</h1>
+          <p>This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.</p>
+          <p>When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.</p>
+        </article></span><span class="col-md-7">
+        <div id="colorcanvas" class="hidden-xs"></div><img src="images/color3d.png" class="visible-xs img-responsive"></span></section>
+  </div>
+  <div class="container-fluid navbar-bottom footer">
+    <h3>Copyright &copy; 2016 Jinghao Zhao</h3>
+  </div>
+  <script src="js/TweenLite.min.js"></script>
   <script src="js/EasePack.min.js"></script>
-  <script src="js/rAF.js"></script>
-  <script src="js/demo-3.js"></script>
-  <script src="js/myself.js"></script>
-  <script src="js/zhangyangTriangle.js"></script>
+  <!--<script src="js/rAF.js"></script>-->
+  <!--<script src="js/rAF.js"></script>--><script src="js/demo-3.js"></script>
+  <script src="js/dealCsv.js"></script>
 </body></html>

@@ -3,6 +3,49 @@
     src:url('../fonts/raleway.ttf');
 }
 
+body {
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+}
+
+@media screen and (max-width: 768px) {
+    .blur{
+        background:rgba(200, 200, 200, 0.7);
+    }
+}
+/*整页通用*/
+a:hover{
+    text-decoration:none;
+}
+
+a:visited{
+    text-decoration:none;
+}
+div.shadow
+{
+    background:#E9E9E9;
+}
+
+h1{
+    font-weight: 900;
+    text-align: center;
+}
+.wrapper {
+    padding: 75px 20px 70px 20px;
+
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    text-align: center;
+}
+.row {
+    width: 100%;
+    max-width: 980px;
+    min-width: 320px;
+    margin: 20px auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+/*首页第一个页面*/
 .mainName {
     font-family: "Raleway","Segoe UI",Arial,sans-serif;
     font-size: 80px;
@@ -29,6 +72,7 @@
     text-align:center;
 }
 .icon {
+    margin: 20px;
     font-size: 20px;
     color: #ffffff;
     text-align:center;
@@ -42,15 +86,10 @@
     text-decoration:none;
 }
 
-.black {
-    color: #000000;
-}
 
 .middle{
     margin-left: auto;
     margin-right: auto;
-    position:relative;
-    z-index:2;
 }
 
 #large-header {
@@ -65,8 +104,82 @@
     z-index:1
 }
 
+article.information {
+    margin-top: 10%;
+    margin-bottom: 30%;
+    height: 10%;
+    text-align: center;
+}
+div.information{
+    padding: 75px 20px 70px 20px;
+    position:relative;
+    z-index:2;
+}
 
-/*------------------------------------------------------------------------------------------*/
+/*Bio*/
+
+#Bio {
+    text-align: left;
+}
+#biophoto {
+    width: 100%;
+    max-width: 400px;
+}
+
+.bio-nav {
+    padding: 10px;
+    width:70%;
+    max-width: 980px;
+}
+
+/*Projects*/
+
+/*acemap*/
+#acemap{
+    background: url("../images/Information_Security.jpg");
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+.topicmap {
+    position: relative;
+    left: -100px;
+
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+    height: 600px;
+
+}
+
+/*color3d*/
+.color3d {
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    height: 400px;
+}
+
+#color3d {
+    padding: 20px ;
+}
+#colorcanvas{
+    position: relative;
+    top:-40px;
+}
+
+/*footer*/
+.footer {
+    background-color: #adadad;
+    height: 80px;
+
+    font-size: 16px;
+    text-align: center;
+    color:white;
+}
+
+
+/*--------------------------------------html5 test ----------------------------------------------------*/
 .zoomimg {
     background: white;
     border: 1px solid #bfbfbf;
@@ -109,12 +222,7 @@
     text-align: center;
 }
 
-/*canvas{*/
-    /*border: 2px double #000;*/
-/*}*/
-
-.blur{
-    width:100%;
-    height: 648px;
-    background:transparent url(../images/blur.png);
+.test {
+    background-image: url(../images/blur.png);
+    background-repeat: repeat-x;
 }

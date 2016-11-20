@@ -1,9 +1,9 @@
 doctype
 
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="imagetoolbar" content="no" />
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
@@ -14,21 +14,16 @@ block vars
 title Zhaojh|#{title}
 
 <script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/plotly-gl3d.js"></script>
+
 </head>
 body(id="top")
     block content
-    //block footer
-        div(style="background-image: url('images/background.jpg');").container-fluid.navbar-bottom
-            div.pull-right
-                p(style="font-size: 16px;color:white;").fl_right <br>Copyright &copy; 2016 Jinghao Zhao
+    block footer
+        div.container-fluid.navbar-bottom.footer
+            h3 Copyright &copy; 2016 Jinghao Zhao
 
+    block script
 
-
-    <script src="js/TweenLite.min.js"></script>
-    <script src="js/EasePack.min.js"></script>
-    <script src="js/rAF.js"></script>
-    <script src="js/demo-3.js"></script>
-    <script src="js/myself.js"></script>
-    <script src="js/zhangyangTriangle.js"></script>
 </html>

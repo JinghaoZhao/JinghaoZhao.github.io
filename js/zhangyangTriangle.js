@@ -1,6 +1,6 @@
 $(function () {
-    var canvasHeight = window.innerHeight, canvasWidth = window.innerWidth, nodesPerLine = 10,
-        lines = 10, threshold = 140, maxDrift = 40, maxDim = 30, baseColor = "#065688", ratio = 2;
+    var canvasHeight = window.innerHeight, canvasWidth = window.innerWidth, nodesPerLine = 4,
+        lines = 4, threshold = 140, maxDrift = 140, maxDim = 30, baseColor = "#065688", ratio = 10;
     var canvas = $(document).find("#kinetic-bg>canvas"), ctx;
     try {
         ctx = canvas[0].getContext("2d");
@@ -32,7 +32,7 @@ $(function () {
         this.dim = Math.random() * maxDim;//颜色明暗变化率
         this.dimdir = Math.round(Math.random()) * 2 - 1;//颜色明暗变化方向,+-1
         this.dimv = this.v * maxDim / maxDrift * 2;
-        this.oc = colors[Math.round(Math.random())]
+        this.oc = colors[Math.round(Math.random())];
         this.c = shadeColor(this.oc, this.dim);//origin color
     }
 

@@ -9,27 +9,83 @@ block vars
 
 block content
 
-    script(type='text/javascript').
-        $(function () {
-            $('[data-toggle="popover"]').popover()
-        })
     div.embed-responsive#large-header
         div.canvas
             canvas#demo-canvas
-        div.middle
-            <br><br><br><br><br><br>
-            h1.mainName Jinghao Zhao
-            br
-            h3.mainins0 ENGINEER & DESIGNER
-            h3.mainins1.text-uppercase To be an observer.
-            h3.mainins1.icon
-                a.icon(href="https://github.com/anonymous-slave") &nbsp;&nbsp;
-                    i.icon-github &nbsp;&nbsp;&nbsp;&nbsp;
-                a.icon(href="http://www.linkedin.com/in/%E7%92%9F%E6%B5%A9-%E8%B5%B5-2aa646b1?trk=nav_responsive_tab_profile")
-                    i.icon-linkedin-sign &nbsp;&nbsp;&nbsp;&nbsp;
-                a.icon(href="http://zhaojinghao.lofter.com/")
-                    i.icon-book &nbsp;&nbsp;&nbsp;&nbsp;
-                a.icon(href="mailto:zhaojinghao1996@gmail.com")
-                    i.icon-envelope &nbsp;&nbsp;&nbsp;&nbsp;
+        div.information
+            article.information
+                h1.mainName Jinghao Zhao
+                br
+                h3.mainins0 ENGINEER & DESIGNER
+                h3.mainins1.text-uppercase To be an observer.
+                span
+                    a.icon(href="https://github.com/anonymous-slave" target="_blank")
+                        i.icon-github
+                    a.icon(href="http://www.linkedin.com/in/%E7%92%9F%E6%B5%A9-%E8%B5%B5-2aa646b1?trk=nav_responsive_tab_profile" target="_blank")
+                        i.icon-linkedin-sign
+                    a.icon(href="http://zhaojinghao.lofter.com/" target="_blank")
+                        i.icon-book
+                    a.icon(href="mailto:zhaojinghao1996@gmail.com")
+                        i.icon-envelope
+    div.wrapper#Bio
+        section.row.container-fluid
+            span.col-md-7
+                article
+                    h1 Bio
+                    p I'm an undergraduate from Shanghai Jiao Tong University,majoring in Electronic Engineering.I'm trying to learn more interesting things and make life colorful and convinent by program.
+                    p I have been learning about website for years and enjoy design the front-end and whole structure of websites by PHP , HTML , CSS and JavaScript.
+                    p I also finish some projects by Java & Python, you can see these projects if you scroll down.
+            span.col-md-4.col-md-push-1
+                img#biophoto.img-responsive.img-rounded(src="images/bio.png")
+    div.wrapper
+        div.btn-group.btn-group-lg.btn-group-justified.bio-nav.middle.hidden-xs
+            a.btn.btn-primary Android App
+            a.btn.btn-success(href="#doubancrawler") Python Crawler
+            a.btn.btn-info(href="#acemap") Web
+            a.btn.btn-warning(href="#color3d") Visualization
+        div.btn-group.btn-group-lg.btn-group-vertical.bio-nav.middle.visible-xs
+            a.btn.btn-primary Android App
+            a.btn.btn-success(href="#doubancrawler") Python Crawler
+            a.btn.btn-info(href="#acemap") Web
+            a.btn.btn-warning(href="#color3d") Visualization
 
 
+    h1 Projects
+    hr
+    div.wrapper#acemap
+        section.row.blur.container-fluid
+            article.col-md-8
+                h1 Acemap
+                p It is a special scholar search engine which can show you the academic map, as well as the topics information.This search engine & recommendation system can help you to find the best paper you want.
+                br
+                a.btn-lg.btn-info(href="//acemap.sjtu.edu.cn" target="_blank") Go To Acemap
+        section.row.container-fluid.hidden-xs
+            div#topicmap.topicmap.col-md-8
+    div.wrapper.shadow#doubancrawler
+        section.row.container-fluid
+            span.col-md-4
+                img(src="images/douban.jpg")
+            span.col-md-8
+                article
+                    h1 Douban Reading Crawler
+                    p Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.
+                    p It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.
+                    a.btn-lg.btn-success(href="https://github.com/anonymous-slave/doubanCrawler" target="_blank") View on Github
+    div.wrapper#color3d
+        section.row.container-fluid
+            span.col-md-5
+                article
+                    h1 Color Cube
+                    p This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.
+                    p When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.
+            span.col-md-7
+                div#colorcanvas.hidden-xs
+                img.visible-xs.img-responsive(src="images/color3d.png")
+
+block script
+    <script src="js/TweenLite.min.js"></script>
+    <script src="js/EasePack.min.js"></script>
+    //<script src="js/rAF.js"></script>
+    //<script src="js/rAF.js"></script>
+    <script src="js/demo-3.js"></script>
+    <script src="js/dealCsv.js"></script>

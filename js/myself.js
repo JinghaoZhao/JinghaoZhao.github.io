@@ -1,7 +1,3 @@
-/**
- * Created by MyPC on 2016/4/26.
- */
-
 var canvas = document.getElementById("mycanvas").getContext("2d") ;
 
 canvas.shadowOffsetX = 100;
@@ -15,3 +11,6 @@ canvas.fillRect(0,0,100,100);
 canvas.clearRect(25,25,50,50);
 canvas.strokeRect(25,25,50,50);
 
+
+//$("#a").show().animate({left:200px}) ;
+$("#a").show().slideDown("slow");
