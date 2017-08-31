@@ -14,3 +14,6 @@ canvas.strokeRect(25,25,50,50);
 
 //$("#a").show().animate({left:200px}) ;
 $("#a").show().slideDown("slow");
+
+
+var cars = new Array['vw','wolve'];

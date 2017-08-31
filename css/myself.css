@@ -94,7 +94,7 @@ h1{
 
 #large-header {
     background-image: url('../images/background.jpg');
-    background-size:cover;
+    background-size:100% 100%;
     clear:both;
 }
 
@@ -139,6 +139,20 @@ div.information{
     background: url("../images/Information_Security.jpg");
     background-position: right;
     background-repeat: no-repeat;
+}
+
+
+/*kpimap*/
+#kpimap{
+    background: url("../images/kpimap.png");
+    background-size: cover;
+}
+
+#kpimap article{
+    opacity: 0.85;
+    background-color: gray;
+    font-weight: 600;
+    color: white;
 }
 
 .topicmap {
