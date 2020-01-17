@@ -5,10 +5,82 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 <link rel="stylesheet" href="css/myself.css" type="text/css" />
-<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" /><title>Zhaojh|Homepage</title><script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
+<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+<title>Zhaojh|Homepage</title><script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/plotly-gl3d.js"></script>
-</head><body id="top"><div id="large-header" class="embed-responsive"><div class="canvas"><canvas id="demo-canvas"></canvas></div><div class="information"><article class="information"><h1 class="mainName">Jinghao Zhao</h1><br><h3 class="mainins0">RESEARCHER & DESIGNER</h3><h3 class="mainins1 text-uppercase">To be an observer.</h3><span><a href="https://github.com/anonymous-slave" target="_blank" class="icon"><i class="icon-github"></i></a><a href="https://www.linkedin.com/in/jinghao-zhao-2aa646b1/" target="_blank" class="icon"><i class="icon-linkedin-sign"></i></a><a href="mailto:zhaojinghao1996@gmail.com" class="icon"><i class="icon-envelope"></i></a></span></article></div></div><div id="Bio" class="wrapper"><section class="row container-fluid"><span class="col-md-7"><article><h1>Bio</h1><p>I'm a Ph.D. student in Computer Science at University of California, Los Angeles, advised by Prof. Songwu Lu. I am a member of the Wireless Networking Group (WiNG) at UCLA. I got my BS degree in Electronic Engineering from Shanghai Jiao Tong University (SJTU).</p><p>I have been learning about web for years and enjoy design the websites by PHP , HTML , CSS and JavaScript.</p><p>I also finish some projects by Java & Python, you can see these projects if you scroll down.</p></article></span><span class="col-md-4 col-md-push-1"><img id="biophoto" src="images/bio.png" class="img-responsive img-rounded"></span></section></div><div class="wrapper"><div class="btn-group btn-group-lg btn-group-justified bio-nav middle hidden-xs"><a class="btn btn-primary">Android App</a><a href="#doubancrawler" class="btn btn-success">Python Crawler</a><a href="#acemap" class="btn btn-info">Web</a><a href="#color3d" class="btn btn-warning">Visualization</a></div><div class="btn-group btn-group-lg btn-group-vertical bio-nav middle visible-xs"><a class="btn btn-primary">Android App</a><a href="#doubancrawler" class="btn btn-success">Python Crawler</a><a href="#acemap" class="btn btn-info">Web</a><a href="#color3d" class="btn btn-warning">Visualization</a></div></div><h1>Projects</h1><hr><div id="acemap" class="wrapper"><section class="row blur container-fluid"><article class="col-md-8"><h1>Acemap</h1><p>It is a special scholar search engine which can show you the academic map, as well as the topics information.This search engine & recommendation system can help you to find the best paper you want.</p><br><a href="//acemap.sjtu.edu.cn" target="_blank" class="btn-lg btn-info">Go To Acemap</a></article></section><section class="row container-fluid hidden-xs"><div id="topicmap" class="topicmap col-md-8"></div></section></div><div id="kpimap" class="wrapper"><section class="row blur container-fluid"><span class="col-md-5"><!--img.img-circle(src="images/kpimap.png" width="500px")--><!--iframe(src="http://34.213.149.155/test/#" width="800px" height="400px")--></span><article class="col-md-7"><h1>Network KPI Map</h1><p>Through the KPI Map, you kan easily figure out the basic information of the network situation in your position. Knowing the network by collect statistics, cluster and change to heat mode. This Project is one part of the MobileInsight in WING Lab at UCLA.</p><br><a href="http://knowledge-map.xyz" target="_blank" class="btn-lg btn-info">Go To Network Map</a></article></section></div><div id="doubancrawler" class="wrapper shadow"><section class="row container-fluid"><span class="col-md-4"><img src="images/douban.jpg"></span><span class="col-md-8"><article><h1>Douban Reading Crawler</h1><p>Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.</p><p>It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.</p><a href="https://github.com/anonymous-slave/doubanCrawler" target="_blank" class="btn-lg btn-success">View on Github</a></article></span></section></div><div id="color3d" class="wrapper"><section class="row container-fluid"><span class="col-md-5"><article><h1>Color Cube</h1><p>This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.</p><p>When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.</p></article></span><span class="col-md-7"><div id="colorcanvas" class="hidden-xs"></div><img src="images/color3d.png" class="visible-xs img-responsive"></span></section></div><div class="container-fluid navbar-bottom footer"><h3>Copyright &copy; 2016-2019 Jinghao Zhao</h3></div><script src="js/TweenLite.min.js"></script>
-<script src="js/EasePack.min.js"></script>
-<script src="js/demo-3.js"></script>
-<script src="js/dealCsv.js"></script></body></html>
+</head>
+<body id="top">
+  <div id="large-header" class="embed-responsive">
+    <div class="canvas">
+      <canvas id="demo-canvas"></canvas>
+    </div>
+    <div class="information">
+      <article class="information">
+        <h1 class="mainName">Jinghao Zhao</h1><br>
+        <h3 class="mainins0">RESEARCHER & DESIGNER</h3>
+        <h3 class="mainins1 text-uppercase">To be an observer.</h3><span><a href="https://github.com/anonymous-slave" target="_blank" class="icon"><i class="icon-github"></i></a><a href="https://www.linkedin.com/in/jinghao-zhao-2aa646b1/" target="_blank" class="icon"><i class="icon-linkedin-sign"></i></a><a href="mailto:zhaojinghao1996@gmail.com" class="icon"><i class="icon-envelope"></i></a></span>
+      </article>
+    </div>
+  </div>
+  <div id="Bio" class="wrapper">
+    <section class="row container-fluid"><span class="col-md-7">
+        <article>
+          <h1>Bio</h1>
+          <p>I'm a Ph.D. student in Computer Science at University of California, Los Angeles, advised by Prof. Songwu Lu. I am a member of the Wireless Networking Group (WiNG) at UCLA. I got my BS degree in Electronic Engineering from Shanghai Jiao Tong University (SJTU).</p>
+          <p>My research interests include wireless networks, mobile systems, mobile edge computing, network security. I have been learning about web for years and enjoy design the web.</p>
+          <p>I also finish some projects by Java & Python, you can see these projects if you scroll down.</p>
+        </article></span><span class="col-md-4 col-md-push-1"><img id="biophoto" src="images/bio.png" class="img-responsive img-rounded"></span></section>
+  </div>
+  <div class="wrapper">
+    <div class="btn-group btn-group-lg btn-group-justified bio-nav middle hidden-xs"><a class="btn btn-primary">Android App</a><a href="#doubancrawler" class="btn btn-success">Python Crawler</a><a href="#acemap" class="btn btn-info">Web</a><a href="#color3d" class="btn btn-warning">Visualization</a></div>
+    <div class="btn-group btn-group-lg btn-group-vertical bio-nav middle visible-xs"><a class="btn btn-primary">Android App</a><a href="#doubancrawler" class="btn btn-success">Python Crawler</a><a href="#acemap" class="btn btn-info">Web</a><a href="#color3d" class="btn btn-warning">Visualization</a></div>
+  </div>
+  <h1>Projects</h1>
+  <hr>
+  <div id="acemap" class="wrapper">
+    <section class="row blur container-fluid">
+      <article class="col-md-8">
+        <h1>Acemap</h1>
+        <p>It is a special scholar search engine which can show you the academic map, as well as the topics information.This search engine & recommendation system can help you to find the best paper you want.</p><br><a href="//acemap.sjtu.edu.cn" target="_blank" class="btn-lg btn-info">Go To Acemap</a>
+      </article>
+    </section>
+    <section class="row container-fluid hidden-xs">
+      <div id="topicmap" class="topicmap col-md-8"></div>
+    </section>
+  </div>
+  <div id="kpimap" class="wrapper">
+    <section class="row blur container-fluid"><span class="col-md-5">
+        <!--img.img-circle(src="images/kpimap.png" width="500px")-->
+        <!--iframe(src="http://34.213.149.155/test/#" width="800px" height="400px")--></span>
+      <article class="col-md-7">
+        <h1>Network Knowledge Map</h1>
+        <p>Through the Knowledge Map, you kan easily figure out the basic information of the network situation in your position. Knowing the network by collect statistics, cluster and change to heat mode. This Project is one part of the MobileInsight in WING Lab at UCLA.</p><br><a href="http://knowledge-map.xyz" target="_blank" class="btn-lg btn-info">Go To Network Map</a>
+      </article>
+    </section>
+  </div>
+  <div id="doubancrawler" class="wrapper shadow">
+    <section class="row container-fluid"><span class="col-md-4"><img src="images/douban.jpg"></span><span class="col-md-8">
+        <article>
+          <h1>Douban Reading Crawler</h1>
+          <p>Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.</p>
+          <p>It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.</p><a href="https://github.com/anonymous-slave/doubanCrawler" target="_blank" class="btn-lg btn-success">View on Github</a>
+        </article></span></section>
+  </div>
+  <div id="color3d" class="wrapper">
+    <section class="row container-fluid"><span class="col-md-5">
+        <article>
+          <h1>Color Cube</h1>
+          <p>This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.</p>
+          <p>When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.</p>
+        </article></span><span class="col-md-7">
+        <div id="colorcanvas" class="hidden-xs"></div><img src="images/color3d.png" class="visible-xs img-responsive"></span></section>
+  </div>
+  <div class="container-fluid navbar-bottom footer">
+    <h3>Copyright &copy; 2016-2019 Jinghao Zhao</h3>
+  </div>
+  <script src="js/TweenLite.min.js"></script>
+  <script src="js/EasePack.min.js"></script>
+  <script src="js/demo-3.js"></script>
+  <script src="js/dealCsv.js"></script>
+</body></html>
