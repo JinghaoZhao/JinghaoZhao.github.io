@@ -19,9 +19,9 @@ block content
                 h3.mainins0 RESEARCHER & DESIGNER
                 h3.mainins1.text-uppercase To be an observer.
                 span
-                    a.icon(href="https://github.com/anonymous-slave" target="_blank")
+                    a.icon(href="https://github.com/JinghaoZhao" target="_blank")
                         i.icon-github
-                    a.icon(href="https://www.linkedin.com/in/jinghao-zhao-2aa646b1/" target="_blank")
+                    a.icon(href="www.linkedin.com/in/jinghaozhao/" target="_blank")
                         i.icon-linkedin-sign
                     a.icon(href="mailto:zhaojinghao1996@gmail.com")
                         i.icon-envelope
@@ -30,25 +30,45 @@ block content
             span.col-md-7
                 article
                     h1 Bio
-                    p I'm a Ph.D. student in Computer Science at University of California, Los Angeles, advised by Prof. Songwu Lu. I am a member of the Wireless Networking Group (WiNG) at UCLA. I got my BS degree in Electronic Engineering from Shanghai Jiao Tong University (SJTU).
+                    p I'm a Ph.D. candidate in Computer Science at University of California, Los Angeles, advised by Prof. Songwu Lu. I am a member of the Wireless Networking Group (WiNG) at UCLA. I got my BS degree in Electronic Engineering from Shanghai Jiao Tong University (SJTU).
                     p My research interests include wireless networks, mobile systems, mobile edge computing and network security. I have been learning about web for years and enjoy design the web. I also finish some projects by Java & Python, you can see these projects if you scroll down.
             span.col-md-4.col-md-push-1
                 img#biophoto.img-responsive.img-rounded(src="images/bio.png")
     div.wrapper
         div.btn-group.btn-group-lg.btn-group-justified.bio-nav.middle.hidden-xs
-            a.btn.btn-primary Android App
-            a.btn.btn-success(href="#doubancrawler") Python Crawler
+            a.btn.btn-primary(href="#flora") LTE/5G Platform
+            a.btn.btn-success(href="#lrp") Mobile VR
             a.btn.btn-info(href="#acemap") Web
-            a.btn.btn-warning(href="#color3d") Visualization
+            a.btn.btn-warning(href="#kpimap") Visualization
         div.btn-group.btn-group-lg.btn-group-vertical.bio-nav.middle.visible-xs
-            a.btn.btn-primary Android App
-            a.btn.btn-success(href="#doubancrawler") Python Crawler
+            a.btn.btn-primary(href="#flora") LTE/5G Platform
+            a.btn.btn-success(href="#lrp") Mobile VR
             a.btn.btn-info(href="#acemap") Web
-            a.btn.btn-warning(href="#color3d") Visualization
+            a.btn.btn-warning(href="#kpimap") Visualization
 
 
     h1 Projects
     hr
+    div.wrapper#flora
+        section.row.container-fluid
+            span.col-md-8
+                img(src="images/flora_intro.png" style="width:100%")
+            span.col-md-4
+                article
+                    h1 Flora
+                    p Flora (Flexible Mobile Network Platform) is a flexible software-defined 4G LTE/5G system without commodity SIM cards, communication chipsets, or dedicated infrastructure equipment.
+                    a.btn-lg.btn-success(href="https://project-flora.github.io/Flora/" target="_blank") View on Github
+
+    div.wrapper.shadow#lrp
+        section.row.container-fluid
+            span.col-md-12
+                img(src="images/lrp.png" style="width:100%")
+            span.col-md-12
+                article
+                    h1 Mobile VR System with LTE Latency Reduction
+                    p <i><strong>Device-Based LTE Latency Reduction at the Application Layer</strong></i> to appear in the 18th USENIX Symposium on Networked Systems Design and Implementation (NSDI '21)
+                    //a.btn-lg.btn-success(href="https://project-flora.github.io/Flora/" target="_blank") View on Github
+
     div.wrapper#acemap
         section.row.blur.container-fluid
             article.col-md-8
@@ -69,16 +89,16 @@ block content
                 p Through the Knowledge Map, you kan easily figure out the basic information of the network situation in your position. Knowing the network by collect statistics, cluster and change to heat mode. This Project is one part of the MobileInsight in WING Lab at UCLA.
                 br
                 a.btn-lg.btn-info(href="http://knowledge-map.xyz" target="_blank") Go To Network Map
-    div.wrapper.shadow#doubancrawler
-        section.row.container-fluid
-            span.col-md-4
-                img(src="images/douban.jpg")
-            span.col-md-8
-                article
-                    h1 Douban Reading Crawler
-                    p Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.
-                    p It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.
-                    a.btn-lg.btn-success(href="https://github.com/anonymous-slave/doubanCrawler" target="_blank") View on Github
+    //div.wrapper.shadow#doubancrawler
+    //    section.row.container-fluid
+    //        span.col-md-4
+    //            img(src="images/douban.jpg")
+    //        span.col-md-8
+    //            article
+    //                h1 Douban Reading Crawler
+    //                p Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.
+    //                p It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.
+    //                a.btn-lg.btn-success(href="https://github.com/anonymous-slave/doubanCrawler" target="_blank") View on Github
     div.wrapper#color3d
         section.row.container-fluid
             span.col-md-5
