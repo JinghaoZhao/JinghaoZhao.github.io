@@ -1,0 +1,242 @@
+@font-face {
+    font-family: "Raleway";
+    src:url('../fonts/raleway.ttf');
+}
+
+body {
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+}
+
+@media screen and (max-width: 768px) {
+    .blur{
+        background:rgba(200, 200, 200, 0.7);
+    }
+}
+/*整页通用*/
+a:hover{
+    text-decoration:none;
+}
+
+a:visited{
+    text-decoration:none;
+}
+div.shadow
+{
+    background:#E9E9E9;
+}
+
+h1{
+    font-weight: 900;
+    text-align: center;
+}
+.wrapper {
+    padding: 75px 20px 70px 20px;
+
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    text-align: center;
+}
+.row {
+    width: 100%;
+    max-width: 980px;
+    min-width: 320px;
+    margin: 20px auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+/*首页第一个页面*/
+.mainName {
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+    font-size: 80px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 1);
+    text-align:center;
+}
+
+.mainins0 {
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    Letter-spacing:2px;
+    color: #ffffff;
+    text-align:center;
+}
+
+.mainins1 {
+    font-family: "Raleway","Segoe UI",Arial,sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    Letter-spacing:2px;
+    color: #ffffff;
+    text-align:center;
+}
+.icon {
+    margin: 20px;
+    font-size: 20px;
+    color: #ffffff;
+    text-align:center;
+}
+
+.icon :hover{
+    text-decoration:none;
+}
+
+.icon :visited{
+    text-decoration:none;
+}
+
+
+.middle{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#large-header {
+    background-image: url('../images/background.jpg');
+    background-size:100% 100%;
+    clear:both;
+}
+
+
+.canvas {
+    position:absolute;
+    z-index:1
+}
+
+article.information {
+    margin-top: 10%;
+    margin-bottom: 30%;
+    height: 10%;
+    text-align: center;
+}
+div.information{
+    padding: 75px 20px 70px 20px;
+    position:relative;
+    z-index:2;
+}
+
+/*Bio*/
+
+#Bio {
+    text-align: left;
+}
+#biophoto {
+    width: 100%;
+    max-width: 400px;
+}
+
+.bio-nav {
+    padding: 10px;
+    width:70%;
+    max-width: 980px;
+}
+
+/*Projects*/
+
+/*acemap*/
+#acemap{
+    background: url("../images/Information_Security.jpg");
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+
+/*kpimap*/
+#kpimap{
+    background: url("../images/kpimap.png");
+    background-size: cover;
+}
+
+#kpimap article{
+    opacity: 0.85;
+    background-color: gray;
+    font-weight: 600;
+    color: white;
+}
+
+.topicmap {
+    position: relative;
+    left: -100px;
+
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+    height: 600px;
+
+}
+
+/*color3d*/
+.color3d {
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    height: 400px;
+}
+
+#color3d {
+    padding: 20px ;
+}
+#colorcanvas{
+    position: relative;
+    top:-40px;
+}
+
+/*footer*/
+.footer {
+    background-color: #adadad;
+    height: 80px;
+
+    font-size: 16px;
+    text-align: center;
+    color:white;
+}
+
+
+/*--------------------------------------html5 test ----------------------------------------------------*/
+.zoomimg {
+    background: white;
+    border: 1px solid #bfbfbf;
+    display: block;
+    float: left;
+    height: 125px;
+    width: 125px;
+    margin: 0 10px 0 0;
+    padding: 5px;
+    position: relative;
+    -webkit-box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    -moz-box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    -o-transition: all 1s ease-in-out;
+}
+
+.zoomimg:hover{
+    background: #ff414b;
+    border: 1px solid #bf1211;
+    -webkit-transform: rotate(360deg) scale(2);
+    -moz-transform: rotate(0deg) scale(2);
+    -o-transform: rotate(0deg) scale(2);
+    -ms-transform: rotate(0deg) scale(2);
+    transform: rotate(360deg) scale(2) skew(0deg,0deg);
+    transform-origin: center;
+    z-index: 2;
+}
+
+.zoomimg:hover:after{
+    background: #343eff;
+    border: 10px solid #1e3abf;
+    content: attr(alt);
+    display: block;
+    position: absolute;
+    bottom: -45px;
+    left: 0px;
+    z-index: 2;
+    text-align: center;
+}
+
+.test {
+    background-image: url(../images/blur.png);
+    background-repeat: repeat-x;
+}

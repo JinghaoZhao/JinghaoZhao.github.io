@@ -1,0 +1,56 @@
+//
+   Created by MyPC on 2016/4/26.
+
+extends _base
+
+block vars
+    -var title = "HTML"
+
+block content
+    <br><br><br><br>
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    img.zoomimg(src="images/background.jpg",alt="Hello World")
+    <br><br><br><br><br><br><br><br>
+    br.clean
+    input(type="color")
+    progress(value="66",max="100")
+    input(type="search" placeholder="Hello")
+
+    canvas#mycanvas(width="80px",height="80px")
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+    div
+        div#kinetic-bg.canvas
+            canvas
+        div.middle.blur
+            <br><br><br><br><br><br>
+            h1.mainName Jinghao Zhao
+            br
+            h3.mainins0 ENGINEER & DESIGNER
+            h3.mainins1.text-uppercase To be an observer.
+            h3.mainins1.icon
+                a.icon(href="https://github.com/anonymous-slave") &nbsp;&nbsp;
+                    i.icon-github &nbsp;&nbsp;&nbsp;&nbsp;
+                a.icon(href="http://www.linkedin.com/in/%E7%92%9F%E6%B5%A9-%E8%B5%B5-2aa646b1?trk=nav_responsive_tab_profile")
+                    i.icon-linkedin-sign &nbsp;&nbsp;&nbsp;&nbsp;
+                a.icon(href="http://zhaojinghao.lofter.com/")
+                    i.icon-book &nbsp;&nbsp;&nbsp;&nbsp;
+                a.icon(href="mailto:zhaojinghao1996@gmail.com")
+                    i.icon-envelope &nbsp;&nbsp;&nbsp;&nbsp;
+
+
+block script
+    <script src="js/TweenLite.min.js"></script>
+    <script src="js/EasePack.min.js"></script>
+    <script src="js/rAF.js"></script>
+    <script src="js/demo-3.js"></script>
+    <script src="js/myself.js"></script>
+    <script src="js/zhangyangTriangle.js"></script>
+    <script src="js/dealCsv.js"></script>

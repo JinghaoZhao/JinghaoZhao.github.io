@@ -1,0 +1,117 @@
+//
+   Created by MyPC on 2016/4/24.
+
+
+extends _base
+
+block vars
+    -var title = "Homepage"
+
+block content
+
+    div.embed-responsive#large-header
+        div.canvas
+            canvas#demo-canvas
+        div.information
+            article.information
+                h1.mainName Jinghao Zhao
+                br
+                h3.mainins0 RESEARCHER & DESIGNER
+                h3.mainins1.text-uppercase To be an observer.
+                span
+                    a.icon(href="https://github.com/JinghaoZhao" target="_blank")
+                        i.icon-github
+                    a.icon(href="www.linkedin.com/in/jinghaozhao/" target="_blank")
+                        i.icon-linkedin-sign
+                    a.icon(href="mailto:zhaojinghao1996@gmail.com")
+                        i.icon-envelope
+    div.wrapper#Bio
+        section.row.container-fluid
+            span.col-md-7
+                article
+                    h1 Bio
+                    p I'm a Ph.D. candidate in Computer Science at University of California, Los Angeles, advised by Prof. Songwu Lu. I am a member of the Wireless Networking Group (WiNG) at UCLA. I got my BS degree in Electronic Engineering from Shanghai Jiao Tong University (SJTU).
+                    p My research interests include wireless networks, mobile systems, mobile edge computing and network security. I have been learning about web for years and enjoy design the web. I also finish some projects by Java & Python, you can see these projects if you scroll down.
+            span.col-md-4.col-md-push-1
+                img#biophoto.img-responsive.img-rounded(src="images/bio.png")
+    div.wrapper
+        div.btn-group.btn-group-lg.btn-group-justified.bio-nav.middle.hidden-xs
+            a.btn.btn-primary(href="#flora") LTE/5G Platform
+            a.btn.btn-success(href="#lrp") Mobile VR
+            a.btn.btn-info(href="#acemap") Web
+            a.btn.btn-warning(href="#kpimap") Visualization
+        div.btn-group.btn-group-lg.btn-group-vertical.bio-nav.middle.visible-xs
+            a.btn.btn-primary(href="#flora") LTE/5G Platform
+            a.btn.btn-success(href="#lrp") Mobile VR
+            a.btn.btn-info(href="#acemap") Web
+            a.btn.btn-warning(href="#kpimap") Visualization
+
+
+    h1 Projects
+    hr
+    div.wrapper#flora
+        section.row.container-fluid
+            span.col-md-8
+                img(src="images/flora_intro.png" style="width:100%")
+            span.col-md-4
+                article
+                    h1 Flora
+                    p Flora (Flexible Mobile Network Platform) is a flexible software-defined 4G LTE/5G system without commodity SIM cards, communication chipsets, or dedicated infrastructure equipment.
+                    a.btn-lg.btn-success(href="https://project-flora.github.io/Flora/" target="_blank") View on Github
+
+    div.wrapper.shadow#lrp
+        section.row.container-fluid
+            span.col-md-12
+                img(src="images/LRP.png" style="width:100%")
+            span.col-md-12
+                article
+                    h1 Mobile VR System with LTE Latency Reduction
+                    p <i><strong>Device-Based LTE Latency Reduction at the Application Layer</strong></i> to appear in the 18th USENIX Symposium on Networked Systems Design and Implementation (NSDI '21)
+                    //a.btn-lg.btn-success(href="https://project-flora.github.io/Flora/" target="_blank") View on Github
+
+    div.wrapper#acemap
+        section.row.blur.container-fluid
+            article.col-md-8
+                h1 Acemap
+                p It is a special scholar search engine which can show you the academic map, as well as the topics information.This search engine & recommendation system can help you to find the best paper you want.
+                br
+                a.btn-lg.btn-info(href="//acemap.sjtu.edu.cn" target="_blank") Go To Acemap
+        section.row.container-fluid.hidden-xs
+            div#topicmap.topicmap.col-md-8
+
+    div.wrapper#kpimap
+        section.row.blur.container-fluid
+            span.col-md-5
+                //img.img-circle(src="images/kpimap.png" width="500px")
+                //iframe(src="http://34.213.149.155/test/#" width="800px" height="400px")
+            article.col-md-7
+                h1 Network Knowledge Map
+                p Through the Knowledge Map, you kan easily figure out the basic information of the network situation in your position. Knowing the network by collect statistics, cluster and change to heat mode. This Project is one part of the MobileInsight in WING Lab at UCLA.
+                br
+                a.btn-lg.btn-info(href="http://knowledge-map.xyz" target="_blank") Go To Network Map
+    //div.wrapper.shadow#doubancrawler
+    //    section.row.container-fluid
+    //        span.col-md-4
+    //            img(src="images/douban.jpg")
+    //        span.col-md-8
+    //            article
+    //                h1 Douban Reading Crawler
+    //                p Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.
+    //                p It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.
+    //                a.btn-lg.btn-success(href="https://github.com/anonymous-slave/doubanCrawler" target="_blank") View on Github
+    div.wrapper#color3d
+        section.row.container-fluid
+            span.col-md-5
+                article
+                    h1 Color Cube
+                    p This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.
+                    p When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.
+            span.col-md-7
+                div#colorcanvas.hidden-xs
+                img.visible-xs.img-responsive(src="images/color3d.png")
+
+block script
+    <script src="js/TweenLite.min.js"></script>
+    <script src="js/EasePack.min.js"></script>
+    <script src="js/demo-3.js"></script>
+    <script src="js/dealCsv.js"></script>
