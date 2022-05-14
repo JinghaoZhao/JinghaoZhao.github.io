@@ -17,11 +17,12 @@ block content
                 h1.mainName Jinghao Zhao
                 br
                 h3.mainins0 RESEARCHER & DESIGNER
-                h3.mainins1.text-uppercase To be an observer.
+                h3
+                //h3.mainins1.text-uppercase To be an observer.
                 span
                     a.icon(href="https://github.com/JinghaoZhao" target="_blank")
                         i.icon-github
-                    a.icon(href="www.linkedin.com/in/jinghaozhao/" target="_blank")
+                    a.icon(href="https://www.linkedin.com/in/jinghaozhao/" target="_blank")
                         i.icon-linkedin-sign
                     a.icon(href="mailto:zhaojinghao1996@gmail.com")
                         i.icon-envelope
@@ -31,7 +32,7 @@ block content
                 article
                     h1 Bio
                     p I'm a Ph.D. candidate in Computer Science at University of California, Los Angeles, advised by Prof. Songwu Lu. I am a member of the Wireless Networking Group (WiNG) at UCLA. I got my BS degree in Electronic Engineering from Shanghai Jiao Tong University (SJTU).
-                    p My research interests include wireless networks, mobile systems, mobile edge computing and network security. I have been learning about web for years and enjoy design the web. I also finish some projects by Java & Python, you can see these projects if you scroll down.
+                    p My research interests include wireless networks, mobile systems, mobile edge computing and network security.
             span.col-md-4.col-md-push-1
                 img#biophoto.img-responsive.img-rounded(src="images/bio.png")
     div.wrapper
@@ -47,8 +48,29 @@ block content
             a.btn.btn-warning(href="#kpimap") Visualization
 
 
-    h1 Projects
+    h1 Publications & Projects
     hr
+
+    div.wrapper#seed
+        section.row.container-fluid
+            span.col-md-6
+                img(src="images/SIMInsight.png" style="width:100%")
+            span.col-md-6
+                article
+                    h1 SEED: A SIM-Based Solution to 5G Failures
+                    p We devise a novel SIM-based solution to 5G failure diagnosis and handling. Our work <i>"SEED: A SIM-Based Solution to 5G Failures"</i> to appear in ACM SIGCOMM 2022 Conference &nbsp;
+                        a(href="https://conferences.sigcomm.org/sigcomm/2022/" target="_blank") (SIGCOMM'22)
+
+    div.wrapper.shadow#secureSIM
+        section.row.container-fluid
+            span.col-md-4
+                img(src="images/securesim.png" style="width:80%")
+            span.col-md-8
+                article
+                    h1 SecureSIM
+                    p We uncover new vulnerabilities of the current SIM practice and propose a new solution that offers both authentication and fine-grained access control. Our work <i>"SecureSIM: Rethinking Authentication and Access Control for SIM/eSIM"</i> has been appeared in the 27th Annual International Conference On Mobile Computing And Networking &nbsp;
+                        a(href="https://dl.acm.org/doi/10.1145/3447993.3483254" target="_blank") (MobiCom'21)
+
     div.wrapper#flora
         section.row.container-fluid
             span.col-md-8
@@ -66,7 +88,7 @@ block content
             span.col-md-12
                 article
                     h1 Mobile VR System with LTE Latency Reduction
-                    p <i><strong>Device-Based LTE Latency Reduction at the Application Layer</strong></i> to appear in the 18th USENIX Symposium on Networked Systems Design and Implementation &nbsp;
+                    p <i><strong>Device-Based LTE Latency Reduction at the Application Layer</strong></i> appeared in the 18th USENIX Symposium on Networked Systems Design and Implementation &nbsp;
                         a(href="https://www.usenix.org/conference/nsdi21/presentation/tan") (NSDI '21)
                     //a.btn-lg.btn-success(href="https://project-flora.github.io/Flora/" target="_blank") View on Github
 
