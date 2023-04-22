@@ -37,6 +37,23 @@ h1{
     font-size: 20px;
     text-align: center;
 }
+
+.pubwrapper {
+    padding: 10px 20px 10px 20px;
+    font-family: sans-serif, "Raleway";
+    font-weight: 200;
+    font-size: 18px;
+    text-align: left;
+}
+.papertitle{
+    margin: 10px 0px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #6a6565;
+}
+strong {
+    font-weight: 400;
+}
 .row {
     width: 100%;
     max-width: 980px;

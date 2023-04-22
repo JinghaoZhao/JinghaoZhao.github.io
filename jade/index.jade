@@ -16,15 +16,15 @@ block content
             article.information
                 h1.mainName Jinghao Zhao
                 br
-                h3.mainins0 RESEARCHER & DESIGNER
-                h3
-                //h3.mainins1.text-uppercase To be an observer.
+                h3.papertitle.mainins0 RESEARCHER & DESIGNER
+                h3.papertitle
+                //h3.papertitle.mainins1.text-uppercase To be an observer.
                 span
                     a.icon(href="https://github.com/JinghaoZhao" target="_blank")
                         i.icon-github
                     a.icon(href="https://www.linkedin.com/in/jinghaozhao/" target="_blank")
                         i.icon-linkedin-sign
-                    a.icon(href="mailto:zjhapply@outlook.com")
+                    a.icon(href="mailto:zjh@zhaojinghao.com")
                         i.icon-envelope
                     a.icon(href="docs/Resume-Jinghao.pdf")
                         i.icon-list-ul
@@ -41,18 +41,18 @@ block content
                 img#biophoto.img-responsive.img-rounded(src="images/bio.png")
     div.wrapper
         div.btn-group.btn-group-lg.btn-group-justified.bio-nav.middle.hidden-xs
-            a.btn.btn-primary(href="#seed") LTE/5G Platform
-            a.btn.btn-success(href="#lrp") Mobile VR
-            a.btn.btn-info(href="#acemap") Web
-            a.btn.btn-warning(href="#kpimap") Visualization
+            a.btn.btn-primary(href="#projects") Projects
+            a.btn.btn-success(href="#conf") Conference
+            a.btn.btn-info(href="#journal") Journal
+            //a.btn.btn-warning(href="#kpimap") Visualization
         div.btn-group.btn-group-lg.btn-group-vertical.bio-nav.middle.visible-xs
-            a.btn.btn-primary(href="#seed") LTE/5G Platform
-            a.btn.btn-success(href="#lrp") Mobile VR
-            a.btn.btn-info(href="#acemap") Web
-            a.btn.btn-warning(href="#kpimap") Visualization
+            a.btn.btn-primary(href="#projects") Projects
+            a.btn.btn-success(href="#conf") Conference
+            a.btn.btn-info(href="#journal") Journal
+            //a.btn.btn-warning(href="#kpimap") Visualization
 
 
-    h1 Publications & Projects
+    h1#projects Projects
     hr
 
     div.wrapper#seed
@@ -107,16 +107,99 @@ block content
         section.row.container-fluid.hidden-xs
             div#topicmap.topicmap.col-md-8
 
-    div.wrapper#kpimap
-        section.row.blur.container-fluid
-            span.col-md-5
-                //img.img-circle(src="images/kpimap.png" width="500px")
-                //iframe(src="http://34.213.149.155/test/#" width="800px" height="400px")
-            article.col-md-7
-                h1 Network Knowledge Map
-                p Through the Knowledge Map, you kan easily figure out the basic information of the network situation in your position. Knowing the network by collect statistics, cluster and change to heat mode. This Project is one part of the MobileInsight in WING Lab at UCLA.
-                br
-                a.btn-lg.btn-info(href="http://knowledge-map.xyz" target="_blank") Go To Network Map
+
+
+    h1#publications Conference Publications
+    hr
+
+    h1 2023
+
+    div.pubwrapper
+        section.container-fluid
+            article.col-md-8.col-md-push-2
+                div.row
+                    h3.papertitle CellDAM: User-Space, Rootless Detection and Mitigation for 5G Data Plane
+                    p Zhaowei Tan, <strong>Jinghao Zhao</strong>, Boyan Ding, Songwu Lu.
+                    p USENIX NSDI 2023.
+
+    h1 2022
+
+    div.pubwrapper
+        section.container-fluid
+            article.col-md-8.col-md-push-2
+                div.row
+                    h3.papertitle SEED: A SIM-Based Solution to 5G Failures
+                    p <strong>Jinghao Zhao</strong>, Zhaowei Tan, Yifei Xu, Zhehui Zhang, Songwu Lu.
+                    p ACM SIGCOMM 2022.
+                div.row
+                    h3.papertitle 5G Messaging: System Insecurity and Defenses
+                    p <strong>Jinghao Zhao</strong>, Qianru Li, Zengwen Yuan, Zhehui Zhang, Songwu Lu.
+                    p IEEE CNS 2022.
+
+    h1 2021
+
+    div.pubwrapper
+        section.container-fluid
+            article.col-md-8.col-md-push-2
+                div.row
+                    h3.papertitle SecureSIM: Rethinking Authentication and Access Control for SIM/eSIM,
+                    p <strong>Jinghao Zhao</strong>, Boyan Ding, Yunqi Guo, Zhaowei Tan, Songwu Lu.
+                    p ACM MobiCom 2021.
+                div.row
+                    h3.papertitle Data-Plane Signaling in Cellular IoT: Attacks and Defense
+                    p Zhaowei Tan, Boyan Ding, <strong>Jinghao Zhao</strong>, Yunqi Guo, Songwu Lu.
+                    p ACM MobiCom 2021.
+                div.row
+                    h3.papertitle Experience: A Five-Year Retrospective of MobileInsight
+                    p Yuanjie Li, Chunyi Peng, Zhehui Zhang, Zhaowei Tan, Haotian Deng, <strong>Jinghao Zhao</strong>, Qianru Li, Yunqi Guo, Kai Ling, Boyan Ding, Hewu Li, Songwu Lu.
+                    p ACM MobiCom 2021.
+                div.row
+                    h3.papertitle Device-Based LTE Latency Reduction at the Application Layer
+                    p Zhaowei Tan, <strong>Jinghao Zhao</strong>, Yuanjie Li, Yifei Xu, Songwu Lu.
+                    p USENIX NSDI 2021.
+
+    h1 2019
+
+        div.pubwrapper
+            section.container-fluid
+                article.col-md-8.col-md-push-2
+                    div.row
+                        h3.papertitle Skip The Question You Don’t Know: An Embedding Space Approach
+                        p Kaiyuan Chen, <strong>Jinghao Zhao</strong>
+                        p IJCNN 2019.
+
+    h1 Journal Publications
+    hr
+
+    div.pubwrapper
+        section.container-fluid
+            article.col-md-8.col-md-push-2
+                div.row
+                    h3.papertitle LDRP: Device-Centric Latency Diagnostic and Reduction for Cellular Networks without Root
+                    p Zhaowei Tan, <strong>Jinghao Zhao</strong>, Yuanjie Li, Yifei Xu, Songwu Lu.
+                    p IEEE Transactions on Mobile Computing (TMC) 2023.
+                div.row
+                    h3.papertitle Movement-Based Reliable Mobility Management for Beyond 5G Cellular Networks
+                    p Zhehui Zhang, Yuanjie Li, Qianru Li, <strong>Jinghao Zhao</strong>, Ghufran Baig, Lili Qiu, Songwu Lu.
+                    p IEEE/ACM Transactions on Networking (TON) 2022.
+                div.row
+                    h3.papertitle Breaking Cellular IoT with Forged Data-Plane Signaling: Attacks and Countermeasure
+                    p Zhaowei Tan, Boyan Ding, <strong>Jinghao Zhao</strong>, Yunqi Guo, Songwu Lu.
+                    p ACM Transactions on Sensor Networks (TOSN) 2022.
+    div.wrapperLeft
+        section.row.container-fluid
+
+
+    //div.wrapper#kpimap
+    //    section.row.blur.container-fluid
+    //        span.col-md-5
+    //            //img.img-circle(src="images/kpimap.png" width="500px")
+    //            //iframe(src="http://34.213.149.155/test/#" width="800px" height="400px")
+    //        article.col-md-7
+    //            h1 Network Knowledge Map
+    //            p Through the Knowledge Map, you kan easily figure out the basic information of the network situation in your position. Knowing the network by collect statistics, cluster and change to heat mode. This Project is one part of the MobileInsight in WING Lab at UCLA.
+    //            br
+    //            a.btn-lg.btn-info(href="http://knowledge-map.xyz" target="_blank") Go To Network Map
     //div.wrapper.shadow#doubancrawler
     //    section.row.container-fluid
     //        span.col-md-4
@@ -127,16 +210,16 @@ block content
     //                p Douban Reading Crawler can help you to get books from a certain topic so that yocan find books which have high rates.
     //                p It's also a basic of book recommendation system, the excellent books can be discovered from a great many of books.
     //                a.btn-lg.btn-success(href="https://github.com/anonymous-slave/doubanCrawler" target="_blank") View on Github
-    div.wrapper#color3d
-        section.row.container-fluid
-            span.col-md-5
-                article
-                    h1 Color Cube
-                    p This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.
-                    p When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.
-            span.col-md-7
-                div#colorcanvas.hidden-xs
-                img.visible-xs.img-responsive(src="images/color3d.png")
+    //div.wrapper#color3d
+    //    section.row.container-fluid
+    //        span.col-md-5
+    //            article
+    //                h1 Color Cube
+    //                p This graph can help you transform the RGB value to the color which you can see directly.The x,y,z axes represent the red, green and blue value of a certain color.
+    //                p When you hover on a point , you can see the value of this point, x represents Red, y represents Green and z represents Blue.The background color is the color what this RGB value equals.You can also drag the graph to orbit it and observe it from different angles.
+    //        span.col-md-7
+    //            div#colorcanvas.hidden-xs
+    //            img.visible-xs.img-responsive(src="images/color3d.png")
 
 block script
     <script src="js/TweenLite.min.js"></script>
