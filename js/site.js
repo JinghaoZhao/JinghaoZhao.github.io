@@ -488,7 +488,7 @@
     });
     const label =
       selectedField === "all" ? "All fields" : fields[Number(selectedField)];
-    mapStatus.textContent = `${label} · ${count.toLocaleString()} topics. Choose a topic or explore the map.`;
+    mapStatus.textContent = `${label} · ${count.toLocaleString()} topics.`;
     $("#map-title").textContent =
       `Acemap topic map: ${label}, ${count} topics. Choose a research field using the dropdown below.`;
   }
@@ -561,7 +561,6 @@
       group.addEventListener("pointerover", showTopic);
       group.addEventListener("click", showTopic);
       mapLoad.hidden = true;
-      $(".map-panel .study-kind").textContent = "Research topic map";
       $(".field-select").hidden = false;
       $(".topic-select").hidden = false;
       updateMap();

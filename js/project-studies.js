@@ -17,19 +17,12 @@
       };
       const replay = element.querySelector(".study-replay");
       const parts = [...element.querySelectorAll("[data-part]")];
-      const labels = [...element.querySelectorAll("[data-step-label]")];
       function paint() {
         element.dataset.step = String(state.step);
         parts.forEach((part) =>
           part.classList.toggle(
             "is-active",
             part.dataset.part.split(" ").includes(String(state.step)),
-          ),
-        );
-        labels.forEach((label) =>
-          label.classList.toggle(
-            "is-current",
-            Number(label.dataset.stepLabel) === state.step,
           ),
         );
       }

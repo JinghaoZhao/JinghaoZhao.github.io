@@ -22,4 +22,8 @@ Alternatives considered: restoring a white section would solve the edge contrast
 
 Each walkthrough plays once for 10.8 seconds on entering view, then rests as a complete static diagram. Three 3.6-second stages highlight corresponding components and data flows. Replay is available locally within each illustration; no floating pause control returns. CSS handles motion, with small native timers used only for visible stages. Offscreen and hidden-tab playback pauses, operating-system reduced-motion preferences yield static figures, and content remains available without JavaScript.
 
-SVG title/description elements explain the conceptual sequence to assistive technology. The visuals include a visible conceptual-walkthrough label. Original images remain unchanged in the repository. Acemap uses the same light paper, metadata, heading scale, three-step strip, and replay treatment as the other projects; the loaded topic colors are tuned for the light background without changing their field assignments. The live site remains unchanged while this version is reviewed locally.
+SVG title/description elements explain the conceptual sequence to assistive technology. Original images remain unchanged in the repository. Acemap uses the same light paper, heading scale, and replay treatment as the other projects; the loaded topic colors are tuned for the light background without changing their field assignments.
+
+## Copy simplification — October 23
+
+The project layout now carries the hierarchy: title, a short description, the diagram, and the destination link. Remove repeated category/number labels, walkthrough headers, numbered stage strips, and captions that restate the diagram. Keep component labels, accessible SVG descriptions, and the local replay control. The three-stage motion itself is unchanged. Acemap shows loading/error feedback and selected-field counts when relevant, with no repeated introduction below its preview.

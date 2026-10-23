@@ -1,10 +1,7 @@
 /* Project illustrations share the page's paper, ink, and blue palette. */
 .project-study {
   min-width: 0;
-}
-.project-study .project-meta {
-  margin: 0 0 20px;
-  padding-top: 25px;
+  padding-top: 28px;
   border-top: 1px solid #c4d4e1;
 }
 .project-study h3 {
@@ -12,7 +9,7 @@
   margin-bottom: 13px;
 }
 .project-study .project-description {
-  min-height: 76px;
+  min-height: 51px;
   max-width: 470px;
 }
 .project-visual {
@@ -21,9 +18,7 @@
   --art-stroke: #68859d;
   position: relative;
   margin-top: 20px;
-  padding: 18px 0 16px;
-  border-top: 1px solid #d3e0e9;
-  border-bottom: 1px solid #c9d9e5;
+  padding: 6px 0;
   background: radial-gradient(ellipse at 50% 40%, #dceaf4b3, #eef3f700 69%);
 }
 #seed .project-visual {
@@ -35,20 +30,6 @@
 }
 #flora .project-visual {
   --art-accent: #337f87;
-}
-.study-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  color: #58738b;
-  font-size: 9px;
-  line-height: 1.5;
-  letter-spacing: 1.6px;
-}
-.study-kind {
-  letter-spacing: 0.1px;
-  font-size: 10px;
-  color: #667f92;
 }
 .project-art {
   width: 100%;
@@ -231,47 +212,9 @@
 .is-running .art-part.is-active .art-trace {
   animation-play-state: running;
 }
-.study-steps {
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  list-style: none;
-}
-.study-steps li {
-  font-size: 11px;
-  color: #55728a;
-  border-top: 1px solid #c5d7e4;
-  padding-top: 10px;
-  transition:
-    color 0.4s,
-    border-color 0.4s;
-}
-.study-steps li span {
-  font-size: 9px;
-  padding-right: 7px;
-  color: #68869c;
-}
-.study-steps li.is-current {
-  color: var(--art-accent);
-  border-color: var(--art-accent);
-}
-.study-steps li.is-current span {
-  color: var(--art-accent);
-}
-.project-visual figcaption {
-  margin-top: 17px;
-  padding-right: 58px;
-  color: #58738a;
-  font-size: 11px;
-  line-height: 1.6;
-  min-height: 36px;
-}
 .study-replay {
-  position: absolute;
-  bottom: 20px;
-  right: 0;
+  display: block;
+  margin: 8px 0 0 auto;
   border: 0;
   padding: 4px 0 4px 10px;
   background: none;
@@ -384,27 +327,7 @@
 }
 @media (max-width: 760px) {
   .project-study .project-description {
-    min-height: 90px;
-  }
-  .study-heading {
-    font-size: 8px;
-    letter-spacing: 1px;
-  }
-  .study-kind {
-    font-size: 9px;
-  }
-  .study-steps {
-    gap: 7px;
-  }
-  .study-steps li {
-    font-size: 10px;
-  }
-  .study-steps li span {
-    display: block;
-    padding-bottom: 3px;
-  }
-  .project-visual figcaption {
-    font-size: 10px;
+    min-height: 72px;
   }
 }
 @media (max-width: 600px) {
@@ -416,9 +339,6 @@
   }
   .project-visual {
     margin-top: 24px;
-  }
-  .study-steps li span {
-    display: inline;
   }
   .project-grid {
     row-gap: 48px;
@@ -476,9 +396,6 @@
     margin-left: auto;
     margin-right: auto;
   }
-  .study-steps li span {
-    display: inline;
-  }
 }
 /* Acemap closes the project grid in the same editorial visual language. */
 .acemap-project {
@@ -486,15 +403,11 @@
   gap: 24px 45px;
   align-items: start;
   margin-top: 62px;
-  padding: 0;
+  padding: 28px 0 0;
   background: transparent;
   color: var(--ink);
   border-radius: 0;
   overflow: visible;
-}
-.acemap-project > .project-meta {
-  grid-column: 1 / -1;
-  margin-bottom: 0;
 }
 .acemap-copy h3 {
   font-size: clamp(22px, 2.15vw, 29px);
@@ -579,4 +492,8 @@
     width: 100%;
     min-width: 0;
   }
+}
+
+.map-panel .map-status:empty {
+  display: none;
 }
