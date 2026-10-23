@@ -7,7 +7,7 @@ Read this file before starting a new task in this repository.
 - Preserve the blue geometric identity and the existing page structure. Simplify repeated UI copy; let spacing, alignment, and the diagrams establish hierarchy.
 - Edit the maintained root HTML, `css/site.css`, `js/site.js`, and `project-studies` files. The old Jade/Sass/Less sources are reference material, not a build input.
 - Keep original media unchanged. The seven inline project studies replace the visible original-image panels; do not restore those panels or the floating motion-pause button.
-- Project-copy simplification is on `codex/project-copy-simplification` and has been checked locally. It has not been published.
+- Project-copy simplification was implemented on `codex/project-copy-simplification` and checked locally. GitHub Pages publishes from `master`; check its latest deployment and the live page when resuming publication work.
 
 ## Pitfalls
 

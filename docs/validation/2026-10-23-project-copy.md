@@ -10,4 +10,4 @@ Scope: remove repeated project metadata, walkthrough headings, stage strips, and
 - Acemap loads all 2,208 topics. Selecting Computer Science reports 256 topics. No browser console errors were captured during these interactions.
 - The four changed runtime files total 109,589 bytes, down from 118,516 bytes before this change (8,927 bytes fewer, uncompressed). No dependencies, network requests, or animation loops were added. This is a payload comparison, not a performance benchmark.
 
-These checks cover the local preview; this change has not been deployed.
+These checks were completed on the local preview before publication. They do not by themselves confirm a successful production deployment.
