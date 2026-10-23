@@ -33,7 +33,7 @@ Acemap retains all 2,208 topics from the existing CSV. Data is requested only wh
 
 ## Content provenance
 
-The current GCE Bare Metal team membership and participation in the Google Cloud/CME low-latency platform are user-supplied. Public platform context comes from:
+The current GCE Bare Metal team membership, end-to-end architectural perspective, and participation in the Google Cloud/CME low-latency platform are user-supplied. The work section presents the broader platform perspective first, with CME as a subordinate case study. Contact links use the existing LinkedIn profile; a custom website domain does not imply an email service. Public case-study context comes from:
 
 - [Google Cloud's U4 compute introduction, October 7, 2026](https://cloud.google.com/blog/topics/financial-services/ultra-low-latency-solution-with-u4-enables-high-velocity-trading)
 - [CME Group's migration update, October 12, 2026](https://www.cmegroup.com/media-room/press-releases/2026/10/12/cme_group_announcescloudmigrationmilestones.html)

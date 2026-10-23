@@ -7,7 +7,7 @@
     <title>Jinghao Zhao — Engineer & Designer</title>
     <meta
       name="description"
-      content="Jinghao Zhao is a software engineer on Google’s GCE Bare Metal team, working on cloud infrastructure and ultra-low-latency trading. UCLA Ph.D., systems and networking researcher."
+      content="Jinghao Zhao is a software engineer on Google’s GCE Bare Metal team, bringing an end-to-end systems perspective to cloud infrastructure. UCLA Ph.D., systems and networking researcher."
     />
     <link rel="canonical" href="https://zhaojinghao.com/" />
     <meta property="og:type" content="website" />
@@ -73,8 +73,8 @@
         <a href="#work">Work</a><a href="#Bio">About</a
         ><a href="#projects">Projects</a><a href="#publications">Research</a>
       </nav>
-      <a class="header-contact" href="mailto:zjh@zhaojinghao.com"
-        >Let’s talk <span aria-hidden="true">↗</span></a
+      <a class="header-contact" href="https://www.linkedin.com/in/jinghaozhao/"
+        >Connect <span aria-hidden="true">↗</span></a
       >
     </header>
     <main id="main">
@@ -83,10 +83,6 @@
         <canvas id="hero-canvas" aria-hidden="true"></canvas>
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow hero-eyebrow">
-            <span class="status-dot" aria-hidden="true"></span> GOOGLE CLOUD ·
-            GCE BARE METAL
-          </p>
           <h1 id="hero-title">
             Jinghao Zhao<span class="name-period">.</span>
           </h1>
@@ -140,37 +136,32 @@
           </div>
           <div class="work-layout">
             <div class="work-copy reveal">
-              <p class="work-partners">Google Cloud <span>×</span> CME Group</p>
+              <p class="work-platform">Google Cloud · GCE Bare Metal</p>
               <h2 id="work-title">
-                Less latency.<br /><span class="text-blue"
-                  >More possibility.</span
+                Bare metal.<br /><span class="text-blue"
+                  >Cloud, end to end.</span
                 >
               </h2>
               <p class="work-intro">
                 I’m a software engineer on Google’s
-                <strong>GCE Bare Metal</strong> team, working on the low-latency
-                trading platform behind the Google Cloud and CME Group
-                collaboration.
+                <strong>GCE Bare Metal</strong>
+                team. I think about bare metal end to end: how compute,
+                networking, storage, and the control plane fit together into a
+                cloud platform.
               </p>
               <p class="work-description">
-                The collaboration brings dedicated bare metal compute and
-                deterministic networking to financial markets—combining the
-                precision of physical infrastructure with the flexibility of the
-                cloud.
+                My perspective is grounded in the architecture of the whole
+                system—the connections between physical infrastructure, machine
+                lifecycle, and cloud services that make dedicated hardware
+                reliable and usable at scale.
               </p>
-              <a
-                class="text-link light-link"
-                href="https://cloud.google.com/blog/topics/financial-services/ultra-low-latency-solution-with-u4-enables-high-velocity-trading"
-                >Read the Google Cloud story
-                <span aria-hidden="true">↗</span></a
-              >
             </div>
             <figure
               class="compute-figure reveal"
               aria-labelledby="compute-caption"
             >
               <div class="figure-topline">
-                <span>COMPUTE / CONNECT / SCALE</span
+                <span>COMPUTE / CONTROL / CONNECT</span
                 ><span class="figure-dot" aria-hidden="true"></span>
               </div>
               <svg
@@ -317,12 +308,12 @@
                   letter-spacing="1.5"
                   fill="#a3bdd8"
                 >
-                  <text x="82" y="151">LOW LATENCY</text>
-                  <text x="428" y="113">CLOUD SCALE</text>
+                  <text x="82" y="151">CONTROL PLANE</text>
+                  <text x="428" y="113">CLOUD SERVICES</text>
                 </g>
               </svg>
               <figcaption id="compute-caption">
-                <span>Dedicated hardware. Connected possibilities.</span
+                <span>Physical infrastructure. Cloud architecture.</span
                 ><span class="diagram-note">Conceptual illustration</span>
               </figcaption>
             </figure>
@@ -330,27 +321,60 @@
           <div class="work-pillars reveal">
             <div>
               <span class="pillar-index">01</span>
-              <h3>Bare metal compute</h3>
-              <p>Direct access to dedicated hardware.</p>
+              <h3>Compute &amp; I/O</h3>
+              <p>
+                The physical foundations: processors, networking, and storage.
+              </p>
             </div>
             <div>
               <span class="pillar-index">02</span>
-              <h3>Deterministic networking</h3>
-              <p>Built for latency-sensitive workloads.</p>
+              <h3>Control plane</h3>
+              <p>Provisioning, orchestration, and the machine lifecycle.</p>
             </div>
             <div>
               <span class="pillar-index">03</span>
-              <h3>Cloud flexibility</h3>
-              <p>Infrastructure provisioned through cloud APIs.</p>
+              <h3>System behavior</h3>
+              <p>Reliability, operability, and performance across layers.</p>
             </div>
           </div>
-          <p class="source-note">
-            Platform capabilities described in public Google Cloud materials.
-            <a
-              href="https://www.cmegroup.com/media-room/press-releases/2026/10/12/cme_group_announcescloudmigrationmilestones.html"
-              >CME Group’s migration update · October 2026 ↗</a
-            >
-          </p>
+          <article class="work-case reveal" aria-labelledby="cme-title">
+            <div class="case-heading">
+              <p class="eyebrow">IN PRACTICE / SELECTED WORK</p>
+              <h3 id="cme-title">Google Cloud <span>×</span><br />CME Group</h3>
+              <p class="case-focus">Ultra-low-latency trading</p>
+            </div>
+            <div class="case-copy">
+              <p>
+                One application of this platform-level work is the low-latency
+                trading platform I work on as part of the Google Cloud and CME
+                Group collaboration.
+              </p>
+              <p>
+                The collaboration brings dedicated bare metal compute and
+                deterministic networking to financial markets—combining the
+                precision of physical infrastructure with the flexibility of the
+                cloud.
+              </p>
+              <div class="case-links">
+                <a
+                  class="text-link light-link"
+                  href="https://cloud.google.com/blog/topics/financial-services/ultra-low-latency-solution-with-u4-enables-high-velocity-trading"
+                  >Read the Google Cloud story
+                  <span aria-hidden="true">↗</span></a
+                >
+                <a
+                  class="text-link light-link"
+                  href="https://www.cmegroup.com/media-room/press-releases/2026/10/12/cme_group_announcescloudmigrationmilestones.html"
+                  >CME migration update · Oct 2026
+                  <span aria-hidden="true">↗</span></a
+                >
+              </div>
+              <p class="source-note">
+                Platform context from public Google Cloud and CME Group
+                materials.
+              </p>
+            </div>
+          </article>
         </div>
       </section>
       <section
@@ -384,8 +408,10 @@
                 class="text-link"
                 href="https://drive.google.com/file/d/1w_XJ42SjzV_rB1WRCMU-FlWVH3ZQ_RF9/view?usp=sharing"
                 >View my CV <span aria-hidden="true">↗</span></a
-              ><a class="text-link" href="mailto:zjh@zhaojinghao.com"
-                >Get in touch <span aria-hidden="true">↗</span></a
+              ><a
+                class="text-link"
+                href="https://www.linkedin.com/in/jinghaozhao/"
+                >Connect on LinkedIn <span aria-hidden="true">↗</span></a
               >
             </div>
           </div>
@@ -923,13 +949,15 @@
             </h2>
             <a
               class="contact-arrow"
-              href="mailto:zjh@zhaojinghao.com"
-              aria-label="Email Jinghao Zhao"
+              href="https://www.linkedin.com/in/jinghaozhao/"
+              aria-label="Connect with Jinghao Zhao on LinkedIn"
               ><span aria-hidden="true">↗</span></a
             >
           </div>
-          <a class="contact-email text-link" href="mailto:zjh@zhaojinghao.com"
-            >zjh@zhaojinghao.com <span aria-hidden="true">↗</span></a
+          <a
+            class="contact-link text-link"
+            href="https://www.linkedin.com/in/jinghaozhao/"
+            >Connect on LinkedIn <span aria-hidden="true">↗</span></a
           >
         </div>
       </section>

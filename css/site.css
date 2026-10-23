@@ -331,25 +331,6 @@ article[id],
   text-align: center;
   will-change: transform;
 }
-.hero-eyebrow {
-  color: #a4bed7;
-  font-size: 10px;
-  letter-spacing: 3px;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-.status-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #a2d5ff;
-  box-shadow:
-    0 0 0 5px #7ab4ed12,
-    0 0 18px #69a9ff80;
-}
 .hero h1 {
   font-family: Raleway, sans-serif;
   font-size: clamp(70px, 9.6vw, 146px);
@@ -497,13 +478,13 @@ article[id],
   gap: 58px;
   align-items: center;
 }
-.work-partners {
+.work-platform {
   font-size: 16px;
   color: #b7cce1;
   letter-spacing: 0.1px;
   margin-bottom: 22px;
 }
-.work-partners > span {
+.work-platform > span {
   color: #6e8ba6;
   margin: 0 10px;
 }
@@ -647,6 +628,79 @@ article[id],
   text-decoration-color: #4d6884;
   text-underline-offset: 3px;
   margin-left: 6px;
+}
+/* Platform architecture comes first; selected work is the next level. */
+.work-case {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 70px;
+  margin-top: 54px;
+  padding-top: 40px;
+  border-top: 1px solid #ffffff1a;
+}
+.work-case .eyebrow {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+}
+.case-heading h3 {
+  margin-top: 18px;
+  font-size: 29px;
+  font-weight: 450;
+  letter-spacing: -0.6px;
+  line-height: 1.3;
+}
+.case-heading h3 span {
+  color: #6e8ba6;
+}
+.case-focus {
+  margin-top: 12px;
+  color: #8caccb;
+  font-size: 12px;
+}
+.case-copy > p {
+  font-size: 14px;
+  color: #b5cadf;
+}
+.case-copy > p + p {
+  color: #90a9c1;
+}
+.case-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  margin-top: 24px;
+}
+.case-links .text-link {
+  font-size: 12px;
+  gap: 13px;
+}
+.case-copy .source-note {
+  margin-top: 20px;
+  color: #8da8c1;
+  font-size: 10px;
+}
+@media (max-width: 760px) {
+  .work-case {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin-top: 36px;
+    padding-top: 30px;
+  }
+  .case-heading h3 {
+    font-size: 26px;
+  }
+  .case-heading h3 br {
+    display: none;
+  }
+  .case-copy > p {
+    font-size: 13px;
+  }
+  .case-links {
+    gap: 18px;
+  }
+  .case-links .text-link {
+    font-size: 11px;
+  }
 }
 /* Portrait and editorial biography retain the personal part of the original. */
 .about-section {
@@ -1084,7 +1138,7 @@ article[id],
   transform: rotate(45deg);
   border-color: #8aaecf;
 }
-.contact-email {
+.contact-link {
   margin-top: 38px;
   font-size: 15px;
 }
@@ -1152,9 +1206,6 @@ article[id],
 .motion-enabled .reveal.is-pending {
   opacity: 0;
   transform: translateY(25px);
-}
-.motion-enabled .hero-eyebrow {
-  animation: enter 1s var(--ease) 0.1s both;
 }
 .motion-enabled .hero h1 {
   animation: enter 1.2s var(--ease) 0.2s both;
@@ -1305,11 +1356,6 @@ html:has(.motion-paused) {
     letter-spacing: -3px;
     white-space: normal;
   }
-  .hero-eyebrow {
-    font-size: 8px;
-    letter-spacing: 2px;
-    margin-bottom: 28px;
-  }
   .hero-role {
     font-size: 10px;
     letter-spacing: 4px;
@@ -1382,7 +1428,7 @@ html:has(.motion-paused) {
   .work-copy h2 {
     font-size: 46px;
   }
-  .work-partners {
+  .work-platform {
     font-size: 14px;
   }
   .work-description {
@@ -1541,7 +1587,7 @@ html:has(.motion-paused) {
   .contact-arrow > span {
     font-size: 34px;
   }
-  .contact-email {
+  .contact-link {
     font-size: 13px;
     margin-top: 28px;
   }
@@ -1575,10 +1621,6 @@ html:has(.motion-paused) {
   .hero h1 {
     font-size: 60px;
     letter-spacing: -3.1px;
-  }
-  .hero-eyebrow {
-    letter-spacing: 1.7px;
-    font-size: 7.5px;
   }
   .hero-description {
     font-size: 13px;
@@ -1687,10 +1729,6 @@ html:has(.motion-paused) {
   .hero h1 {
     font-size: 53px;
   }
-  .hero-eyebrow {
-    font-size: 6.5px;
-    letter-spacing: 1.4px;
-  }
   .site-header nav {
     gap: 13px;
   }
@@ -1776,8 +1814,7 @@ html:has(.motion-paused) {
     font-size: 45px;
   }
   .hero-description,
-  .hero-role,
-  .hero-eyebrow {
+  .hero-role {
     color: #456;
   }
   .section {
