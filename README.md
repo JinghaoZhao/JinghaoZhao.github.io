@@ -17,15 +17,18 @@ Open http://127.0.0.1:8765. Use an HTTP server rather than opening the HTML file
 - `index.html`: biography, current work, projects, complete publication records, contact links, and metadata.
 - `css/site.css`: responsive layouts, typography, illustration animation, and reduced-motion styling.
 - `js/site.js`: geometric canvas scene, animation lifecycle, navigation state, publication filters, and the on-demand Acemap explorer.
+- `css/project-studies.css` and `js/project-studies.js`: SVG walkthrough styling and visible-only, finite playback for the project section.
 - `images/optimized/`: WebP derivatives of original images. The original files remain in `images/`.
 - `fonts/`: locally served fonts. DM Sans is distributed under the included SIL Open Font License.
 - `CNAME`: the existing custom domain.
 
-The older Jade, Sass, Less, and JavaScript files are retained for reference. **The maintained source is now the root HTML and the two `site` files; do not regenerate it from the old Jade templates.** No npm installation or build step is required. The root `.nojekyll` file makes GitHub Pages serve the static files directly.
+The older Jade, Sass, Less, and JavaScript files are retained for reference. **The maintained source is the root HTML, the `site` files, and the `project-studies` files; do not regenerate it from the old Jade templates.** No npm installation or build step is required. The root `.nojekyll` file makes GitHub Pages serve the static files directly.
 
 ## Motion and accessibility
 
 The native canvas replaces the former 600-triangle tween loop. Rendering is capped at 30 fps and 1.5× pixel density, with fewer geometry elements on small screens. The canvas suspends when the hero is offscreen or the document is hidden. SVG illustration animation suspends offscreen as well.
+
+Project figures are inline SVG walkthroughs with three stages and a local replay control. Each plays once when visible, pauses offscreen or in a hidden tab, and then rests. Original project images are available in expandable disclosures. The Acemap preview uses the same playback lifecycle before loading its existing interactive dataset. See `docs/plans/2026-10-22-project-motion-design.md` for source grounding and design decisions.
 
 Motion follows the operating system's reduced-motion setting. There is no floating pause control or stored manual motion preference. Biography, links, all projects, and all publications remain readable without JavaScript. Filters are native buttons; the knowledge map includes native field and topic selectors for keyboard use. There is no custom scroll interception.
 

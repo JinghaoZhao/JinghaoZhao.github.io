@@ -41,8 +41,10 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="stylesheet" href="css/site.css?v=20261022-2" />
-    <script src="js/site.js?v=20261022-2" defer></script>
+    <link rel="stylesheet" href="css/site.css?v=20261022-3" />
+    <link rel="stylesheet" href="css/project-studies.css?v=20261022-3" />
+    <script src="js/site.js?v=20261022-3" defer></script>
+    <script src="js/project-studies.js?v=20261022-3" defer></script>
     <!-- Retain the existing production analytics property; skip local previews. -->
     <script>
       if (
@@ -466,159 +468,1416 @@
             </p>
           </div>
           <div class="project-grid">
-            <article class="project project-feature reveal" id="seed">
-              <a
-                class="project-image"
-                href="docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
-                aria-label="Read the SEED paper"
-                ><img
-                  src="images/optimized/SIMInsight.webp"
-                  alt="SEED SIM-based 5G diagnosis system and research prototype"
-                  width="1502"
-                  height="766"
-                  loading="lazy"
-                  decoding="async"
-                /><span class="image-arrow" aria-hidden="true">↗</span></a
-              >
+            <article class="project project-study reveal" id="seed">
               <div class="project-meta">
                 <span>MOBILE SYSTEMS</span><span>SIGCOMM ’22</span>
               </div>
-              <h3>
-                <a
-                  href="docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
-                  >SEED</a
-                >
-              </h3>
-              <p>
+              <h3>SEED</h3>
+              <p class="project-description">
                 A SIM-based solution to diagnose and handle 5G failures,
                 bringing better visibility into the mobile network.
               </p>
-              <a
-                class="text-link"
-                href="docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
-                >Read the paper <span aria-hidden="true">↗</span></a
-              >
+              <figure class="project-visual" data-motion-study data-step="0">
+                <div class="study-heading">
+                  <span>HOW IT WORKS</span
+                  ><span class="study-kind">Conceptual walkthrough</span>
+                </div>
+                <svg
+                  class="project-art"
+                  viewBox="0 0 560 320"
+                  role="img"
+                  aria-labelledby="seed-art-title seed-art-desc"
+                >
+                  <title id="seed-art-title">SEED: how it works</title>
+                  <desc id="seed-art-desc">
+                    A device reports a failure to the SEED SIM applet. SIM and
+                    core-network diagnosis inform a recovery action.
+                  </desc>
+                  <g aria-hidden="true">
+                    <path d="M115 130V210H236" class="art-route" />
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M115 130V210H236"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M310 210H413V147" class="art-route" />
+                    <g data-part="2" class="art-part">
+                      <path
+                        d="M310 210H413V147"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M415 103V64H115V94" class="art-route" />
+                    <g data-part="3" class="art-part">
+                      <path
+                        d="M415 103V64H115V94"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <rect
+                        x="82"
+                        y="61"
+                        width="65"
+                        height="107"
+                        rx="10"
+                        class="art-device"
+                      />
+                      <rect
+                        x="89"
+                        y="75"
+                        width="51"
+                        height="73"
+                        rx="3"
+                        class="art-screen"
+                      />
+                      <path d="M106 68h17 M107 158h15" class="art-line" />
+                      <text
+                        x="114"
+                        y="188"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        DEVICE
+                      </text>
+                      <circle cx="114" cy="111" r="12" class="art-alert" />
+                      <text
+                        x="114"
+                        y="116"
+                        class="art-alert-text"
+                        text-anchor="middle"
+                      >
+                        !
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <g transform="translate(240 165) scale(0.8)">
+                        <path d="M0 0H48L70 22V90H0Z" class="art-device" />
+                        <rect
+                          x="14"
+                          y="35"
+                          width="42"
+                          height="38"
+                          rx="4"
+                          class="art-chip"
+                        />
+                        <path
+                          d="M28 35V73M42 35V73M14 47H56M14 60H56"
+                          class="art-line"
+                        />
+                      </g>
+                      <text
+                        x="268"
+                        y="268"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        SIM / SEED
+                      </text>
+                      <path
+                        d="M250 207l9-9 9 9-9 9Z M259 198v-12 M259 216v13"
+                        class="art-line"
+                      />
+                    </g>
+                    <g data-part="2 3" class="art-part">
+                      <rect
+                        x="380"
+                        y="88"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="390" cy="95" r="2" class="art-dot" />
+                      <path d="M426 95h17" class="art-line" />
+                      <rect
+                        x="380"
+                        y="107"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="390" cy="114" r="2" class="art-dot" />
+                      <path d="M426 114h17" class="art-line" />
+                      <rect
+                        x="380"
+                        y="126"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="390" cy="133" r="2" class="art-dot" />
+                      <path d="M426 133h17" class="art-line" />
+                      <text
+                        x="417"
+                        y="166"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        5G CORE
+                      </text>
+                      <text
+                        x="417"
+                        y="184"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Diagnostic assistance
+                      </text>
+                    </g>
+                    <g data-part="3" class="art-part">
+                      <path d="M160 63l5 5 10-12" class="art-check" />
+                      <text
+                        x="266"
+                        y="48"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        RECOVERY ACTION
+                      </text>
+                    </g>
+                    <text
+                      x="159"
+                      y="229"
+                      class="art-small"
+                      text-anchor="middle"
+                    >
+                      Error report
+                    </text>
+                    <text
+                      x="366"
+                      y="230"
+                      class="art-small"
+                      text-anchor="middle"
+                    >
+                      Cause inference
+                    </text>
+                  </g>
+                </svg>
+                <ol class="study-steps" aria-label="SEED walkthrough">
+                  <li data-step-label="1"><span>01</span>Report</li>
+                  <li data-step-label="2"><span>02</span>Diagnose</li>
+                  <li data-step-label="3"><span>03</span>Recover</li>
+                </ol>
+                <figcaption>
+                  From a failure report to a targeted recovery action.
+                </figcaption>
+                <button
+                  type="button"
+                  class="study-replay"
+                  aria-label="Replay SEED walkthrough"
+                  hidden
+                >
+                  <span aria-hidden="true">↻</span> Replay
+                </button>
+              </figure>
+              <div class="project-resources">
+                <a
+                  class="text-link"
+                  href="docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
+                  >Read the paper <span aria-hidden="true">↗</span></a
+                >
+                <details class="project-original">
+                  <summary>
+                    Original diagram <span aria-hidden="true">+</span>
+                  </summary>
+                  <div class="original-sheet">
+                    <img
+                      src="images/optimized/SIMInsight.webp"
+                      alt="Original SEED project illustration"
+                      width="1502"
+                      height="766"
+                      loading="lazy"
+                      decoding="async"
+                    /><a
+                      href="images/optimized/SIMInsight.webp"
+                      target="_blank"
+                      rel="noopener"
+                      >Open full size ↗</a
+                    >
+                  </div>
+                </details>
+              </div>
             </article>
-            <article class="project project-feature reveal" id="secureSIM">
-              <a
-                class="project-image secure-image"
-                href="https://dl.acm.org/doi/10.1145/3447993.3483254"
-                aria-label="Read the SecureSIM paper"
-                ><img
-                  src="images/optimized/securesim.webp"
-                  alt="SecureSIM research prototype for SIM authentication and access control"
-                  width="666"
-                  height="729"
-                  loading="lazy"
-                  decoding="async"
-                /><span class="image-arrow" aria-hidden="true">↗</span></a
-              >
+            <article class="project project-study reveal" id="secureSIM">
               <div class="project-meta">
                 <span>NETWORK SECURITY</span><span>MOBICOM ’21</span>
               </div>
-              <h3>
-                <a href="https://dl.acm.org/doi/10.1145/3447993.3483254"
-                  >SecureSIM</a
-                >
-              </h3>
-              <p>
+              <h3>SecureSIM</h3>
+              <p class="project-description">
                 Rethinking SIM and eSIM authentication with fine-grained access
                 control, informed by vulnerabilities in existing practice.
               </p>
-              <a
-                class="text-link"
-                href="https://dl.acm.org/doi/pdf/10.1145/3447993.3483254"
-                >Read the paper <span aria-hidden="true">↗</span></a
-              >
+              <figure class="project-visual" data-motion-study data-step="0">
+                <div class="study-heading">
+                  <span>HOW IT WORKS</span
+                  ><span class="study-kind">Conceptual walkthrough</span>
+                </div>
+                <svg
+                  class="project-art"
+                  viewBox="0 0 560 320"
+                  role="img"
+                  aria-labelledby="secureSIM-art-title secureSIM-art-desc"
+                >
+                  <title id="secureSIM-art-title">
+                    SecureSIM: how it works
+                  </title>
+                  <desc id="secureSIM-art-desc">
+                    A certificate is authenticated, a request is checked against
+                    permissions, and authorized access reaches the SIM service.
+                  </desc>
+                  <g aria-hidden="true">
+                    <path d="M128 110H228" class="art-route" />
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M128 110H228"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M128 218H228" class="art-route" />
+                    <g data-part="2" class="art-part">
+                      <path
+                        d="M128 218H228"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M337 154H443" class="art-route" />
+                    <g data-part="3" class="art-part">
+                      <path
+                        d="M337 154H443"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <rect
+                        x="32"
+                        y="73"
+                        width="96"
+                        height="73"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <path
+                        d="M52 90h48M52 102h34M52 114h25"
+                        class="art-line"
+                      />
+                      <circle cx="104" cy="128" r="6" class="art-dot" />
+                      <text
+                        x="80"
+                        y="169"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        CERTIFICATE
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <rect
+                        x="32"
+                        y="198"
+                        width="96"
+                        height="40"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="80"
+                        y="222"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        Request
+                      </text>
+                      <text
+                        x="80"
+                        y="260"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        PERMISSIONS
+                      </text>
+                    </g>
+                    <g data-part="1 2 3" class="art-part">
+                      <g transform="translate(246 71) scale(1.28)">
+                        <path d="M0 0H48L70 22V90H0Z" class="art-device" />
+                        <rect
+                          x="14"
+                          y="35"
+                          width="42"
+                          height="38"
+                          rx="4"
+                          class="art-chip"
+                        />
+                        <path
+                          d="M28 35V73M42 35V73M14 47H56M14 60H56"
+                          class="art-line"
+                        />
+                      </g>
+                    </g>
+                    <g data-part="2 3" class="art-part">
+                      <path
+                        d="M276 140q22 13 44 0v34q0 27-22 40-22-13-22-40Z"
+                        class="art-shield"
+                      />
+                      <path d="M287 174l8 8 16-21" class="art-check" />
+                    </g>
+                    <g data-part="3" class="art-part">
+                      <rect
+                        x="443"
+                        y="117"
+                        width="79"
+                        height="75"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="482"
+                        y="145"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        SIM
+                      </text>
+                      <text
+                        x="482"
+                        y="165"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        service
+                      </text>
+                      <text
+                        x="482"
+                        y="218"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        ALLOWED
+                      </text>
+                    </g>
+                    <text
+                      x="282"
+                      y="266"
+                      class="art-small"
+                      text-anchor="middle"
+                    >
+                      Authenticate. Authorize. Access.
+                    </text>
+                  </g>
+                </svg>
+                <ol class="study-steps" aria-label="SecureSIM walkthrough">
+                  <li data-step-label="1"><span>01</span>Authenticate</li>
+                  <li data-step-label="2"><span>02</span>Authorize</li>
+                  <li data-step-label="3"><span>03</span>Access</li>
+                </ol>
+                <figcaption>
+                  A trusted identity. Precisely scoped access.
+                </figcaption>
+                <button
+                  type="button"
+                  class="study-replay"
+                  aria-label="Replay SecureSIM walkthrough"
+                  hidden
+                >
+                  <span aria-hidden="true">↻</span> Replay
+                </button>
+              </figure>
+              <div class="project-resources">
+                <a
+                  class="text-link"
+                  href="https://dl.acm.org/doi/pdf/10.1145/3447993.3483254"
+                  >Read the paper <span aria-hidden="true">↗</span></a
+                >
+                <details class="project-original">
+                  <summary>
+                    Original diagram <span aria-hidden="true">+</span>
+                  </summary>
+                  <div class="original-sheet">
+                    <img
+                      src="images/optimized/securesim.webp"
+                      alt="Original SecureSIM project illustration"
+                      width="666"
+                      height="729"
+                      loading="lazy"
+                      decoding="async"
+                    /><a
+                      href="images/optimized/securesim.webp"
+                      target="_blank"
+                      rel="noopener"
+                      >Open full size ↗</a
+                    >
+                  </div>
+                </details>
+              </div>
             </article>
-            <article class="project project-small reveal" id="gptcodelearner">
+            <article class="project project-study reveal" id="gptcodelearner">
               <div class="project-meta">
                 <span>AI / DEVELOPER TOOLS</span><span>01</span>
               </div>
               <h3>GPT-Code-Learner</h3>
-              <p>Explore and learn a code repository interactively with GPT.</p>
-              <img
-                class="small-project-image"
-                src="images/optimized/GPT-Code-Learner.webp"
-                alt="GPT-Code-Learner interactive repository exploration interface"
-                width="3022"
-                height="1136"
-                loading="lazy"
-                decoding="async"
-              /><a
-                class="text-link"
-                href="https://github.com/JinghaoZhao/GPT-Code-Learner"
-                >Explore on GitHub <span aria-hidden="true">↗</span></a
-              >
+              <p class="project-description">
+                Explore and learn a code repository interactively with GPT.
+              </p>
+              <figure class="project-visual" data-motion-study data-step="0">
+                <div class="study-heading">
+                  <span>HOW IT WORKS</span
+                  ><span class="study-kind">Conceptual walkthrough</span>
+                </div>
+                <svg
+                  class="project-art"
+                  viewBox="0 0 560 320"
+                  role="img"
+                  aria-labelledby="gptcodelearner-art-title gptcodelearner-art-desc"
+                >
+                  <title id="gptcodelearner-art-title">
+                    GPT-Code-Learner: how it works
+                  </title>
+                  <desc id="gptcodelearner-art-desc">
+                    Source code is searched by the context toolkit. The question
+                    and relevant repository context inform a GPT explanation.
+                  </desc>
+                  <g aria-hidden="true">
+                    <path d="M162 110H220" class="art-route" />
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M162 110H220"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M302 165V200H387" class="art-route" />
+                    <g data-part="2" class="art-part">
+                      <path
+                        d="M302 165V200H387"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M415 200H431V168" class="art-route" />
+                    <g data-part="3" class="art-part">
+                      <path
+                        d="M415 200H431V168"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <rect
+                        x="25"
+                        y="53"
+                        width="137"
+                        height="117"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <path d="M25 78H162" class="art-line" />
+                      <circle cx="38" cy="66" r="2" class="art-dot" />
+                      <circle cx="47" cy="66" r="2" class="art-dot" />
+                      <circle cx="56" cy="66" r="2" class="art-dot" />
+                      <text x="42" y="101" class="art-code" text-anchor="start">
+                        repo /
+                      </text>
+                      <text x="48" y="122" class="art-code" text-anchor="start">
+                        ├ src /
+                      </text>
+                      <text x="48" y="143" class="art-code" text-anchor="start">
+                        └ docs /
+                      </text>
+                      <text
+                        x="93"
+                        y="197"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        CODEBASE
+                      </text>
+                    </g>
+                    <g data-part="1 2" class="art-part">
+                      <rect
+                        x="220"
+                        y="58"
+                        width="164"
+                        height="107"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="302"
+                        y="86"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        Context toolkit
+                      </text>
+                      <path d="M238 98H366" class="art-line" />
+                      <text
+                        x="302"
+                        y="121"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Code search
+                      </text>
+                      <text
+                        x="302"
+                        y="144"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Repository context
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <rect
+                        x="188"
+                        y="222"
+                        width="173"
+                        height="42"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="274"
+                        y="248"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        How does this work?
+                      </text>
+                      <path d="M274 222v-22h28v-35" class="art-route" />
+                    </g>
+                    <g data-part="3" class="art-part">
+                      <rect
+                        x="416"
+                        y="56"
+                        width="113"
+                        height="112"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="472"
+                        y="84"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        GPT
+                      </text>
+                      <path
+                        d="M435 102h70M435 114h53M435 126h63M435 138h37"
+                        class="art-answer"
+                      />
+                      <text
+                        x="473"
+                        y="200"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        EXPLANATION
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <circle cx="401" cy="200" r="14" class="art-context" />
+                      <text
+                        x="401"
+                        y="205"
+                        class="art-symbol"
+                        text-anchor="middle"
+                      >
+                        +
+                      </text>
+                    </g>
+                  </g>
+                </svg>
+                <ol
+                  class="study-steps"
+                  aria-label="GPT-Code-Learner walkthrough"
+                >
+                  <li data-step-label="1"><span>01</span>Search</li>
+                  <li data-step-label="2"><span>02</span>Build context</li>
+                  <li data-step-label="3"><span>03</span>Explain</li>
+                </ol>
+                <figcaption>
+                  Follow a question from the repository to an explanation.
+                </figcaption>
+                <button
+                  type="button"
+                  class="study-replay"
+                  aria-label="Replay GPT-Code-Learner walkthrough"
+                  hidden
+                >
+                  <span aria-hidden="true">↻</span> Replay
+                </button>
+              </figure>
+              <div class="project-resources">
+                <a
+                  class="text-link"
+                  href="https://github.com/JinghaoZhao/GPT-Code-Learner"
+                  >Explore on GitHub <span aria-hidden="true">↗</span></a
+                >
+                <details class="project-original">
+                  <summary>
+                    Original diagram <span aria-hidden="true">+</span>
+                  </summary>
+                  <div class="original-sheet">
+                    <img
+                      src="images/optimized/GPT-Code-Learner.webp"
+                      alt="Original GPT-Code-Learner project illustration"
+                      width="3022"
+                      height="1136"
+                      loading="lazy"
+                      decoding="async"
+                    /><a
+                      href="images/optimized/GPT-Code-Learner.webp"
+                      target="_blank"
+                      rel="noopener"
+                      >Open full size ↗</a
+                    >
+                  </div>
+                </details>
+              </div>
             </article>
-            <article class="project project-small reveal" id="sonica">
+            <article class="project project-study reveal" id="sonica">
               <div class="project-meta">
                 <span>OPEN SOURCE / NB-IOT</span><span>02</span>
               </div>
               <h3>Sonica</h3>
-              <p>
+              <p class="project-description">
                 An open NB-IoT research platform that communicates with
                 off-the-shelf devices.
               </p>
-              <img
-                class="small-project-image"
-                src="images/optimized/sonica-overview.webp"
-                alt="Sonica software-defined NB-IoT research platform architecture"
-                width="1092"
-                height="617"
-                loading="lazy"
-                decoding="async"
-              /><a
-                class="text-link"
-                href="https://github.com/sonica-nbiot/sonica"
-                >Explore on GitHub <span aria-hidden="true">↗</span></a
-              >
+              <figure class="project-visual" data-motion-study data-step="0">
+                <div class="study-heading">
+                  <span>HOW IT WORKS</span
+                  ><span class="study-kind">Conceptual walkthrough</span>
+                </div>
+                <svg
+                  class="project-art"
+                  viewBox="0 0 560 320"
+                  role="img"
+                  aria-labelledby="sonica-art-title sonica-art-desc"
+                >
+                  <title id="sonica-art-title">Sonica: how it works</title>
+                  <desc id="sonica-art-desc">
+                    A commodity NB-IoT device communicates over the air with a
+                    software-defined eNodeB and a CIoT-enabled core, enabling
+                    network research.
+                  </desc>
+                  <g aria-hidden="true">
+                    <path d="M100 162H231" class="art-route" />
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M100 162H231"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M298 162H407" class="art-route" />
+                    <g data-part="2" class="art-part">
+                      <path
+                        d="M298 162H407"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M442 199V258H267V218" class="art-route" />
+                    <g data-part="3" class="art-part">
+                      <path
+                        d="M442 199V258H267V218"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <rect
+                        x="39"
+                        y="126"
+                        width="63"
+                        height="77"
+                        rx="8"
+                        class="art-device"
+                      />
+                      <rect
+                        x="48"
+                        y="136"
+                        width="45"
+                        height="25"
+                        rx="3"
+                        class="art-screen"
+                      />
+                      <circle cx="71" cy="184" r="6" class="art-dot" />
+                      <path d="M52 119v-15M89 119v-9" class="art-line" />
+                      <text
+                        x="71"
+                        y="231"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        COTS DEVICE
+                      </text>
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M138 135q25 27 0 54M153 126q34 36 0 72M168 117q43 45 0 90"
+                        class="art-radio"
+                      />
+                    </g>
+                    <g data-part="1 2" class="art-part">
+                      <path
+                        d="M249 181l18-65 18 65M257 151l24 16M254 167l22-16"
+                        class="art-device-line"
+                      />
+                      <circle cx="267" cy="116" r="4" class="art-dot" />
+                      <path
+                        d="M255 102q-16 14 0 28M279 102q16 14 0 28"
+                        class="art-line"
+                      />
+                      <text
+                        x="267"
+                        y="213"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        eNodeB
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <rect
+                        x="406"
+                        y="128"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="416" cy="135" r="2" class="art-dot" />
+                      <path d="M452 135h17" class="art-line" />
+                      <rect
+                        x="406"
+                        y="147"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="416" cy="154" r="2" class="art-dot" />
+                      <path d="M452 154h17" class="art-line" />
+                      <rect
+                        x="406"
+                        y="166"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="416" cy="173" r="2" class="art-dot" />
+                      <path d="M452 173h17" class="art-line" />
+                      <text
+                        x="443"
+                        y="213"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        EPC + CIoT
+                      </text>
+                    </g>
+                    <g data-part="3" class="art-part">
+                      <rect
+                        x="191"
+                        y="35"
+                        width="154"
+                        height="41"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="268"
+                        y="60"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        OTA research
+                      </text>
+                      <path d="M267 76v29" class="art-line" />
+                      <text
+                        x="365"
+                        y="281"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Observe · prototype · verify
+                      </text>
+                    </g>
+                  </g>
+                </svg>
+                <ol class="study-steps" aria-label="Sonica walkthrough">
+                  <li data-step-label="1"><span>01</span>Connect</li>
+                  <li data-step-label="2"><span>02</span>Exchange</li>
+                  <li data-step-label="3"><span>03</span>Experiment</li>
+                </ol>
+                <figcaption>
+                  Real devices. An open network. Room to experiment.
+                </figcaption>
+                <button
+                  type="button"
+                  class="study-replay"
+                  aria-label="Replay Sonica walkthrough"
+                  hidden
+                >
+                  <span aria-hidden="true">↻</span> Replay
+                </button>
+              </figure>
+              <div class="project-resources">
+                <a
+                  class="text-link"
+                  href="https://github.com/sonica-nbiot/sonica"
+                  >Explore on GitHub <span aria-hidden="true">↗</span></a
+                >
+                <details class="project-original">
+                  <summary>
+                    Original diagram <span aria-hidden="true">+</span>
+                  </summary>
+                  <div class="original-sheet">
+                    <img
+                      src="images/optimized/sonica-overview.webp"
+                      alt="Original Sonica project illustration"
+                      width="1092"
+                      height="617"
+                      loading="lazy"
+                      decoding="async"
+                    /><a
+                      href="images/optimized/sonica-overview.webp"
+                      target="_blank"
+                      rel="noopener"
+                      >Open full size ↗</a
+                    >
+                  </div>
+                </details>
+              </div>
             </article>
-            <article class="project project-small reveal" id="flora">
+            <article class="project project-study reveal" id="flora">
               <div class="project-meta">
                 <span>SOFTWARE-DEFINED NETWORKS</span><span>03</span>
               </div>
               <h3>Flora</h3>
-              <p>
+              <p class="project-description">
                 A flexible 4G LTE/5G platform without commodity SIMs, chipsets,
                 or dedicated infrastructure equipment.
               </p>
-              <img
-                class="small-project-image"
-                src="images/optimized/flora_intro.webp"
-                alt="Flora flexible mobile network platform overview"
-                width="2326"
-                height="1065"
-                loading="lazy"
-                decoding="async"
-              /><a
-                class="text-link"
-                href="https://project-flora.github.io/Flora/"
-                >Explore the project <span aria-hidden="true">↗</span></a
-              >
+              <figure class="project-visual" data-motion-study data-step="0">
+                <div class="study-heading">
+                  <span>HOW IT WORKS</span
+                  ><span class="study-kind">Conceptual walkthrough</span>
+                </div>
+                <svg
+                  class="project-art"
+                  viewBox="0 0 560 320"
+                  role="img"
+                  aria-labelledby="flora-art-title flora-art-desc"
+                >
+                  <title id="flora-art-title">Flora: how it works</title>
+                  <desc id="flora-art-desc">
+                    A configurable eSIM profile connects through the
+                    software-defined LTE RAN and core to an edge VR application,
+                    with network analytics across the platform.
+                  </desc>
+                  <g aria-hidden="true">
+                    <path d="M102 187L251 112" class="art-route" />
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M102 187L251 112"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M317 112L454 187" class="art-route" />
+                    <g data-part="2" class="art-part">
+                      <path
+                        d="M317 112L454 187"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M454 228V270H104V228" class="art-route" />
+                    <g data-part="3" class="art-part">
+                      <path
+                        d="M454 228V270H104V228"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <g transform="translate(54 151) scale(0.85)">
+                        <path d="M0 0H48L70 22V90H0Z" class="art-device" />
+                        <rect
+                          x="14"
+                          y="35"
+                          width="42"
+                          height="38"
+                          rx="4"
+                          class="art-chip"
+                        />
+                        <path
+                          d="M28 35V73M42 35V73M14 47H56M14 60H56"
+                          class="art-line"
+                        />
+                      </g>
+                      <text
+                        x="83"
+                        y="258"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        eSIM PROFILE
+                      </text>
+                    </g>
+                    <g data-part="1 2" class="art-part">
+                      <rect
+                        x="201"
+                        y="42"
+                        width="166"
+                        height="88"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <rect
+                        x="217"
+                        y="57"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="227" cy="64" r="2" class="art-dot" />
+                      <path d="M263 64h17" class="art-line" />
+                      <rect
+                        x="217"
+                        y="76"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="227" cy="83" r="2" class="art-dot" />
+                      <path d="M263 83h17" class="art-line" />
+                      <rect
+                        x="217"
+                        y="95"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="227" cy="102" r="2" class="art-dot" />
+                      <path d="M263 102h17" class="art-line" />
+                      <text
+                        x="323"
+                        y="75"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        RAN
+                      </text>
+                      <text
+                        x="323"
+                        y="96"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        CORE
+                      </text>
+                      <text
+                        x="284"
+                        y="153"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        SOFTWARE-DEFINED LTE
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <rect
+                        x="406"
+                        y="159"
+                        width="104"
+                        height="69"
+                        rx="8"
+                        class="art-device"
+                      />
+                      <path d="M406 182H510" class="art-line" />
+                      <path
+                        d="M444 189l16 -8.0 16 8.0v16l-16 8.0 -16 -8.0Z M444 189l16 8.0 16 -8.0 M460 197.0v16"
+                        class="art-device-line"
+                      />
+                      <text
+                        x="458"
+                        y="254"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        EDGE VR
+                      </text>
+                    </g>
+                    <g data-part="3" class="art-part">
+                      <rect
+                        x="198"
+                        y="204"
+                        width="170"
+                        height="47"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="283"
+                        y="224"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        Network analytics
+                      </text>
+                      <path
+                        d="M216 238h20l7-9 10 15 9-9h23l8-6 7 9h47"
+                        class="art-trace"
+                      />
+                    </g>
+                    <text
+                      x="282"
+                      y="299"
+                      class="art-small"
+                      text-anchor="middle"
+                    >
+                      One platform. Across the stack.
+                    </text>
+                  </g>
+                </svg>
+                <ol class="study-steps" aria-label="Flora walkthrough">
+                  <li data-step-label="1"><span>01</span>Configure</li>
+                  <li data-step-label="2"><span>02</span>Connect</li>
+                  <li data-step-label="3"><span>03</span>Observe</li>
+                </ol>
+                <figcaption>
+                  Connect the profile, network, and edge application.
+                </figcaption>
+                <button
+                  type="button"
+                  class="study-replay"
+                  aria-label="Replay Flora walkthrough"
+                  hidden
+                >
+                  <span aria-hidden="true">↻</span> Replay
+                </button>
+              </figure>
+              <div class="project-resources">
+                <a
+                  class="text-link"
+                  href="https://project-flora.github.io/Flora/"
+                  >Explore the project <span aria-hidden="true">↗</span></a
+                >
+                <details class="project-original">
+                  <summary>
+                    Original diagram <span aria-hidden="true">+</span>
+                  </summary>
+                  <div class="original-sheet">
+                    <img
+                      src="images/optimized/flora_intro.webp"
+                      alt="Original Flora project illustration"
+                      width="2326"
+                      height="1065"
+                      loading="lazy"
+                      decoding="async"
+                    /><a
+                      href="images/optimized/flora_intro.webp"
+                      target="_blank"
+                      rel="noopener"
+                      >Open full size ↗</a
+                    >
+                  </div>
+                </details>
+              </div>
             </article>
-            <article class="project project-small reveal" id="lrp">
+            <article class="project project-study reveal" id="lrp">
               <div class="project-meta">
                 <span>LOW LATENCY / MOBILE VR</span><span>04</span>
               </div>
               <h3>Less delay. More immersion.</h3>
-              <p>
+              <p class="project-description">
                 Device-based LTE latency reduction at the application layer,
                 demonstrated through mobile VR.
               </p>
-              <img
-                class="small-project-image"
-                src="images/optimized/LRP.webp"
-                alt="Mobile VR system demonstrating cellular latency reduction"
-                width="1964"
-                height="370"
-                loading="lazy"
-                decoding="async"
-              /><a
-                class="text-link"
-                href="https://www.usenix.org/system/files/nsdi21-tan.pdf"
-                >Read the NSDI ’21 paper <span aria-hidden="true">↗</span></a
-              >
+              <figure class="project-visual" data-motion-study data-step="0">
+                <div class="study-heading">
+                  <span>HOW IT WORKS</span
+                  ><span class="study-kind">Conceptual walkthrough</span>
+                </div>
+                <svg
+                  class="project-art"
+                  viewBox="0 0 560 320"
+                  role="img"
+                  aria-labelledby="lrp-art-title lrp-art-desc"
+                >
+                  <title id="lrp-art-title">
+                    Less delay. More immersion.: how it works
+                  </title>
+                  <desc id="lrp-art-desc">
+                    Mobile VR sends motion to an edge renderer and receives
+                    rendered frames. Application-layer inference, DRX doze
+                    reduction, and proactive scheduling prepare the uplink ahead
+                    of data arrival. Timing is illustrative, not a benchmark.
+                  </desc>
+                  <g aria-hidden="true">
+                    <path d="M125 148H390" class="art-route" />
+                    <g data-part="1" class="art-part">
+                      <path
+                        d="M125 148H390"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <path d="M390 173H125" class="art-route" />
+                    <g data-part="3" class="art-part">
+                      <path
+                        d="M390 173H125"
+                        class="art-flow"
+                        pathLength="100"
+                      />
+                    </g>
+                    <g data-part="1" class="art-part">
+                      <rect
+                        x="60"
+                        y="91"
+                        width="65"
+                        height="107"
+                        rx="10"
+                        class="art-device"
+                      />
+                      <rect
+                        x="67"
+                        y="105"
+                        width="51"
+                        height="73"
+                        rx="3"
+                        class="art-screen"
+                      />
+                      <path d="M84 98h17 M85 188h15" class="art-line" />
+                      <text
+                        x="92"
+                        y="226"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        MOBILE VR
+                      </text>
+                      <path
+                        d="M78 135l15-8 14 8v18l-14 8-15-8Z"
+                        class="art-line"
+                      />
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <rect
+                        x="167"
+                        y="35"
+                        width="187"
+                        height="53"
+                        rx="8"
+                        class="art-panel"
+                      />
+                      <text
+                        x="261"
+                        y="57"
+                        class="art-label"
+                        text-anchor="middle"
+                      >
+                        Latency reduction
+                      </text>
+                      <text
+                        x="261"
+                        y="75"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Infer · wake · schedule
+                      </text>
+                      <path d="M260 88v40" class="art-line" />
+                    </g>
+                    <g data-part="1 2" class="art-part">
+                      <text
+                        x="257"
+                        y="139"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Motion →
+                      </text>
+                    </g>
+                    <g data-part="3" class="art-part">
+                      <rect
+                        x="393"
+                        y="104"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="403" cy="111" r="2" class="art-dot" />
+                      <path d="M439 111h17" class="art-line" />
+                      <rect
+                        x="393"
+                        y="123"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="403" cy="130" r="2" class="art-dot" />
+                      <path d="M439 130h17" class="art-line" />
+                      <rect
+                        x="393"
+                        y="142"
+                        width="74"
+                        height="15"
+                        rx="3"
+                        class="art-device"
+                      />
+                      <circle cx="403" cy="149" r="2" class="art-dot" />
+                      <path d="M439 149h17" class="art-line" />
+                      <path
+                        d="M416 178l20 -10.0 20 10.0v20l-20 10.0 -20 -10.0Z M416 178l20 10.0 20 -10.0 M436 188.0v20"
+                        class="art-device-line"
+                      />
+                      <text
+                        x="430"
+                        y="242"
+                        class="art-kicker"
+                        text-anchor="middle"
+                      >
+                        EDGE RENDERER
+                      </text>
+                      <text
+                        x="257"
+                        y="198"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        ← Rendered frames
+                      </text>
+                    </g>
+                    <g data-part="2" class="art-part">
+                      <path d="M169 267H354" class="art-route" />
+                      <rect
+                        x="188"
+                        y="256"
+                        width="10"
+                        height="22"
+                        rx="2"
+                        class="art-slot"
+                      />
+                      <rect
+                        x="215"
+                        y="256"
+                        width="10"
+                        height="22"
+                        rx="2"
+                        class="art-slot"
+                      />
+                      <rect
+                        x="242"
+                        y="256"
+                        width="10"
+                        height="22"
+                        rx="2"
+                        class="art-slot art-slot-active"
+                      />
+                      <rect
+                        x="269"
+                        y="256"
+                        width="10"
+                        height="22"
+                        rx="2"
+                        class="art-slot"
+                      />
+                      <rect
+                        x="296"
+                        y="256"
+                        width="10"
+                        height="22"
+                        rx="2"
+                        class="art-slot"
+                      />
+                      <rect
+                        x="323"
+                        y="256"
+                        width="10"
+                        height="22"
+                        rx="2"
+                        class="art-slot"
+                      />
+                      <text
+                        x="262"
+                        y="300"
+                        class="art-small"
+                        text-anchor="middle"
+                      >
+                        Prepare the uplink before data arrives
+                      </text>
+                    </g>
+                  </g>
+                </svg>
+                <ol
+                  class="study-steps"
+                  aria-label="Less delay. More immersion. walkthrough"
+                >
+                  <li data-step-label="1"><span>01</span>Sense</li>
+                  <li data-step-label="2"><span>02</span>Prepare uplink</li>
+                  <li data-step-label="3"><span>03</span>Render</li>
+                </ol>
+                <figcaption>
+                  Anticipate the uplink. Keep the motion-to-frame loop moving.
+                </figcaption>
+                <button
+                  type="button"
+                  class="study-replay"
+                  aria-label="Replay Less delay. More immersion. walkthrough"
+                  hidden
+                >
+                  <span aria-hidden="true">↻</span> Replay
+                </button>
+              </figure>
+              <div class="project-resources">
+                <a
+                  class="text-link"
+                  href="https://www.usenix.org/system/files/nsdi21-tan.pdf"
+                  >Read the NSDI ’21 paper <span aria-hidden="true">↗</span></a
+                >
+                <details class="project-original">
+                  <summary>
+                    Original diagram <span aria-hidden="true">+</span>
+                  </summary>
+                  <div class="original-sheet">
+                    <img
+                      src="images/optimized/LRP.webp"
+                      alt="Original Less delay. More immersion. project illustration"
+                      width="1964"
+                      height="370"
+                      loading="lazy"
+                      decoding="async"
+                    /><a
+                      href="images/optimized/LRP.webp"
+                      target="_blank"
+                      rel="noopener"
+                      >Open full size ↗</a
+                    >
+                  </div>
+                </details>
+              </div>
             </article>
           </div>
           <article class="acemap-project reveal" id="acemap">
@@ -633,7 +1892,7 @@
                 >Explore Acemap <span aria-hidden="true">↗</span></a
               >
             </div>
-            <div class="map-panel">
+            <div class="map-panel" data-motion-study data-step="0">
               <svg
                 id="topic-map"
                 viewBox="0 0 600 360"
@@ -672,9 +1931,16 @@
                     transform="rotate(55 300 180)"
                   />
                   <path
+                    class="map-connectors"
+                    pathLength="100"
                     d="M120 120 300 45 465 100 480 240 315 318 130 265Z M120 120 480 240 M465 100 130 265 M300 45 315 318"
                   />
-                  <g fill="#9edaff" stroke="none">
+                  <g
+                    fill="#9edaff"
+                    stroke="none"
+                    class="map-constellation"
+                    data-part="1 2 3"
+                  >
                     <circle cx="120" cy="120" r="6" />
                     <circle cx="300" cy="45" r="5" />
                     <circle cx="465" cy="100" r="7" />
@@ -685,6 +1951,14 @@
                   </g>
                 </g>
               </svg>
+              <button
+                type="button"
+                class="study-replay map-replay"
+                aria-label="Replay Acemap discovery walkthrough"
+                hidden
+              >
+                <span aria-hidden="true">↻</span> Replay
+              </button>
               <div class="map-controls" hidden>
                 <button class="map-load" type="button">
                   Explore the topic map
