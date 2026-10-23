@@ -6,37 +6,14 @@
   const body = document.body;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-  const motionButton = $("#motion-toggle");
-  let userPaused = false;
-  try {
-    userPaused = localStorage.getItem("jz-motion-paused") === "true";
-  } catch {
-    /* Storage is optional. */
-  }
-  let motionEnabled = !reduceMotion.matches && !userPaused;
+  let motionEnabled = !reduceMotion.matches;
   let syncScene = () => {};
   let updateScroll = () => {};
 
   function applyMotion() {
-    motionEnabled = !reduceMotion.matches && !userPaused;
+    motionEnabled = !reduceMotion.matches;
     body.classList.toggle("motion-enabled", motionEnabled);
     body.classList.toggle("motion-paused", !motionEnabled);
-    motionButton.setAttribute("aria-pressed", String(!motionEnabled));
-    motionButton.disabled = reduceMotion.matches;
-    motionButton.setAttribute(
-      "aria-label",
-      reduceMotion.matches
-        ? "Animations reduced by your system preference"
-        : motionEnabled
-          ? "Pause animations"
-          : "Resume animations",
-    );
-    $(".motion-label").textContent = reduceMotion.matches
-      ? "Motion reduced"
-      : motionEnabled
-        ? "Pause motion"
-        : "Resume motion";
-    $(".motion-icon").textContent = motionEnabled ? "Ⅱ" : "▷";
     if (!motionEnabled)
       $$(".reveal.is-pending").forEach((el) =>
         el.classList.remove("is-pending"),
@@ -44,16 +21,6 @@
     syncScene();
     updateScroll();
   }
-  motionButton.hidden = false;
-  motionButton.addEventListener("click", () => {
-    userPaused = !userPaused;
-    try {
-      localStorage.setItem("jz-motion-paused", String(userPaused));
-    } catch {
-      /* Private browsing can reject writes. */
-    }
-    applyMotion();
-  });
   reduceMotion.addEventListener("change", applyMotion);
   applyMotion();
   $("#year").textContent = new Date().getFullYear();

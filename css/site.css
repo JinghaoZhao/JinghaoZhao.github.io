@@ -1169,34 +1169,6 @@ article[id],
 .footer-links a:hover {
   color: #163a5d;
 }
-.motion-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 22px;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid #7995b53b;
-  border-radius: 25px;
-  background: #132b43e8;
-  backdrop-filter: blur(10px);
-  color: #c8ddf1;
-  font-size: 10px;
-  padding: 9px 14px;
-  box-shadow: 0 2px 12px #0000000c;
-}
-.motion-icon {
-  font-size: 12px;
-  width: 12px;
-  text-align: center;
-}
-.motion-toggle:hover {
-  background: #214563;
-}
-.motion-toggle:focus-visible {
-  outline-color: #a6d1f5;
-}
 /* Motion is progressive enhancement: all content starts visible by default. */
 .motion-enabled .reveal {
   transition:
@@ -1604,12 +1576,6 @@ html:has(.motion-paused) {
   .site-footer p {
     margin-left: auto;
   }
-  .motion-toggle {
-    right: 15px;
-    bottom: 15px;
-    font-size: 9px;
-    padding: 8px 12px;
-  }
   h2 {
     letter-spacing: -1.6px;
   }
@@ -1787,7 +1753,6 @@ html:has(.motion-paused) {
   .site-header,
   .hero-footer,
   .hero-actions,
-  .motion-toggle,
   .contact-section,
   .footer-links,
   .compute-figure,
@@ -1868,10 +1833,6 @@ html:has(.motion-paused) {
   }
 }
 
-.motion-toggle:disabled {
-  cursor: default;
-  opacity: 0.8;
-}
 .topic-select {
   display: flex;
   gap: 14px;

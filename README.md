@@ -27,7 +27,7 @@ The older Jade, Sass, Less, and JavaScript files are retained for reference. **T
 
 The native canvas replaces the former 600-triangle tween loop. Rendering is capped at 30 fps and 1.5× pixel density, with fewer geometry elements on small screens. The canvas suspends when the hero is offscreen or the document is hidden. SVG illustration animation suspends offscreen as well.
 
-The motion control saves the visitor's preference locally and respects the operating system's reduced-motion setting. Biography, links, all projects, and all publications remain readable without JavaScript. Filters are native buttons; the knowledge map includes native field and topic selectors for keyboard use. There is no custom scroll interception.
+Motion follows the operating system's reduced-motion setting. There is no floating pause control or stored manual motion preference. Biography, links, all projects, and all publications remain readable without JavaScript. Filters are native buttons; the knowledge map includes native field and topic selectors for keyboard use. There is no custom scroll interception.
 
 Acemap retains all 2,208 topics from the existing CSV. Data is requested only when a visitor opens the map. The homepage no longer loads jQuery, Bootstrap, TweenLite, or Plotly. The existing Google Analytics property is retained on the production domains only.
 
