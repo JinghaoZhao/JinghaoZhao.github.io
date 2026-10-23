@@ -11,3 +11,10 @@
 - No browser console errors observed for the completed revision.
 
 Limits: browser checks used Chromium and emulated sizes, not physical devices or Safari/Firefox. These are conceptual mechanisms, not measured simulation timings, benchmarks, or exhaustive protocol diagrams. Changes are staged locally for review; no deployment is part of this verification.
+
+## Follow-up: consistent project presentation
+
+- Removed all six original-image disclosures and their styles; original image files remain in the repository.
+- Restyled Acemap with the same light background, project metadata, title scale, conceptual-figure header, three-step strip, and replay control as the six other projects. Native field/topic controls and selected-point outlines use matching light-theme colors.
+- Kept the original CSV color values as field identifiers and applied a separate display palette, preserving all 2,208 topics and field assignments. Selecting Computer Science still exposes 256 topics (257 dropdown options including the placeholder).
+- Confirmed the old disclosure text and elements are absent, all local assets and IDs remain valid, and the JavaScript passes syntax checks. Desktop and mobile browser checks found no horizontal overflow or console errors. The loaded map is labeled as a research topic map rather than a conceptual preview.

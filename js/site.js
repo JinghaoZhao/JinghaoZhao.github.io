@@ -415,6 +415,28 @@
     "#8df8a0",
     "#ffce63",
   ];
+  // Source colors identify fields in the original CSV; display colors suit the light page.
+  const displayColors = [
+    "#806092",
+    "#658344",
+    "#75689e",
+    "#ab6d59",
+    "#9c793f",
+    "#7c803a",
+    "#3b7fa5",
+    "#a47748",
+    "#2c8876",
+    "#866c8d",
+    "#348a97",
+    "#528471",
+    "#7b8045",
+    "#527f50",
+    "#a46d86",
+    "#ac7164",
+    "#a56477",
+    "#4c855d",
+    "#9e813e",
+  ];
   let topicPoints = [],
     circles = [],
     selectedField = "all";
@@ -516,7 +538,7 @@
           ((point.y - minY) * scale + offsetY).toFixed(2),
         );
         circle.setAttribute("r", "1.9");
-        circle.setAttribute("fill", point.color);
+        circle.setAttribute("fill", displayColors[point.field]);
         circle.setAttribute("class", "map-point");
         circle.dataset.point = i;
         fragment.appendChild(circle);
@@ -539,6 +561,7 @@
       group.addEventListener("pointerover", showTopic);
       group.addEventListener("click", showTopic);
       mapLoad.hidden = true;
+      $(".map-panel .study-kind").textContent = "Research topic map";
       $(".field-select").hidden = false;
       $(".topic-select").hidden = false;
       updateMap();

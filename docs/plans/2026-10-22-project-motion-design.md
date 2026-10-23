@@ -2,11 +2,11 @@
 
 ## Direction
 
-Replace the six white-backed thumbnail figures in “Ideas, made real.” with inline SVG walkthroughs on the existing blue-gray paper. Keep the original figures in native “Original diagram” disclosures. Retain the seven projects, their descriptions, destinations, research records, and the rest of the site.
+Replace the six white-backed thumbnail figures in “Ideas, made real.” with inline SVG walkthroughs on the existing blue-gray paper. Keep the original figure assets in the repository without showing original-image disclosures on the page. Retain the seven projects, their descriptions, destinations, research records, and the rest of the site.
 
 A unified line weight, restrained blue/teal accents, readable labels, and three-step sequences make the projects feel related while explaining distinct mechanisms. Six purpose-drawn schematics and the existing Acemap preview cover all seven entries. Narrow layouts become a single column at 900 px to preserve diagram legibility.
 
-Alternatives considered: restoring a white section would solve the edge contrast but preserve the dense thumbnail problem; floating or zooming the old images would add motion without explaining a mechanism. The chosen approach retains both an accessible visual explanation and the original technical detail.
+Alternatives considered: restoring a white section would solve the edge contrast but preserve the dense thumbnail problem; floating or zooming the old images would add motion without explaining a mechanism. The chosen approach provides an accessible visual explanation, with project and paper links for technical detail.
 
 ## Evidence and motion mapping
 
@@ -22,4 +22,4 @@ Alternatives considered: restoring a white section would solve the edge contrast
 
 Each walkthrough plays once for 10.8 seconds on entering view, then rests as a complete static diagram. Three 3.6-second stages highlight corresponding components and data flows. Replay is available locally within each illustration; no floating pause control returns. CSS handles motion, with small native timers used only for visible stages. Offscreen and hidden-tab playback pauses, operating-system reduced-motion preferences yield static figures, and content remains available without JavaScript.
 
-SVG title/description elements explain the conceptual sequence to assistive technology. The visuals include a visible conceptual-walkthrough label. Original images remain unchanged and expandable with native keyboard controls. The live site remains unchanged while this version is reviewed locally.
+SVG title/description elements explain the conceptual sequence to assistive technology. The visuals include a visible conceptual-walkthrough label. Original images remain unchanged in the repository. Acemap uses the same light paper, metadata, heading scale, three-step strip, and replay treatment as the other projects; the loaded topic colors are tuned for the light background without changing their field assignments. The live site remains unchanged while this version is reviewed locally.
