@@ -1,36 +1,28 @@
-# 今日科技长文：Claude 已经能从一句话设计出真正能工作的电子产品，AI 正在跨越软件与物理世界的边界
+# **今日科技长文：Claude 已经能从一句话设计出真正能工作的电子产品，AI 正在跨越软件与物理世界的边界**
 
 今天推荐 **Anthropic Science 团队于 2026 年 11 月 9 日发表的《Testing Claude on real-world electronics design》**，中文可译为《在真实电子硬件设计中测试 Claude》。这篇文章由 Anthropic 的 Mike Cretella、Connor Jennings、Brent Yi，以及 Diode Computers 的 Craig Chen 等工程师参与完成。**全文免费公开**，包含实际制造的硬件照片、四层 PCB 布线图、设计修改案例和模型评测数据。结合图片及技术背景，适合花约 15–20 分钟深入阅读。
 
-<Link url={turn101057search0.url.uri} title="阅读 Anthropic 官方英文原文与硬件设计图"/>
+[阅读 Anthropic 官方英文原文与硬件设计图](https://www.anthropic.com/research/claude-electronics-design)
 
 我今天选择它，是因为这篇文章展示了一项与普通 Coding Agent 完全不同的能力：**AI 不仅可以编写软件，还可以把自然语言中的产品想法转化成电路图、PCB、机械结构、固件和可供工厂制造的设计文件。**
 
 Anthropic 让 Claude Fable 5.2 设计了三款设备。工程师根据模型输出的文件制作实体原型，三款设备都成功运行，而且据团队披露，不需要对电路设计进行返工。
 
-<box gap={2}>
-  <grid columns={3} gap={2}>
-    <grid-item>
-      <AsyncImage query="Anthropic Diode Computers Claude Fable 5.2 white round USB speakerphone hardware prototype November 2026" aspectRatio="4:3"/>
-      <text weight="medium" size="xs" textAlign="center">USB 会议扬声器</text>
-    </grid-item>
-    <grid-item>
-      <AsyncImage query="Anthropic Claude Fable 5.2 Diode Computers black wedge shaped voice assistant hub electronic prototype November 2026" aspectRatio="4:3"/>
-      <text weight="medium" size="xs" textAlign="center">家庭语音助手</text>
-    </grid-item>
-    <grid-item>
-      <AsyncImage query="Anthropic Claude Fable 5.2 Diode Computers handheld virtual pet electronics prototype November 2026" aspectRatio="4:3"/>
-      <text weight="medium" size="xs" textAlign="center">手持电子宠物</text>
-    </grid-item>
-  </grid>
-  <caption>三款原型的设计与制造由 Anthropic 和 Diode Computers 合作完成。它们目前只是功能原型，并非已完成商业认证的量产产品。<Cite ref="turn101057search0"/></caption>
-</box>
+USB 会议扬声器
+
+家庭语音助手
+
+手持电子宠物
+
+三款原型的设计与制造由 Anthropic 和 Diode Computers 合作完成。它们目前只是功能原型，并非已完成商业认证的量产产品。
+
+Anthropic
 
 真正令人印象深刻的并不是 AI 画出了 PCB，而是它能够发现设计中的物理冲突，重新组织布线，编写自己的 CAD 辅助算法，还能考虑声音共振、供电限制和工厂制造条件。
 
 这标志着 AI Agent 的一个重要变化：它不再只是处理数字文件，而开始协调软件、几何、电气和制造约束，尝试生产现实世界中能够使用的物体。
 
-## 为什么硬件设计远比生成代码困难？
+## **为什么硬件设计远比生成代码困难？**
 
 过去一年，Coding Agent 已经证明自己能够独立修改大量代码。但电子硬件设计与软件开发之间存在一项根本差异。
 
@@ -62,9 +54,11 @@ Anthropic 在 2025 年就开始与 Diode Computers 合作，让 Claude 学习读
 
 又或者它能完成大部分布线，却在最后几条连接上陷入死局。
 
-**这次进步的关键，不是 Claude 突然学会了更多电子学术语，而是它能够在多个现实约束之间持续推理，并修正自己的决策。** <Cite ref="turn341006view0"/>
+**这次进步的关键，不是 Claude 突然学会了更多电子学术语，而是它能够在多个现实约束之间持续推理，并修正自己的决策。** 
 
-## 从一句话到真正的硬件：Claude 究竟独立完成了哪些工作？
+Anthropic
+
+## **从一句话到真正的硬件：Claude 究竟独立完成了哪些工作？**
 
 研究团队给 Claude 提供的是简短的产品描述，而不是完整设计图。
 
@@ -90,9 +84,11 @@ Claude 需要把这些要求转化成实际工程方案。
 
 真正量产之前，还需要测试天线、电磁兼容、热性能、长期可靠性，以及不同制造批次之间的一致性。
 
-这些工作并未在本次研究中全部完成。<Cite ref="turn101057search0"/>
+这些工作并未在本次研究中全部完成。
 
-## Claude 首先解决了一个传统 AI 很难做好的问题：复杂空间几何推理
+Anthropic
+
+## **Claude 首先解决了一个传统 AI 很难做好的问题：复杂空间几何推理**
 
 PCB 设计有点像在一座高度拥挤的多层城市里规划道路。
 
@@ -124,9 +120,11 @@ Claude 在家庭语音助手 PCB 的设计过程中，优先处理 USB 和 Ether
 
 因此，Claude 需要把几何空间与电气属性结合考虑。
 
-这正是此前模型很容易失败的地方：**它们能够识别元件，却无法稳定处理元件之间复杂的物理关系。** <Cite ref="turn341006view0"/>
+这正是此前模型很容易失败的地方：**它们能够识别元件，却无法稳定处理元件之间复杂的物理关系。** 
 
-## 为什么四层 PCB 的触摸控制区，反而成了 Claude 最出色的案例之一？
+Anthropic
+
+## **为什么四层 PCB 的触摸控制区，反而成了 Claude 最出色的案例之一？**
 
 会议扬声器使用四层铜结构。
 
@@ -160,9 +158,11 @@ Claude 最初也遇到了布局拥挤的问题。
 
 这是因为附近的导电金属可能改变天线电磁场分布，影响射频性能。
 
-这些细节说明，模型并不是只追求把线路全部连接起来，而是开始考虑它们连接以后是否能够正常工作。<Cite ref="turn341006view0"/>
+这些细节说明，模型并不是只追求把线路全部连接起来，而是开始考虑它们连接以后是否能够正常工作。
 
-## 比会画 PCB 更重要的是：Claude 知道什么时候应该推倒重来
+Anthropic
+
+## **比会画 PCB 更重要的是：Claude 知道什么时候应该推倒重来**
 
 研究中出现了一个非常具有代表性的行为变化。
 
@@ -194,9 +194,11 @@ Anthropic 表示，早期模型经常能够完成约 95% 的 PCB 设计，却始
 
 因为很多真正困难的问题，并不是缺少下一步操作，而是早期决策已经把整个设计带入了无法完成的状态。
 
-一个能够主动重新规划的 Agent，可能远比一个只会不断执行后续步骤的 Agent 更有实际价值。<Cite ref="turn341006view0"/>
+一个能够主动重新规划的 Agent，可能远比一个只会不断执行后续步骤的 Agent 更有实际价值。
 
-## Claude 甚至认为现有工具太麻烦，于是自己写了一个新的 PCB 布线器
+Anthropic
+
+## **Claude 甚至认为现有工具太麻烦，于是自己写了一个新的 PCB 布线器**
 
 这是我认为整篇文章最有意思的技术细节。
 
@@ -228,9 +230,11 @@ KiCad 是一款广泛使用的开源电子设计自动化（EDA）软件。
 
 **当已有工具不适合当前任务时，Agent 可以先编写新的工具，再使用它完成原本的工程目标。**
 
-不过，这仍然是研究团队披露的具体案例，不代表这个临时生成的布线算法已经达到商业 EDA 软件在所有场景中的可靠性和性能水平。<Cite ref="turn341006view0"/>
+不过，这仍然是研究团队披露的具体案例，不代表这个临时生成的布线算法已经达到商业 EDA 软件在所有场景中的可靠性和性能水平。
 
-## 电路正确还不够：Claude 必须理解产品的声学和机械结构
+Anthropic
+
+## **电路正确还不够：Claude 必须理解产品的声学和机械结构**
 
 硬件设计的另一个困难，是不同专业领域的决策会相互影响。
 
@@ -266,9 +270,11 @@ Claude 估计，原先约 **25 毫米**长的麦克风声音通道，会在约 *
 
 但这个案例说明了一个关键变化。
 
-**模型能够把外观设计、机械结构和物理性能联系起来，而不是只生成一个看起来漂亮的外壳。** <Cite ref="turn341006view0"/>
+**模型能够把外观设计、机械结构和物理性能联系起来，而不是只生成一个看起来漂亮的外壳。** 
 
-## Claude 还把供电约束传递到了固件里
+Anthropic
+
+## **Claude 还把供电约束传递到了固件里**
 
 电子产品中的软件与硬件不是完全独立的。
 
@@ -298,9 +304,11 @@ Claude 查阅了充电芯片的数据手册，判断设备可以运行，但预�
 
 这个例子再次说明模型能够利用元器件的具体规格进行推理。
 
-但原文没有明确证明闪灯预测已经通过实测验证，因此不能把它当作确认的实验结果。<Cite ref="turn101057search0"/>
+但原文没有明确证明闪灯预测已经通过实测验证，因此不能把它当作确认的实验结果。
 
-## 从原型到制造，最容易被低估的是 DFM
+Anthropic
+
+## **从原型到制造，最容易被低估的是 DFM**
 
 如果 Claude 只能设计出在仿真环境中成立的 PCB，它依然无法真正替代任何实际的工程工作。
 
@@ -336,17 +344,19 @@ Diode 最终根据 Claude 输出的文件制造了全部三块电路板。
 
 对于普通电子产品原型开发，这是一项具有实际意义的结果。
 
-但它仍然只是三个经过选择的原型项目，不代表任意复杂度的 PCB 都能实现同样的首次制造成功率。<Cite ref="turn341006view0"/>
+但它仍然只是三个经过选择的原型项目，不代表任意复杂度的 PCB 都能实现同样的首次制造成功率。
 
-## Benchmark 的改进到底有多大？
+Anthropic
+
+## **Benchmark 的改进到底有多大？**
 
 Anthropic 还使用两套评测检查模型的进步。
 
-<box gap={2}>
-  <title size="md">Diode PCB Gym：PCB 布局与布线能力</title>
-  <Chart content={{"chartType":"bar","xKey":"model","series":[{"dataKey":"score","label":"测试得分","valueSuffix":"%"}],"yAxisMin":0,"yAxisMax":100,"data":[{"model":"Claude Fable 5","score":25},{"model":"Claude Fable 5.2","score":69}]}}/>
-  <caption>Diode Computers 内部评测。分数提高 44 个百分点，但不意味着实际 PCB 项目完成速度提高了相同比例。<Cite ref="turn101057search0"/></caption>
-</box>
+### **Diode PCB Gym：PCB 布局与布线能力**
+
+Diode Computers 内部评测。分数提高 44 个百分点，但不意味着实际 PCB 项目完成速度提高了相同比例。
+
+Anthropic
 
 PCB Gym 会从已有 PCB 设计中移除布局，让模型重新放置元器件并建立铜线连接。
 
@@ -364,13 +374,15 @@ Anthropic 报告 Claude Fable 5.2 达到 **83.5%**，而此前 Fable 5.1 的得�
 
 Fable 5.2 的 83.5% 是在允许工具辅助的配置下取得的；同一模型使用标准配置的得分约为 **75.4%**。
 
-因此，不同工具环境和评测执行方式会改变成绩，不能混用不同版本或者不同执行条件的数据来证明模型具有某种绝对领先优势。<Cite ref="turn341006search2"/>
+因此，不同工具环境和评测执行方式会改变成绩，不能混用不同版本或者不同执行条件的数据来证明模型具有某种绝对领先优势。
+
+BenchCAD Blog
 
 总体而言，这些 Benchmark 支持的结论是：Claude 在几何和工程工具任务上的能力显著进步。
 
 但真实电子设计能力，还需要通过更多不同复杂度、独立复现的工程项目验证。
 
-## 为什么这项研究不能被理解为 AI 已经可以取代硬件工程师？
+## **为什么这项研究不能被理解为 AI 已经可以取代硬件工程师？**
 
 Anthropic 在原文末尾明确指出了研究局限。
 
@@ -402,9 +414,11 @@ Anthropic 在原文末尾明确指出了研究局限。
 
 因此，人类工程师仍然需要负责实体装配、测量与判断。
 
-我认为这份研究已经证明了一种很有价值的原型开发能力，但还没有证明完整的、无人参与的商业产品研发能力。<Cite ref="turn101057search0"/>
+我认为这份研究已经证明了一种很有价值的原型开发能力，但还没有证明完整的、无人参与的商业产品研发能力。
 
-## OpenAI 也在做类似研究，这意味着什么？
+Anthropic
+
+## **OpenAI 也在做类似研究，这意味着什么？**
 
 值得补充的是，OpenAI 在 2026 年 11 月 3 日发表了《Accelerating Engineering for the Physical World》，展示了 AI 参与电子、机械和跨专业工程设计的工作。
 
@@ -418,11 +432,11 @@ OpenAI 还介绍了在赛车工程和汽车设计中的应用，包括将扫描�
 
 这些案例与 Anthropic 的结果相互印证，说明前沿 AI 公司正在将 Agent 从纯软件任务推进到真实工程工作流。
 
-但两家公司采用的任务、模型、工具和人工参与程度不同，不能凭原型数量或演示结果直接判断谁的硬件工程能力更强。<Cite ref="turn101057view0"/>
+但两家公司采用的任务、模型、工具和人工参与程度不同，不能凭原型数量或演示结果直接判断谁的硬件工程能力更强。
 
----
+OpenAI
 
-## 我的进一步判断：AI 可能正在把硬件创业最昂贵的早期环节变得更便宜
+## **我的进一步判断：AI 可能正在把硬件创业最昂贵的早期环节变得更便宜**
 
 下面是我的独立分析，不属于 Anthropic 原文已经通过经济学实验证明的结论。
 
@@ -454,7 +468,7 @@ PCB 仍然需要生产。
 
 但硬件开发不会完全复制软件行业，因为真实制造、库存和售后服务仍然具有固定成本。
 
-## 对 EDA、工业软件和半导体行业的影响
+## **对 EDA、工业软件和半导体行业的影响**
 
 我认为未来 EDA 市场值得关注一个结构性变化：AI Agent 可能逐渐成为现有工程软件的重要使用者，而不只是用户界面上的辅助聊天工具。
 
@@ -480,7 +494,7 @@ PCB 布局并不等于芯片内部的逻辑综合、物理设计、时序收敛�
 
 因此，未来真正有价值的软件能力，可能越来越集中在高质量物理模型、可信验证、复杂工程数据与制造生态整合上，而不只是操作界面。
 
-## 更深的意义：AI 的下一阶段，不是生成更多设计图，而是缩短从想法到真实物体的距离
+## **更深的意义：AI 的下一阶段，不是生成更多设计图，而是缩短从想法到真实物体的距离**
 
 我认为《Testing Claude on real-world electronics design》最值得记住的，并不是 69% 的 PCB Gym 成绩，也不是三款小型电子产品。
 

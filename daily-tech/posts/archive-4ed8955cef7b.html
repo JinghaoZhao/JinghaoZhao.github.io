@@ -1,0 +1,65 @@
+<h1 class="original-title">今日科技长文：最值得被 AI 自动化的，可能不是一个岗位，而是一个专家的“品味”</h1>
+<p>今天推荐 Casey Newton 于 <strong>2026 年 8 月 20 日</strong>发表在 Platformer 的 <strong>《The website that created an AI clone of its editor in chief》</strong>，副标题是“Every CEO Dan Shipper 谈一边把一切自动化、一边把员工数量翻倍，以及如何用 3 万次历史编辑训练出一个编辑 agent”。文章目前可以<strong>免费阅读全文</strong>，是一篇经过整理的深度访谈，完整访谈还可以通过 Platformer 的播客观看或收听。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank">阅读 Platformer 原文</a> <a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>我今天选它，是因为它给出了一个比“AI 会不会替代编辑/程序员”更有用的企业 AI 框架：<strong>Every 正在尝试把某个优秀员工多年积累的隐性判断力，变成可以在整个公司里调用的 agent。</strong> 更反直觉的是，这家公司几乎把能自动化的东西都自动化了，代码也基本全部由 AI 生成，但过去一年员工却从约 15 人增加到约 30 人。Shipper 把这称为 AI automation 的一个悖论：模型让过去已经解决过的工作越来越便宜，却同时让那些需要真正判断、品味和创造新方法的专家工作变得更多。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<h2>Every 是一家很适合观察“AI-native 公司到底长什么样”的小实验室</h2>
+<p>Newton 首先解释 Every 为什么值得研究。Dan Shipper 和 Nathan Baschez 在 2020 年把它做成一组商业 newsletter，如今 Every 一边运营科技媒体，一边又像小型软件工作室一样开发产品。公司目前大约 30 人，除了新闻和评论，还同时运营邮件助手 Cora、文件整理工具 Sparkle、写作软件 Spiral 和语音输入工具 Monologue，软件和内容一起打包成每月 20 美元的订阅。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>Shipper 说，现在 Every 的代码基本已经不是人手写。AI agents 承担实际 coding，人类更多负责确定要构建什么、设计系统、检查结果和解决模型无法独立处理的问题。对于一家只有几十人的公司而言，它能够同时维护多个软件产品和高频出版业务，很大程度上正是因为一个工程师现在可以承担过去需要一个小团队才能完成的产品范围。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>Newton 问了一个非常现实的问题：Every 又不是 OpenAI 或 Anthropic，本身严重依赖这些实验室提供模型。基础模型不断变强，今天创业公司辛苦开发一年的功能，明天可能直接被模型厂商吸收到基础产品里。这种“built on moving ground”的风险到底怎么防？</p>
+<p>Shipper 并没有假装自己有完美答案。他承认这是非常混乱的关系：OpenAI、Anthropic 一方面给 Every 模型和早期访问，另一方面它们自己的 application layer 随时可能进入 Every 正在做的市场。因此他的策略不是寻找一个永远不会被 foundation model 吃掉的静态功能，而是接受产品可能每 <strong>3 到 6 个月</strong>就需要重新构建。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>他认为 Every 相对更耐久的一项资产反而是“判断模型好不好”。因为模型厂商没有办法令人信服地告诉用户“我们自己的模型在市场上排第几”，所以 Every 做 frontier model 的实际使用评测和所谓 vibe check，能够成为模型公司与最终用户之间的独立仲裁者。</p>
+<p>Shipper 用一个很好理解的比喻：模型公司像生产烤箱的人，而 Every 想研究的是怎样用这台烤箱真正做出一道好菜。模型公司当然也可能有一天开始自己做菜，但“知道工具在真实工作流里怎么用”仍然可能形成独立价值。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<h2>3 万次修改：他们不是在训练“编辑 AI”，而是在复制一个具体编辑的判断力</h2>
+<p>文章最值得看的部分，是 Every 如何处理主编 Kate Lee 的工作。</p>
+<p>Kate Lee 以前在 Stripe Press 和 Medium 做内容，如今是 Every 的 editor in chief。Shipper 认为她拥有公司里最好的 copy-editing taste。但随着 Every 扩张，她已经不只需要改文章，还要检查产品 landing page、发布邮件以及各种对外文字是否符合 Every 的标准。问题非常传统：一个组织里最优秀专家的时间永远不够用。<a href="https://every.to/team" rel="noopener noreferrer" target="_blank" class="citation">Every</a></p>
+<p>Shipper 从 GPT-3 时代就一直试图把她的一部分编辑工作自动化，但长期效果都不够好。最近模型能力跨过了一个门槛。一方面，新模型 instruction following 已经足够稳定，可以理解复杂编辑要求；另一方面，browser/computer-use 能力也变强了，agent 已经可以真的进入 Google Docs，像一个人类编辑一样留下 suggested edits。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>真正关键的是数据。Every 收集了 Kate Lee 历史上大约 <strong>30,000 次实际编辑记录</strong>。</p>
+<p>它没有简单告诉模型“你是一名优秀编辑，请把这篇文章改好”，而是利用这些真实历史修改反推出 Kate 的偏好，然后把 prompt 放到过去文档上反复 back-test。系统观察“这个 prompt 做出的修改是否接近 Kate 当年实际做出的修改”，再不断调整规则。最终 Every 做出了一个内部 agent，员工只需要在工作文档里要求它做一次 “Kate copy edit”，就能获得类似主编风格的修改建议。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>这套系统并不是一次训练后固定不变。Agent 做完编辑后，Kate 仍然会继续检查；如果她进一步修改了 agent 的结果，那些差异又会成为新的学习材料。所以专家本人每一次纠错，都让下一轮自动化更接近她的判断。</p>
+<p>Shipper 给这种机制用了一个很有意思的词：<strong>compounding</strong>。</p>
+<p>传统情况下，Kate 今天花一个小时编辑，价值基本只存在于那篇文章里。新的模式则是，她今天做的一次高质量判断不仅改善当前文章，还成为未来上百篇文章可以重复调用的组织资产。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>这里要特别注意，Shipper 并没有说 Kate 已经被替代。恰恰相反，他认为这套系统真正的价值，是把她一部分可以被形式化的判断从“必须消耗本人时间”变成一个组织级工具，让她本人把时间花在更高层级、更模糊、模型还不会处理的问题上。</p>
+<p>换句话说，Every 自动化的并不是 <strong>Kate Lee 这个人</strong>，而是 Kate 已经反复做过、已经能够通过历史记录表达出来的那部分专业知识。</p>
+<h2>这引出了 Shipper 对 AI 的一个更大的理论：模型吃掉的是“人类专业知识留下来的残渣”</h2>
+<p>Shipper 后面的观点比编辑 agent 本身更值得思考。他说 AI 的训练材料，本质上是 <strong>“the residue of human expertise”</strong>——人类专家过去解决问题以后留下来的代码、文章、教程、标准和示例。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>模型因此非常擅长处理“人类已经解决过的问题”。</p>
+<p>程序员以前已经写过无数登录系统，所以 AI 可以迅速写一个登录页面；营销人员已经写过无数 launch email，所以模型也能快速生成一封看起来像样的发布邮件；世界上已经有大量商业分析，所以 AI 可以几秒钟输出一份格式漂亮的市场报告。</p>
+<p>但具体到一家公司的问题，总会存在一点不同。</p>
+<p>Shipper 认为，这正是现在很多 AI 输出给人一种奇怪体验的原因：第一眼非常漂亮，仔细看却只是“差不多对”。大量人把自己的问题扔给模型，模型利用历史知识生成一个近似答案，于是整个市场突然涌现大量表面专业、实际价值很低的内容和产品，也就是他所谓的 slop。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>当这种“80 分能力”变成几乎免费的商品之后，它本身就不再稀缺。</p>
+<p>真正稀缺的变成另外两种东西：一种是专家能够判断这次具体情境为什么与过去不同，并把80分提高到真正可以投入生产的95分或99分；另一种是创造过去没有出现过的新问题、新产品和新做法。</p>
+<p>所以 Shipper 得出了一个与大量“AI 消灭知识工作”预测相反的判断：<strong>AI 抬高了能力下限，却也同时抬高了专家工作的上限。</strong> <a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<h2>为什么 Every 自动化得越多，反而从 15 人招到了 30 人</h2>
+<p>Newton 随即追问这篇文章最大的矛盾：Every 一直公开宣称自己尽可能自动化所有东西，但一年左右员工数量却从约 <strong>15 人翻到了约 30 人</strong>。</p>
+<p>Shipper 认为其中当然有一个简单原因——公司本身正在增长，有收入以后自然能够做更多事情。但他认为还有一个结构性机制。</p>
+<p>过去一个工程师可能需要一个团队，才有能力把一个产品真正推到市场。因此很多潜在产品根本不会被做出来，因为最低组织成本太高。</p>
+<p>AI 把这个最低成本大幅降低以后，一个人就可能把产品从想法做到真正服务客户。结果不一定是“原来的十个人变一个人”，也可能是“一家公司原来只值得做两个产品，现在值得同时尝试十个产品”。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>Every 自己就是例子。Shipper说，一度只有 12–15 人时，公司已经可以同时运营六个软件产品和一份日更 newsletter。过去这种组织结构几乎不可想象。</p>
+<p>但等某个由一个人验证出来的小产品真正获得需求后，公司下一步通常不是让那个员工永远一个人干，而是开始再给他配人，把已经验证的机会做大。</p>
+<p>因此生产率提高产生了两种方向相反的力量：完成固定数量工作所需的人变少了，但值得尝试的工作数量变多了。</p>
+<p>Every 的净结果目前是后者更强。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>Shipper 用软件工程举了一个很好的思想实验。如果 2020 年有人告诉他，一个 agent 有一天可以一天 vibe-code 完整的 todo app，他可能会猜软件工程师会受到巨大冲击。但现实确实已经接近这个能力水平，而 Every 仍然需要工程师，只是工程师工作的抽象层级上移了。</p>
+<p>工程师越来越少负责“亲手输入代码”，更多负责设计让其他员工安全使用 agents 的系统、构建可靠基础设施、定义产品、验证输出，并解决现有模型不知道如何解决的新问题。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<h2>AI 写作的问题，也许不应该是“哪些字是人敲出来的”</h2>
+<p>访谈后半部分转向 AI 写作。Newton 问了一个现在创意行业非常敏感的问题：如果文章上署的是一个人的名字，到底多少文字可以由 AI 生成？</p>
+<p>Shipper 的答案是，他不太在意最终字符是不是由作者亲手敲出的。他拿真人编辑做类比：作者接受编辑修改后的句子，通常不会因此认为文章不再属于作者。对他而言，关键是文章表达的思想、判断和最终选择是不是作者自己的。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>但他没有因此说“让 AI 写整篇然后直接发布也无所谓”。相反，他认为个人署名的文章与纯信息型指南应该采用不同标准。</p>
+<p>如果文章的核心价值是一个人的观点，那么作者必须知道自己究竟想表达什么，并且需要不断对文字施加自己的 taste。Shipper借用了 George Saunders 对写作的理解：优秀写作的过程，本质上是作者一次又一次把自己的判断施加在每一个词上，直到文字尽可能准确地表达思想。</p>
+<p>AI 可以成为这个过程的一部分，但不能替作者拥有观点。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>对于纯工具型、参考型内容，他则更加开放。因为这种内容未来很可能本来就是交给另一个 agent 阅读，再在需要时提取信息，所以谁亲手输入每句话的重要性会下降。</p>
+<p>这其实指向一个很可能越来越重要的区分：<strong>未来“为人阅读而写的个人表达”和“为机器消费而生产的信息资产”可能逐渐变成两种不同内容产品。</strong></p>
+<p>这是我基于访谈进一步作出的判断，不是 Platformer 的直接结论。</p>
+<h2>最有争议的一句话：几乎所有写作者都已经在用 AI，只是不愿承认</h2>
+<p>Shipper 还给出了一个明显属于个人观察、无法当成统计事实的判断：他认为现在“几乎所有写作者”多少都已经把 AI 放进工作流，只是大多数人不公开说。</p>
+<p>Newton 马上意识到这背后真正的问题并不是工具使用，而是社会规范还没有稳定。</p>
+<p>Shipper 用历史技术做类比。打字机最初普及时，一封机打信件会让一些人觉得没有手写信私人；后来电话出现时，电话又不如见面“有人情味”；再后来短信出现，上一代人又觉得短信不如电话。技术不断改变社会对于“这是不是我亲自表达”的判断。</p>
+<p>他因此认为今天关于 AI 写作的界线仍然是“铅笔画的”，未来一定还会变化。<a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>这并不等于透明度问题不重要。更准确的理解是：行业正在从一个很容易定义的时代——作者就是打字的人——进入一个更难定义的时代：作者可能负责思想、证据、判断、选择和最终责任，却没有亲自生成所有句子。</p>
+<h2>我认为这篇文章真正值得记住的地方</h2>
+<p>这篇访谈最重要的地方，不是“Every 用 AI 把编辑克隆了”，因为所谓 clone 其实仍然非常有限。Shipper自己明确说，即使 copy editing 这种相对规则化的工作，目前仍然没有完全自动化。</p>
+<p>更值得关注的是它展示了一种新的企业知识资产形式。</p>
+<p>过去一家公司的顶级工程师、销售负责人、律师或投资经理真正值钱的东西，大量存在于脑子里：什么情况下应该违反默认规则，哪种方案看起来正确但实际上有坑，什么表达虽然语法没问题却不像公司说话。这些 tacit knowledge 很难写成 handbook，所以扩张只能依靠培训、review 和师徒关系。</p>
+<p>如果类似 Every 的方法成熟，公司可能开始系统收集专家每天产生的 correction traces：代码 review、合同修改、销售邮件修改、研究报告批注、设计调整，再把这些历史“专家选择”变成专用 agent。</p>
+<p>这样一来，企业 AI 最有价值的数据可能不是更多普通文档，而是<strong>专家在哪些地方对 AI 或普通员工说了“不，这里应该这样做”</strong>。</p>
+<p>从投资和企业战略角度，这是我自己的延伸：未来公司的护城河可能出现一种新形态——<strong>proprietary judgment data</strong>。基础模型越来越接近商品，同一家公司里的“Kate Lee agent”却无法被竞争对手直接复制，因为竞争对手没有 Kate 过去 3 万次真实修改，也没有未来持续产生的纠错反馈。</p>
+<p>而 Every 的“自动化越多、员工反而越多”也提供了一个很好的观察指标。它并不能证明整个经济最终不会减少就业；Every 只有几十个人，而且是一家高速成长、极度 AI-native 的特殊公司，因此不能把它外推成宏观结论。但它至少说明一种可能的企业路径：<strong>AI 并不是简单把组织压缩到更少的人，而是先让单位团队能够承担更多业务，然后企业利用更低的实验成本扩张到过去根本不值得做的新产品。</strong> <a href="https://www.platformer.news/every-dan-shipper-interview-ai-writing/" rel="noopener noreferrer" target="_blank" class="citation">Platformer</a></p>
+<p>如果这个机制在更大范围里成立，那么未来真正危险的岗位可能不是“专家”，而是那些工作价值主要来自重复执行已经被充分记录的标准答案的人；而真正升值的能力，则越来越接近 <strong>taste、judgment、problem selection 和 exception handling</strong>。也就是说，AI 越擅长复制过去的人类专业知识，“知道什么时候过去的答案不适用于今天”反而越值钱。</p>

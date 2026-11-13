@@ -1,0 +1,332 @@
+<h1 class="original-title">今日科技长文：《Inference Performance Index》——为什么 GB300 的算力只比 H100 高 2.5 倍，却可能同时服务 25 倍的 AI Agent？</h1>
+<p>今天推荐 <strong>Jason Li 于 2026 年 11 月 9 日在 Epoch AI 发表的《Inference Performance Index: Changing the Way We Measure Inference Capacity》</strong>，中文可译为《推理性能指数：重新定义 AI 芯片计算能力的衡量方式》。</p>
+<p>文章<strong>全文免费，采用 CC BY 4.0 开放许可</strong>，研究代码、完整技术方法和敏感性分析也已公开。正文适合花约 15–20 分钟阅读。作者 Jason Li 是 Epoch AI 的研究员，此前曾在 NVIDIA 从事大语言模型服务与推理优化相关工作。</p>
+<p><a href="https://epoch.ai/publications/inference-performance-index" rel="noopener noreferrer" target="_blank">阅读 Epoch AI 原文及图表</a></p>
+<p><a href="https://github.com/jasonlizhengjian/inference-performance-index" rel="noopener noreferrer" target="_blank">查看完整技术方法和可复现代码</a></p>
+<p>我今天选择这篇文章，是因为它提出了一个对未来 AI 基础设施投资非常重要的判断：</p>
+<p><strong>我们过去用来衡量 AI 芯片性能的 FLOPs，可能正在严重低估新一代 GPU 的实际推理能力。</strong></p>
+<p>按照 Epoch AI 最新建立的推理性能模型，在特定的长上下文 Agent 工作负载下，NVIDIA GB300 的单 GPU 推理服务容量约为 H100 的 <strong>25 倍</strong>。</p>
+<p>但如果只比较两者的 8-bit 理论计算吞吐量，GB300 仅为 H100 的约 <strong>2.5 倍</strong>。</p>
+<p>也就是说，传统 FLOP/s 指标可能把两代 GPU 在这类推理负载下的容量差距低估了整整一个数量级。</p>
+<p>更有意思的是，Epoch AI 发现，即使使用同一代 Blackwell Ultra GPU，把八颗 GPU 组成一个服务器，与把七十二颗 GPU 组成高速互连的 NVL72 系统，每颗 GPU 能够支持的推理请求数量也可能相差约 <strong>1.9 倍</strong>。</p>
+<p>这说明，未来 AI 计算能力的增长，可能越来越不只来自芯片算术单元的进步，还来自 HBM 容量、内存带宽、芯片间通信，以及整个推理系统的组织方式。</p>
+<p>不过，这些数字有一个必须提前说明的限制。</p>
+<p><strong>25 倍不是实际生产环境中已经普遍测得的性能提升，而是基于特定模型、Agent 工作负载和硬件规格推算的理论服务容量。</strong> 它不能直接解释为 Token 生成速度提高 25 倍，也不代表成本或能耗改善 25 倍。<a href="https://samaritan-research.org/publications/inference-performance-index" rel="noopener noreferrer" target="_blank" class="citation">Samaritan Research</a></p>
+<p>这篇报告真正的价值，在于提供了一套比峰值 FLOPs 更接近 AI Agent 真实需求的计算能力衡量方法。</p>
+<hr>
+<h2>为什么 AI 芯片行业一直使用的 FLOPs，可能不再是最重要的性能指标？</h2>
+<p>过去十年，AI 芯片性能通常通过每秒能够执行多少次浮点运算来衡量。</p>
+<p>FLOP/s 是 Floating-Point Operations per Second 的缩写。</p>
+<p>例如，一颗芯片每秒可以执行一千万亿次浮点运算，就拥有约 1 PFLOP/s 的理论计算能力。</p>
+<p>这种指标非常有用。</p>
+<p>尤其是在大模型训练阶段，大量矩阵乘法能够充分利用 GPU 的张量计算单元。</p>
+<p>但推理阶段的工作方式不同。</p>
+<p>训练一个模型，通常需要同时处理大量 Token，并反复更新模型参数。</p>
+<p>而推理过程中，模型需要根据已有上下文，一个接一个地生成新 Token。</p>
+<p>特别是在服务单个用户时，GPU 可能没有足够多的并行计算任务，无法充分利用全部算术单元。</p>
+<p>此时，瓶颈可能不再是算术计算速度，而是如何及时把模型权重和中间状态送到计算单元。</p>
+<p>如果 GPU 的 Tensor Core 能够在一秒内完成大量运算，却必须等待 HBM 提供数据，那么额外增加 Tensor Core 并不会线性提高实际推理速度。</p>
+<p>Epoch AI 认为，这种差异随着 AI Agent 的普及变得越来越重要。</p>
+<p>因为 Agent 不只是执行一次简单问答。</p>
+<p>它可能保留几十万 Token 的历史上下文，不断调用工具，再把新的工具结果加入对话。</p>
+<p>每次请求都需要访问大量已经缓存的状态。</p>
+<p>因此，同一颗 GPU 能够同时服务多少 Agent，不只取决于计算能力，还取决于它能够存储和访问多少上下文，以及是否能够高效地与其他 GPU 协同运行。<a href="https://epoch.ai/data/machine-learning-hardware-documentation/methodology" rel="noopener noreferrer" target="_blank" class="citation">Epoch AI</a></p>
+<h2>一个 Coding Agent 的真实工作过程，能够解释为什么 KV Cache 如此重要</h2>
+<p>作者用 Coding Agent 说明这个问题。</p>
+<p>假设一个 Agent 正在修改大型代码仓库。</p>
+<p>它已经拥有约 <strong>200,000 Token</strong> 的历史上下文。</p>
+<p>其中包含系统指令、此前阅读的代码、已经执行过的操作，以及过去模型生成的内容。</p>
+<p>现在，Agent 通过代码搜索工具找到了新的结果，形成约 1,000 Token 的新输入。</p>
+<p>如果模型能够复用此前保存的上下文缓存，就不需要重新计算全部 200,000 Token。</p>
+<p>它主要处理新增的输入，同时保留此前的状态。</p>
+<p>这就是 Prefill 阶段。</p>
+<p>随后，模型生成约 1,000 Token 的输出。</p>
+<p>这些输出可能包含对代码的分析、内部推理，以及新的工具调用。</p>
+<p>假设模型决定继续读取另一个文件。</p>
+<p>Agent 执行工具调用后，再次向模型发送请求。</p>
+<p>此时，能够复用的历史上下文已经增长到约 <strong>202,000 Token</strong>，即此前的 200,000 Token，加上新输入和刚刚生成的输出。</p>
+<p>接下来的请求只需要对新读取的文件内容进行增量 Prefill。</p>
+<p>但此前保存的上下文状态仍然占据内存。</p>
+<p>而且，在后续 Decode 阶段，模型仍然需要访问相关历史状态。<a href="https://samaritan-research.org/publications/inference-performance-index" rel="noopener noreferrer" target="_blank" class="citation">Samaritan Research</a></p>
+<p>这里需要理解两个不同的概念。</p>
+<p><strong>Prefill 是处理输入上下文的过程，Decode 是逐步生成新 Token 的过程。</strong></p>
+<p>在传统全注意力 Transformer 中，Prefill 会建立相应的 Key-Value Cache，也就是 KV Cache。</p>
+<p>Decode 时，模型需要利用新的 Query 与历史 Key、Value 进行注意力计算。</p>
+<p>随着上下文增加，KV Cache 的存储需求可能持续增长。</p>
+<p>这并不是说每次生成新 Token 都需要完整重新计算之前所有 Token。</p>
+<p>缓存恰恰避免了这种重复计算。</p>
+<p>但缓存本身需要占用内存，并且可能带来持续的数据读取需求。</p>
+<p>因此，长上下文 Agent 很容易把 HBM 容量和带宽变成关键资源。</p>
+<p>当然，并非所有现代模型都使用完全相同的 KV Cache 结构。</p>
+<p>一些模型采用局部注意力、线性注意力或压缩状态，减少历史信息的存储和读取成本。</p>
+<p>这也是为什么 Epoch AI 没有选择单一模型衡量所有芯片。</p>
+<h2>为什么增加 Batch Size，能够提高总吞吐量，却让每个用户感觉更慢？</h2>
+<p>这是文章最有教学价值的部分之一。</p>
+<p>假设一台 GPU 只处理一个用户的请求。</p>
+<p>模型每生成一个 Token，GPU 都需要执行相应计算。</p>
+<p>某些模型权重必须从 HBM 读取到更靠近计算单元的存储层级。</p>
+<p>但如果同时处理多个用户，GPU 就有机会复用已经读取的权重。</p>
+<p>例如，假设一个 Batch 中有八个请求。</p>
+<p>执行同一层模型计算时，GPU 可以把读取权重的成本分摊到多个请求上。</p>
+<p>因此，Batching 能够提高整体推理吞吐量。</p>
+<p>但这也有代价。</p>
+<p>每增加一个请求，系统就需要处理更多 Token、访问更多缓存，并承担额外的计算和内存流量。</p>
+<p>因此，虽然 GPU 每秒输出的总 Token 数量增加，每个请求独立获得 Token 的速度却可能降低。</p>
+<p>Epoch AI 提供了一个具体例子。</p>
+<p>在其 Kimi K3 与 GB300 的模型推算中，当每颗 GPU 同时服务约两个请求时，每个请求的生成速度约为 <strong>210 Token/s</strong>。</p>
+<p>如果把并发提高到每颗 GPU 八个请求，每个请求的生成速度就可能下降到约 <strong>80 Token/s</strong>。</p>
+<p>但 GPU 的总吞吐量反而提高了。</p>
+<p>两个请求分别每秒生成 210 Token，对应总计约 420 Token/s。</p>
+<p>八个请求分别每秒生成 80 Token，对应约 640 Token/s。</p>
+<p>因此，<strong>每个请求的输出速度下降约 62%，GPU 的总输出吞吐量却提高约 52%。</strong></p>
+<p>这两个变化可以同时成立。</p>
+<p>而且，即使整个工作负载仍然主要受到内存带宽限制，也可能出现这种现象。<a href="https://samaritan-research.org/publications/inference-performance-index" rel="noopener noreferrer" target="_blank" class="citation">Samaritan Research</a></p>
+<p>这意味着，不能简单地问一颗 GPU 每秒能够生成多少 Token。</p>
+<p>还必须问：</p>
+<p>在要求每个 Agent 保持某种响应速度的情况下，一颗 GPU 最多能够同时服务多少请求？</p>
+<p>这正是 Epoch AI 希望衡量的能力。</p>
+<h2>新指标 IPI：把 GPU 性能从 FLOPs 转换成并发 Agent 容量</h2>
+<p>Epoch AI 把新指标称为 <strong>Inference Performance Index，推理性能指数，简称 IPI</strong>。</p>
+<p>它不直接比较芯片峰值计算能力。</p>
+<p>而是估计不同芯片在一系列推理速度要求下，能够同时承载多少持续生成内容的请求。</p>
+<p>这里的核心指标是 Concurrency，也就是并发请求数。</p>
+<p>如果一颗 GPU 能够在满足延迟相关速度约束的情况下，同时执行更多请求，那么它就拥有更高的推理服务容量。</p>
+<p>不过，并发不能脱离用户体验单独衡量。</p>
+<p>如果允许每个请求每秒只生成几个 Token，那么系统可能通过增加 Batch Size 获得很高的总吞吐量。</p>
+<p>但对于需要快速响应的 Agent，这种速度可能无法接受。</p>
+<p>因此，Epoch AI 没有只选择一个固定的性能目标。</p>
+<p>研究团队选择了 <strong>50–400 Token/s/request</strong> 的输出速度区间。</p>
+<p>它覆盖从相对较慢的批量任务，到需要更快输出的交互式 Agent 工作负载。</p>
+<p>对于每个输出速度要求，系统寻找能够满足该要求的最高并发配置。</p>
+<p>最终得到一条曲线。</p>
+<p>横轴是每个请求需要达到的生成速度。</p>
+<p>纵轴是每颗芯片能够同时处理的请求数量。</p>
+<p>随着输出速度要求提高，可以同时处理的请求数量通常会下降。</p>
+<p>因此，不同芯片之间的比较，不再是单一 FLOP/s 数值，而是比较整条<strong>并发容量—输出速度曲线</strong>。<a href="https://epoch.ai/data/machine-learning-hardware-documentation/methodology" rel="noopener noreferrer" target="_blank" class="citation">Epoch AI</a></p>
+<h2>为什么 Epoch AI 采用对数坐标，而不是简单平均不同速度？</h2>
+<p>这里存在一个很值得注意的统计设计。</p>
+<p>研究人员希望比较从 50 到 400 Token/s 的不同输出速度。</p>
+<p>但如果使用普通线性坐标，那么 300–400 Token/s 区间会与 50–150 Token/s 区间获得相同权重。</p>
+<p>这实际上更加重视较高绝对速度的区间。</p>
+<p>而 Epoch AI 认为，按照速度提升的比例分配权重，可能更加合适。</p>
+<p>因此，它采用对数速度坐标。</p>
+<p>在这种情况下，50–100 Token/s、100–200 Token/s，以及 200–400 Token/s 这三个区间获得相同权重。</p>
+<p>原因是它们都对应输出速度翻倍。</p>
+<p>研究人员计算并发容量曲线下的面积，再把不同芯片的结果进行比较。</p>
+<p>对于每一种模型架构，NVIDIA GB300 NVL72 都被设为参考值 1。</p>
+<p>其他芯片的曲线面积除以 GB300 的曲线面积，得到相对推理容量。</p>
+<p>例如，对于 Kimi K3，Epoch AI 估计 Vera Rubin VR200 的曲线面积约为 GB300 的 <strong>2.48 倍</strong>。</p>
+<p>这意味着，在研究选择的速度范围和配置条件下，VR200 每颗芯片可以支持大约 2.48 倍的并发请求容量。</p>
+<p>但这种优势并不是在所有速度下完全相同。</p>
+<p>如果某家公司只关心非常低的输出延迟，或者只关心大规模后台批处理，那么它可能会得到不同的相对性能结论。<a href="https://github.com/jasonlizhengjian/inference-performance-index" rel="noopener noreferrer" target="_blank" class="citation">GitHub</a></p>
+<h2>为什么不能只测试一种模型？</h2>
+<p>Epoch AI 使用了四种不同的模型架构。</p>
+<p>它们分别是 GLM-5.2、Kimi K3、Qwen3-Coder 480B，以及一个用于近似 Microsoft MAI-Base-2 的模型架构。</p>
+<p>这些模型的注意力机制并不相同。</p>
+<p>GLM-5.2 使用压缩的历史状态，并在主要注意力计算中选择部分 Token。</p>
+<p>Kimi K3 结合线性注意力与传统全注意力。</p>
+<p>Qwen3-Coder 480B 使用覆盖完整上下文的 Grouped-Query Attention。</p>
+<p>MAI-Base-2 的近似模型则结合滑动窗口注意力与全局注意力。</p>
+<p>这些差异非常重要。</p>
+<p>例如，全上下文注意力可能需要读取较多历史状态。</p>
+<p>而滑动窗口注意力可以限制部分注意力层访问的历史范围。</p>
+<p>线性注意力则可能使用固定大小的递归状态。</p>
+<p>因此，即使两颗芯片拥有相同的算术吞吐量，它们在不同模型上的实际表现也可能差异很大。</p>
+<p>HBM 容量较大的芯片，可能特别适合保留大量上下文。</p>
+<p>芯片间互连更强的系统，则可能更适合需要跨设备通信的稀疏 MoE 模型。</p>
+<p>所以研究人员分别计算四种模型的容量，再将每一种模型相对于 GB300 的比值进行算术平均。</p>
+<p>这形成最终 IPI。</p>
+<p><strong>这里采用的是四种模型等权重，而不是按照真实市场的 Token 使用量加权。</strong></p>
+<p>研究团队认为，目前还没有足够可靠的数据，能够准确预测未来各种模型架构在推理市场中的份额。</p>
+<p>因此，等权重是一种覆盖不同架构的选择，并不意味着四种模型未来一定拥有相同的商业使用量。<a href="https://epoch.ai/data/machine-learning-hardware-documentation/methodology" rel="noopener noreferrer" target="_blank" class="citation">Epoch AI</a></p>
+<h2>IPI 为什么还必须把 Prefill 计算资源算进去？</h2>
+<p>如果只计算 Decode 性能，可能高估完整推理系统的服务能力。</p>
+<p>原因是 Agent 每次调用模型，都可能带来新的输入。</p>
+<p>这些输入需要执行 Prefill。</p>
+<p>即使能够复用此前的缓存，也不代表新增输入的处理成本为零。</p>
+<p>因此，Epoch AI 假设 Prefill 和 Decode 由两组相对独立的计算资源承担。</p>
+<p>研究人员先计算需要多少 Decode GPU，才能以目标速度服务一定数量的请求。</p>
+<p>再计算需要多少 Prefill GPU，才能及时处理这些请求不断产生的新输入。</p>
+<p>最终，将两组 GPU 的数量相加。</p>
+<p>然后使用并发请求数量除以总 GPU 数量，得到真正用于评分的每 GPU 并发容量。</p>
+<p>研究采用的 Prefill 负载，来自约 <strong>110,565 个经过筛选的 Claude Code 请求</strong>。</p>
+<p>这些请求具有较长、且高度缓存的历史上下文。</p>
+<p>研究人员发现，在所选样本中，每生成一个输出 Token，平均对应约 <strong>1.51 个新增输入 Token</strong>。</p>
+<p>这里的 1.51 不是全部输入 Token 与输出 Token 的比值。</p>
+<p>已经缓存的历史输入不计入新增输入。</p>
+<p>研究团队由此建立了一个固定负载：每次 Prefill 包含 <strong>262,144 Token 的缓存历史</strong>，以及 <strong>1,024 个新增输入 Token</strong>。</p>
+<p>需要强调，这是一种代表性工作负载假设，而不是对所有 Coding Agent 请求的逐条回放。</p>
+<p>同时，研究样本来自特定 Claude Code 使用轨迹，不应被理解为整个 AI 行业的普遍比例。<a href="https://epoch.ai/data/machine-learning-hardware-documentation/methodology" rel="noopener noreferrer" target="_blank" class="citation">Epoch AI</a></p>
+<p>这套方法还有一个重要细节。</p>
+<p>Prefill 与 Decode 的计算资源比例不是固定的。</p>
+<p>当输出速度提高，系统需要以更快速度持续处理新输入。</p>
+<p>因此，对 Prefill GPU 的需求可能同步提高。</p>
+<p>如果某种硬件拥有很强的 Decode 性能，却缺乏足够的 Prefill 吞吐量，那么整个系统的最终并发能力仍然会受到限制。</p>
+<p>为了把这层关系表达清楚，研究团队采用了以下计算式：</p>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>C</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mrow><mn>1</mn><mo>+</mo><mi>r</mi><mtext> </mtext><mi>s</mi><mtext> </mtext><mi>C</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>P</mi></mrow></mfrac></mrow></semantics></math>
+<p>其中，<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></semantics></math> 是在输出速度要求为 <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi></mrow></semantics></math> 时，Decode 阶段每颗 GPU 可以处理的并发请求数。</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow></semantics></math> 是每颗 Prefill GPU 每秒可以处理的新增输入 Token 数量。</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow></semantics></math> 则是每个输出 Token 对应的新增输入 Token 数量，研究中约为 1.51。</p>
+<p>最终的 <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></semantics></math>，就是把 Prefill GPU 一起计入以后，整个系统每颗 GPU 能够承担的并发请求数量。</p>
+<p>这说明，一个推理系统不能只优化 Decode。</p>
+<p><strong>真正有效的吞吐量，必须同时考虑输入处理和输出生成所需的全部计算资源。</strong></p>
+<h2>Epoch AI 使用什么工具模拟这些复杂的推理行为？</h2>
+<p>研究团队使用 NVIDIA 的开源工具 <strong>AISimulate</strong>。</p>
+<p>它可以根据模型运算结构和硬件规格，估计不同推理操作需要多少时间。</p>
+<p>模型不仅考虑浮点计算吞吐量。</p>
+<p>还考虑 HBM 容量、HBM 带宽、芯片间互连带宽、通信延迟以及不同芯片组成的通信域大小。</p>
+<p>例如，一个模型可能需要跨多颗 GPU 分配权重。</p>
+<p>那么系统就要估计 Tensor Parallelism 或其他并行策略带来的通信成本。</p>
+<p>如果模型属于 MoE 架构，不同专家可能分布在不同设备上。</p>
+<p>系统还需要考虑专家计算和跨芯片数据交换。</p>
+<p>研究人员针对不同硬件与模型组合，搜索满足内存容量约束的 Batch Size 和并行布局。</p>
+<p>然后在每个目标输出速度下，选择能够获得最高并发容量的配置。</p>
+<p>这个过程使用的是基于硬件资源限制推算的 <strong>Speed of Light（SOL）性能</strong>。</p>
+<p>SOL 可以理解为在研究所采用的硬件及执行模型假设下，系统能够达到的理想性能。</p>
+<p>它不是生产环境中已经测得的速度。</p>
+<p>现实部署可能受到 Kernel 优化、调度开销、网络拥塞和其他软件因素限制。</p>
+<p>因此，IPI 更适合被理解为一套<strong>经过统一假设计算的硬件潜在能力指标</strong>，而不是实际运行效率排行榜。<a href="https://github.com/jasonlizhengjian/inference-performance-index/blob/master/docs/METHODOLOGY.md" rel="noopener noreferrer" target="_blank" class="citation">GitHub</a></p>
+<h2>最重要的结果：NVIDIA H100、H200、GB300 和 Vera Rubin 究竟差多少？</h2>
+<p>按照 Epoch AI 公布的 IPI Version 1，将 NVIDIA GB300 NVL72 设为 1，可以得到一组很有意思的结果。</p>
+<p>H100 的模型化得分约为 <strong>0.04</strong>。</p>
+<p>H200 约为 <strong>0.12</strong>。</p>
+<p>B300 HGX 约为 <strong>0.54</strong>。</p>
+<p>AMD MI355X 约为 <strong>0.55</strong>。</p>
+<p>GB300 NVL72 为 <strong>1.00</strong>。</p>
+<p>Vera Rubin VR200 则约为 <strong>2.18</strong>。</p>
+<p>这些数字代表在相同研究方法、模型集合与输出速度范围下，每颗 GPU 的相对推理容量。</p>
+<p>例如，H200 的得分约为 0.12，意味着 GB300 的理论并发服务容量约为 H200 的八倍。</p>
+<p>H100 的得分约为 0.04，则意味着 GB300 约为 H100 的二十五倍。</p>
+<p>而 Vera Rubin VR200 约为 GB300 的 2.18 倍。</p>
+<p>需要特别注意，VR200 的成绩属于基于公开硬件规格和建模假设的预测，不能理解为所有客户已经获得相应的生产性能。</p>
+<p>另外，AMD MI355X 与 B300 HGX 的得分接近，并不意味着两者在真实生产环境中已经拥有完全相同的性能、成本或软件成熟度。</p>
+<p>它们只是根据这套特定模拟方法，获得相近的理论容量估计。<a href="https://github.com/jasonlizhengjian/inference-performance-index/blob/master/docs/research/methodology-sensitivity/README.md" rel="noopener noreferrer" target="_blank" class="citation">GitHub</a></p>
+<p>我认为最值得关注的不是某家供应商排名高一位。</p>
+<p>而是从 H100 到 GB300 的差距，明显大于人们仅从 FP8 FLOP/s 能够推断出来的差距。</p>
+<p>这意味着，新一代 GPU 的价值可能越来越多地来自更大容量的 HBM、更高的内存带宽、更强的芯片间互连，以及能够支持更大规模并行部署的系统设计。</p>
+<p>如果投资者只比较每代芯片的理论计算能力，就可能低估这些架构变化的重要性。</p>
+<h2>一个很有说服力的例子：为什么 GB300 NVL72 每颗 GPU 比 B300 HGX 高效约 1.9 倍？</h2>
+<p>这是整篇报告中最容易被低估的结果。</p>
+<p>GB300 NVL72 和 B300 HGX 都采用 Blackwell Ultra GPU。</p>
+<p>两者并不是完全不同的计算架构。</p>
+<p>但它们的系统组织方式不同。</p>
+<p>B300 HGX 通常以八颗 GPU 为一个紧密连接的计算节点。</p>
+<p>GB300 NVL72 则通过高速 NVLink 网络，把七十二颗 GPU 组织成一个更大的通信域。</p>
+<p>这对部分大型 MoE 模型非常重要。</p>
+<p>假设一个模型包含大量专家网络。</p>
+<p>如果专家分布在不同 GPU 上，每个 Token 在推理过程中可能需要访问不同专家。</p>
+<p>如果相互通信的 GPU 位于同一个高带宽通信域中，数据交换就可能更加高效。</p>
+<p>但如果模型规模超出单个八卡节点，需要在多个节点之间交换数据，那么跨节点网络的带宽与延迟就可能成为新的限制。</p>
+<p>因此，GB300 NVL72 的优势，并不是其中每颗 GPU 的算术能力比 B300 高出近两倍。</p>
+<p>而是更大的高速互连域，使每颗 GPU 能够更加有效地参与完整模型推理。</p>
+<p>在 Epoch AI 的模型集合下，这种系统差异对应了约 <strong>1.9 倍的单 GPU 推理容量差距</strong>。<a href="https://samaritan-research.org/publications/inference-performance-index" rel="noopener noreferrer" target="_blank" class="citation">Samaritan Research</a></p>
+<p>这产生了一个非常重要的商业启示。</p>
+<p>过去，我们习惯把 GPU 视为可以独立采购、独立比较的设备。</p>
+<p>但未来大型 AI 推理集群，可能越来越需要按整个计算域进行优化。</p>
+<p>一个机柜里的 GPU 数量、互连拓扑和软件并行策略，可能与单颗芯片性能同样重要。</p>
+<p>因此，一家 AI 公司购买七十二颗 GPU，与购买九台八卡服务器，并不一定能够获得完全相同的有效推理能力。</p>
+<h2>为什么 NVIDIA Vera Rubin 的优势，在不同模型上竟然相差两倍以上？</h2>
+<p>这也说明了单一排行榜的局限。</p>
+<p>虽然 Epoch AI 给 Vera Rubin VR200 的综合得分约为 2.18，但它在四种模型上的表现差异很大。</p>
+<p>在 GLM-5.2 上，VR200 的相对容量约为 GB300 的 <strong>1.23 倍</strong>。</p>
+<p>在 Kimi K3 上，约为 <strong>2.48 倍</strong>。</p>
+<p>在 Qwen3-Coder 480B 上，约为 <strong>2.36 倍</strong>。</p>
+<p>而在 MAI-Base-2 的架构近似模型上，优势约为 <strong>2.65 倍</strong>。</p>
+<p>这些不同表现最终通过等权重平均，得到约 2.18 的综合得分。</p>
+<p>因此，不能直接说 Vera Rubin 对所有大语言模型都能够带来 2.18 倍推理容量提升。</p>
+<p>更准确的说法是：</p>
+<p><strong>在当前 IPI 使用的四种模型架构和性能约束下，VR200 的平均模型化推理容量约为 GB300 的 2.18 倍。</strong></p>
+<p>模型本身的注意力结构，对硬件相对优势具有显著影响。<a href="https://github.com/jasonlizhengjian/inference-performance-index/blob/master/docs/research/methodology-sensitivity/README.md" rel="noopener noreferrer" target="_blank" class="citation">GitHub</a></p>
+<p>这对芯片采购非常重要。</p>
+<p>假设一家云厂商主要服务 Qwen 系列模型。</p>
+<p>另一家云厂商主要运行大量采用压缩注意力结构的模型。</p>
+<p>即使它们采购完全相同的 GPU，实际可提供的服务能力，也可能因为模型结构不同而存在差异。</p>
+<p>因此，未来芯片厂商和云平台竞争，可能更加依赖硬件与目标模型之间的协同优化。</p>
+<h2>为什么研究人员没有直接使用真实 Benchmark，而是选择分析模型？</h2>
+<p>这里涉及一项重要的研究方法权衡。</p>
+<p>真实 Benchmark 能够测量部署以后真正实现的性能。</p>
+<p>但问题是，不同芯片的软件成熟程度可能相差很大。</p>
+<p>例如，某种新 GPU 刚刚发布时，推理引擎可能尚未充分优化。</p>
+<p>另一种 GPU 已经运行多年，拥有成熟的 Kernel、通信库和内存管理实现。</p>
+<p>如果直接比较实际测得的吞吐量，就可能把软件优化程度与硬件潜在能力混在一起。</p>
+<p>Epoch AI 希望回答的问题稍有不同。</p>
+<p>它关心的是，如果不同硬件都能够较好地利用自己的理论资源，那么它们之间的推理服务能力应该存在多大差异。</p>
+<p>因此，研究人员采用统一的硬件规格建模方法，而不是简单复制每家供应商公布的最佳 Benchmark。</p>
+<p>但他们也没有完全忽略真实测试。</p>
+<p>研究团队使用 SemiAnalysis InferenceX 的 Kimi K3 测试结果进行交叉检查。</p>
+<p>对于 GB300，他们发现，当假设实际可实现性能约为模拟 SOL 的 <strong>50%</strong> 时，模型预测吞吐量与五个测试点的实测结果，平均相差约 <strong>12%</strong>。</p>
+<p>这说明，至少在这些 GB300 与 Kimi K3 配置下，模型化结果能够较好反映真实性能趋势。</p>
+<p>但研究人员也指出，在其他硬件上，模拟结果与实测的吻合程度较弱。</p>
+<p>而且，部分 Hopper GPU 在特定模型上的表现较差，可能与软件优化不充分有关。</p>
+<p>因此，这项验证不能证明整个 IPI 排行榜都拥有约 12% 的误差范围。<a href="https://epoch.ai/data/machine-learning-hardware-documentation/methodology" rel="noopener noreferrer" target="_blank" class="citation">Epoch AI</a></p>
+<p>换句话说，IPI 的作用不是替代真实 Benchmark，而是提供一种更加一致的硬件潜能比较方法。</p>
+<h2>另一个重要限制：推理容量提高，不代表运营成本下降相同倍数</h2>
+<p>IPI 有意不包括芯片采购价格、电力消耗和软件许可成本。</p>
+<p>因此，即使某颗 GPU 的 IPI 得分是另一颗的两倍，也不能直接认为它的每百万 Token 成本只有另一颗的一半。</p>
+<p>例如，假设一套新系统可以支持两倍并发请求。</p>
+<p>但如果它的采购成本也接近两倍，那么从资本成本角度看，经济性可能没有明显改善。</p>
+<p>如果系统需要更复杂的液冷、高功率供电和专用网络，实际部署成本还可能进一步增加。</p>
+<p>同样，IPI 也没有将不同模型的回答质量调整到完全相同水平。</p>
+<p>某个硬件可能通过更低精度的模型权重，提高吞吐量。</p>
+<p>但如果这种低精度导致模型在实际任务中的成功率下降，那么单纯的 Token 吞吐量就可能高估商业价值。</p>
+<p>研究团队也明确承认，目前没有充分证明不同硬件上采用的所有低精度计算设置，都能保持完全相同的模型质量。<a href="https://github.com/jasonlizhengjian/inference-performance-index/blob/master/docs/METHODOLOGY.md" rel="noopener noreferrer" target="_blank" class="citation">GitHub</a></p>
+<p>因此，从商业角度看，真正值得比较的可能是：</p>
+<p><strong>在完成同样质量要求的任务、满足同样延迟目标的情况下，系统每美元能够提供多少有效推理工作量。</strong></p>
+<p>这个指标比 IPI 更接近实际利润率，但也更难标准化。</p>
+<p>因为它需要结合芯片价格、系统功耗、设备利用率、模型质量和真实客户负载。</p>
+<p>IPI 解决的是其中非常重要的硬件容量比较问题，而不是完整的经济性问题。</p>
+<h2>Agent 实际运行时还有大量等待时间，为什么不能直接用 IPI 估算在线 Agent 数量？</h2>
+<p>这是我认为最需要特别强调的局限。</p>
+<p>IPI 统计的是正在持续生成 Token 的并发请求。</p>
+<p>但一个 Coding Agent 并不会始终保持生成状态。</p>
+<p>它可能等待文件读取。</p>
+<p>等待代码编译。</p>
+<p>等待测试运行。</p>
+<p>等待外部 API。</p>
+<p>甚至等待用户确认。</p>
+<p>这些等待阶段通常不需要持续占用 Decode GPU。</p>
+<p>因此，同时在线的一万个 Agent，不等于需要同时运行一万个 Decode 请求。</p>
+<p>反过来，Agent 在等待工具时，仍然可能需要保留上下文缓存，或者在下次请求到达时重新加载相关状态。</p>
+<p>这就涉及 KV Cache 的驻留策略、缓存命中率、跨 GPU 迁移成本，以及推理调度系统如何管理突发请求。</p>
+<p>Epoch AI 的模型没有完整模拟这些生产环境因素。</p>
+<p>它假设 Prefill 与 Decode 资源分别配置并充分利用，也没有计入工具等待、请求排队、冷缓存未命中，以及两组 GPU 之间转移 KV Cache 的成本。</p>
+<p>因此，不能把一座数据中心的 IPI 总容量，直接换算成它能够服务多少真实用户。<a href="https://epoch.ai/data/machine-learning-hardware-documentation/methodology" rel="noopener noreferrer" target="_blank" class="citation">Epoch AI</a></p>
+<p>不过，这并不削弱 IPI 的价值。</p>
+<p>它只是说明，硬件潜在计算容量和最终业务吞吐量之间，还存在一层非常重要的软件系统。</p>
+<p>真正的推理平台需要决定哪些请求应该组成 Batch、什么时候移动缓存、怎样分配 Prefill 与 Decode 资源，以及如何在吞吐量和延迟之间取得平衡。</p>
+<p>这些问题也是 SGLang、vLLM 等推理系统持续优化的核心方向。</p>
+<h2>这项研究还有一个隐藏结论：先进 GPU 的价值，可能越来越取决于软件能否兑现硬件潜力</h2>
+<p>研究人员公布了完整的模型实现与敏感性分析，并检查不同假设会如何改变结果。</p>
+<p>例如，把输出速度区间从 50–400 Token/s 缩小到 50–200 Token/s，VR200 的综合得分会从约 2.18 降到约 <strong>2.07</strong>。</p>
+<p>如果将速度范围扩大到 50–800 Token/s，则提高到约 <strong>2.26</strong>。</p>
+<p>如果不使用对数坐标，而是在 50–400 Token/s 范围采用线性加权，VR200 的得分约为 <strong>2.43</strong>。</p>
+<p>这些结果说明，芯片相对性能不仅取决于硬件，也取决于研究人员怎样定义需要满足的业务需求。</p>
+<p>研究团队还测试了其他模型权重与 Prefill 负载假设。</p>
+<p>因此，当前 IPI 应该被视为一个带有明确版本的测量体系。</p>
+<p>未来如果模型结构、Agent 工作方式和硬件规格发生变化，IPI 本身也需要更新。</p>
+<p><strong>不能把不同版本 IPI 的分数直接拼接，得出芯片硬件突然变强或变弱的结论。</strong><a href="https://github.com/jasonlizhengjian/inference-performance-index/blob/master/docs/research/methodology-sensitivity/README.md" rel="noopener noreferrer" target="_blank" class="citation">GitHub</a></p>
+<p>我认为这也提醒我们，未来 AI 芯片竞争，可能并不只是争取最高理论 FLOPs。</p>
+<p>硬件厂商还需要投入大量资源，让运行时、通信库、Kernel 和调度软件真正发挥硬件的潜在能力。</p>
+<p>例如，一套拥有极强 NVLink 网络的系统，只有在软件能够有效地把计算和通信映射到对应拓扑上时，才可能实现预期性能。</p>
+<p>同样，一种拥有大量 HBM 的芯片，也需要优秀的 KV Cache 管理和模型并行策略，才能把容量优势转化成实际吞吐量。</p>
+<hr>
+<h2>我的进一步判断：AI 基础设施可能正在进入一个更重视有效推理容量的阶段</h2>
+<p>下面是我的独立分析，不属于 Jason Li 已经通过经济学研究证明的结论。</p>
+<p>我认为这篇报告最值得投资者关注的地方，是它提示 AI 计算资源的经济价值可能正在发生变化。</p>
+<p>过去市场主要关注模型训练。</p>
+<p>大型训练项目需要多少 GPU、多少 FLOPs，以及需要建设多大的训练集群，是估算 AI 资本开支的重要依据。</p>
+<p>但随着 Agent 普及，推理需求可能越来越多地表现为长上下文、高并发、多轮工具调用的组合。</p>
+<p>这种负载需要的不只是算术运算。</p>
+<p>还需要大量高带宽内存、可靠的高速互连，以及能够将模型权重与缓存高效组织起来的系统架构。</p>
+<p>因此，如果仍然使用传统 H100e 之类主要基于算术吞吐量的指标衡量所有 AI 芯片，可能会系统性低估某些新架构的推理能力。</p>
+<p>这也意味着，同样规模的名义 AI 算力，能够实际创造的 Token 服务收入可能存在很大差异。</p>
+<p>对于 NVIDIA，我认为这项研究强化了完整计算平台的重要性。NVL72 的优势不仅来自 GPU，而是来自 GPU、NVLink、HBM 和系统软件之间的协同设计。只要大型模型推理继续依赖高带宽的跨芯片通信，这种系统整合能力就可能保持较高价值。</p>
+<p>但它并不证明 NVIDIA 一定拥有最高投资回报。竞争对手也可以针对特定模型设计更加高效的 ASIC，而硬件性能优势能否转化成利润，还取决于定价、竞争、供应链成本和客户的真实购买意愿。</p>
+<p>对于 AMD、Google TPU、AWS Trainium，以及 OpenAI 等公司开发的定制加速器，我认为需要更加重视不同模型架构下的性能差异。某种芯片可能在通用计算指标上不领先，却在特定长上下文推理任务中具有更好的内存或通信效率。反过来，一种理论性能很强的芯片，也可能因为软件栈尚未成熟而无法兑现潜力。</p>
+<p>因此，未来比较这些平台时，应该尽量使用同一模型、同一量化质量、同一上下文分布和同一延迟目标，再比较真实服务成本，而不是只引用厂商公布的最佳性能数字。</p>
+<h2>更深的意义：未来 AI 芯片的竞争，可能越来越像一场内存与通信系统的竞争</h2>
+<p>我认为《Inference Performance Index》最重要的贡献，不是给 GB300 或 VR200 打出了一个更高的分数，而是提出了一种更加符合 Agent 时代特点的计算能力衡量方式。</p>
+<p>当模型只需要处理一次短问题时，峰值 FLOPs 可能已经能够解释不少性能差异。但当 AI Agent 保留几十万 Token 的上下文、持续调用工具，并且需要在大量并发请求之间共享计算资源时，硬件性能就变成了一个涉及算力、内存、通信和调度的复杂系统问题。<strong>下一代 GPU 即使没有把 FLOPs 提高十倍，也可能因为这些系统能力的改善，把特定负载下的有效推理容量提高一个数量级。</strong></p>
+<p>从投资和商业角度看，最值得长期跟踪的变化，是 AI 基础设施企业能否把理论算力真正转化成低成本、高可靠性的付费任务。更高的 IPI 并不必然创造更高利润，但它揭示了一个重要方向：未来数据中心的价值，可能越来越不能只用拥有多少 GPU、多少 H100e 或多少兆瓦来衡量，而需要进一步考察它在具体模型和服务质量要求下，能够持续提供多少有效智能计算。</p>
+<p><strong>如果未来 AI 的主要消费形式逐渐从人类聊天转向持续运行的 Agent，那么衡量计算资源的最佳单位，也许不再只是每秒多少次浮点运算，而是每单位资本、每单位电力，能够可靠完成多少有价值的 Agent 工作。</strong></p>
+<p>这才是我认为这篇报告最值得记住的变化：它不是简单宣布新 GPU 更快，而是在尝试重新定义 AI 时代究竟应该怎样衡量计算能力。</p>

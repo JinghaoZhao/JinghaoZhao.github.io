@@ -1,0 +1,204 @@
+<p>今天推荐 <strong>SemiAnalysis 于 2026 年 9 月 14 日发表的《Vera Rubin NVL72 Agentic Inference: 67x better Performance per Dollar》</strong>，作者是 <strong>Bryan Shan、Alec Ibarra、Cam Quilici、Wenyao Gao 和 Dylan Patel</strong>。原文标注约 <strong>10 分钟阅读</strong>；核心 benchmark、方法说明和相当长的一部分分析可以免费阅读，后半部分属于付费订阅内容，相关 InferenceX 数据面板则公开可查。<a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank">阅读 SemiAnalysis 原文及公开 benchmark</a> <a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">InferenceX</a></p>
+<p>我今天选这篇，不是因为标题里的“67 倍”特别吸睛，而是因为它回答了一个比 Rubin GPU 规格表更重要的问题：<strong>当 AI 从一次问答变成持续几十、几百轮、不断调用工具和派生 sub-agent 的 agentic workload 后，真正决定 GPU 经济性的到底是什么？</strong> SemiAnalysis 第一次拿到 Vera Rubin NVL72 的预发布系统，用它自己的 AgentX 真实 agentic 流量回放进行测试。结果表明，下一代推理系统的瓶颈已经越来越不像传统的“谁有更多 FLOPS”，而是 <strong>HBM 容量、KV cache、prefix reuse、CPU 内存、GPU 间互联、调度软件和数据中心电力如何共同工作</strong>。更值得注意的是，文章标题里的 67 倍虽然是真的测试点，但高度依赖比较对象、服务软件和 latency target；在更接近生产部署的区域，Rubin 相对 GB300 的优势通常没有 67 倍那么夸张，却依然足以改变 AI factory 的单位经济学。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>以下不会把这篇受版权保护的文章逐句改写成中文，而是重新组织其公开部分的论证、数字和限定，并结合 SemiAnalysis 的 AgentX 方法文档以及 Nvidia 的 Rubin 官方资料解释这些结果究竟意味着什么。</p>
+<h2>为什么传统的“8K 输入、1K 输出”benchmark，已经越来越无法告诉你一个 AI agent 真正需要什么硬件</h2>
+<p>理解这篇文章，首先必须理解 SemiAnalysis 为什么专门造了 AgentX。</p>
+<p>传统 LLM inference benchmark 通常给模型一批长度相似、彼此独立的 prompt，然后测 tokens per second。这个方法非常适合比较 GPU 的基础矩阵计算能力和 kernel 性能，但它越来越不像真实的 coding agent、research agent 或 computer-use agent。</p>
+<p>真正的 agent session 往往持续几十乃至几百轮。用户最初给一个任务，模型输出内容；下一轮输入会包含此前的大量对话；agent 再调用工具，把工具结果加入 context，然后可能同时启动几个 sub-agents 去搜索、写代码或分析不同方案。随着任务继续，context 变得越来越长，而其中绝大部分又和前一轮重复。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这产生了传统 chatbot 很少遇到的一个关键特征：<strong>prefix reuse 极高</strong>。</p>
+<p>假设一个 coding agent 已经累计了 200,000 tokens 的项目上下文，下一次调用可能只新增几百或几千 tokens。如果系统每一轮都重新计算前面那 200,000 tokens，经济上几乎不可接受，因此 inference server 必须把之前 attention 所产生的 <strong>KV cache</strong> 尽可能保留下来。随着会话越来越长，cached input 在总 input 中的比例会越来越接近 100%。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>问题是 KV cache 要占内存。</p>
+<p>而且 agent 不只是一个长会话。父 agent 随时可能突然启动五个、十个 sub-agents，每个子 agent 又拥有自己的新 context，这会形成 SemiAnalysis 所说的 <strong>sub-agent bursts</strong>。平均 cache-hit rate 看起来可能很好，但某一瞬间大量新分支同时出现，会突然产生大量 cold prefill、挤占 HBM 并增加 first-token latency。<a href="https://inferencex.semianalysis.com/glossary/subagent-bursts" rel="noopener noreferrer" target="_blank" class="citation">InferenceX</a></p>
+<p>因此 agentic inference 的真实问题不是单独最大化 tokens/s。</p>
+<p>运营商必须同时处理 throughput、每个用户看到的 streaming speed、time-to-first-token、端到端任务 latency、KV cache 命中率以及突发并发。</p>
+<p>这些指标彼此会互相牺牲。</p>
+<p>你可以塞进更多并发用户来提高 GPU 利用率，但更多 agent session 会产生更多 sub-agent bursts，TTFT 可能突然恶化；你也可以减少并发换低延迟，但 GPU 经济性又会下降。<a href="https://newsletter.semianalysis.com/p/agentx-inferencexv3-does-cuda-moat" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这正是 SemiAnalysis 认为过去大量标准 benchmark 会严重误判未来 AI infrastructure 的原因。</p>
+<h2>AgentX 并不是随便编几个长 prompt，而是从真实 Claude Code 工作流里提取请求形状</h2>
+<p>为了尽可能模拟这种流量，SemiAnalysis 最初收集了 <strong>393 条内部、匿名化的 Claude Code traces</strong>。</p>
+<p>它没有保留真实文本内容，而是保留每一轮请求长度、prefix 重用关系、时间顺序以及 sub-agent 结构，再用合成 token 替换内容。随后通过 AIPerf 按原来的 request schedule 回放，并通过改变并发用户数量观察系统从低负载逐渐进入高吞吐区域后的表现。<a href="https://newsletter.semianalysis.com/p/agentx-inferencexv3-does-cuda-moat" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>AgentX 的测量流程也不是机器启动后马上记一次数字。系统首先随机进入真实 session 的中段，通过 primer 和 warm-up 建立已经存在的 prefix/KV 状态，之后才进入一小时 profiling window。因此 benchmark 想模拟的是：“一套线上 agent 服务已经持续运行，大量会话处在不同生命周期阶段”时的状态，而不是全部用户同时从一个空 prompt 开始。<a href="https://inferencex.semianalysis.com/zh/agentx/methodology" rel="noopener noreferrer" target="_blank" class="citation">InferenceX</a></p>
+<p>SemiAnalysis 目前公开的 AgentX telemetry 已经包含 <strong>79 种 serving configuration、8 个模型以及 2,152 个 benchmark points</strong>，读者可以从最终 Pareto curve 一路追到单个请求，看 cache hit、prefill、decode 和 sub-agent 的时间线。<a href="https://inferencex.semianalysis.com/inference/agentic" rel="noopener noreferrer" target="_blank" class="citation">InferenceX</a></p>
+<p>这个背景很重要，因为文章后面所有惊人的 Rubin 数字都应该理解成：</p>
+<p><strong>Rubin 在这一类 agentic serving workload 上的结果。</strong></p>
+<p>而不是“所有 AI workload 都比 Blackwell 快几十倍”。</p>
+<h2>Rubin 的设计本身已经说明 Nvidia 认为下一代 AI 机器不应该再被理解成“一堆 GPU”</h2>
+<p>Nvidia 在今年 1 月正式发布 Vera Rubin 时，把它称为一次跨六种芯片的 “extreme co-design”。</p>
+<p>一个 Vera Rubin NVL72 rack 包含 <strong>72 枚 Rubin GPU 和 36 枚 Vera CPU</strong>，同时结合 NVLink 6、ConnectX-9、BlueField-4 和 Spectrum-6 网络。Nvidia 官方规格显示，整个 rack 拥有 <strong>20.7 TB HBM4，HBM 总带宽最高约 1,580 TB/s</strong>；NVLink 6 switch fabric 带宽达到 <strong>260 TB/s</strong>。单颗 Rubin GPU 提供 288 GB HBM4 和约 22 TB/s 带宽。<a href="https://www.nvidia.com/fr-fr/data-center/vera-rubin-nvl72/" rel="noopener noreferrer" target="_blank" class="citation">NVIDIA</a></p>
+<p>36 枚 Vera CPU 又不是普通 host CPU。每枚配 <strong>88 个自研 Olympus Arm cores</strong>，整 rack 合计 3,168 个 CPU cores，并配有约 <strong>54 TB LPDDR5X CPU memory</strong>。CPU 与 GPU 之间通过 NVLink-C2C 相连。<a href="https://www.nvidia.com/fr-fr/data-center/vera-rubin-nvl72/" rel="noopener noreferrer" target="_blank" class="citation">NVIDIA</a></p>
+<p>这里很容易只注意 3,600 PFLOPS NVFP4 inference。</p>
+<p>但对 AgentX 这种 workload，更有价值的可能反而是 <strong>20.7 TB HBM + 54 TB CPU memory + 极高速 GPU/CPU/GPU interconnect</strong>。</p>
+<p>原因就是 KV cache。</p>
+<p>当一个长会话的全部 prefix 不能留在 HBM 时，server 必须把一部分 KV tensors offload 到 host DRAM，之后需要时再拉回来。SemiAnalysis 在前一代 Blackwell 测试里已经观察到：B300 比 B200 多出来的 50% HBM 不只是线性增加容量，因为更多 session prefix 能一直留在最快层，DRAM 层因此只承担真正的 spillover，而不是不断处理 cache eviction。<a href="https://inferencex.semianalysis.com/zh/blog/deepseek-v4-pro-agentx-b200-vs-b300-kv-working-set" rel="noopener noreferrer" target="_blank" class="citation">InferenceX</a></p>
+<p>Rubin 把这种思想继续推得更远。</p>
+<p>所以 Nvidia 官方在发布 Rubin 时甚至额外推出了 <strong>Inference Context Memory Storage Platform</strong>，由 BlueField-4 管理跨基础设施共享和复用 KV cache。Nvidia明确表示，这一层就是为了越来越长的多轮 agentic reasoning。<a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Kicks-Off-the-Next-Generation-of-AI-With-Rubin--Six-New-Chips-One-Incredible-AI-Supercomputer/" rel="noopener noreferrer" target="_blank" class="citation">NVIDIA Investor Relations</a></p>
+<p>换句话说，KV cache 已经从 inference engine 的一个软件实现细节，开始变成 Nvidia 整个系统 architecture 的设计对象。</p>
+<h2>文章标题里的“67 倍”，是真的，但也是最容易被误解的数字</h2>
+<p>SemiAnalysis 在 DeepSeek V4 Pro 的 AgentX workload 上比较 Vera Rubin NVL72 和 GB300 NVL72。</p>
+<p>它选择 DeepSeek V4 Pro 的原因之一是模型非常大，大约 <strong>1.6 万亿总参数、490 亿 active parameters</strong>，可以作为未来 1–3T 参数级大模型的公开 proxy；模型使用 MIT license，所以推理经济模型里不需要额外计算 model-license fee。<a href="https://newsletter.semianalysis.com/p/agentx-inferencexv3-does-cuda-moat" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>在 <strong>170 tokens/s 的 P90 interactivity</strong> 附近，如果比较 Rubin 的 TensorRT-LLM 配置和 GB300 的特定 TensorRT-LLM 配置，并使用 SemiAnalysis 的 hyperscaler owning-cost 假设，Rubin 可以达到大约 <strong>67 倍的 total tokens per TCO dollar</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>但文章自己马上给出了非常重要的限定。</p>
+<p>在更常见、运营商更可能真正部署的 <strong>60–100 TPS</strong> 区域，Rubin 对最新 GB300 TRT-LLM 配置的 throughput-per-TCO 优势大约是 <strong>1.4 倍到 3 倍</strong>。</p>
+<p>67 倍出现在 performance frontier 很特殊的位置：GB300 那条 serving-engine 曲线已经接近其极限，而 Rubin 仍然可以维持更高 throughput，因此比值突然放大。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>文章后面的 per-watt 数据更清楚地说明了这一点。</p>
+<p>在 <strong>170 TPS</strong>，Rubin 对 GB300 TRT-LLM 的 token throughput per MW 可以达到约 <strong>62.9 倍</strong>；但如果不用 GB300 的 TRT-LLM，而换成当时表现更强的 <strong>SGLang</strong> 配置，同一个 170 TPS 下优势就变成约 <strong>5.56 倍</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这意味着看到“Rubin 67x Blackwell”以后，绝不能推导出：</p>
+<p>“下一代 Nvidia GPU 普遍比上一代快 67 倍。”</p>
+<p>正确理解应该是：</p>
+<p><strong>在某些非常高 interactivity 的 agentic workload 上，Rubin 把上一代某些 serving configuration 无法有效进入的性能区间打开了，因此 TCO 差距可以出现数量级跳跃。</strong></p>
+<p>这是一个很强的结果，但与“裸算力提升 67 倍”完全不是一回事。</p>
+<h2>真正让我更重视的结果，是在比较公平的 100 TPS 附近，Rubin 仍然明显领先</h2>
+<p>在 <strong>100 TPS P90 interactivity</strong> 下，SemiAnalysis 测到 Rubin 大约可以做到 <strong>5,940 万 total tokens/s/MW</strong>。</p>
+<p>同一 workload 下，GB300 Dynamo SGLang 约为 <strong>2,850 万</strong>，因此 Rubin 大约是其 <strong>2.09 倍</strong>。</p>
+<p>GB300 Dynamo TRT-LLM 是约 2,110 万。</p>
+<p>B200 SGLang 约 695 万。</p>
+<p>B300 vLLM 约 556 万。</p>
+<p>H200 Dynamo SGLang 约 226 万。</p>
+<p>AMD MI355X SGLang 在当时这一测试点约为 <strong>201 万 tokens/s/MW</strong>，Rubin 对它的优势达到约 <strong>29.5 倍</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这里当然也必须强调：这比较的是<strong>当时具体 hardware + serving software + caching + parallelism configuration 的整体系统</strong>，不是单纯 silicon。</p>
+<p>AMD 的软件仍在快速变化，SemiAnalysis 自己也在与 AMD 合作测试下一代 MI455X UALoE72；vLLM、SGLang 和 TensorRT-LLM 每隔几周都可能因为 kernel、router 或 KV cache 优化产生巨大变化。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>但这个结果仍然很有意义，因为客户买的最终就是系统。</p>
+<p>数据中心运营商并不关心理论 FLOPS 输赢；它关心同一兆瓦、同一延迟 SLA、同一美元究竟能卖多少 token。</p>
+<h2>Rubin 的优势会随着你要求的速度变化，这可能比一个“X 倍”数字更值得理解</h2>
+<p>在 150 TPS 时，SemiAnalysis 测到 Rubin 仍然有接近 <strong>3,700 万 tokens/s/MW</strong>，相对当时最好的 GB300 SGLang 大约高 <strong>7.2 倍</strong>。</p>
+<p>再把速度要求推到 200 TPS，优势收窄到约 <strong>2.72 倍</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>为什么倍率不是固定的？</p>
+<p>因为 inference hardware 并不存在一个单一“速度”。</p>
+<p>你可以像汽车一样在不同 operating point 运行。</p>
+<p>如果运营商追求极低 latency，就不能把大量请求塞在 GPU 上，硬件利用率降低。</p>
+<p>如果追求最大 throughput，可以增加 batching 和 concurrency，但 TTFT 和尾部延迟可能恶化。</p>
+<p>不同 GPU、不同 serving engine 和不同 parallelism strategy 各自在这条 throughput/latency curve 上有不同形状。</p>
+<p>所以真实采购决策应该看 <strong>Pareto frontier</strong>，而不是最高 tokens/s 一个数字。</p>
+<p>SemiAnalysis 甚至指出，Rubin 最大 P90 interactivity 大约达到 <strong>276.24 TPS</strong>，而相关 GB300 TRT-LLM 测试约为 <strong>171.53 TPS</strong>，高出约 61%；但如果 GB300 使用开放的 SGLang stack，其最高 interactivity 又能够接近 Rubin。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这再次说明 Rubin 的故事不仅是 hardware generation。</p>
+<p><strong>Inference software 已经变成芯片性能的一部分。</strong></p>
+<h2>这一点也是 Nvidia 真正护城河最容易被低估的地方：GPU 的性能可以在芯片已经出厂以后继续提高</h2>
+<p>SemiAnalysis 特别强调，这批 Rubin 测试用的还是 <strong>early pre-release software</strong>。</p>
+<p>也就是说硬件距离真正成熟 deployment stack 还有一段时间，TensorRT-LLM、vLLM、SGLang、Dynamo、router、KV manager 和各种 kernels 之后仍会持续优化。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>AgentX 本身已经推动了大量上游软件修改。</p>
+<p>例如 vLLM 针对长 context 改进 prefix caching，避免 sliding-window allocation 把真正值得保留的长 prefix 挤掉；hybrid model 的 CPU KV offload 也开始得到支持；一些修改使 DeepSeek V4 在 prefix 放不进 HBM 后，不必整段重新计算，而可以把 KV state 放到 CPU memory。相关测试中，这类 hybrid-memory 改动曾带来 <strong>81.7% 更高 output throughput 和 46.6% 更低 mean end-to-end latency</strong>。<a href="https://newsletter.semianalysis.com/p/agentx-inferencexv3-does-cuda-moat" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这里揭示了 Nvidia CUDA moat 的一个很重要的现代版本。</p>
+<p>过去大家说 CUDA moat，经常指开发者已经写了大量 CUDA code。</p>
+<p>现在更准确的 moat 已经变成：</p>
+<p>GPU architecture。</p>
+<p>NVLink。</p>
+<p>network。</p>
+<p>serving engine。</p>
+<p>kernel。</p>
+<p>router。</p>
+<p>cache manager。</p>
+<p>distributed inference。</p>
+<p>开源社区。</p>
+<p>全部一起优化。</p>
+<p>Rubin 的“extreme co-design”实际上就是把这种系统级优势产品化。</p>
+<h2>文章对 H200 的比较特别能说明为什么“老 GPU 还能算”不等于“老 GPU 还能经济地跑 agent”</h2>
+<p>在 80 TPS P90 interactivity 时，Rubin 相对 H200 的 tokens-per-dollar 大约达到 <strong>18 倍</strong>。</p>
+<p>把目标提高到 120 TPS，差距扩大到大约 <strong>39 倍</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这里并不是说 Hopper 的 tensor cores 突然失去价值。</p>
+<p>SemiAnalysis 在 AgentX 早期结果中甚至观察到，H200 在低 concurrency、低 throughput 场景下，perf/$ 可以与更新的 B200 和 MI355X 相当。</p>
+<p>真正的问题是 HBM。</p>
+<p>随着同时在线的长 context agent 增加，H200 无法在 HBM 中容纳足够大的 KV working set，于是 increasingly依赖 CPU DRAM offload。Offload 虽然可以提供容量，却要付出 transfer 和 latency 成本，用户数继续增加以后 tail latency 会迅速恶化。<a href="https://newsletter.semianalysis.com/p/agentx-inferencexv3-does-cuda-moat" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这对未来 GPU residual value 很有意思。</p>
+<p>一块旧 GPU 并不会因为下一代出来就失去 FLOPS。</p>
+<p>但如果 workload 从短 prompt inference 迁移到拥有巨大 KV state 的 agentic inference，它的<strong>经济寿命可能因为 memory hierarchy，而不是 compute，提前结束</strong>。</p>
+<p>这也是为什么 SemiAnalysis 认为 Hopper 会越来越被迁往 offline batch inference 或 training，而不是最前沿的 interactive agent serving。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<h2>Rubin 在租赁价格更贵的情况下仍然可能更便宜，这才是客户愿意升级的真正原因</h2>
+<p>SemiAnalysis 使用的 2026 年 7 月市场调查数据里，Rubin 三年期 committed rental price 当时估计高于 <strong>8.5 美元/accelerator-hour</strong>，Blackwell Ultra NVL72 则大约是 <strong>5 美元</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>因此 Rubin 并不是靠“GPU 更便宜”赢。</p>
+<p>单小时租金明显更贵。</p>
+<p>但在 <strong>80 TPS P90 interactivity</strong> 下，即便按照这个更高的租赁价格计算，Rubin 仍然可以在相同租赁 TCO 下生成约 <strong>62% 更多 token</strong>；进入 performance frontier 更靠右的高 interactivity 区域后，某些配置的 tokens-per-rental-dollar 优势可以达到 <strong>16 倍</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>换句话说：</p>
+<p>买 Rubin 的逻辑和买一辆更便宜的车完全不同。</p>
+<p>它更接近购买一台贵很多、但每小时产量高得更多的工业机器。</p>
+<p>真正需要比较的是：</p>
+<p><strong>每一美元全生命周期成本能卖出多少 inference。</strong></p>
+<p>SemiAnalysis 的 TCO 模型也因此不是只算 GPU 价格。其 owning-cost calculation 会加入 server capex、DRAM、NAND、scale-up 和 scale-out networking、数据中心电力、colocation 以及资本成本，然后折算成每 accelerator-hour 的实际拥有成本。<a href="https://semianalysis.com/ai-cloud-tco-model/" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这也是为什么直接拿“H100 一张多少钱”和“Rubin 一张多少钱”判断 ROI，越来越没有意义。</p>
+<h2>但比美元更稀缺的东西已经变成电，所以整篇文章真正最重要的单位可能是 tokens / MW</h2>
+<p>SemiAnalysis 花很大篇幅讨论 <strong>performance per megawatt</strong>。</p>
+<p>原因非常现实：</p>
+<p>钱理论上可以融资。</p>
+<p>GPU 可以下单。</p>
+<p>数据中心土地也可以找。</p>
+<p>但一个区域能够新增多少电力，受发电、变电站、输电线路、并网审批和施工周期限制。</p>
+<p>对已经拿到 1 GW utility allocation 的 hyperscaler 来说，短期内真正固定的生产要素可能就是这个 1 GW。</p>
+<p>因此一个新 GPU 如果不是便宜 20%，而是让同一 1 GW 生产两倍 token，这代表的是完全不同级别的经济价值。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>Nvidia 自己在 GTC 2026 宣称，在约 1–3T 参数的大模型和大约 200 TPS 场景中，Vera Rubin NVL72 相比 Blackwell 能达到大约 <strong>3 倍 performance per MW</strong>。</p>
+<p>SemiAnalysis 的预发布实测在部分 workload 上甚至看到最高约 <strong>7 倍 total token throughput per MW</strong>，因此文章半开玩笑地说 Jensen 又在 “sandbagging”——像 2024 年发布 Blackwell 时一样，官方承诺可能反而比较保守。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>Nvidia 自己年初的官方目标则是：Rubin 相比 Blackwell可以把 inference token cost 最高降低约 <strong>10 倍</strong>。那依然是厂商宣称，而 SemiAnalysis 这次的价值正是第一次给出了第三方、可重复检查的 agentic workload 数据。<a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Kicks-Off-the-Next-Generation-of-AI-With-Rubin--Six-New-Chips-One-Incredible-AI-Supercomputer/" rel="noopener noreferrer" target="_blank" class="citation">NVIDIA Investor Relations</a></p>
+<h2>Rubin 还有一个很容易被忽视的功能：不再按“所有 GPU 同时跑到最大 TDP”设计整个数据中心</h2>
+<p>SemiAnalysis 特别提到 Nvidia 的 <strong>DSX MaxLPS dynamic power shifting</strong>。</p>
+<p>传统 cluster power planning 很保守：假设大量 GPU 可能同时达到最大 TDP，然后再留 10%–20% safety margin。</p>
+<p>但真实 inference workload 通常不会所有 GPU 在每一秒都跑到理论最大功耗。</p>
+<p>尤其 agentic inference 在 prefill、decode、cache hit、tool call 等不同阶段的 power profile 差异很大。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>如果 operator 能够动态观察和控制 rack 的实际功耗，就可以在不超过 utility limit 的情况下，在同一个数据中心放入更多 GPU。</p>
+<p>从经济上说，这等于把一个 1 GW 数据中心“虚拟扩容”。</p>
+<p>它没有多拿一瓦电，却通过降低同时达到 peak TDP 的概率，把更多 accelerator 塞进同一个 power envelope。</p>
+<p>所以 Rubin 的 performance-per-MW 改进其实来自两层：</p>
+<p>芯片和系统本身更高效。</p>
+<p><strong>数据中心也能把 power capacity 利用得更激进。</strong></p>
+<p>这开始让 Nvidia 从 GPU supplier 越来越像一家 <strong>AI factory operating-system company</strong>。</p>
+<h2>文章里最惊人的财务数字——每 GW 1499 亿美元利润——一定要非常谨慎地看</h2>
+<p>SemiAnalysis 最后把 AgentX benchmark 塞进自己的 inference economics model。</p>
+<p>在 DeepSeek V4 Pro workload、<strong>75 TPS、60% utilization、没有模型 license fee</strong>，并按照其设定的 token prices 计算时，Vera Rubin 每 1 GW utility power 可以对应大约 <strong>1,595 亿美元年收入和 1,499 亿美元模型化利润</strong>。</p>
+<p>对比之下，当时表现最强的 GB300 Dynamo SGLang 配置约为 <strong>1,149 亿美元收入和 1,053 亿美元利润</strong>。</p>
+<p>Rubin 因此在模型中增加约 <strong>39% revenue 和 42% profit per GW</strong>。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>绝对差距约 <strong>446 亿美元/GW/年</strong>；如果简单线性缩到 10 MW，就是约 4.46 亿美元的模型化利润差。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这些数字绝对不能理解成：</p>
+<p>“买一吉瓦 Rubin 就一定赚 1500 亿美元。”</p>
+<p>它们高度依赖 token 售价、60% billable utilization、模型使用率、需求弹性、没有 license fee 等假设。</p>
+<p>真实 AI cloud 不可能永远以同样价格卖掉所有新增 token。</p>
+<p>如果 Rubin 大量降低供给成本，市场本身也可能迅速降价。</p>
+<p>所以这组数字最大的价值不是绝对值，而是解释<strong>为什么 hyperscaler 愿意在新一代 GPU 出现后迅速淘汰经济上仍能工作的旧硬件</strong>。</p>
+<p>只要同一兆瓦能多产生几十个百分点的 gross profit，升级速度就可能比传统服务器周期快得多。</p>
+<h2>而且更高效率并不一定让 Nvidia 客户少花钱，反而可能让他们更愿意继续扩算力</h2>
+<p>SemiAnalysis 根据模型估计，如果 Rubin operator 不想把全部 efficiency gain 留作利润，它大约可以把 cached input、uncached input 和 output token 价格都降低 <strong>28% 左右</strong>，仍然获得与 GB300 同样的 revenue per GW。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这就是 AI compute 的一个典型 Jevons-paradox 结构。</p>
+<p>一代硬件让 token 便宜。</p>
+<p>开发者因此构建更长 context。</p>
+<p>Agent 做更多轮 reasoning。</p>
+<p>启动更多 sub-agent。</p>
+<p>消费者使用更多 inference。</p>
+<p>最后总 compute consumption 反而增加。</p>
+<p>所以“Rubin 每 token 更高效”并不自动意味着 GPU 需求下降。</p>
+<p>它甚至可能反过来让现在因为 token 太贵而无法成立的 agent product 获得经济可行性，从而释放新的需求。</p>
+<h2>我认为这篇文章最重要的技术结论，是下一轮 inference scaling 已经从 FLOPS scaling 变成 memory-system scaling</h2>
+<p>下面是我的判断，不是 SemiAnalysis 原文的直接结论。</p>
+<p>如果你只看 Rubin GPU 自己，会觉得它是 Blackwell 后又一次正常的算力升级。</p>
+<p>但 AgentX 数据让我觉得真正的变化比这更结构化。</p>
+<p>未来 agent 的 workload 大致会越来越像：</p>
+<p>非常长的 conversation。</p>
+<p>非常高的 prefix reuse。</p>
+<p>大量同时存在的 KV cache。</p>
+<p>突然出现的 sub-agent burst。</p>
+<p>tool call 之间又会暂停计算。</p>
+<p>然后继续恢复同一个巨大 context。</p>
+<p>这种 workload 的关键指标已经不再只是矩阵乘法速度。</p>
+<p><strong>HBM capacity、HBM bandwidth、CPU memory、NVLink、KV cache software、router 和 power scheduling 开始共同决定一枚 token 的价格。</strong></p>
+<p>这实际上和你目前关注的 KV-cache reuse、decode batching 等问题完全连起来了：传统 decode server 可以把 request 看成一批相对规则的 token 流，而 agentic serving 更像一个不断分叉又重新汇合的动态计算图，batch composition、缓存位置和 memory pressure 每一秒都在变化。<a href="https://inferencex.semianalysis.com/glossary/subagent-bursts" rel="noopener noreferrer" target="_blank" class="citation">InferenceX</a></p>
+<h2>从投资角度，这篇文章最 bullish 的其实不只是 Rubin，而是 Nvidia 把护城河从“GPU”继续扩到了整个 AI factory</h2>
+<p>如果 SemiAnalysis 的方向判断成立，我认为 Nvidia 最重要的竞争优势会越来越难用“AMD GPU 的 FLOPS 是否接近”来衡量。</p>
+<p>竞争对象必须同时做到：</p>
+<p>高性能 accelerator。</p>
+<p>足够大的 HBM。</p>
+<p>scale-up fabric。</p>
+<p>scale-out network。</p>
+<p>CPU。</p>
+<p>DPU。</p>
+<p>KV cache movement。</p>
+<p>distributed inference。</p>
+<p>serving software。</p>
+<p>kernel ecosystem。</p>
+<p>power management。</p>
+<p>最后还必须让客户在真实 workload 上把这些东西跑稳。</p>
+<p>这就是为什么 AMD 某些 hardware specification 看起来很有竞争力，但 AgentX 某些模型上的表现仍然差很多；与此同时，在另外一些模型和低 latency 区域，MI355X 又可以非常接近甚至超过部分 Nvidia 配置。<a href="https://newsletter.semianalysis.com/p/agentx-inferencexv3-does-cuda-moat" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>这并不意味着 AMD 永远追不上。</p>
+<p>恰恰相反，AgentX 还说明软件优化可以在几周内大幅改变 leaderboard。</p>
+<p>真正的含义是：<strong>Nvidia 的 moat 已经从 silicon moat 变成 systems-engineering moat。</strong></p>
+<p>对于 NVDA，我认为这比“Rubin 又多了多少 PFLOPS”更值得跟踪。如果 hyperscaler 最终采购的优化目标从“<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">/</mi><mi>G</mi><mi>P</mi><mi>U</mi><mtext>”变成“</mtext></mrow></semantics></math>/token at SLA”甚至“profit/GW”，那么最贵的 GPU 完全可能也是最便宜的算力。</p>
+<p>而对整个 AI infrastructure 链条，这篇文章同样强化了 HBM、先进封装、高速互联和电力的重要性。Agent 越流行，每个 active user 需要持续保存的 context state 越大，memory capacity 的价值越高；sub-agent 越多，network 和 cache movement 越关键；电力越难新增，tokens/MW 越接近 AI 数据中心真正的生产率指标。</p>
+<p>不过我不会用这篇文章得出“Rubin 已经被证明是 67x Blackwell，因此 Nvidia 未来几年没有竞争”这样的结论。测试运行在预发布软件上，核心案例集中在一个特定的超大模型和 agentic trace；最高倍率对 serving engine 与 operating point 极其敏感；SemiAnalysis 也获得了 Nvidia 工程团队协助完成 Rubin software bring-up 和结果验证，因此未来仍应该看更多独立部署、vLLM/SGLang 结果以及 AMD MI455X、TPU、Trainium 等下一代系统的相同 AgentX comparison。<a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>
+<p>但如果只从这篇文章里记住一个数字，我反而不会选 <strong>67x</strong>。</p>
+<p>我会记住 <strong>2.09x tokens per MW at 100 TPS</strong>。</p>
+<p>它没有标题那么夸张，却可能对未来几年的 AI 基建经济学重要得多。因为在一个 GPU 可以融资、电力却无法快速复制的世界里，<strong>同一个兆瓦能够多生产一倍左右的高质量 agentic inference，意味着下一代芯片的价值不再只是“更快”，而是在没有新建电厂、输电线和数据中心的情况下，凭空扩大了 AI factory 的可售产能。</strong></p>
+<p>Rubin 最值得关注的地方因此不是它是一枚更强的 GPU，而是它让人第一次很清楚地看到：<strong>Agent 时代的计算机，正在从“GPU 集群”演化成一台以 memory、network、software 和 power 为共同状态的巨型机器。</strong> <a href="https://newsletter.semianalysis.com/p/vera-rubin-nvl72-agentic-inference" rel="noopener noreferrer" target="_blank" class="citation">SemiAnalysis</a></p>

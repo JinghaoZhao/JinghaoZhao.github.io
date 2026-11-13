@@ -1,0 +1,326 @@
+<h1 class="original-title">今日科技长文：Anthropic 不只是想让 Claude 操作软件，它开始给 AI 建一套“USB 接口”，直接连接实验室和工厂</h1>
+<p>今天推荐 Anthropic 于 <strong>2026 年 8 月 27 日</strong>发布的长文 <strong>《Previewing the Model Hardware Standard》</strong>。这是 Anthropic 官方的一手技术文章，<strong>目前免费公开阅读</strong>。文章介绍了一个新标准 <strong>Model Hardware Standard，MHS</strong>：它试图为 AI agent 操作显微镜、液体处理器、机械臂、激光器、PCR 仪器乃至量子计算机设备建立统一接口。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank">阅读 Anthropic 原文</a> <a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>我今天选它，是因为过去几天我们连续讨论了自动科研、synthetic environments 和 AI researcher，而 MHS 正好补上了那套逻辑里最难自动化的一环：<strong>真实世界实验</strong>。模型已经越来越会提出 hypothesis、写代码、分析数据，真正拖慢 scientific loop 的往往不是“想不到下一步做什么”，而是实验室里的仪器来自不同厂商、接口互不兼容，需要研究人员手工搬样品、盯设备、排故障。Anthropic 现在做的不是另一颗机器人“大脑”，而是试图标准化 <strong>AI 与物理设备之间的控制层</strong>。如果这个方向成立，MCP 把软件世界变成 agent 可调用工具之后，MHS 可能尝试把一部分物理世界也变成同样可调用的工具。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<h2>MHS 要解决的第一个问题其实非常“无聊”：实验室设备根本不会彼此说话</h2>
+<p>Anthropic 开篇描述了一个长期存在于科研和制造业里的现实问题。实验室里即使已经有大量自动化设备，每台机器往往仍然拥有自己的 programming interface、数据格式和 vendor software。如果要让显微镜、液体处理器、机械臂、plate reader 等设备协同工作，通常需要专业工程师逐个编写 glue code。完整集成往往需要数周甚至数月。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>更麻烦的是，把几台机器“接起来”之后，还没有一个统一办法让 AI agent 知道这些设备能做什么、当前是什么状态，以及哪些操作绝对不能执行。</p>
+<p>MHS 试图把这两件事同时标准化。</p>
+<p>它首先定义一个统一 driver layer。设备向上暴露非常简单的 primitive，例如 read 可以表示“读取温度”，write 可以表示“把温度设置为某个值”。不同厂商下面到底用什么 API 或控制系统，由 driver 自己负责转换。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>同时，每台设备会通过标准格式描述自己的 capabilities 和 state。Agent 因而不需要先为某个 Thermo Fisher 仪器学一套接口、再为另一个 Tecan 设备学另一套接口，而是通过同一种抽象访问它们。</p>
+<p>Anthropic 进一步加入了自然语言 tags。这里存的不是纯软件 API 能表达的信息，而是大量过去存在于说明书或者实验员脑子里的 tacit knowledge，例如机械臂有多重、运动范围是多少、设备可以调哪些参数，以及必须执行哪些安全限制。系统再利用这些信息自动生成一份 reference file，让 agent 在第一次看到设备时就知道怎样使用它。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这一层非常重要，因为真正的物理世界和软件不同。调用一个错误 API 最坏可能返回 error；让机械臂以错误方向运动、让激光功率过高或者让液体处理器发生碰撞，可能直接损坏实验和设备。</p>
+<p>所以 Anthropic 并没有把安全完全交给模型自己“判断”。MHS 的思路是在设备层预先声明和执行一些 hard safety limits。</p>
+<h2>MCP 与 MHS 并不是同一个东西：一个连接软件，一个连接机器</h2>
+<p>Anthropic 明确说，MHS 是 <strong>model-agnostic</strong> 的，并不要求必须使用 Claude。任何 agent harness 理论上都可以使用它。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>设备连接以后，agent 有三种主要控制方式：MCP、命令行以及代码文件/API。</p>
+<p>这个区分很关键。</p>
+<p>MCP 可以理解成 agent 与工具、软件之间的通用连接协议；MHS 更像设备 driver 和 hardware abstraction layer。也就是说，MCP 可以成为 agent 进入 MHS 的一个入口，但 MHS 并不是“新版 MCP”。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>当操作很短时，agent 可以直接发命令。</p>
+<p>当一个物理过程需要高速或者长时间连续运行时，让大模型每一步都在线思考反而很笨。于是 Claude 可以先观察设备、探索正确操作，然后把学到的策略写成一个 deterministic script。</p>
+<p>Anthropic 举了激光对准的例子。Claude 先调整激光器，通过摄像头观察光斑怎样移动，再继续调整；理解控制关系之后，它把整个过程写进脚本，之后设备自己执行，模型不需要再在每个毫秒级动作之间推理。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这揭示了一个非常重要的架构：</p>
+<p><strong>AI 不一定永远处于控制回路最里面。</strong></p>
+<p>更合理的结构可能是：</p>
+<p>模型负责探索和决策。</p>
+<p>然后生成一个普通、确定性的控制程序。</p>
+<p>真正高速运行时，让传统软件接管。</p>
+<p>物理世界 agent 的最终形态很可能大量采用这种“AI learning → deterministic execution”的混合方式。</p>
+<h2>Genentech 的案例：Claude 第一次尝试 pipetting 时就犯了一个非常典型的“没有物理常识”的错误</h2>
+<p>Genentech 用 MHS 做的是 BCA protein assay，也就是测量样品总蛋白浓度的经典实验。</p>
+<p>这个过程需要三类设备协作：液体处理器负责精确移液，机械臂负责搬动实验板，microplate reader 测量样品吸光度。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>真正困难的地方不是理解实验步骤，而是液体本身具有不同物理性质。</p>
+<p>普通水和 BSA 蛋白溶液的黏度不同。</p>
+<p>如果 pipetting flow rate 太高，黏稠的蛋白溶液会产生大量气泡；气泡会占据 pipette 中的一部分体积，让真正转移的液体量偏小，也可能干扰 liquid-level sensor 和最终 optical reading。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>Genentech 第一次把标准实验 protocol 给 Claude 时，模型使用了非常通用的 liquid-handling 参数，并对水和黏稠 BSA 使用相同 flow rate。</p>
+<p>结果 BSA 产生气泡，导致液体转移不准确。</p>
+<p>这个失败非常有意思，因为 Claude 从符号层面完全“理解”实验，但没有足够强的 physical intuition。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>研究人员随后没有直接告诉 Claude 最优参数，而是给它一个实验任务：在专家定义的 flow-rate range 中自己测试。</p>
+<p>Claude 每次改变 flow rate，实际向 plate 中转移带颜色液体，让 plate reader 测量结果，并与专家完成的 ground-truth transfer 比较。它用 RMSE 评价自己离目标有多远。</p>
+<p>最后，Claude 对水选择约 <strong>140 µL/s</strong>，RMSE 约 <strong>0.016</strong>；对较黏的 BSA 选择约 <strong>10 µL/s</strong>，RMSE 约 <strong>0.181</strong>。Genentech 的 automation experts 判断这两个数对他们的 setup 是合理的。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>所以这里第一次出现真正的 closed loop：</p>
+<p>AI 决定参数。</p>
+<p>机器执行真实实验。</p>
+<p>传感器产生现实数据。</p>
+<p>AI 根据数据重新决定参数。</p>
+<p>这已经不再是 synthetic simulation。</p>
+<h2>但 Claude 遇到气泡以后，又暴露了一个更深的问题：它会把物理错误当成软件错误</h2>
+<p>在实验过程中，Claude 遇到了 tip pickup failure 和 fluid detection error 等异常。</p>
+<p>其中部分错误它能够自己恢复。</p>
+<p>但碰到气泡时，模型最初采取的策略非常像一个只活在软件世界里的 agent：<strong>重试。</strong></p>
+<p>某个 well 失败以后，它换参数，再在同一个位置尝试一次。</p>
+<p>问题是，对软件 API 来说 retry 往往是合理做法；对一管正在起泡的蛋白液体来说，反复搅动只会产生更多气泡。</p>
+<p>于是系统反而越来越糟。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>研究人员最终必须明确告诉它，这是一个物理泡沫问题，不是 transient software failure；正确动作应该包括换到干净的 well，并减少 mixing cycles。</p>
+<p>一旦 Claude 得到这个解释，它在后续实验中能够保持这条 context。Genentech 之后还把这些经验编码成 reusable liquid-handling skills，让模型遇到类似液体时可以直接使用更合理的默认参数。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>我认为这是全文非常有代表性的一段。</p>
+<p>LLM 在软件领域遇到 error 的默认世界观，很多是：</p>
+<p>重试。</p>
+<p>换参数。</p>
+<p>重新调用工具。</p>
+<p>但物理世界具有 <strong>irreversibility</strong>。</p>
+<p>你摔碎一个样品不能 retry。</p>
+<p>试剂污染以后不能 Ctrl-Z。</p>
+<p>培养细胞死了以后不能 restore checkpoint。</p>
+<p>这意味着真正 physical agents 的安全性和软件 agents 会是完全不同的难题。</p>
+<h2>University of Washington 的案例反而更现实：很多实验员真正想自动化的，不是科学发现，而是“半夜四点起来换一块板”</h2>
+<p>David Baker 和 Sudarshan Pinglay 实验室的博士生 Zihao Song 提出了一个很典型的实验室痛点。</p>
+<p>现在用 AI 设计一个新蛋白可以便宜得惊人。文章举的数量级是，设计类似 PETase 这样的候选蛋白，纯计算成本可能低至约 <strong>0.01 美元</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>但把这个候选真正放进实验室验证，可能仍然需要约 <strong>100 美元和一周人工</strong>。</p>
+<p>而实验人员一次可能要验证大约1,000个 candidates。</p>
+<p>所以 AI protein design 的 bottleneck 已经从“生成候选物”明显移动到<strong>真实实验 throughput</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>Song 描述的日常非常不 glamorous。</p>
+<p>实验室只有一台某些关键仪器。</p>
+<p>PCR 一次只能跑一块 plate。</p>
+<p>每90分钟需要人工回来换下一块。</p>
+<p>所以博士生甚至会凌晨4点起床去搬 plate。</p>
+<p>监控也一样。设备散落在不同角落，HPLC 如果半夜报错、液体处理器突然 misfire，等研究员几个小时后发现，整份 sample 可能已经无法使用。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>传统 automated lab 可以解决这些问题，但价格和刚性都很高。工厂可以让一条产线一万次重复同一个 protocol；academic research 每年可能做几十种不同 protocol，其中一半是第一次运行，而且实验中间随时需要修改。</p>
+<p>所以传统 automation engineering 的 ROI 很难成立。</p>
+<p>Song 过去曾经花几周评估平台、找 vendor support、写 glue code，最后仍然放弃。使用 MHS 后，他把 <strong>6 台设备连接起来不到一周</strong>，其中还包含自己写 driver 的时间。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<h2>一个很简单但很实用的应用，是让 Claude 替博士生“盯 PCR 曲线”</h2>
+<p>qPCR 在每个 cycle 中复制目标 DNA，并通过 fluorescent signal 显示复制量。</p>
+<p>信号最初很弱，随后进入指数增长阶段，最终当 reagent 用尽后进入 plateau。</p>
+<p>如果让 reaction 一直跑进 plateau，会扭曲 library，影响后续定量。</p>
+<p>所以研究人员必须一直观察 amplification curve，在正确时刻停止。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>过去这个任务本质上要求一个博士生盯着仪器。</p>
+<p>接入 MHS 后，agent 可以实时读取 curve。</p>
+<p>当它判断 reaction 到达适当阶段时，可以询问研究员是否停止；获得确认以后，直接终止 reaction，并把设备切换到 <strong>4°C hold</strong>，防止 DNA 降解。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这不是最炫目的 AI 能力。</p>
+<p>但恰恰非常容易产生 ROI。</p>
+<p>一个系统如果每天替几十名研究人员消灭这种“必须有人看着”的劳动，实验室的有效工作时间可以明显增加。</p>
+<h2>更进一步，Claude 开始协调机械臂和液体处理器，避免两台机器人撞在一起</h2>
+<p>Song 还把一台基于 Hugging Face LeRobot 的开源机械臂，与 liquid handler 通过 MHS 接在一起。</p>
+<p>workflow 很简单。</p>
+<p>Liquid handler 先把 reagent 加到 plate。</p>
+<p>做完以后，机械臂把完成的 plate 拿走，再换进下一块新的 plate。</p>
+<p>问题是两台机器必须严格协调，否则机械臂可能在 pipetting 尚未结束时伸进去，或者 liquid handler 在机械臂尚未离开时重新开始动作。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>Claude Code 负责协调两台设备。</p>
+<p>只有上一阶段返回 completion signal，下一台设备才启动。</p>
+<p>实验中 liquid handler 完成后，约 <strong>10 秒</strong>后 agent 触发机械臂下一动作；多轮测试里没有发生碰撞。研究人员本人只是在办公室电脑上监控整个过程。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>现在这还只是 proof of concept。</p>
+<p>Song 自己也明确提醒，更复杂实验需要更高可靠性，持续数小时运行 agent 本身也有 inference compute cost，必须与节省的人力比较。</p>
+<p>但真正吸引他的下一步是完整的 <strong>design-build-test-learn loop</strong>。</p>
+<p>Agent 可以提出 protein designs。</p>
+<p>自动安排 build 和 assay。</p>
+<p>读取实验结果。</p>
+<p>再根据真实数据生成下一轮设计。</p>
+<p>这意味着实验室自己可以一轮又一轮自动产生 proprietary scientific data。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<h2>Carnegie Mellon 做了一个更接近完整自动实验的案例：系统发现第一轮剂量曲线不好，自己扔掉，再跑第二轮</h2>
+<p>CMU 做的是 drug development 里非常常见的 dose-response serial dilution。</p>
+<p>研究人员需要找到适当 concentration range。如果最高浓度太高，measurement 会 saturation；步长太小覆盖范围不足，步长太大又会错过真正的 transition region。</p>
+<p>手工运行这一套实验可能需要多次迭代。即使已经有 robotic automation，建立 protocol 仍可能需要 automation engineer 花几周。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>CMU 的设备尤其能体现现实实验室为什么难自动化。</p>
+<p>机械臂运行在一台电脑上，通过把 XML 文件扔进特定 directory 来控制。</p>
+<p>Liquid handler 在另一台机器上，通过老式 Windows <strong>ActiveX/COM</strong> 接口。</p>
+<p>Plate reader 在第三台电脑上，<strong>根本没有 API，只有 GUI</strong>。</p>
+<p>另外还有 USB camera。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>MHS 把这些完全不同的控制方式统一成同一种 states 和 procedures。</p>
+<p>团队从零编写 drivers 和 orchestration layer，让 Claude Opus 4.8 完整运行 protocol，只用了大约 <strong>8 小时</strong>；他们估计传统 vendor setup 通常需要数周。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>实验里使用的是一种安全的 colorimetric dye，并不是真实药物，但决策过程与真正的 dose-response 类似。</p>
+<p>团队还故意制造六种异常：plate 缺失、plate 放反、reader 忙碌、camera 断开、device unreachable，以及 emergency stop 已被触发。</p>
+<p>六种情况下，系统都在设备真正运动之前停止操作。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>然后真正运行实验。</p>
+<p>第一轮 concentration range 最高达到 <strong>200 µg/mL</strong>。</p>
+<p>Claude 看到结果以后判断拟合不够好，<strong>R² &lt; 0.9</strong>，原因是高浓度区域发生 saturation。</p>
+<p>它没有接受这个结果，而是自主丢弃这块 plate，把最高浓度降低到 <strong>100 µg/mL</strong>，重新运行完整实验。</p>
+<p>第二轮得到 <strong>R² &gt; 0.98</strong> 的可用曲线，过程中没有人类干预。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这就是我认为 MHS 真正值得注意的能力边界。</p>
+<p>它不是“让 Claude 帮我点击机器上的 Start”。</p>
+<p>而是：</p>
+<p><strong>观察实验结果 → 判断结果不够好 → 修改实验参数 → 重跑真实实验 → 再评价结果。</strong></p>
+<p>这已经非常接近 autonomous experimentation 的基本闭环。</p>
+<h2>HHMI Janelia 的故事则展示了另一个瓶颈：一套顶级显微镜可能实际上是七个互不认识的软件拼起来的</h2>
+<p>Virginie Ruetten 在 Janelia 研究睡眠如何影响整个身体。</p>
+<p>她使用年轻斑马鱼，因为斑马鱼体积小而且透明，可以通过 two-photon microscopy 同时观察脑、心脏、脊髓、肠道等不同组织的 cellular activity。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>但她的 microscope rig 并不是一台“机器”。</p>
+<p>它是一间屋子。</p>
+<p>里面有 femtosecond lasers、galvanometer mirrors、photomultiplier detectors、translation stages、camera 和 electrophysiology equipment。</p>
+<p>这些东西来自不同厂商，甚至分别用 MATLAB、Python 和 C# 控制。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>过去她为了启动一次实验，需要按照固定顺序打开 <strong>7 个程序</strong>。</p>
+<p>顺序错了甚至可能毁掉整个实验 session。</p>
+<p>新增一个设备往往需要数天 integration。</p>
+<p>接入 MHS 后，她新加一个用于观察 laser beam 的 camera，只需要<strong>几分钟</strong>。</p>
+<p>开始实验也从7个独立步骤变成了 dashboard 上一次点击。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>更重要的是，MHS 把不同设备产生的数据统一写进 shared-memory state dictionary。</p>
+<p>以前一个 MATLAB program 里的变量，Python 程序看不到；现在 camera image、stage position、heart signal 和 neural activity 都变成标准化数据流。</p>
+<p>因此她可以写一次 frequency-analysis code，然后既用于分析斑马鱼心跳，也用于分析另一台设备产生的神经活动，而不必针对每个 vendor 重写。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>文章有一句很好的总结：过去工程工作分别积累在每个设备的独立 codebase 里，现在同一份工作可以在一个共享系统里复利。</p>
+<h2>更大的变化是，“ballistic experiment”开始变成 adaptive experiment</h2>
+<p>Ruetten 对传统实验用了一个很形象的概念：<strong>ballistic</strong>。</p>
+<p>现在很多实验像发射炮弹。</p>
+<p>开始之前决定全部参数。</p>
+<p>然后启动。</p>
+<p>等待几个小时。</p>
+<p>结束以后才知道参数是否正确。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>但实际科学问题经常需要动态权衡。</p>
+<p>例如 microscopy 中，扫描范围越大，可以覆盖更多脑区，但速度越慢；扫描范围越窄，可以获得更高 temporal resolution，却可能错过真正感兴趣的细胞。</p>
+<p>传统做法必须在实验开始前选定一个 compromise。</p>
+<p>Agentic microscopy 可以改变这件事。</p>
+<p>先大范围扫描。</p>
+<p>Agent 发现具有目标 oscillation 的细胞群。</p>
+<p>然后立刻缩小区域、高速扫描。</p>
+<p>实验参数由<strong>已经产生的数据反过来决定</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>Ruetten 已经用这种方式找到固定参数原本可能漏掉的一组 oscillatory cells，因此减少了重复实验以及所需动物数量。</p>
+<p>而 MHS 设备层又可以直接限制最大 laser power，所以不必完全依赖 Claude 自己记得“不要把荧光分子照坏”。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这其实是 autonomous science 很核心的一种价值：</p>
+<p>不是机器跑实验更快。</p>
+<p>而是<strong>实验本身开始变成实时 feedback policy。</strong></p>
+<h2>QuEra 的案例是整篇文章里最惊人的：Claude 把一套专家写了几个月、成功率58%的控制脚本，优化到了99.3%</h2>
+<p>QuEra 使用 neutral atoms 做 quantum computing。</p>
+<p>这类系统高度依赖 laser。</p>
+<p>激光频率必须保持到大约 <strong>万亿分之一</strong>的精度；文章用一个很形象的尺度说明，相当于测量地球到月球的距离，误差只有一根头发宽。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>温度、振动或者空气压力稍微变化，都可能让 laser “unlock”。</p>
+<p>而量子计算机如果正在运行一个持续几个小时的 error-corrected program，中途 laser unlock 可能毁掉整次 computation。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>传统上，这种问题需要经验丰富的技术人员处理。</p>
+<p>一个人发现 unlock 后，要观察多个仪器、依次调节控制参数，并判断什么时候已经真正重新稳定。</p>
+<p>通常需要 <strong>5–10 分钟</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>QuEra 早就尝试过自动化。</p>
+<p>在 MHS 之前，一个由 laser engineer、software engineer、algorithm specialist 和 tester 组成的团队花了<strong>几个月</strong>编写 bespoke recovery script。</p>
+<p>这个 script 基本就是把专家操作流程逐步写死。</p>
+<p>最终成功率只有 <strong>58%</strong>，单次 recovery 大约 <strong>150 秒</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>原因并不难理解。</p>
+<p>真实世界在你执行脚本期间仍然会变化。</p>
+<p>脚本前面某一步已经调好，某个人推门进实验室造成温度或气压变化，那个步骤又可能失效；线性的流程只能重新从头开始。</p>
+<p>QuEra 随后让 Claude 通过 MHS 接触同一套真实 laser system。</p>
+<p>团队给它目标：写出一个 standalone Python script，第一次就把 laser relock，并保持30秒。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>然后人为制造各种扰动。</p>
+<p>遮挡 laser beam。</p>
+<p>断掉某些仪器电源模拟 surge。</p>
+<p>把频率推离 target。</p>
+<p>Claude 可以通过 MHS 读取仪器并移动真实控制器。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<h2>最值得注意的是，它不是让一个 Claude 自己研究，而是建立了一个四 agent 自动实验团队</h2>
+<p>QuEra 把工作循环拆成四种角色，每轮都使用新的 Claude instance。</p>
+<p>一个 agent 提出怎样让 recovery 更快、更可靠的 hypothesis。</p>
+<p>一个负责修改 Python script。</p>
+<p>一个把新 script 真正在 laser 上跑一次，并记录全过程。</p>
+<p>最后一个阅读日志，再决定下一轮修改方向。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这个 loop 整晚无人值守运行了数百轮。</p>
+<p>第二天早上，recovery time 从150秒降到了大约 <strong>6秒</strong>，development success rate 从58%提高到约 <strong>96%</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>模型最终没有继续模拟人类专家原来的线性步骤，而是把控制逻辑重写成 decision tree。</p>
+<p>如果频率只轻微偏移，它发现根本不需要检查全部控制器，只调整最可能相关的一两个参数即可。</p>
+<p>这种 shortcut 是 Claude 在不断重复真实 disturbance 的过程中自己发现的。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>之后 QuEra 把最终 script 单独拿出来，不再让 agent 在线参与，进行了 <strong>700 次 blind trials</strong>。</p>
+<p>695 次成功。</p>
+<p>最终 success rate <strong>99.3%</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>最困难的 disturbance 需要10–14秒。</p>
+<p>简单情况只需要 <strong>0.9–5.4秒</strong>。</p>
+<p>人工操作则仍然需要5–10分钟。</p>
+<p>而最终产物不是一个不可解释的 agent，而是一份普通、确定性、可检查、可以进入 production 的 Python script。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这一点特别重要。</p>
+<p>AI 真正创造的价值不是“以后量子计算机旁边永远运行 Claude”。</p>
+<p>而是 Claude 用数百次真实实验<strong>发现了比专家原有 heuristic 更好的控制算法，然后把知识蒸馏成普通软件。</strong></p>
+<h2>Claude 甚至进一步把专家已经调好的 laser noise 又降低了约十倍</h2>
+<p>QuEra 随后把问题从“laser 掉锁以后怎样快速恢复”扩展到“怎样让 laser 本身更稳定”。</p>
+<p>控制系统内部有 <strong>12 个相互影响的 PID 参数</strong>。</p>
+<p>专家通常观察 servo 的 RMS error 来调节，因为每调一次参数都做完整 oscilloscope trace 和 Fourier transform 太耗时间。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>Claude 不受这种人类时间约束。</p>
+<p>每次修改参数以后，它都可以真的抓取波形、计算完整 spectrum，然后继续试。</p>
+<p>经过 <strong>363 次实验和16小时无人值守运行</strong>，它把 residual RMS error 从专家原先调好的 <strong>15.7 mV 降到1.55 mV</strong>，大约降低一个数量级。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>随后专家完全不知道 Claude 结果的情况下，重新从零手动调一次。</p>
+<p>两组参数送去更加专业的 phase-noise analyzer 比较。</p>
+<p>总体结果接近，但在约 <strong>220 kHz resonance</strong> 的一个区域，人工调节版本留下的 noise 大约是 Claude 版本的 <strong>1000 倍</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>真正最有意义的 operational test 是持续运行。</p>
+<p>Claude 选择的 PID 参数在 <strong>19 小时</strong>测试里一次都没有掉锁。</p>
+<p>专家版本平均每小时约掉锁 <strong>1.6 次</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这已经不是普通的“AI 帮专家省时间”。</p>
+<p>它更接近另一种模式：</p>
+<p><strong>AI 利用远高于人类的实验频率，把专家不得不使用的 heuristic 替换成 exhaustive empirical optimization。</strong></p>
+<h2>但 QuEra 也暴露出一个非常清楚的边界：Claude 知道程序里的机器，不真正理解机器本身</h2>
+<p>这篇文章并没有把结果包装成“无人实验室已经完成”。</p>
+<p>QuEra 明确指出，只要真正出现 physical hardware failure，Claude 仍然经常不知道怎么处理，因为它对设备的理解主要来自程序状态，而不是完整物理世界。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>另外 Claude 往往非常谨慎。</p>
+<p>只要它觉得某个动作稍微有风险，就可能停下来等 human confirmation。</p>
+<p>这甚至会造成实验整晚暂停，因为半夜没人批准。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>QuEra 的态度反而是，当前阶段“过度谨慎”比“不够谨慎”好。</p>
+<p>他们下一步准备把 relock system 部署到真正 live quantum processor，并把 tuning workflow 打包成独立工具，之后再扩展到更多 subsystem，让机器逐渐具备某种 <strong>self-maintenance</strong> 能力。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<h2>Tetsuwan 的案例则说明，physical agent 最强的能力之一可能是“现场找一台机器来解决另一台机器的问题”</h2>
+<p>Tetsuwan Scientific 正在建设 automated biology lab。</p>
+<p>他们使用 MHS 运行 qPCR，并研究加州 San Pedro Creek 的污染来源。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>实验中 master mix 黏稠而且容易起泡。</p>
+<p>摄像头发现 pipetting 出现泡沫以后，机械臂自己没有办法解决。</p>
+<p>于是系统扫描网络上所有 MHS-connected devices。</p>
+<p>Claude 发现实验室里还有 centrifuge，于是通过 Slack 向研究人员建议：把这管液体送去 centrifuge，低速短暂旋转，让泡沫消失并让液体重新集中到底部。</p>
+<p>获得允许后，Claude 再通过 MHS 控制 centrifuge 执行。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这里出现一个非常有意思的能力：</p>
+<p>agent 不必事先知道某个固定机器负责某个固定步骤。</p>
+<p>Protocol 可以写成“把 plate 以15,000 rpm旋转5分钟”，而不用指定哪一台 centrifuge。</p>
+<p>系统自己寻找一台满足要求的设备，再把 protocol 里的 abstract operation 转成那个具体硬件所需要的参数。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这和 cloud computing 的思想非常相似。</p>
+<p>程序员不需要知道自己的 workload 最终跑在哪一台物理服务器。</p>
+<p>未来实验 protocol 也可能逐渐不需要知道“哪一台具体机器”完成操作。</p>
+<h2>Tetsuwan 甚至让 Claude 用9,143次真实移液实验去反过来改进实验自动化 compiler</h2>
+<p>这一段尤其值得和前几天讨论的自动 researcher 连起来看。</p>
+<p>Tetsuwan 的 ResearchOS 会把高层实验描述编译成具体 lab-equipment instructions。</p>
+<p>但 compiler 需要预测不同液体、tip、volume、dispense count 下 transfer 到底有多准确。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>团队让 Claude 建立 closed-loop optimization。</p>
+<p>系统生成许多真实 worklists。</p>
+<p>机器人在真实条件下执行。</p>
+<p>Plate reader 返回 accuracy。</p>
+<p>Claude 分析结果、可视化，再建议怎样修改 compiler 对 transfer precision 的估计。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>最终实验覆盖 <strong>9,143 次 individual dispenses、300种 transfer types、1,508种测量条件，以及4种不同液体</strong>。</p>
+<p>在 held-out experiments 上，新模型对 multi-dispense precision 的预测相对于 manufacturer technical specification 大约提高 <strong>12%</strong>，45轮测试中有31轮更准确，sign-test 的 p 值约 <strong>0.001</strong>；在数据重复最多的部分，改善约 <strong>17%</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这就是一个真正意义上的：</p>
+<p><strong>software → physical experiment → data → software improvement</strong></p>
+<p>闭环。</p>
+<p>而且这里现实世界不再只是“最终验证”。</p>
+<p>现实世界本身变成训练数据工厂。</p>
+<h2>Anthropic 的野心很明显：MHS 希望成为物理设备世界的标准接口，而不是 Claude 的专有功能</h2>
+<p>目前的 partner list 很值得关注。</p>
+<p>AWS 准备通过 Strands Robots 支持 MHS。</p>
+<p>Automata 正在把它加入 LINQ lab-automation platform。</p>
+<p>Danaher 正研究用它扩展 smart instruments 和 autonomous labs。</p>
+<p>Doosan Robotics 在机械臂上测试。</p>
+<p>MBF Bioscience 正为 ScanImage 建 driver。</p>
+<p>QIAGEN 在 QIAsymphony Connect nucleic-acid purification platform 上做 proof of concept。</p>
+<p>Tecan 将在 Fluent liquid-handler platform 增加支持。</p>
+<p>Universal Robots 也计划接入。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>另外 Hugging Face 会把 MHS 加入 LeRobot，Raspberry Pi 也已经开始支持相关 integration。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这说明 Anthropic 选择的是一条和 Google DeepMind Robotics、Figure 或 Nvidia GR00T 很不同的路线。</p>
+<p>它没有先推出一个 humanoid foundation model。</p>
+<p>而是在尝试控制<strong>协议层</strong>。</p>
+<p>如果越来越多实验室和机器人厂商原生支持 MHS，那么任何 agent 都可以在同样接口上工作。</p>
+<p>Anthropic 明确说标准最终会 open source，而且 model-agnostic。</p>
+<p>不过这里必须保持一个重要限定：<strong>截至目前 MHS 还没有真正开源</strong>。它仍然处于 invitation-based research preview，没有公开完整 specification 和 reference implementation。Anthropic 表示需要先和合作伙伴建立 physical-safety evaluations 和 deployment best practices，之后才计划正式开源。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>所以现在更准确的说法是：Anthropic 正在<strong>争取成为标准</strong>，而不是它已经成为标准。</p>
+<h2>这篇文章最大的反面信号也写得很清楚：语言模型对物理世界仍然非常“纸上谈兵”</h2>
+<p>Anthropic 自己强调，Claude 主要通过文字和图片学习现实世界，因此 spatial 和 physical reasoning 仍存在明显限制。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>Genentech 的气泡问题就是最清楚例子。</p>
+<p>模型知道 pipetting。</p>
+<p>知道 BSA。</p>
+<p>知道 flow rate。</p>
+<p>甚至能做 statistical optimization。</p>
+<p>但它第一次遇到泡沫时，仍然没有真正理解“你继续搅只会让泡更多”。</p>
+<p>另外 MHS 目前只能直接支持具有 programmable interface 的设备。完全没有数字控制面的硬件仍需要厂商先开发 driver。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这也是为什么我不会把这篇文章解读成“autonomous lab 已经完成”。</p>
+<p>更准确地说，它解决的是 autonomous science stack 里一个之前非常大的 <strong>integration bottleneck</strong>。</p>
+<p>而真正的 scientific autonomy 仍然依赖模型物理直觉、安全控制、实验设计质量、设备可靠性以及最重要的——真实实验本身是否提供可靠 feedback。</p>
+<h2>我认为这篇文章真正重要的地方：AI for Science 的瓶颈正在从“模型能不能想”转向“现实世界能不能像 API 一样被调用”</h2>
+<p>下面是我的延伸判断，不是 Anthropic 的原文结论。</p>
+<p>过去两年 AI for Science 里最吸睛的是 AlphaFold、protein generation、material discovery 和 virtual cell，因为这些都发生在 GPU 中。</p>
+<p>但当 computational design 成本不断趋近于零以后，价值链会向下一层移动。</p>
+<p>UW 那个数字很能说明问题：</p>
+<p>计算上生成一个蛋白候选可以低至约 <strong>1美分</strong>。</p>
+<p>真实实验却可能是 <strong>100美元 + 一周时间</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>如果每一美元 compute 可以产生十万条 hypothesis，而实验室一天只能验证100条，模型再聪明也不会让科学发现等比例加速。</p>
+<p>所以真正决定 AI-for-science productivity 的指标可能越来越像：</p>
+<p><strong>每美元、每天可以完成多少个可信的真实 experiment-feedback loops。</strong></p>
+<p>这正是 MHS 的战略意义。</p>
+<p>它并没有让显微镜更快，也没有让 PCR chemistry 更快。</p>
+<p>它削掉的是现实实验之间大量人为的 <strong>coordination latency</strong>。</p>
+<p>过去：</p>
+<p>模型输出 hypothesis → 研究员读结果 → 写 protocol → automation engineer 写程序 → 人搬 plate → 等设备 → 看结果 → 再把数据上传给模型。</p>
+<p>未来可能逐渐变成：</p>
+<p><strong>agent → MHS → instrument → sensor data → agent。</strong></p>
+<p>中间的人类 handoff 越少，scientific loop 越接近真正 machine-time。</p>
+<p>我认为这对 life-science tools 产业尤其值得长期观察。Thermo Fisher、Danaher、Agilent、Waters、Tecan、QIAGEN 这些公司的设备过去很大一部分粘性来自独立软件生态和复杂 workflow。如果 MHS、SiLA、OPC-UA 等通用 agent interface 最终成功，设备的软件差异可能部分被抽象掉，客户越来越关心的是仪器本身的 reliability、precision、throughput 和 service，而不是 proprietary UI。反过来，最早原生支持 agent control、提供高质量 telemetry 和 robust safety API 的设备商，也可能因为更容易进入 autonomous lab 而获得新的竞争优势。这里还处于非常早期阶段，不能据此判断传统仪器软件护城河已经消失。</p>
+<p>更值得注意的是 QuEra 的案例，它揭示了一个更大的 AI 经济学变化。Claude 真正超过专家的地方，并不是拥有比 laser engineer 更强的物理理论，而是它可以在16小时里连续做 <strong>363个真实实验</strong>，每次都做一个人类嫌太麻烦的完整测量，再不断搜索参数空间。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>
+<p>这意味着一旦 physical automation 足够成熟，AI 的一个巨大优势会从“思考速度”扩展成 <strong>empirical iteration speed</strong>。</p>
+<p>过去一个研究员一天只能试十次。</p>
+<p>未来 agent 可以试一千次。</p>
+<p>它不需要第一次就比人类聪明。</p>
+<p>只要现实世界允许它快速、廉价、安全地得到反馈，它就可以靠搜索找到人类靠经验无法轻易发现的解。</p>
+<p>所以这篇文章最值得记住的并不是“Claude 可以控制机械臂”。</p>
+<p>更重要的是另一件事：</p>
+<p><strong>AI 开始获得了产生自己下一批真实训练数据的手。</strong></p>
+<p>如果 MCP 让模型可以调用软件，那么 MHS 想做的是让它可以调用实验。等 hypothesis generation、自动 researcher、physical instruments 和 verifier 真正连成一条闭环以后，AI for Science 才可能从“AI 给科学家提供建议”，走到“AI 与现实世界持续对话”。</p>
+<p>而那时科学研究真正稀缺的资源，也许不再只是 GPU 或顶尖研究员，而是那些能够被机器安全、快速、重复访问的 <strong>reality interfaces</strong>。<a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" rel="noopener noreferrer" target="_blank" class="citation">Anthropic</a></p>

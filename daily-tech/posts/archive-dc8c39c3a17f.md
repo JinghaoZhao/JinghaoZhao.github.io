@@ -1,0 +1,205 @@
+今天推荐 **Mahsa Alimardani 于 2026 年 9 月 10 日在 *Rest of World* 发表的《Google Earth’s AI experiment lasted 24 hours. The damage to trust will linger》**。Alimardani 是影像真实性与人权技术组织 WITNESS 的 Technology Threats & Opportunities 项目副主任，文章**全文免费公开**。[阅读 Rest of World 原文](https://restofworld.org/2026/google-earth-ai-deepfake-iran-war/) 这篇文章篇幅不算特别长，但我认为是过去两周很值得读的一篇 AI 产品治理文章，因为它讨论的并不是“生成图片又能逼真多少”，而是一个更基础的问题：**当生成式 AI 被嵌入一个原本承担“现实证据”功能的产品时，哪怕功能只上线 24 小时，是否也可能永久改变人们对这个产品所呈现事实的信任？** [Rest of World](https://restofworld.org/2026/google-earth-ai-deepfake-iran-war/)
+
+这件事尤其值得现在读，是因为 Google 自己其实同时展示了问题的两端。一边，它曾把 Nano Banana 2 直接放进 Google Earth，让任何人基于真实经纬度、卫星图、航拍和 3D 地形生成照片级场景；另一边，Google Pixel 已经在相机硬件层加入 C2PA Content Credentials，而 Apple 刚发布的 iPhone 18 Pro 也加入了能够保存、验证传感器原始所见的 Apple Reference Image。也就是说，整个消费科技行业正在同时建设两套能力：**一套让“现实”变得越来越容易修改，另一套又试图证明什么是真实拍摄的。** [blog.google](https://blog.google/products-and-platforms/products/earth/nano-banana-google-earth-image-generation/)
+
+## Google Earth 的问题，不在于它也能生成假图，而在于 Google Earth 本来就是用来判断“什么是真的”的
+
+Alimardani 把文章放在当前中东冲突的信息环境中来理解。战区往往无法让记者自由进入，因此商业卫星图成为记者、OSINT 调查员、人权组织和政府核实事件的重要工具。Google Earth 长期处于这套验证体系的底层；Bellingcat 多年前甚至就用叙利亚、也门、苏丹案例正式教授调查员如何利用 Google Earth 三维地形和卫星资料进行地理定位与冲突分析。换句话说，普通图片生成器从来没有“真实”承诺，而 Google Earth 的品牌资产恰恰是：**屏幕上的地理对象原则上对应现实世界。** [Rest of World](https://restofworld.org/2026/google-earth-ai-deepfake-iran-war/)
+
+Google 在 **7 月 30 日**改变了这个边界。公司官方宣布，Nano Banana 2 首次能够直接结合 Google Earth 的卫星、航空和 3D 图像生成新场景。Google 给出的正面用途其实都很合理：老师可以让古代庞贝在现代遗址上“复原”，房地产开发商可以在东京空地上预览商业区，用户也可以看看某块地建上房子之后是什么样。操作几乎没有门槛，只需放大一个真实地点，点击“Create image”，然后输入自然语言。[blog.google](https://blog.google/products-and-platforms/products/earth/nano-banana-google-earth-image-generation/)
+
+这里真正关键的设计变化，是生成内容不再从一张空白画布开始。**真实坐标、真实地貌和真实建筑为合成内容提供了天然的可信外壳。**
+
+因此用户马上开始做 Google 示例里没有展示的事情。几个小时内，就有人让系统在伊朗真实位置生成不存在的核设施，在加沙医院旁制造假的爆炸弹坑，还生成美国国会大厦周边被洪水淹没的卫星视角图像。Google 在第二天，也就是 **7 月 31 日**就撤回功能。公司承认用户“独特地信任 Google Earth 对世界的可靠呈现”，并称发现有人分享似乎违反政策的生成截图，因此将在加入更强 guardrails 后再考虑恢复。Google 同时强调，这些合成图不会自动出现在其他人的正常 Google Earth 地图中，并且生成图带有 AI 标记。[Rest of World](https://restofworld.org/2026/google-earth-ai-deepfake-iran-war/)
+
+这个限定很重要。Google 并没有偷偷修改全球所有人看到的卫星底图。如果一个用户制造了一座假核设施，另一个人打开 Google Earth 并不会也看到它。
+
+但 Alimardani 的观点是，**问题从来不是数据库被污染，而是截图可以离开数据库。**
+
+一旦生成画面被截屏、录屏、重新压缩、拍摄手机屏幕或剪掉界面元素，它就脱离 Google 最初设计的验证环境，进入 X、Telegram、TikTok、WhatsApp 和新闻媒体。在这些场景里，接收者看到的可能只是一张“看起来像 Google Earth”的卫星图。
+
+这正是卫星图特别危险的地方。街头照片已经让人形成了“可能是 AI”的心理防御，卫星图却长期带有一种机器客观性的感觉：它看起来不像哪个摄影师选择了角度，而像某颗卫星只是把地球拍了下来。
+
+## 真正的风险不是“别人相信一个假图”，而是以后别人可以不相信一个真图
+
+这是整篇文章最重要的逻辑转折。
+
+通常讨论 deepfake，我们关心的是 false positive：有人看到假的东西，以为是真的。
+
+Alimardani 更担心另一种后果：**真实证据也因此失去说服力。**
+
+法律学者 Bobby Chesney 和 Danielle Citron 多年前把这个现象称为 **liar’s dividend**。当大众知道逼真假视频随时可以生成以后，一个被真实视频记录下来的人不再必须证明视频是假的；他只需要说一句“这是 AI”。
+
+Google Earth 的案例把这种问题推到了原本相对可靠的卫星证据层。
+
+这不仅是理论风险。Ars Technica 当时测试发现，把 Google Earth 生成图直接用另一台手机拍下来之后，Google 的 SynthID 已经不能提供有效的原始验证信号。这说明水印在完整文件链条里可以有价值，但真实互联网传播不会总是把原文件、metadata 和 provenance 完整保留下来。[Ars Technica](https://arstechnica.com/ai/2026/07/google-earth-releases-swiftly-retracts-ai-feature-to-make-fake-satellite-images/)
+
+所以一旦公众已经看过“Google Earth 也能生成假的伊朗核设施”，以后真实的卫星证据出现时，一个政府、军队或宣传账户甚至不需要真的制作另一个 deepfake。
+
+它只需要说：
+
+**“你怎么知道这张 Google Earth 图不是 AI？”**
+
+这就是作者所谓 24 小时功能留下的长期损害。产品可以撤回，**否认真实性的新借口却无法撤回。**
+
+## 战争环境把这个问题放大，因为假信息传播的速度和事实验证的速度根本不是同一个数量级
+
+文章用此前伊朗冲突中的一个案例解释这种时间差。
+
+2025 年以色列攻击伊朗 Evin Prison 期间，一个账号网络在真实空袭仍在发生时发布了一段看似记录爆炸瞬间的视频。Citizen Lab 后来的完整取证显示，这段视频是 AI 生成的；它在德黑兰时间 **12:05** 被发出，而 Human Rights Watch 根据卫星图、热异常和目击信息判断，真实攻击大约持续到 **12:18**。Citizen Lab 找到的第一段看起来属于真实现场 aftermath 的公开视频，比这段 deepfake 甚至只晚了约一分钟。[The Citizen Lab](https://citizenlab.ca/2025/10/ai-enabled-io-aimed-at-overthrowing-iranian-regime/)
+
+这说明生成式 AI 不必完美模拟一个从未发生的事件。更危险的策略是：**真实事件正在发生时，比真实影像早几分钟抢占叙事。**
+
+Citizen Lab 发现，相关网络随后继续发布要求伊朗民众前往监狱、释放囚犯的内容，并使用 AI 视频、重新剪辑旧视频、伪造媒体页面和重复转发等手段推进政权更迭叙事。其中一条相关帖子达到约 4.6 万次观看和 3500 多个点赞。Citizen Lab 对整个行动的归因使用的是不同置信等级，并没有把每一条内容都简单归为 AI 生成，因此这里也不应把所有网络活动等同为 deepfake。[The Citizen Lab](https://citizenlab.ca/2025/10/ai-enabled-io-aimed-at-overthrowing-iranian-regime/)
+
+这个案例把 Alimardani 所说的“两个时钟”解释得很清楚。
+
+**造假按照生成模型的速度运行。**
+
+**验证按照取证的速度运行。**
+
+几秒钟生成视频，几分钟扩散。
+
+而研究人员必须找原始帖子、下载文件、比较时间戳、查卫星图、分析像素和社交网络关系，再谨慎写出归因。
+
+几天以后真相可能非常清楚。
+
+但几天对战争中的信息环境来说已经太长。
+
+所以作者认为，“最终可以检测出来”并不能完全回答问题。假内容并不一定要永久骗过 forensic analyst；**只要它能够在最关键的几个小时里改变认知，它就已经完成了任务。**
+
+## 这也是为什么“我们给图片加了水印”并不足以成为安全论证
+
+过去两年生成式 AI 行业对合成媒体真实性问题的主要技术答案之一是 watermark。
+
+这个方向有价值，但现实证据显示它远远没有完成。
+
+WITNESS 与 Indicator 在今年 8 月测试了 **13 家**主要生成式 AI 服务商，包括 Google、Meta、Microsoft、OpenAI、Adobe、Midjourney、Grok、ElevenLabs 等。他们发现其中 **7 家当时没有可用的专门公共检测工具**；剩下拥有检测工具的公司中，只有一家能够正确识别测试中该公司自己的全部生成图片。整个评估共进行了 243 次测试。[Indicator](https://indicator.media/p/ai-generators-are-now-required-to-offer-detection-tools-we-tested-them-and-they-need-work)
+
+这说明“模型提供者知道自己生成了什么”和“互联网上一个普通记者能够验证这张截图从哪里来”是两件完全不同的事情。
+
+这种差距恰好出现在监管开始真正要求 AI provenance 的时候。欧盟《AI Act》第 50 条从 **2026 年 8 月 2 日**开始适用，要求生成合成音频、图片、视频和文字的 AI 系统提供者加入机器可读标记，使内容能够被识别为人工生成或修改；deepfake 以及某些公共利益内容也受到明确透明度要求。最高处罚在相关情形下可达到 **1500 万欧元或全球年营业额 3%**。欧盟同时允许部分在 8 月 2 日之前已经上市的系统在标记和检测义务上过渡到 12 月 2 日。[数字战略欧盟](https://digital-strategy.ec.europa.eu/en/faqs/transparency-obligations-under-article-50-ai-act)
+
+所以法律正在从“AI 公司最好主动标记”转向“生成内容必须具有可检测性”。
+
+但 Rest of World 这篇文章提出了一个更难的问题：
+
+**可检测性是不是正确目标，还是我们其实应该把重点放在可证明的真实性上？**
+
+## “检测这是不是 AI”与“证明这是真的”是两种完全不同的安全架构
+
+这可能是全文最值得技术行业思考的一层。
+
+AI detector 的逻辑是，从结果反推来源。
+
+拿到一张图片以后，它试图判断像素里有没有模型特征、水印或者生成痕迹。
+
+这种模式天然是一场攻防。
+
+模型变了，检测器要更新。
+
+图片被裁剪，信号可能变弱。
+
+重新编码，metadata 可能消失。
+
+对着屏幕拍照，更可能直接把原来的数字证明链截断。
+
+相比之下，**provenance** 的方向是从源头开始建立证明。
+
+不是问：
+
+“这张照片看起来像不像 AI？”
+
+而是问：
+
+“有没有可信设备能够证明，这些像素在某个时间真的从相机传感器进入了系统，而且之后发生过哪些编辑？”
+
+Google 自己其实已经在建设这种架构。Pixel 10 的 C2PA Content Credentials 使用硬件 root of trust、Android Key Attestation、Titan M2 中的防篡改密钥，以及每张照片独立的一次性证书。Google还刻意设计成证书无法把不同照片链接到同一个用户，从而降低 provenance 系统变成追踪系统的风险。[blog.google](https://blog.google/security/pixel-android-trusted-images-c2pa-content-credentials/)
+
+这里有一个很有意思的隐私工程细节。最简单的内容签名方法，是让同一部手机长期使用一把密钥。但任何人只要比较签名，就可能发现两张原本匿名发布的照片来自同一设备。Google 因此让每张图使用不同证书，使验证者能够确认“这是一台可信 Pixel 拍摄的真实图像”，但不能由签名反推出“这和昨天那个匿名账号的照片来自同一人”。[blog.google](https://blog.google/security/pixel-android-trusted-images-c2pa-content-credentials/)
+
+Apple 本周发布 iPhone 18 Pro 时，又把这一方向推进了一步。新的 **Apple Reference Image** 模式会使用相机主传感器产生签名后的传感器数据，经 Private Cloud Compute 形成一个不可修改的参考图像；用户可以把最终照片与这个类似“数字底片”的 reference 对比。Apple 还向第三方 app 开放相关 API，并表示图像 metadata 和即将支持的 SynthID 可进一步识别 AI 编辑。[Apple](https://images.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/)
+
+所以消费电子行业正在出现一种很重要的架构分化：
+
+**AI generation 负责告诉你“什么都可以被创造”。**
+
+**secure capture 负责告诉你“这一张确实发生过”。**
+
+Alimardani 的观点是，后者应该成为核心基础设施，而不是等造假问题发生以后才补上的功能。
+
+## 这也是作者为什么认为，Google Earth 这个功能的问题不能仅靠“更强 guardrail”解决
+
+Google 的官方说法是，功能只是暂时撤回，等 stronger guardrails 准备好以后可能重新上线。[blog.google](https://blog.google/products-and-platforms/products/earth/nano-banana-google-earth-image-generation/)
+
+Alimardani 的结论却更强。她认为，即使生成能力能够用于教育、城市规划和建筑预览，把它**直接放进 Google Earth 这种验证型基础设施**仍然是错误的产品边界。
+
+这并不是主张不应该生成“未来这块空地建成公园是什么样”。
+
+而是说同样能力完全可以放在一个明确叫做 “Concept Studio”“Imagine Earth” 或其他从视觉上、产品入口上都与 evidence layer 分开的环境中。
+
+作者担心，一旦 creation mode 和 verification mode 使用几乎相同的界面与视觉语言，用户对两者的认知边界会逐渐消失。
+
+这是一个很重要的产品设计思想：
+
+**安全不一定只是拒绝某些 prompt。安全有时意味着某项能力根本不应该出现在某个 surface 上。**
+
+医院系统可以有 Photoshop。
+
+但病人的原始 X 光片 viewer 不一定应该直接内置一个“一键生成肿瘤”的工具。
+
+证券交易软件可以有模拟账户。
+
+但模拟成交不应该与真实成交使用完全相同、无法区分的记录。
+
+地图软件当然可以有设计和幻想工具。
+
+但承担“现实世界公共记录”角色的地图层，可能值得拥有更严格的 epistemic boundary。
+
+## 我认为这篇文章真正讨论的，是 AI 时代最容易被低估的一类资产：可信界面
+
+下面是我的延伸判断，不是 Alimardani 原文的直接结论。
+
+过去二十年互联网企业一直把“trust”当成一种相对柔性的品牌资产。
+
+Google Search 值钱，因为用户相信排序大体有用。
+
+Google Maps 值钱，因为人相信道路和地点大体存在。
+
+GitHub 值钱，因为代码历史有清晰 provenance。
+
+Bloomberg Terminal 值钱，因为数字可以追溯到数据来源。
+
+AI 让这件事情第一次变得更加工程化：
+
+**一个产品究竟是在告诉你世界是什么，还是在帮你想象世界可以是什么？**
+
+过去这两类产品很容易区分。
+
+Photoshop 是编辑器。
+
+Google Earth 是地球。
+
+生成式 AI 把边界抹掉之后，能够重新建立这个边界的公司可能拥有非常大的长期价值。
+
+这也是为什么我觉得 C2PA、硬件级 secure capture、内容签名、provenance ledger、企业媒体审计、模型输出追踪和 forensic tooling 不只是“deepfake safety”小市场。它们可能逐渐成为 AI 时代的信息安全基础设施，类似 HTTPS 从一个网站额外的安全功能变成整个 Web 的默认层。
+
+对 Google 本身，这件事今天当然远不到影响 Alphabet 收入或估值的程度。Google 24 小时就撤回功能，本身说明内部反馈机制至少仍然足够快。真正值得投资者观察的是另一件事：**AI 产品竞争越来越可能从“谁能塞进去最多模型能力”，转向“谁知道哪些地方不应该塞进去”。**
+
+模型能力正在商品化。
+
+但一个拥有二十年历史的可信产品，其信任资产没有办法重新训练一个 checkpoint 就恢复。
+
+所以这篇文章最后让我记住的并不是 Google Earth 曾经能生成一座假的伊朗核电站，而是一个更普遍的 AI 产品原则：
+
+**生成错误的成本，取决于它发生在哪里。**
+
+聊天机器人胡编一个事实，用户可能重新问一次。
+
+设计软件生成一栋不存在的楼，本来就是用途。
+
+但如果同样的生成模型进入一个记者、人权调查员、法院、政府和普通公众长期拿来判断现实世界发生了什么的界面，那么一次“有趣的新功能”就可能开始改变整个系统的证据价值。
+
+Google 可以在 24 小时内删掉一个功能。
+
+但正如 Alimardani 这篇文章真正强调的那样，**它无法让全世界忘记：那个看起来像现实世界的画面，现在也可能只是一个 prompt。** [Rest of World](https://restofworld.org/2026/google-earth-ai-deepfake-iran-war/)

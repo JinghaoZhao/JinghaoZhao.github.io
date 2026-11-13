@@ -1,0 +1,219 @@
+今天推荐 **The Verge 记者 Robert Hart 于 2026 年 9 月 12 日发表的《OpenAI just wants to win》**。文章目前可以**免费阅读全文**，篇幅属于大约 10–15 分钟的深读。[阅读 The Verge 原文《OpenAI just wants to win》](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition) 这篇文章表面写的是 OpenAI 用大约一万名 AI agents 攻下 Navier–Stokes 千禧年难题之后爆发的学术争议，真正讨论的却是一个更深的问题：**当 AI 公司既提供数学家每天使用的研究工具，又拥有比任何大学团队都大几个数量级的算力，并且开始亲自参与前沿数学竞争时，传统科学中关于信用、合作、未发表工作和“谁先发现”的规则还能不能继续运行。** [The Verge](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition)
+
+这篇文章属于受版权保护的新闻特稿，因此下面不会按原文章节或句子逐一重写，而是把 Hart 的核心报道与 Buckmaster、OpenAI、Clay Mathematics Institute 和国际数学联盟的一手材料重新交叉整理，尽可能保留重要事实、争议和限定。
+
+## 这场争议真正让数学界震动的，不只是“AI 解出了一道很难的题”
+
+事情的背景已经足够惊人。OpenAI 9 月 8 日宣布，其正在训练中的内部模型——公司称其数学能力“显著强于 GPT‑6 Astra”——生成了一份关于三维 Navier–Stokes 方程有限时间奇性的分析证明，并提供了 Lean 形式化证明。OpenAI 称项目始于 9 月 1 日，在听到有关重大数学突破的传闻后，公司把不同 agent 群组分别派去攻击多个尚未解决的千禧年问题；Navier–Stokes 方向最终扩大到约 **10,000 个并行 agents**。从第一批 agents 启动到得到核心结果大约用了 **88 小时**，之后 GPT‑6 Astra 又用了约 **17 小时**完成 Lean 形式化和验证。仅 Navier–Stokes 项目就产生约 **270 万条 agent 消息和 1300 亿 output tokens**；所有被尝试的问题合计达到 490 万条消息、约 3000 亿 output tokens。[OpenAI](https://openai.com/index/navier-stokes-solution/)
+
+这里先纠正一个很容易被媒体标题带偏的地方。OpenAI 并没有证明最常被大众描述的“任何没有外力的平滑流体一定会爆炸”。它构造的是一个带有**平滑外力**的 Navier–Stokes 流体：初始状态甚至可以静止，随后在这个平滑 forcing 下形成越来越细、越来越快的旋涡，速度最终在有限时间内变得无界，同时总能量保持有限。关键技术难点正是 forcing 本身必须始终平滑，不能靠人为施加一个无限大的外力“作弊”。[OpenAI](https://openai.com/index/navier-stokes-solution/)
+
+但“有 forcing”并不意味着这只是一个擦边球、因此与 Clay 问题无关。Charles Fefferman 给出的官方千禧年问题定义本来就允许两种证明方向：A/B 要证明无外力情况下所有解永远平滑；C/D 则允许构造满足严格光滑和衰减条件的外力，证明某个解无法始终保持光滑。OpenAI 声称证明的正是 C 和 D。因此，**如果论文和形式化都经得起完整数学审查，它确实符合官方问题的一个合法解决路径**，哪怕它仍然留下了非常有趣的“无外力会不会也 blow up”问题。[Clay Mathematics Institute](https://www.claymath.org/wp-content/uploads/2022/02/MPPc.pdf)
+
+Science News 采访的 Wisconsin–Madison 数学家 Dallas Albritton 将其称为对整个领域具有指导意义的问题；Johns Hopkins 的 Gregory Eyink 则强调，166 页论文刚公开不久，人类数学家还没有完成从头到尾的独立审核。Lean verification 是很强的正确性证据，但数学社区仍需要确认形式化中的 statement、定义和假设确实与大家所理解的 Clay 命题完全一致，并理解证明为什么成立。[Science News](https://www.sciencenews.org/article/ai-math-puzzle-navier-stokes-openai)
+
+## The Verge 真正关心的却是：为什么这样一项成果没有变成数学界的纯粹庆祝
+
+Hart 采访了十多名数学家。文章描述的整体情绪不是“AI 不应该做数学”，甚至不是普遍否认 OpenAI 结果，而是对**做数学的制度发生变化**越来越不安。
+
+传统数学当然也极其重视 priority。历史上为了谁先证明一个定理争得非常难看的例子并不少。但过去有一个天然限制：真正能够突然“抢做”一个高度专业问题的人非常少，因为另一个研究组首先要掌握相关领域多年积累的知识、理解新思路，再投入大量时间推导。
+
+AI 公司改变的是这个速度约束。
+
+一旦听说某个重要问题“快被解决了”，一个资本充足的 frontier lab 可以立即把成千上万个 agents、数亿美元级基础设施和顶级模型集中到同一个目标上。OpenAI 自己公开说明，这次正是因为在 9 月 1 日听到“两项千禧年问题可能已经解决”的传闻，才启动大规模测试，并最终把其他方向的 agents 调去集中攻击 Navier–Stokes。[OpenAI](https://openai.com/index/navier-stokes-solution/)
+
+因此 Hart 把冲突描述成两个研究文化之间的碰撞。对许多数学家而言，**一个重要证明的价值不只是最终 theorem 是否为真**。中间发展出来的方法、谁提出关键构造、一个技巧如何从旧论文演化出来，常常比最终“打掉了哪个著名问题”更加重要，因为这些方法未来还能解决一整类问题。
+
+而对一个需要证明自身模型能力的 AI 公司而言，千禧年问题却同时具有极强的 benchmark 和品牌属性：问题世界闻名，成功或失败高度可验证，又有明确的“此前无人解决”标签。因此，The Verge 认为很多数学家的不适并不来自机器做数学本身，而来自**前沿数学被重新包装成模型公司之间的竞技场**。[The Verge](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition)
+
+## Buckmaster 与 Alpöge 的工作，是理解争议为何如此尖锐的关键
+
+NYU 数学家 Tristan Buckmaster 和 Anthropic 研究员 Levent Alpöge 在 OpenAI 宣布 Navier–Stokes 结果前一天公开了三项流体方程结果，其中包括三维不可压 Euler 方程在平滑 forcing 下的有限时间 blowup。
+
+Buckmaster 自己非常明确地说，他们并不是凭空让 LLM “发明了路线”。基础研究计划来自 Diego Córdoba 和 Luis Martínez-Zoroa 多年来发展的 forced-blowup program；他和 Alpöge 使用 Claude、OpenAI Codex、GPT‑5.6 Sol 等模型，把这一研究路线继续推向更光滑的 forcing 和更困难的不可压 Euler 系统。他甚至写道，他认为 Martínez-Zoroa 对这条计划的基础思想贡献非常大。[NYU Courant](https://cims.nyu.edu/~tristanb/statement.pdf)
+
+这恰好体现数学家所说的“intellectual lineage”：AI 可以把最后几十公里跑得惊人地快，但跑道可能是很多人在十年里一点一点铺出来的。
+
+Buckmaster 把自己与 Alpöge 的结果称为数学的一个 **Deep Blue–Kasparov moment**。他的重点并不是“我们证明了三条 theorem，所以赢了”，而是一个数学家与 LLM 在大约一个月时间里已经能够把多年研究计划推进到过去难以想象的速度。他认为这会改变学生训练、论文评审、credit 分配，以及“哪些问题值得一个人花一生研究”的基本判断。[NYU Courant](https://cims.nyu.edu/~tristanb/statement.pdf)
+
+## 然后发生了整篇 The Verge 特稿的核心冲突
+
+Buckmaster 在公开声明中称，9 月 3 日他得知外界已经出现“Anthropic 解决了重大公开问题”的传言，而且消息似乎已经传到 OpenAI，于是主动联系 OpenAI 数学团队，希望避免两边在信息不对称状态下互相抢跑。他特别强调，他和 Alpöge 是个人合作，并不是 Anthropic 官方项目。[NYU Courant](https://cims.nyu.edu/~tristanb/statement.pdf)
+
+据 Buckmaster 的版本，后来与 OpenAI 的讨论中，他得知公司内部模型已经产生了一个 forced Navier–Stokes blowup 证明，而且恰好走的是 Fefferman 官方问题 C/D 所允许的 smooth-forcing 路线。他之所以立刻警觉，是因为这条方向并不是所有研究 Navier–Stokes 的人都会自然首先选择，而恰好与 Córdoba–Martínez-Zoroa program 以及他和 Alpöge 正在秘密推进的路线非常接近。[NYU Courant](https://cims.nyu.edu/~tristanb/statement.pdf)
+
+Buckmaster 随后提出两个不同的问题：OpenAI 的 agents 在求解时有没有直接访问他的 Codex session；以及这些未发表论文、草稿和讨论有没有通过训练或模型改进流程间接影响正在使用的模型。他还声称，OpenAI 曾提出提供近乎不受限制的算力帮助他完成工作，并讨论由他来撰写 OpenAI 的 Navier–Stokes 论文，但其中一个方案不包含 Alpöge；Buckmaster 将这一安排理解为要求他放弃合作者，因此拒绝。[NYU Courant](https://cims.nyu.edu/~tristanb/statement.pdf)
+
+这些都是 **Buckmaster 的陈述和指控，不是已经独立证明的事实**。他在自己的声明末尾也刻意写明，他没有看到 OpenAI 的 proof，不知道 OpenAI 模型究竟如何得出答案，也不知道自己的数据是否真的被使用；他强调自己是在记录发生过的沟通，而不是声称已经证明数据被窃取。[NYU Courant](https://cims.nyu.edu/~tristanb/statement.pdf)
+
+## OpenAI 对最严重的数据问题，现在给出了明确否认
+
+OpenAI 的官方版本与 Buckmaster 对一些沟通的解释明显不同。
+
+公司称，研究人员和 agents 在 Buckmaster 与 Alpöge 公开论文之前**没有通过任何渠道看到他们的工作**，也没有为了求解问题访问特定用户数据。更重要的是，OpenAI 在 9 月 10 日更新了自己的 Navier–Stokes 公告，表示经过内部调查，公司已经确认 Buckmaster 在公告前两个月输入 Codex 的 prompts **不可能以任何方式影响用于这项结果的系统，包括通过训练**；OpenAI 的解释是，这个内部模型建立在更早预训练好的模型之上，之后主要进行大规模强化学习，因此这些时间较晚的 prompts 不在训练路径中。[OpenAI](https://openai.com/index/navier-stokes-solution/)
+
+公司还强调，两边的结果并不是同一个证明：Buckmaster–Alpöge 当时公开的是**带 forcing 的 Euler blowup**；OpenAI agents 先自行得到的是**无 forcing 的 Euler blowup**，随后再推进到带平滑 forcing 的 Navier–Stokes C/D counterexample。OpenAI 也明确承认 Buckmaster 和 Alpöge 对 forced Euler 的优先权。[OpenAI](https://openai.com/index/navier-stokes-solution/)
+
+因此，目前公开证据并不足以支持一种简单叙述——“OpenAI 偷了数学家的私人论文然后让 AI 交作业”。更准确的情况是，**Buckmaster 对时间线、研究路线和双方沟通提出了严重的信任问题；OpenAI经过调查后明确否认他的 Codex 数据影响了此次模型。** 最终外界目前无法像检查 Lean proof 那样独立检查一家公司的内部训练数据 lineage，这正是争议难以彻底消失的原因。
+
+## The Verge 认为真正麻烦的是一种结构性的利益冲突，而不仅是这一次谁说了真话
+
+这里是文章最有价值的一层。
+
+假设所有关于 Buckmaster 数据的怀疑最终都被证明完全没有问题，结构性矛盾仍然存在。
+
+越来越多数学家正在用 ChatGPT、Codex、Claude 等系统讨论**尚未发表的猜想、失败路线、草稿证明和实验结果**。与此同时，开发这些工具的公司自己也开始部署最强模型，对同一批公开问题进行工业规模研究。
+
+于是 AI lab 同时具有两个身份：
+
+它是你的**研究工具供应商**。
+
+它又可能是你的**研究竞争者**。
+
+这和 Google Docs 自己突然组建一支团队，利用超级计算机与你竞争发表你正在 Docs 里写的论文，在制度上并不完全一样，但冲突直觉非常接近。The Verge 引述包括 Fields Medal 得主丘成桐在内的数学家，认为即使没有实际滥用发生，这种双重角色本身也值得建立更清晰、可验证的防火墙。[The Verge](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition)
+
+文章还联系了另一名数学家 Andreas Thom 最近的类似疑虑。他此前的一项研究路线后来被 OpenAI 的模型大幅推进，而 OpenAI 最初的公告又因为没有充分说明 Thom 与 Gábor Kun 的基础工作而遭到批评、随后修改。Thom 并没有拿出证据证明自己的 ChatGPT 对话进入模型训练，但他认为研究人员不应该只能依赖模型供应商一句“没有使用”的承诺；对于未发表数学，**删除姓名并不能删除数学思想本身**。[Traictory](https://traictory.com/news/2026-09-12-andreas-thom-openai-training-data)
+
+## AI 可能把“抢论文”第一次变成工业化流程
+
+这是我认为 The Verge 全文最重要的概念。
+
+在人类研究体系里，scooping 一直存在，但成本很高。一个竞争者听说你快解出一个问题，并不意味着他下周就能把几十年专业知识补齐并抢在你前面。
+
+10,000-agent research system 改变了这个约束。
+
+未来可能出现一种新型策略：某个学术圈传出一个方向正在突破，模型公司不需要知道完整证明，只需要知道**哪个问题、哪个方向可能有东西**，就可以立即给数千 agents 分配不同搜索路径，再用更多 agents 汇总、验证和 formalize。OpenAI 此次公开描述的工作流已经包含这种结构：不同群组探索不同方案，之后用 Codex 汇总各组有价值的中间结果，再把它们重新注入下一轮搜索。[OpenAI](https://openai.com/index/navier-stokes-solution/)
+
+因此研究人员开始担心一种非常现实的机制：
+
+**rumor → 10,000 agents → 100 billion tokens → formal proof → publication。**
+
+这里甚至不需要有人“偷论文”。仅仅知道“这个山头可能快被攻下来了”，就足以触发一个拥有巨大计算资源的参与者开始地毯式搜索。
+
+这与传统科研竞争在性质上已经不同。
+
+## 于是开放科学出现了一个非常糟糕的博弈论问题
+
+数学进步长期依赖研究人员相对自由地交流。
+
+你告诉同行：“我在这个方向好像找到一个 lemma。”
+
+别人告诉你：“这个方法去年谁试过，失败在这里。”
+
+研究者公开列出有价值的 open problems。
+
+会议上展示尚未完成的结果。
+
+这些机制之所以可持续，部分原因是大家相信分享一个想法通常不会立即让一个拥有一万倍资源的竞争者在三天后把终点拿走。
+
+The Verge 采访到的数学家担心，这个均衡可能被破坏。一些人开始重新考虑是否应该公开整理“重要未解问题清单”，因为这种清单原本是帮助社区发现研究方向，现在却可能同时成为 frontier labs 最方便的 benchmark backlog。[The Verge](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition)
+
+这也是为什么这场争论不能简单被理解成“传统数学家害怕 AI 抢饭碗”。
+
+他们担心的一个更具体后果是：**AI 越擅长快速消化别人公开的早期线索，人类研究者反而越有激励保持秘密。**
+
+如果最终造成未发表结果交流减少，AI 加快单个 theorem 的同时，也可能破坏过去让数学社区长期高效运转的信息共享机制。
+
+## 数学界事实上已经在建立自己的 AI 规则，而且不是全面抵制 AI
+
+今年 6 月公布的 **Leiden Declaration on Artificial Intelligence and Mathematics** 已经获得 International Mathematical Union 的正式背书。IMU 对它的总结非常值得注意，因为这份声明并没有要求数学家拒绝 AI；相反，它承认自动推理、formalization 和 LLM 都有巨大潜力，但要求继续保护数学中的几个核心制度：proof 必须能够独立验证，成果必须有清楚的 attribution，研究者权利需要被保护，研究评价不能被公司营销和 benchmark hype 取代，而且公共研究机构也需要获得足够强的 AI 基础设施，避免最前沿研究能力完全被少数私人实验室垄断。[数学联盟](https://www.mathunion.org/imu-news/archive/2026/imu-news-137-may-2026)
+
+IMU 还特别强调，数学研究的价值不能只按照“解决了多少著名问题”衡量。深度、难度、方法的重要性和理解本身仍然应该是评价标准。[数学联盟](https://www.mathunion.org/imu-news/archive/2026/imu-news-137-may-2026)
+
+这与 The Verge 所描述的冲突几乎完全重合。
+
+一家 AI 公司最方便展示的是：
+
+“模型解掉了一个80年无人解决的 theorem。”
+
+数学家却可能更关心：
+
+“它用了什么新 idea？”
+
+“这个 idea 是谁发明的？”
+
+“有没有形成以后还能反复使用的新结构？”
+
+“人类现在真的理解为什么证明成立吗？”
+
+两边衡量 progress 的单位并不相同。
+
+## 关于 Navier–Stokes 本身，现在最准确的状态仍然应该是“极强的 proposed solution”，而不是“Clay 已经正式宣布 solved”
+
+The Verge 写道，Clay Mathematics Institute 已经把 Navier–Stokes 从 unsolved list 中移走、但尚未正式认定解决。不过我核对今天的 Clay 网站后，这一点目前**并不与网站现状一致**：其 “Unsolved” archive 仍列有 Navier–Stokes。更重要的是，这种网页分类并不是正式认证标准。[Clay Mathematics Institute](https://www.claymath.org/problem/unsolved/)
+
+Clay 的正式规则非常明确：一个 proposed solution 必须首先发表在符合条件的出版渠道；之后至少经过 **两年**；同时获得全球数学界的普遍接受；最后才可能进入 Clay 自己的判断程序。Clay 也明确规定它不会直接接受作者投稿要求“帮我验一下”。因此，无论 Lean verification 多么有说服力，2026 年 9 月都不可能已经走完正式 Millennium Prize 认证程序。[Clay Mathematics Institute](https://www.claymath.org/millennium-problems/rules/)
+
+这其实是科学制度一个很聪明的地方：
+
+AI 把 discovery 从几十年压到几天。
+
+**verification 不必跟着 press-release clock 加速。**
+
+## 最值得注意的一个结尾，是 OpenAI 已经告诉 The Verge：它又在推进下一个千禧年问题
+
+Hart 的文章最后留下了一个很不安静的细节。
+
+OpenAI 对 The Verge 表示，在完成 Navier–Stokes 工作以后，它已经在**另一个 Millennium Prize Problem 上取得 substantial progress**，目前正在考虑如何发布。公司没有说明是哪一个问题。关于 Hodge conjecture 等方向的网络传言目前都没有可靠确认，所以不应当当成事实。[The Verge](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition)
+
+真正重要的是前半句。
+
+如果 OpenAI 的说法成立，Navier–Stokes 就不是一个一次性的 lucky shot。
+
+这意味着所谓“10,000-agent mathematics”可能已经变成一种**可重复使用的研究机器**。
+
+这对数学的意义要远远大于100万美元奖金。
+
+---
+
+## 更深的意义：科学可能正在从“人才稀缺”转向“搜索算力稀缺”
+
+下面是我的判断，不是 The Verge 的直接结论。
+
+我认为这篇文章比 OpenAI 自己的 Navier–Stokes 公告更值得读，是因为它揭示了一个 AI for Science 非常可能出现的第二阶段。
+
+第一阶段我们问：
+
+**AI 能不能做真正的新研究？**
+
+现在这个问题正在快速失去悬念。
+
+更重要的问题正在变成：
+
+**当 AI 可以同时运行一万个研究员时，科学的制度怎样适应？**
+
+传统科研制度很多规则其实隐含了一个假设：顶级智力劳动力极其稀缺。一个世界级数学家一年只能认真攻几个方向，因此开放交流总体上能提高所有人的效率。
+
+AI 把这个假设打破以后，“信息”可能比“人”先成为稀缺资源。
+
+知道哪个问题值得做。
+
+知道哪条路线最近有突破。
+
+知道某个教授私下试过什么。
+
+知道一个尚未发表的 lemma。
+
+这些原本只是研究社区交流里的普通信号，在拥有10,000-agent搜索能力以后，都可能变成可以迅速兑换成计算优势的 alpha。
+
+这非常像量化金融：当执行和计算都变便宜以后，真正值钱的是更早获得一点点 signal。
+
+## 对 AI 产业而言，这会让“可信数据边界”成为一个比现在想象得更重要的产品能力
+
+今天企业选择 AI provider 时，通常最关心价格、模型能力、latency 和 security。
+
+如果 AI 真正进入科研、芯片设计、药物、算法和企业战略，另一个指标会突然变得重要：
+
+**我把尚未发表的 idea 输入你的模型以后，你会不会有一天变成我的竞争对手？**
+
+即使答案实际上是“绝对不会”，客户还需要能够**相信并验证**这一点。
+
+所以我认为 frontier lab 最终会需要比今天普通 SaaS 更强的 provenance 和 data-firewall 机制：明确哪些请求永不进入模型改进，训练 checkpoint 的时间和数据 lineage 可以被审计，研究型客户能够得到真正隔离的 inference 环境，甚至需要第三方验证。
+
+这不是纯粹的隐私 feature。
+
+如果最强 AI 逐渐成为世界最强 researcher，它就是一种 **intellectual-property infrastructure**。
+
+一家实验室能否让全球最好的科学家放心把未发表工作交给它，可能会成为模型能力之外非常大的 moat。
+
+而 The Verge 这篇文章真正留下的警告正是在这里：**10,000 个 agents 能够把数学搜索速度提升几个数量级，但如果这种能力让人类研究者开始不敢分享问题、不敢使用 AI 工具、不敢公开早期想法，那么我们获得的可能是更快的定理生产，却不一定是更健康的科学。** [The Verge](https://www.theverge.com/ai-artificial-intelligence/994255/openai-millennium-prize-problem-tristan-buckmaster-competition)

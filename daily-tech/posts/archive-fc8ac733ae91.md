@@ -1,0 +1,199 @@
+# 今日科技长文：当你的客户不再是人，而是一个 AI Agent
+
+今天推荐 Rudrendu Paul 和 Sourav Nandy 8 月 19 日发表于 O’Reilly Radar 的 **《When Your Buyer Is an AI Agent》**。这篇文章目前免费公开，官方标注阅读时间约 **12 分钟**。它讨论的是一个目前还没有被市场充分定价的变化：企业一直在讨论“如何用 AI agent 卖东西”，但真正更剧烈的变化可能发生在另一边——**客户也开始用 AI agent 买东西。** 一旦企业采购、供应商筛选、谈判、续约和价格比较逐渐由软件完成，整个 B2B SaaS 和企业销售体系里那些围绕“人类买家”设计的规则都会被迫重写。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+文章之所以值得读，是因为它没有停留在“未来 agent 会帮你购物”的消费级想象，而是给出了已经发生的企业级案例。Maersk 早在 2021 年就开始使用 Pactum 的 AI agents 与物流供应商自主谈判；现在更广泛的 B2B 软件买家也越来越先让 ChatGPT 一类系统帮助筛选产品。作者的核心判断是：**下一代企业销售的竞争优势，可能不是谁有更多 SDR、谁的销售关系更强，而是谁的价格、产品能力、合同条件和 ROI 最容易被机器理解。** [O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+## Maersk 的例子已经把“AI 谈判”从概念变成现实
+
+文章开头直接用 Maersk 的案例建立基线。Maersk 在 2021 年开始使用 Pactum 的 autonomous negotiation agents 来处理部分货运航线合同谈判。系统不是简单给人类采购经理提供建议，而是可以自己联系承运商、进行多轮价格谈判、讨论航线义务和付款条件，最后直接形成协议。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+文章引用的结果是，这套流程在相关货运场景中实现了约 **96% 的 agreement/conversion rate**，并且在与人工谈判组的对照中，AI 获得的相同航线价格平均低约 **22%**。Pactum 自己公布的物流案例也给出了相同方向的数据：其 FTL 物流谈判可以达到 96% lane conversion，而且平均价格较人工测试组低约 22%。需要说明，这些数字主要来自供应商 Pactum 自己的商业案例，不应该当成独立学术实验，但至少证明这种模式已经真实部署，而不是仅存在于实验室。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+更有意思的是，AI agent 的优势并不只是“更聪明”。它没有疲劳问题，可以同时和大量供应商谈判，也不会因为某个供应商不够重要就暂时放弃。Pactum 描述的工作方式是，企业先设定谈判参数和边界，agent 再自主执行；供应商可以直接和 AI 对话，而 AI 会记住全部条件、解释激励措施，并把最终合同结果再写回 SAP 等企业系统。[Pactum](https://pactum.com/blog/the-first-and-only-use-case-catalog-for-autonomous-negotiations)
+
+这改变了传统采购部门的经济学。过去大型采购团队通常把最优秀的人集中在金额最大的战略供应商上，长尾供应商因为单笔价值太低，往往根本不值得派人逐个谈判。AI 把谈判的边际人工成本压低以后，以前“金额太小所以懒得优化”的采购支出也突然可以自动化处理。[Pactum](https://pactum.com/blog/the-first-and-only-use-case-catalog-for-autonomous-negotiations)
+
+而这恰恰是文章真正关心的地方：如果越来越多企业让 agent 替自己采购，那么**卖方未来面对的不是一个更快的人类采购经理，而是一种完全不同的买家。**
+
+## 这波变化已经先从“找供应商”开始，而不是从自动签合同开始
+
+作者并没有说大多数企业今天已经让 AI 全权签合同。真正大规模发生的第一阶段，是产品发现和 shortlist。
+
+McKinsey 2025 年全球调查覆盖 1,993 名企业受访者，其中 **62% 的组织至少正在试验 AI agents**；真正已经在业务部门大规模部署的比例还只有约 10%。这意味着 agent procurement 仍处于早期，但企业已经明显开始把 AI 从单纯问答工具推进到多步骤业务流程。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+Gartner 此前预计，到 2026 年底约 **40% 的企业应用会包含 task-specific AI agents**，而 2025 年这一比例还不足 5%。作者认为，无论这个预测最终是否精确实现，企业软件体系正在越来越多地默认“软件会代表人采取行动”，而不只是等待人点击按钮。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+真正已经非常明显的数据来自 B2B 软件购买。G2 在 2026 年 3 月调查了 **1,076 名 B2B 软件买家和决策者**，发现 **51% 的买家现在更常用 AI chatbot 作为研究起点**，2025 年这个比例只有 29%；有 71% 的受访者会在某个研究阶段使用 AI chatbot。Google 没有消失，61% 的人仍然把 AI 搜索和 Google 结合使用，但最关键的第一次品牌接触已经越来越可能发生在 ChatGPT 或其他 answer engine 里，而不是企业自己的官网。[G2](https://company.g2.com/news/g2-research-the-answer-economy)
+
+G2 对这种变化的总结非常准确：过去黄页把一个市场压缩进一本目录，Google 把整个互联网压缩到一页搜索结果，而 AI 又把几周的供应商研究进一步压缩成一个答案。对于卖方而言，目标于是从“赢得点击”变成“进入答案”。[G2](https://company.g2.com/news/g2-research-the-answer-economy)
+
+文章引用 HubSpot 产品负责人 Beeri Amiel 的观察：等买家真正来到你的官网时，他们可能已经走到了购买漏斗很后面。TestBox 创始人 Sam Senior 则表示，他观察到一些企业客户在真正联系销售人员之前，**70%–80% 的购买决定已经基本形成**。作者的意思不是所有行业现在都达到这个程度，而是销售漏斗最上游正被 AI answer engines 吃掉。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+这会改变企业销售最基础的一条规律。过去销售组织认为“第一次会议”是 discovery call，销售人员要先了解客户需求，然后逐渐影响需求定义。未来客户很可能在 meeting 之前已经让 AI agent 比较过产品、价格、reviews、功能、竞争对手和 implementation 风险。销售第一次见到客户时，不再是一起定义问题，而更像是在回应一个已经基本形成的机器评估。
+
+## 最先被破坏的商业模式之一，可能是 per-seat SaaS
+
+文章接下来讨论一个非常实际的问题：如果使用软件的主体越来越多不是人，而是 agents，那么 **per-seat pricing 到底还是什么意思？**
+
+传统 SaaS 定价假设一个 seat 大致对应一个人。这个人每天工作八小时，会登录软件、退出软件，有比较稳定的使用频率。如果公司有 1,000 个员工，大致就可以预测需要多少 licenses。
+
+但 agent 没有这种工作模式。一个 agent 可以全天候运行，可以并行启动十几个子任务，也可以一分钟发起几百次 API 调用。一个人甚至可能拥有几十个 agents。一家公司员工人数可能不变，但软件工作量却增加几十倍。
+
+这时候“一个 agent 算一个 seat”既没有经济意义，也可能完全无法反映价值。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+作者引用 Kearney 的估算称，AI procurement agents 可能通过压缩供应商选择差异和售价，让某些分销商的 EBIT 受到最多约 **500 个基点**压力，平均售价可能下降约 **8%**。这个数字本身属于咨询机构的情景估算，但它说明 agent buyer 不只会影响产品界面，也可能直接改变价格结构。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+一些 AI-native 软件公司已经提前改变定价。Sierra 没有主要按照 seats 或 interaction volume 收费，而更倾向根据完成的业务结果定价。Intercom 的 Fin AI agent 也采用类似方式，对一次成功解决的客服对话收费 **0.99 美元**，如果没有解决问题则不收费。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+这里背后的逻辑非常清楚。一个 AI agent 买家会天然问：“我付了多少钱，最后得到了多少可衡量的结果？”它不会因为销售演示很漂亮，就接受一个难以解释的 30% seat uplift。
+
+作者认为 per-seat 不会一夜消失，但它会逐渐让位于 usage、consumption、outcome，或者这几种方式组合的 hybrid pricing。原因不是 AI 公司喜欢换定价模型，而是 agent buyer 会把单位价值算得越来越清楚。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+McKinsey 的企业采购案例也说明为什么买方会喜欢这种变化。文章引用的一个化工企业 agent procurement 试点，让采购员工效率提高约 **20%–30%**，同时让 value capture 增加约 **1%–3%**。另一个电信企业案例中，AI agent 处理长尾软件采购，把谈判团队用于分析和邮件的时间削减最多约 **90%**，并在部分供应商谈判中带来 **10%–15% 的节省**。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+一旦采购部门已经有这种工具，它自然会要求卖方证明自己的价格为什么值得。
+
+## 企业销售最大的软资产——“关系”——可能会被削弱，但不会完全消失
+
+传统 enterprise sales 的核心优势之一，是人与人之间的关系。
+
+Account Executive 会和采购负责人吃饭，会认识 CIO，会了解某个 VP 的升职压力，也会在客户续约之前提前几个月经营关系。Customer Success Manager 的职责不仅是解决问题，还包括持续建立信任。
+
+AI agent 对这些事情几乎没有感觉。
+
+作者强调，未来几年最终签字和真正承担责任的仍然会是人，因此 relationship selling 不会消失。但越来越多的 **screening、comparison 和初步谈判阶段**会被 agent 接管，而这一阶段恰恰决定你有没有机会见到人。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+SUEZ UK 的案例很有代表性。它使用 Pactum agents 后，在两个月内额外覆盖了约 **2,000 家供应商**，潜在平均节省约 2.5%，而通过竞争性采购在部分场景实现约 15% 的成本下降。AI 不会累，也不会因为一家供应商规模太小就懒得重新谈价，因此它把人类采购团队原本没有能力覆盖的供应商重新放进竞争池。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+对于销售方而言，这意味着一个非常不舒服的变化：一个过去因为多年关系而相对安全的供应商，未来可能每次续约都被拿出来重新 benchmark。
+
+Forrester 的预测是，2026 年至少 **20% 的 B2B sellers 会遇到 AI-powered buyer agents**。作者认为，一旦软件成为最早的筛选者，传统 relationship building 在这个阶段的价值就会明显下降，因为 agent 首先看到的是价格、合同、delivery specs、security、compliance 和产品能力这些可测量数据。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+于是销售策略出现一个新的顺序：以前是“先让人喜欢你，再证明产品”；以后可能是“先让机器认为你合格，你才有机会让人喜欢你”。
+
+## 续约也会变得更残酷，因为 AI 不记得那顿晚餐
+
+文章对 Customer Success 的讨论尤其值得 SaaS 投资者注意。
+
+传统 SaaS 续约有很多“软因素”。即使产品 utilization 不够高，一个优秀 CSM 仍然可能通过 relationship、roadmap promise、executive sponsorship 和未来规划把合同续下来。
+
+AI procurement agent 会更倾向于直接读 API logs。
+
+它可以算过去 12 个月实际使用量、每一次工作流产生多少价值、竞品最新价格是多少，再自动算一个切换成本和 ROI 差异。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+如果你和客户关系很好，但机器算出来你比竞争对手贵 35%，而且使用率只有一半，那么关系本身必须和明确的数据价值一起存在。
+
+文章引用 Clari Labs 对 **121 家大型全球企业、约 1,000 万个销售机会**的分析。2023 至 2024 年间，平均合同价值同比下降约 **50%**，而 expansion deal cycle 从 **92 天延长到 125 天**。Clari 把这种变化的一部分归因于买家越来越要求可验证的价值证据，而不是轻易批准扩容。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+作者把 agent buyer 看作这个趋势的进一步强化。
+
+以前客户只有在正式 renewal project 启动时才系统比较竞争对手。未来 agent 可以全年在后台不停比较。
+
+Forrester 的调查显示，已有 **68% 的 B2B 买家在正式采购开始时就已经心里有一个领先供应商**。如果研究本身越来越由 agents 自动完成，那么“领先供应商”甚至可能在当前合同还剩六个月时就已经被机器选出来。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+于是出现所谓 **algorithmic churn**。
+
+客户表面上一切正常，CSM 也觉得关系很好，但 buyer agent 已经连续三个月抓取 competitor pricing、reviews 和 feature updates。等真正 renewal meeting 开始时，机器可能早已算好：换到竞争对手一年省 300 万美元，迁移成本 80 万美元，回本四个月。
+
+这时候 CSM 才开始“挽留”，其实已经太晚。
+
+## GEO 可能会从营销噱头变成真正的 enterprise distribution channel
+
+这一部分和 G2 的数据可以连起来看。
+
+过去企业 SaaS 非常依赖 SEO。你希望采购经理 Google “best observability platform”，然后看到你。
+
+AI answer engines 出现之后，一个潜在的新领域是 **Generative Engine Optimization，GEO**。目标不是排名第一，而是让模型在回答“哪些供应商最适合我的需求”时把你写进 shortlist。
+
+G2 的调查显示，**85% 的 B2B 买家在 AI answer engine 提到某个 vendor 时，会对这个 vendor 给予更高评价**。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+这不是简单的品牌曝光问题。
+
+未来 agent buyer 可能根本不会像人一样浏览 20 个网页。它会主动拉取结构化信息，把十几个供应商压成三个，再提交给采购人员。因此如果你的价格、security certifications、API specs、SLA、availability、contract terms 都无法被机器稳定解析，你可能根本不会进入 comparison set。
+
+作者用了一个很准确的词：**machine-readable product surfaces**。
+
+未来网站不只是给人看的 UI，还需要给 agents 提供稳定、结构化、程序可读的商业接口。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+## UCP、Agent2Agent 这类协议，未来可能像 SEO 的 sitemap 一样重要
+
+文章认为，这个基础设施正在形成。
+
+其中一个例子是 Universal Commerce Protocol，也就是 UCP。它的目标之一，是让 AI 系统能够程序化理解商品信息、价格、库存、条款甚至 checkout。
+
+另一个例子是 Google 的 Agent2Agent 协议。A2A 使用所谓 **Agent Cards**，本质上是一套结构化 JSON capability description，让一个 agent 可以先知道另一个 agent 能做什么，再决定是否与它交互。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+作者认为，对于 B2B 公司而言，这些东西未来可能变成一种类似网站时代 sitemap、API docs 和 schema markup 的基础设施。
+
+一个产品如果只有精美网页，但关键能力全埋在 marketing copy 里，对人很好读，对 agent 却很难稳定解释，那么未来它可能在采购流程中出现一种奇怪状态：**产品很好，但机器看不见。**
+
+这也意味着，未来 marketing 和 developer relations 的边界可能变得模糊。
+
+产品页、API docs、pricing schema、legal terms、case study 和 benchmark 不再只是内容，而是供 agent 做决策的“数据源”。
+
+## 最难解决的问题不是推荐，而是：这个 AI 到底有没有权花钱？
+
+文章接下来讨论一个非常实际但常被忽略的问题：identity 和 authorization。
+
+让一个 AI agent 帮你搜索供应商很容易。
+
+让它直接花 500 万美元签合同，就完全是另一回事。
+
+卖方必须知道，这个 agent 真的是代表某家公司吗？它能花多少钱？什么范围内可以自动签？如果 agent 超出权限做错决定，法律责任归谁？
+
+如果整个 checkout 最后仍然必须让一个人打开邮件、登录网页、点击 Accept，那么所谓 autonomous procurement 到最后一步还是会卡住。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+文章引用 non-human identity 数据说明问题规模已经非常大。不同研究使用口径不同，但很多企业环境中 machine identities、service accounts、API credentials 等 non-human identities 已经远多于真人账户。文章引用 Entro Labs 数据称，在部分企业环境中这一比例达到 **144:1**；另一个金融场景的统计也显示 non-human identities 数量远超员工。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+所以未来 agent economy 必须出现一个真正成熟的 **agent identity + authorization layer**。
+
+AI 必须能够证明：“我是 JPMorgan 的采购 agent；我被授权采购这类软件；最高一年 200 万美元；我可以谈价格，但超过 150 万美元需要 CFO approval。”
+
+卖方的系统则必须程序化验证这些条件，而不是靠销售人员打开 Salesforce 查客户。
+
+这类基础设施已经吸引 VC 投资，文章提到 Descope 等公司开始把 agentic identity 纳入产品方向。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+## 文章最重要的提醒：不要只给销售团队塞更多 AI
+
+作者最后特别反对一种现在非常流行的企业方案：客户用了 AI，所以我也给销售团队配一堆 AI agents，然后就算完成“AI transformation”。
+
+Gartner 预测，到 2028 年 AI agents 数量可能达到真人 sales reps 的 **10 倍**；但它同时预计，真正认为这些 agents 提升了销售生产率的销售人员可能仍然不到 40%。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+这听起来矛盾，但文章认为完全合理。
+
+如果企业原来的销售流程仍然假设买家是人，那么只是往里面塞更多 sales agents，系统并没有真正适应新的买方。
+
+买方 agent 只想看到结构化价格、可验证 ROI 和机器可读合同；卖方却让 AI 自动写更多 cold emails。
+
+这只会让双方产生更多噪音。
+
+文章引用 Gartner 分析师 Melissa Hilbert 的判断是：超过一定程度之后，增加更多 AI 并不会自动提高生产率，反而可能让本来已经很复杂的工作流堆积更多 prompts、工具和通知，最终增加销售团队负担。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+作者因此把真正的竞争优势定义为 **agent-first commercial architecture**，而不是“AI-powered sales”。
+
+核心变化在于，商业模型本身要适合机器交易：价格可以按结果衡量，产品能力可以被机器读取，agent 身份和支付权限可以程序验证，ROI 可以通过真实数据证明。
+
+当这些基础设施存在以后，人类关系才重新回到它真正擅长的位置：复杂战略、长期信任、例外处理和重大决策。
+
+## 我认为这篇文章真正重要的地方
+
+下面是我的延伸判断，不是作者的直接结论。
+
+如果这条趋势成立，我认为它会对 SaaS 产生一个非常深的二阶影响：**AI 不只是降低企业软件开发成本，还可能降低企业软件的销售摩擦和价格不透明度。**
+
+过去 enterprise SaaS 的高毛利很大程度上来自产品价值，但也部分来自复杂的价格体系、信息不对称、强销售关系和高切换成本。一个 agent 可以同时读取几十家供应商、比较公开和私有报价、计算实际 utilization，再每个季度重新 benchmark。如果这种能力大规模普及，很多企业软件行业长期存在的“价格粘性”可能下降。
+
+这对软件公司的影响会高度分化。
+
+真正有很强产品差异、数据网络效应、workflow lock-in 或可量化高 ROI 的公司，反而可能受益，因为机器更容易证明它确实值得贵。相反，那些主要依赖 bundling、销售关系、复杂合同和客户“懒得重新评估”维持高价格的软件，可能受到更明显压力。
+
+我还认为这里会出现一个新的基础设施市场。过去互联网商业基础设施是 DNS、identity、payments、APIs、SEO 和 analytics；agent economy 可能再增加 **agent identity、agent authorization、machine-readable pricing、agent-to-agent protocols、verifiable procurement credentials、GEO 和 autonomous settlement**。文章提到的 UCP、A2A 和 Descope 只是非常早的形态。[O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)
+
+更有意思的是，这可能改变“品牌”的含义。
+
+人类买家会被广告、设计、销售人员人格和品牌故事影响。AI agent 更容易被结构化数据、真实 performance 和可验证第三方证据影响。如果未来很大一部分 shortlist 是机器生成，品牌不会消失，但**品牌需要同时对人和模型成立**。
+
+所以我认为这篇文章最值得记住的不是“以后 AI 会帮企业买软件”，而是更深的一句话：
+
+**当机器开始代表客户做决策，企业就不能只把 AI 当成自己的工具；它还必须开始把 AI 当成一种新的客户类型。** [O'Reilly Media](https://www.oreilly.com/radar/when-your-buyer-is-an-ai-agent/)

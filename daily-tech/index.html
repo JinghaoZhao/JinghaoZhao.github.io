@@ -1,64 +1,14 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>每日科技长文 · Reading Archive</title>
-<style>
-:root{--bg:#f7f8fa;--paper:#fff;--text:#182733;--soft:#62717c;--line:#dae2e8;--blue:#315e9b;--pale:#eaf0f8;color-scheme:light}
-:root.dark{--bg:#141a23;--paper:#1c2632;--text:#e8eef6;--soft:#abb9c9;--line:#374354;--blue:#a7c7ff;--pale:#24384d;color-scheme:dark}
-*{box-sizing:border-box}body{margin:0;font:15px/1.8 -apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC",sans-serif;color:var(--text);background:var(--bg)}
-a{color:var(--blue)}.wrap{max-width:1240px;margin:auto;padding:0 27px}.head{height:67px;border-bottom:1px solid var(--line)}.head .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}.logo{text-decoration:none;color:var(--text);font:700 13px ui-monospace,monospace;letter-spacing:.13em}.logo b{font:900 29px Georgia,serif;letter-spacing:-.12em;margin-right:15px;color:var(--blue)}.head button{background:none;color:var(--soft);border:1px solid var(--line);padding:5px 11px;border-radius:18px;cursor:pointer}
-.hero{padding:55px 0 42px}.eyebrow{font:600 11px ui-monospace,monospace;color:var(--blue);letter-spacing:.16em}.hero h1{font:600 clamp(35px,4vw,57px)/1.3 Georgia,"Songti SC",serif;letter-spacing:-.055em;margin:20px 0 15px}.hero h1 em{color:var(--blue)}.hero p{color:var(--soft);max-width:640px}.notice{background:var(--pale);border-left:3px solid var(--blue);padding:12px 16px;color:var(--soft);font-size:12px;margin-bottom:26px}
-.main{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:730px;border-top:1px solid var(--line)}aside{border-right:1px solid var(--line);padding:29px 21px 35px 0}.caps{font:600 10px ui-monospace,monospace;letter-spacing:.15em;color:var(--soft)}input{width:100%;padding:12px;background:var(--paper);color:var(--text);border:1px solid var(--line);border-radius:6px;margin:20px 0 14px;outline-color:var(--blue)}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}.tag{background:transparent;color:var(--soft);border:1px solid var(--line);border-radius:22px;padding:4px 10px;cursor:pointer;font-size:11px}.tag.chosen{background:var(--blue);color:var(--bg);border-color:var(--blue)}
-#items{max-height:950px;overflow:auto}.item{padding:16px 9px;display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);cursor:pointer;color:var(--text)}.item:hover,.item.active{background:var(--pale)}.item strong{display:block;font-size:13px;line-height:1.5}.item small{color:var(--soft);display:block;font-size:11px;margin-top:8px}.item .ok{color:var(--blue)}article{min-width:0;padding:40px 0 60px 42px}.reader{max-width:770px;margin:auto}.reader h2{font:600 clamp(25px,3vw,35px)/1.45 Georgia,"Songti SC",serif;letter-spacing:-.035em}.reader-head{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:30px}.reader-head p{font-size:12px;color:var(--soft)}.share{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--soft);background:none;cursor:pointer}
-#bodycopy{font-size:15px;line-height:2.05;overflow-wrap:anywhere}#bodycopy p{margin:0 0 21px}#bodycopy h2{font:600 23px/1.5 Georgia,"Songti SC",serif;margin:46px 0 18px}#bodycopy h3{font:600 18px/1.5 Georgia,"Songti SC",serif;margin:32px 0 14px}#bodycopy h1{font-size:24px}#bodycopy strong{font-weight:690}#bodycopy code{background:var(--pale);padding:2px 4px;border-radius:4px}#bodycopy hr{border:0;border-top:1px solid var(--line);margin:35px 0}.legacy{font:11px ui-monospace,monospace;color:var(--soft);border-bottom:1px dotted var(--line)}.widget{color:var(--soft);font-size:12px;padding:13px;margin:12px 0;border:1px dashed var(--line);border-radius:6px}.pending{padding:27px;background:var(--pale);border-radius:6px}.pending p{color:var(--soft)}footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--soft);font:11px ui-monospace,monospace}
-@media(max-width:850px){.wrap{padding:0 19px}.hero{padding:37px 0 27px}.main{grid-template-columns:1fr}aside{border-right:none;border-bottom:1px solid var(--line);padding:23px 0}#items{max-height:280px;border:1px solid var(--line)}.item{padding:11px}article{padding:30px 0 40px}}
-</style></head><body>
-<header class="head"><div class="wrap"><a class="logo" href="./"><b>M.</b>DAILY / TECH</a><button id="theme" aria-label="切换主题">◐ 明暗</button></div></header>
-<div class="wrap"><section class="hero"><div class="eyebrow">PERSONAL READING ARCHIVE · 2026</div><h1>每天一篇，<em>持续思考。</em></h1><p>把科技与 AI 的长文解读集中收藏，按日期与主题查找，不必再翻很长的聊天记录。</p><p id="stats" style="font-size:12px"></p></section>
-<div id="notice" class="notice">载入中…</div>
-<main class="main"><aside><div class="caps">THE ARCHIVE <span id="count"></span></div><input id="search" type="search" placeholder="搜索标题、来源和主题" aria-label="搜索文章"><div id="tags" class="tags"></div><div id="items"></div></aside><article><div class="reader"><div class="reader-head"><div id="status" class="eyebrow"></div><h2 id="title">选择文章开始阅读</h2><p id="meta"></p><p id="source"></p><button class="share" id="share" hidden>复制文章链接</button></div><div id="bodycopy">从左侧目录选择一篇文章。</div></div></article></main>
-<footer>DAILY / TECH　　·　　中文科技深读归档　　·　　独立保存，不替代原始来源</footer></div>
-<script>
-(function(){
-"use strict";
-var root=document.documentElement,posts=[],active="",tag="全部",query="";
-var $=function(id){return document.getElementById(id)};
-var esc=function(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")};
-var date=function(p){return p.delivery_date?"推送 "+p.delivery_date:(p.source_date?"原文 "+p.source_date:"日期未确认")};
-var urlok=function(u){return /^https:\/\/[a-z0-9.-]+\//i.test(u||"")};
-function inline(s){s=esc(s);
-s=s.replace(/url([^]+)(https:\/\/[^]+)/g,function(_,label,u){return '<a href="'+esc(u)+'" rel="noopener" target="_blank">'+label+'</a>'});
-s=s.replace(/cite[^]+/g,'<span class="legacy" title="原聊天内部引用，普通网页无法直接打开">原聊天引用</span>');
-s=s.replace(/&lt;Link[^&]*?title=&quot;([^&]+)&quot;[^&]*?\/&gt;/g,function(_,label){return '<span class="legacy">'+label+'（聊天内动态链接）</span>'});
-s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-s=s.replace(/\[([^\]]+)\]\((https:\/\/[^)]+)\)/g,function(_,label,u){return '<a rel="noopener" target="_blank" href="'+esc(u)+'">'+label+'</a>'});
-return s}
-function markdown(md){var out=[],lines=md.replace(/\r\n/g,"\n").split("\n"),buf=[];
-function flush(){if(buf.length){out.push("<p>"+inline(buf.join(" "))+"</p>");buf=[]}}
-lines.forEach(function(line){if(!line.trim()){flush();return}
-if(/^#{1,3} /.test(line)){flush();var n=line.match(/^#+/)[0].length;out.push("<h"+n+">"+inline(line.slice(n+1))+"</h"+n+">");return}
-if(/^---+$/.test(line.trim())){flush();out.push("<hr>");return}
-if(/^</.test(line.trim())){flush();out.push('<div class="widget">原聊天排版组件（保留于原始 Markdown，外部页面不复原）</div>');return}
-if(/^image_group/.test(line)||/^genui/.test(line)){flush();out.push('<div class="widget">原聊天图片或图表（归档保留原始标记）</div>');return}
-buf.push(line.trim())});flush();return out.join("\n")}
-function paintTags(){var ts=["全部"];posts.forEach(function(p){(p.tags||[]).forEach(function(t){if(ts.indexOf(t)<0)ts.push(t)})});
-$("tags").innerHTML=ts.map(function(t){return '<button class="tag '+(tag===t?"chosen":"")+'" data-tag="'+esc(t)+'">'+esc(t)+'</button>'}).join("");
-$("tags").querySelectorAll("button").forEach(function(b){b.onclick=function(){tag=b.dataset.tag;paintTags();paintList()}})}
-function paintList(){var ps=posts.filter(function(p){return(tag==="全部"||(p.tags||[]).indexOf(tag)>=0)&&[p.title,p.source_title,(p.tags||[]).join(" ")].join(" ").toLowerCase().indexOf(query.toLowerCase())>=0}).sort(function(a,b){return b.sequence-a.sequence});
-$("count").textContent=ps.length+"/"+posts.length;
-$("items").innerHTML=ps.map(function(p){return '<button class="item '+(p.id===active?"active":"")+'" data-id="'+esc(p.id)+'"><strong>'+esc(p.title)+'</strong><small>'+esc(date(p))+' · <span class="'+(p.status==="full"?"ok":"")+'">'+(p.status==="full"?"全文":"待补原文")+"</span></small></button>"}).join("")||'<p style="color:var(--soft);font-size:12px">没有匹配的文章</p>';
-$("items").querySelectorAll("button").forEach(function(b){b.onclick=function(){show(b.dataset.id,true)}})}
-async function show(id,push){var p=posts.find(function(x){return x.id===id});if(!p)return;active=id;paintList();if(push){var u=new URL(location.href);u.searchParams.set("post",id);history.pushState(null,"",u)}
-$("status").textContent=p.status==="full"?"FULL ARCHIVE":"INDEX · PENDING";$("title").textContent=p.title;$("meta").textContent=date(p)+"　·　"+p.source_title+"　·　"+(p.tags||[]).join(" / ");
-$("source").innerHTML=urlok(p.source_url)?'<a href="'+esc(p.source_url)+'" rel="noopener" target="_blank">阅读英文来源 ↗</a>':"来源链接未核实";
-$("share").hidden=false;$("bodycopy").innerHTML="<p>载入中…</p>";
-if(p.status!=="full"||!p.file){$("bodycopy").innerHTML='<div class="pending"><h3>已收录标题，原文待补齐</h3><p>当前暂时无法完整取回这一期聊天消息。为了保存你真正读过的版本，不会用新写的摘要冒充历史原文。</p></div>';return}
-try{var response=await fetch("./"+p.file,{cache:"no-cache"});if(!response.ok)throw Error(response.status);var raw=await response.text();if(active===id)$("bodycopy").innerHTML=markdown(raw)}catch(e){$("bodycopy").textContent="原文载入失败："+e.message}}
-async function init(){var saved=localStorage.getItem("dailytech-theme");if(saved==="dark")root.classList.add("dark");
-$("theme").onclick=function(){root.classList.toggle("dark");localStorage.setItem("dailytech-theme",root.classList.contains("dark")?"dark":"light")};
-$("share").onclick=function(){navigator.clipboard.writeText(location.href).then(function(){$("share").textContent="已复制"}).catch(function(){})};
-$("search").oninput=function(e){query=e.target.value;paintList()};
-var resp=await fetch("./manifest.json",{cache:"no-cache"});if(!resp.ok)throw Error(resp.status);var m=await resp.json();posts=m.posts||[];$("notice").textContent=m.archive_notice;$("stats").textContent=posts.filter(function(p){return p.status==="full"}).length+" 篇原文　·　"+posts.length+" 篇历史目录";paintTags();paintList();
-var id=new URL(location.href).searchParams.get("post");if(id&&posts.some(function(p){return p.id===id}))show(id,false);else {var f=posts.find(function(p){return p.status==="full"});if(f)show(f.id,false)}
-window.onpopstate=function(){var id=new URL(location.href).searchParams.get("post");if(id)show(id,false)}}
-init().catch(function(e){$("notice").textContent="无法读取归档："+e.message})})();
-</script></body></html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="description" content="每日科技长文，按日期归档的中文阅读收藏。保留历史正文与原文链接。"><meta name="theme-color" content="#f7f6f2"><title>每日科技长文 · 阅读收藏</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="progress" id="progress"></div>
+<header class="header"><a class="brand" href="./" aria-label="每日科技长文首页"><span class="brand-mark">阅</span><span>每日科技长文<small>DAILY / TECH</small></span></a><nav><a href="./" id="archive-link">文章归档</a><button id="theme" aria-label="切换深色阅读模式" title="切换深色阅读模式">◐</button></nav></header>
+<main id="home" class="shell">
+<section class="hero"><div class="eyebrow">THE READING COLLECTION</div><h1>把值得读的，<br><em>好好留下。</em></h1><p>科技与 AI 的每日长文，原文链接与中文正文。<br>从一篇文章开始，慢慢读，也随时回来。</p><div id="stats" class="stats" aria-live="polite">正在载入文章…</div></section>
+<section id="featured" class="featured" hidden></section>
+<section class="archive" aria-labelledby="archive-heading"><div class="archive-heading"><h2 id="archive-heading">所有文章 <span id="result-count"></span></h2><span class="micro">CHRONOLOGICAL ARCHIVE</span></div>
+<div class="filters"><label class="search-wrap"><span aria-hidden="true">⌕</span><input type="search" id="search" placeholder="搜索标题、主题或来源" aria-label="搜索标题、主题或来源"></label><select id="month" aria-label="按月份筛选"><option value="all">所有月份</option></select><select id="availability" aria-label="按归档状态筛选"><option value="full">已归档正文</option><option value="all">全部记录</option><option value="pending">待补正文</option></select></div>
+<div class="topic-list" id="topics" aria-label="按主题筛选"></div><div id="post-list" aria-live="polite"></div><div class="more-wrap"><button id="load-more" class="outline" hidden>再看一些文章 ↓</button></div></section>
+</main>
+<main id="reader" class="reader-shell" hidden><a href="./" class="back" id="back">← 返回文章归档</a><div class="reading-layout"><article><div id="article-meta" class="eyebrow"></div><h1 id="article-title"></h1><div id="article-source" class="source"></div><div class="reader-tools"><span id="reading-time"></span><div><button id="font-down" aria-label="缩小正文字号">A−</button><button id="font-up" aria-label="放大正文字号">A＋</button><button id="copy-link">复制链接</button></div></div><div id="article-body" class="prose" aria-live="polite"></div><div id="article-nav" class="article-nav"></div></article><aside id="toc-box"><div class="eyebrow">本篇目录</div><nav id="toc"></nav><a class="back-top" href="#reader">回到顶部 ↑</a></aside></div></main>
+<div id="error" role="alert" class="shell error" hidden></div><footer class="footer"><span>每日科技长文 <span class="footer-dot">/</span> 你的阅读收藏</span><span id="footer-meta">保留当时的文字，也保留思考的过程。</span></footer><script src="app.js" defer></script></body></html>

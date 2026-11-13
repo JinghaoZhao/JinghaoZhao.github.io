@@ -1,0 +1,223 @@
+# 今日科技长文：AI 数据中心正在绕过电网，自建“私人电厂”——75GW 的订单说明这已经不是临时方案，而是一条新的基础设施产业链
+
+今天推荐 SemiAnalysis 于 **2026 年 9 月 10 日**发表的深度报告 **《What is So Hard About Behind-The-Meter Power For Datacenters? Part 1》**，作者包括 Ellie Holbrook、Robert Boswall、Jeremie Eliahou Ontiveros 等人。文章为**付费内容**，但公开部分已经覆盖了相当多核心分析；完整后半部分需要订阅。[阅读 SemiAnalysis 原文](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+我今天选它，是因为过去两年 AI 基础设施讨论的核心问题一直是“哪里能买到 GPU”，而这篇文章说明，到了 2026 年，一个更基础的问题已经压过芯片本身：**GPU 买到了以后，究竟去哪里找几百兆瓦甚至几吉瓦、而且能在两三年内真正送到机架上的电？** SemiAnalysis 的 Energy Model 目前追踪到，专门服务 AI compute 的 behind-the-meter（BTM，表后/现场供电）项目已经出现约 **75GW 的确定性设备订单**，仅 2026 年第二季度就新增约 **20GW**；它们强调这里排除了大量只有新闻稿、没有设备订单的“纸面项目”。SemiAnalysis 预计，到今年底美国大约已有 **3GW 数据中心 IT 负载真正由 BTM 电源运行**，此后数年还会保持三位数百分比增长。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这篇文章最值得读的地方并不是简单说“AI 数据中心开始烧天然气”，而是把一个 GW 级数据中心从新闻稿变成真正通电的全部困难拆开：资本、空气许可、天然气管线、发电设备、变压器与开关设备、施工劳动力，以及最后经常被忽视的电力系统物理。它得出的结论很反直觉：**在 AI 时代，自己建电厂可能已经比等公共电网更现实；但买到一台燃气轮机远远不等于拥有了一座可用的数据中心。**
+
+由于原文受版权保护，下面不是逐句翻译，也不会按原文章节一一对应；我会把文章的核心事实和逻辑重新组织，并对重要的现实项目尽量用企业公告、政府资料和最近几天的新消息交叉核验。
+
+## BTM 到底是什么：它不是简单的“离网发电”，而是一整条从完全并网到完全孤岛化的连续谱
+
+“Behind the meter”最容易被误解成“数据中心和电网彻底断开”。实际上，meter 指的是项目与公共电网交界处的计量点；位于用户侧的电池、开关设备和现场发电机都属于 behind-the-meter。美国能源部对 microgrid 的定义也允许系统既可以正常连接公共电网，也可以在需要时断开、进入 island mode 独立运行，因此“microgrid”“islanded”“off-grid”“co-located”这些词在现实项目里经常被混用，但物理意义并不一样。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+最常见的 AI 数据中心方案甚至不是永久离网，而是 **bridge power**：公共电网排队需要四五年，开发商先自己建燃气机组、燃料电池或其他现场电源，让 GPU 提前两三年开机；等输电和变电基础设施最终建好以后，现场电厂再转为备用、削峰，或者与电网并联运行。xAI 的一些项目已经采用过类似路径。也就是说，BTM 最大价值往往不是让数据中心永远脱离电网，而是**购买时间**。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这个区别很重要，因为未来看到“某公司建 2GW 私人电厂”时，并不能自动理解成它将在未来二十年都完全离网。很多项目真正的商业目标只是把“2029 年才能获得 utility power”变成“2027 年就能开始产生 AI 收入”。
+
+## 为什么 hyperscaler 突然愿意自己当电力公司：AI 算力的时间价值已经高到压倒发电效率
+
+SemiAnalysis 给出的经济学解释非常激进。它估算，一座为 **1GW IT load** 服务的孤岛式电厂可能花费约 **50 亿美元**；与此同时，在其 token economics 模型的高利用率假设下，1GW frontier inference capacity 每年理论上可以对应高达约 **1000 亿美元 API 收入**。后一个数字显然属于 SemiAnalysis 自己的模型，不是行业已实现的平均收入，但它解释了开发商为什么愿意做过去电力行业看来“不经济”的事情：如果早一年上线的算力价值极高，那么即使现场发电贵一倍、能效低三成，也可能比等待电网更划算。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+现实中的 hyperscaler 行为已经与这个逻辑一致。Chevron 在今年 6 月宣布，与 Microsoft 签订 **20 年**电力协议，在西德州建设 Project Kilby，规划约 **2.67GW** 发电能力，由 GE Vernova 大型燃气轮机和 Caterpillar 旗下 Solar Turbines 等设备组成，直接为 Microsoft 数据中心供电。[雪佛龙](https://www.chevron.com/newsroom/2026/q2/chevron-signs-20-year-power-agreement-with-microsoft-for-west-texas-data-center)
+
+而且需求还在继续扩大。Reuters 本周报道，Microsoft 正规划到 **2032 年约 38GW** 的全球数据中心容量，超过当前规模的三倍。美国 EIA 9 月 9 日最新预测也显示，美国 2026、2027 年发电量都将创纪录，数据中心和制造业正在成为商业和工业用电增长的重要驱动力。[Reuters](https://www.reuters.com/business/microsoft-plans-38-gigawatts-data-center-capacity-by-2032-bloomberg-news-reports-2026-09-10/)
+
+所以问题已经从“BTM 比 grid power 贵不贵”逐渐变成“**谁能最早给我真正可用的 MW**”。
+
+## 但自己建电厂后，首先碰到的不是工程，而是金融上的鸡生蛋问题
+
+传统数据中心开发商可以先申请电网接入，前期资本投入相对有限，然后拿已经获得的 utility commitment 去找租户和融资。
+
+BTM 不同。
+
+如果现场电站的资本开支本身就是数十亿美元，开发商必须很早就向燃机、发动机、变压器等供应商支付大额订金。银行却希望先看到一个信用良好的 hyperscaler 签长期购电协议；hyperscaler 又希望开发商先证明设备真的买到了、天然气真的能送到、许可真的拿得到，才愿意签约。于是三方形成一个典型闭环：**没有客户拿不到钱，没有钱买不到设备，没有设备客户又不敢签。** [SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+SemiAnalysis 因此观察到一种新的“BTM utility”正在出现。它们不只是卖一台 generator，而是提供 Energy-as-a-Service：自己融资购买设备、建设电站、保证一定的 MW 和 uptime，再与数据中心签长期合同。一些供应商甚至会在永久天然气管道还没建好时，用卡车运输 CNG 作为临时“虚拟管道”。这意味着传统的 utility function 正被拆成一组私人服务重新组合。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+从产业结构看，这一点可能比“哪一种燃机最好”更重要，因为 AI 数据中心正在催生一类以前不存在于如此大规模市场中的企业：**私人电力公用事业公司。**
+
+## 真正最先把项目打回设计阶段的，经常是空气许可
+
+GW 级现场燃气发电最大的误区是：你已经买了发电机，所以明年就能通电。
+
+空气许可本身就可能需要一年以上，而且美国各州的规则差异非常大。联邦 Clean Air Act 下，NOx 等污染物排放一旦跨过 major-source 门槛，就会进入更复杂的 Prevention of Significant Deterioration 等审查流程；EPA 在 2026 年的新标准中还为高利用率大型天然气轮机确定了 **5 ppm NOx** 的性能标准，这通常意味着需要高等级燃烧控制和 SCR 后处理。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+数据中心的问题在于，几个百分点的排放率乘上 24×7、几百 MW，就会迅速变成每年几百吨污染物。SemiAnalysis 用一个示例说明，即使受控 NOx 排放只有 0.10g/kWh，一套持续运行的约 250MW 电站一年也会接近美国某些重大排放源监管门槛。于是设备选择、机组数量、运行时长和项目选址，本身都变成 permit engineering 的一部分。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这正是 Oracle/OpenAI 的 **Project Jupiter** 为什么如此值得研究。
+
+## Project Jupiter 原本想用燃气轮机，最后为了许可把整套 2GW 级供电系统推倒重来
+
+Project Jupiter 位于新墨西哥州，是 Stargate 基础设施中的旗舰项目之一。原方案采用大规模燃气轮机，并试图通过限制运行方式把 NOx 年排放控制在 major-source 阈值以下。当地环境监管机构对这种几乎贴着边界运行的方案提出可执行性问题，同时项目收到了大量公众意见。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+今年 4 月，Oracle 和开发商直接改变技术路线，宣布使用最高 **2.45GW Bloom Energy 固体氧化物燃料电池**，替代之前的燃气轮机和柴油机方案。Oracle 表示，新方案的 NOx 排放相比原方案下降约 **92%**，同时明显降低用水需求。[Oracle](https://www.oracle.com/news/announcement/oracle-borderplex-and-bloom-energy-to-power-project-jupiter-with-fuel-cell-technology-2026-04-27/)
+
+这是非常有意思的真实案例：并不是工程师先比较所有技术、发现 fuel cell 的 LCOE 最优，而是**许可速度本身改变了技术选择**。
+
+但 fuel cell 并没有让问题消失。它仍需要天然气，仍排放 CO₂，只是没有燃烧过程，因此 NOx 等局部污染物大幅减少。项目的空气许可目前仍面临司法挑战；新墨西哥州最高法院在 **8 月 23 日**暂停了相关许可程序，9 月初仍未解除。Oracle 本周又宣布在新墨西哥州寻求 **2GW 新建可再生能源**项目，并投入资金研究 Project Jupiter 的碳捕集，但这些可再生能源主要用于 carbon-free matching，并不会直接替代现场 Bloom fuel cells 的天然气供应。[Ars Technica](https://arstechnica.com/gadgets/2026/09/oracle-promises-2-gw-of-renewables-to-match-stargate-data-center-emissions/)
+
+这件事很好地说明：**AI 数据中心的 time-to-power 已经变成环境法规、政治许可和电力技术共同决定的问题，而不是单纯的电气工程问题。**
+
+## Bloom Energy 为什么突然变得重要：它卖的并不只是效率，而是“少碰一些许可和施工瓶颈”
+
+Nebius 今年也把首个美国 BTM 项目从原本的燃烧式发电改成 Bloom fuel cells，规划约 **328MW**，官方直接把更快部署和较轻的本地污染排放作为选择理由。[Nebius](https://nebius.com/newsroom/nebius-and-bloom-energy-partner-to-power-ai-infrastructure-build-out)
+
+SemiAnalysis 的订单追踪显示，目前 fuel-cell BTM 市场几乎被 Bloom 占据，它追踪到的相关订单中约 **3.8GW** 来自 Bloom，而 FuelCell Energy 只有约 0.03GW。这里是 SemiAnalysis 的 proprietary tracker 数据，应当理解成其覆盖范围内的订单估计，而不是官方全行业统计。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+Fuel cell 的另一个隐藏优势是施工劳动力结构。大型燃气联合循环电站需要锅炉工、压力管焊工、millwright 等非常专业的工种；fuel-cell module 没有同样的高压蒸汽系统，现场施工更模块化。不过这种优势也有另一面：**历史上几乎没人把数百个甚至上千个 SOFC 模块、超级电容、BESS 和控制系统组合成一座 2GW 级全天候孤岛电厂。** Project Jupiter 如果成功，本身就是一场史无前例的规模实验。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+所以 Bloom 的 bull case 很容易理解，但技术风险也不能忽略：它卖的不是已经在几十座 2GW 电站上验证过的成熟架构，而是在利用 AI 用户对 time-to-power 的极端支付意愿，把自己的技术推到从未有过的规模。
+
+## 天然气本身并不稀缺，稀缺的是“你能不能把足够多天然气稳定送到那个数据中心”
+
+SemiAnalysis 对 gas infrastructure 的分析尤其值得注意。
+
+美国整体并不缺天然气。真正的问题是某个具体数据中心需要 **每天、持续、具有 firm transportation rights 的巨大流量**。地图上离一条 pipeline 只有几公里，并不能说明你真正拥有燃料。合同还要规定最大日输量、入口和出口、最低压力；如果只是 interruptible service，在管道拥堵时数据中心可能最先被断供。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+因此永久离网的数据中心还需要考虑管线故障。实际设计可能包括两路独立输气、现场 LNG 储备、dual-fuel capability，甚至冗余增压设备。
+
+Texas 之所以如此受欢迎，除了土地和天然气便宜，还有 regulatory structure 的优势。很多私人 lateral pipeline 可以主要由 Texas Railroad Commission 管理，因此数据中心开发商甚至开始直接自己修管道。SemiAnalysis 举的一个项目预算中，一条约 31 英里的延伸天然气管线就需要约 **1.2 亿美元**。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+换句话说，AI 公司现在已经从“购买 GPU”走到了：
+
+**GPU → 数据中心 → 电厂 → 天然气管道。**
+
+垂直整合正在一步一步向能源上游延伸。
+
+## 更有趣的是，燃气轮机现在已经开始出现类似 HBM 的“抢产能”和二手市场
+
+早期 BTM 项目最自然的选择是大型 gas turbines，因为电力行业已经用了几十年，可靠性和效率都很成熟。
+
+问题是 utility 也在抢同样的设备。
+
+SemiAnalysis 称，一些主流新燃机的可用制造 slot 已经排到 **2030 年以后**。于是一个过去几乎没人会想到的市场出现了：**发电机组交付时段开始被转卖。** 它观察到的公开交易中，某个释放出来的 slot 相比固定合同价溢价约16%，把其他成本算进去以后溢价可达到46%；买家真正购买的不是机器本身，而是提前几年拿到电。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这又产生了类似 GPU 黄牛市场的投机行为。一些项目方提前签 turbine minimum purchase agreements、支付押金，却没有真正成熟的数据中心项目；如果项目失败，设备位置反而可以在二级市场出售。
+
+这一现象非常能说明当前 AI 基建的资本逻辑：
+
+**时间已经成为一种可交易的资产。**
+
+## 大型往复式燃气发动机正在成为一个容易被忽视的受益者
+
+当大型 turbine 的交货期被挤到 2030 年以后，数据中心开始大量转向 reciprocating engines，也就是本质上类似超大型工业版“活塞发动机”的设备。
+
+这类产品单机功率可以从不到1MW到十几甚至20MW，不如400MW级 frame turbine 简洁，但胜在模块化、制造商更多、交付更快，而且传统 utility 对它们的竞争没那么激烈。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+SemiAnalysis 因此发现 BTM 新订单明显从 turbine 向 reciprocating engine 转移。Caterpillar 正把大型 reciprocating-engine 产量提升到约 **2024 年的三倍**；INNIO 则预计自身总产能从 2025 年约3.5GW/年增加到2030年前后的约10GW/年。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这意味着 AI 基础设施受益链正在继续向一些市场过去很少作为“AI 股票”看的工业公司扩散。
+
+## 但买到了 engine 以后，下一堵墙可能是变压器、开关柜和 eHouse
+
+文章一个很好的提醒是，市场总喜欢盯最昂贵、最显眼的 generator。
+
+真正的电厂却是一整套 Balance of Plant。
+
+如果没有 transformer、medium-voltage switchgear、保护设备、电缆、控制器和模块化电气房，一排价值几亿美元的发动机也不能给 GPU 供电。更麻烦的是，数据中心自己也需要同样的变压器和 switchgear，因此 BTM power plant 与它所服务的数据中心事实上在争夺同一批电气供应链。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这和过去两年 AI 基础设施的很多瓶颈规律非常相似：
+
+先缺 GPU。
+
+GPU 解决以后缺 HBM。
+
+然后缺 network。
+
+再缺 power。
+
+最后 power plant 又开始缺 transformer、switchgear 和 skilled electricians。
+
+**瓶颈不会消失，只会沿着供应链向下一个最慢的环节移动。**
+
+## 劳动力可能比设备更难扩产，因为你不能像扩产服务器一样扩产熟练电工
+
+SemiAnalysis 自己的美国建设劳动力模型预计，2027 年相关数据中心建设可能面临约 **28.8 万人的劳动缺口**。它估计 electrician 大约占现场工时的30%，到2030年前后随着 liquid cooling 和电气复杂度增加可能接近40%。这些数字属于其模型预测，并非美国劳工部官方预测，因此应该看成量级判断。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+行业的解决方案越来越像制造业：把现场施工搬进工厂。
+
+预制 eHouse、skid-mounted power systems 和模块化设备在工厂里组装，然后像 LEGO 一样运到数据中心。SemiAnalysis 的模型认为，这种方法可以把现场总劳动减少约63%，licensed-electrician hours 减少约85%。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这不只是为了“建得更漂亮”。
+
+它本质是一种**劳动力套利**：工厂环境可以使用固定团队重复生产，不必在德州某个偏远县临时找到几千名合格工人。
+
+## 然而，BTM 最容易被忽略的难题其实发生在电厂已经建完以后：GPU 是一个非常糟糕的电力负载
+
+电网之所以重要，不只是因为它供应能量。
+
+一个巨大的公共电网还天然提供两种“隐形服务”：惯性，以及短路时的高 fault current。
+
+大型同步发电机里高速旋转的金属本身会抵抗电网频率突变；发生短路时，它又可以瞬间提供数倍额定电流，使保护装置明确判断“这里出故障了”，迅速跳闸。一个孤岛数据中心必须自己重新制造这些能力。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+AI workload 恰好让问题更难。训练集群在 collective communication、checkpoint 或不同计算阶段之间切换时，负载可以迅速波动。SemiAnalysis 称，xAI Colossus 1 曾出现 **10–20MW 量级、每秒多次的负载抖动**，这种快速变化可能激发 turbine-generator shaft 的 torsional modes、加速机械疲劳，因此 xAI 后来部署第一阶段约150MW Tesla Megapack 来缓冲变化。这个具体运行数据来自 SemiAnalysis 的行业研究，目前我没有看到独立公开运行日志，应当作为其报道数据理解。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这说明 battery 在 BTM 项目里并不只负责“停电时顶几个小时”。
+
+它还相当于巨大的**电力 cache**：
+
+GPU 突然多要几十 MW 时，电池先顶上；
+
+GPU 负载突然下降时，电池吸收能量；
+
+燃气设备则在更平滑、适合自身机械和排放特性的工作点运行。
+
+## 这正是为什么“全用太阳能加电池”也没有表面上那么简单
+
+太阳能和电池避开了天然气管道和大部分空气许可，听起来像最简单答案。
+
+但如果系统真正完全离网，它会面对另一种电力系统物理问题。Solar、battery 和 fuel cell 基本都通过 inverter 接入，短路发生时能够提供的 fault current 通常比同步 generator 小得多，因此传统 protection scheme 可能无法可靠识别故障。真正的大型 renewable island 往往还需要 grid-forming inverter、synchronous condenser 或其他稳定设备。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+此外，可靠性要求会把储能量推得非常高。Crusoe 与 Redwood Materials 在 Nevada 已经运行一个使用约 **12MW solar + 63MWh 二手 EV 电池**的数据中心 microgrid，但它仍然保留公共电网作为 backup；Crusoe 公布的前七个月可用率约99.2%。把这种架构从十几 MW放大到1GW，而且要求全年全天候孤岛运行，需要的 solar、storage 和土地会成倍增加。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+所以 SemiAnalysis 最终并没有找到一种“完美电源”。
+
+Gas 卡在排放、pipeline 和专业施工人员。
+
+Fuel cell 卡在从未验证过的 GW 级 island stability 和大量辅助储能。
+
+Solar + BESS 则卡在长期可靠性、土地、储能规模和 inverter-dominated grid physics。
+
+真正的答案越来越像混合系统，而不是一项技术赢家通吃。
+
+## 更反直觉的是，AI 数据中心自己也开始降低“必须永远不停机”的标准
+
+传统 hyperscale data center 非常崇拜 redundancy：双路供电、UPS、备用 generator，各种 N+1 或 2N 架构。
+
+AI training 改变了部分经济学。
+
+如果一个训练 cluster 偶尔停几分钟，而软件能够 checkpoint/restart，可能比为了把 uptime 从99.9%提高到99.999%额外建设巨量备用电源更划算。SemiAnalysis 称，它观察到 Anthropic、OpenAI、Meta 和 hyperscaler 的部分新设计正在降低 redundancy；Microsoft 也公开讨论过通过选择更可靠的 utility power 和 workload resilience，在某些 AI fleet 中减少传统 UPS 和双路配电。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)
+
+这实际上是一个很漂亮的 hardware–software co-design 问题。
+
+过去电力工程师会问：
+
+“怎样给 workload 提供 five nines？”
+
+未来系统工程师可能反过来问：
+
+**“如果软件能接受偶尔断电一次，我们能不能少花几十亿美元基础设施？”**
+
+AI infrastructure 越来越不像传统 data center，而像一台从模型一直设计到天然气管线的巨大计算机。
+
+## 这篇文章真正重要的地方：电力正在变成“AI 芯片供应链”的一部分
+
+下面是我的延伸判断，不是 SemiAnalysis 的直接结论。
+
+过去我们把 AI supply chain 理解成 Nvidia → HBM → networking → server → data center。
+
+BTM boom 说明这条链应该继续往下画：
+
+**GPU → rack → transformer → switchgear → BESS → generator/fuel cell → gas pipeline → turbine factory → skilled labor → environmental permit。**
+
+任何一层晚一年，最前面的 GPU 都可能晚一年产生 revenue。
+
+这改变了“AI 基建受益者”应该怎样估值。真正有价值的不一定是技术最先进的设备，而可能是**能把通电日期提前六个月的设备**。这就是为什么 Bloom fuel cell 即使燃料成本和长期系统经济性未必优于大型 combined-cycle plant，仍然可以赢得巨大订单；也是为什么大型 reciprocating engine、prefabricated eHouse，甚至二手 turbine slot 都突然拥有很高的价格。
+
+投资上，我会把这篇文章看成对 **GE Vernova、Caterpillar、Bloom Energy 以及整个中压电气/变压器供应链**的一个重要需求解释，而不是简单的买入建议。GEV 和传统大型 turbine 厂商的问题反而可能是产能已经被订到很远；新增 AI 需求最容易形成 earnings surprise 的地方，有时会出现在扩产速度更快的 recips、fuel cells、modular power 和 Balance-of-Plant 设备中。不过 Project Jupiter 当前的诉讼和 xAI 在 Mississippi 遇到的空气污染争议也说明，BTM 的需求再强，也不能绕过当地政治和环境许可。[Mississippi Free Press](https://www.mississippifreepress.org/mississippi-permit-board-grants-xais-request-for-41-southaven-gas-turbines-to-power-memphis-data-center/)
+
+更深的一层是，AI 行业的竞争单位正在从 **$/GPU** 变成 **time-to-compute**。一张 GPU 如果 2027 年能通电，与同样一张 GPU 2029 年才能通电，经济价值可能完全不同。于是 hyperscaler 开始愿意自己签20年天然气电厂合同、修 pipeline、购买 turbine delivery slots、建设 batteries，甚至重新设计整个电力系统。曾经属于 utility 和 heavy-industrial engineering 的能力，正在成为 AI 公司战略能力的一部分。
+
+如果这个趋势继续，我认为未来几年真正值得跟踪的 AI 基础设施指标之一，不再只是“订了多少 GW”，而是**多少 GW 已经同时跨过了许可、燃料、设备、变压器、施工和电网稳定性这些现实门槛，真正把电送进 GPU。** SemiAnalysis 的 75GW 订单非常惊人，但它这篇文章真正想提醒你的恰恰是：订单与 operating megawatts 之间隔着一整套工业世界，而那套工业世界现在正在成为 AI scaling 最硬的现实边界。[SemiAnalysis](https://newsletter.semianalysis.com/p/what-is-so-hard-about-behind-the)

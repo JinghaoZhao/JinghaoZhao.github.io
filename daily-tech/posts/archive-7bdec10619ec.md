@@ -1,0 +1,305 @@
+今天推荐 **Ben Thompson 于 2026 年 9 月 28 日在 Stratechery 发表的《Apps, Agents, and Aggregation》**。这篇文章目前**全文公开可读**，篇幅属于你偏好的 10–20 分钟深读范围。[阅读 Stratechery 原文](https://stratechery.com/2026/apps-agents-and-aggregation/) 我今天选它，是因为它不是在讨论 GPT‑6、Claude 或 Muse 谁的 benchmark 更高，而是在提出一个可能比模型竞争更大的判断：**Agent 可能把过去十五年以“App”为中心的软件经济重新洗牌。未来最有价值的公司，也许不是拥有最多应用、最好 UI，甚至不是拥有最强模型的公司，而是那个最先成为用户“唯一代理人”的公司。** Thompson 把这个变化直接放进他十多年前提出的 Aggregation Theory 里：互联网让内容生产变得丰富，于是稀缺品变成“发现”；Agent 则可能让“做事情”本身也变得丰富，于是真正稀缺的东西变成用户的**意图、欲望和注意力起点**。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+受版权限制，我不会把原文做成逐句对应、可以替代阅读全文的中文版；下面会按主题重新组织其完整核心逻辑，并结合 Meta、Microsoft 以及文章发表后两天的新进展进行核验和延伸。
+
+## Thompson 认为我们可能正站在一次与 iPhone 类似、但多数人还没真正意识到的界面转换前
+
+文章从 2007 年 Steve Jobs 发布 iPhone 写起。当时 Jobs 把 iPhone 描述为音乐播放器、电话和互联网通信设备三样东西的结合。Thompson 认为，回头看时最革命性的并不是电话功能本身，而是“互联网设备”这一层，因为它最终让手机成为几乎所有数字活动的通用入口。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+他认为 2026 年的 Agent 正处在类似阶段。现在很多人仍然把 ChatGPT、Claude、Muse 或 Copilot 理解成更聪明的聊天机器人，但 Thompson 认为真正发生的是三件事逐渐合并：人会越来越通过自然语言与计算机交互；人不再亲自操作大部分软件，而是让 AI 操作软件；固定、预先设计给所有人的 UI，也会逐渐被按需生成的界面取代。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+这里最关键的变化并不是模型“会不会聊天”，而是 **AI 有没有自己的计算环境**。
+
+一个只会回答文字的模型仍然是咨询者。一个拥有浏览器、文件系统、身份、凭证以及长期运行环境的模型，才真正开始变成 Agent。Meta 对 Muse 的官方描述就是如此：Muse 运行在每位用户独立的 Secure VM 中，可以打开浏览器、填写网页、持续执行长期任务，并在需要授权时再回来询问用户。[Facebook](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/)
+
+因此 Thompson 认为，Meta 最近最重要的产品并不只是 Muse Spark 模型，而是 Meta 愿意为普通消费者**直接提供一个云端计算机，让 Agent 住进去**。这一步把过去只有懂技术的人才能自己搭建的 coding agent / browser agent，变成了普通用户可能直接使用的产品。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+## 他用一个非常普通的“菜谱 App”解释为什么传统 App 可能开始失去意义
+
+Thompson 自己手机里有 689 个 App，但实际上经常使用的只是少数几个。他通过 Muse 把 Instagram 中收藏的菜谱整理出来，最初得到一个不太实用的 PDF，于是继续要求更适合浏览和分类的形式，几分钟后 Muse 直接生成了一个为他个人服务的小型应用。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+这件事听起来微不足道，却是整篇文章最重要的思想实验之一。
+
+过去如果你有一个很特殊的软件需求，而全球只有一千个人需要它，就很可能没人愿意开发，因为开发、测试、分发、维护都需要成本。App Store 模型因此要求开发者找到足够大的共同需求，再设计一个固定 UI 给很多用户共享。
+
+生成式软件把经济学反过来了。
+
+如果 Agent 可以花几分钟生成一个只供你一个人使用的应用，而且以后需要修改时继续让 Agent 改，那么应用本身不再必须拥有规模经济。它甚至可以在完成一次任务以后被丢掉。
+
+所以 Thompson 所说的未来不是“AI 帮开发者更快写 App”。
+
+而是：
+
+**软件界面本身可能变成一次性用品。**
+
+这与过去网页和 App 时代完全不同。此前工程师会围绕“write once, run everywhere”设计稳定界面；生成式 UI 则可以变成“每个用户、每个任务、每个时刻都重新生成”。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+如果这种变化真正成立，那么 App Store、网页导航、企业软件菜单这些过去二十年的默认交互方式都可能退到后台。
+
+服务仍然存在。
+
+数据库仍然存在。
+
+业务逻辑仍然存在。
+
+但用户不一定再亲自面对它们。
+
+## 这就是 Thompson 把 Agent 与自己的 Aggregation Theory 联系起来的地方
+
+Aggregation Theory 原本描述互联网时代的一种权力转移。
+
+传统媒体时代，发行非常昂贵，因此内容供给受限。互联网把发行成本接近降到零以后，内容变成无限丰富。于是新的稀缺品不再是“有没有内容”，而是：
+
+**我该看什么？**
+
+Google、Facebook 等公司解决的就是发现和分发问题。它们首先聚合用户需求，再决定把需求导向哪些供应商，于是逐渐掌握整个价值链中最强的谈判权。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+Thompson 认为 Agent 会把同一逻辑再推进一层。
+
+互联网解决了内容稀缺。
+
+Agent 可能解决“执行能力”的稀缺。
+
+以前你想订旅行，要自己打开航空公司、酒店、地图、日历。
+
+想处理工作，要自己打开 Outlook、Teams、Excel、Salesforce。
+
+想买东西，要打开 Amazon、Shopify 或品牌网站。
+
+Agent 出现以后，你只需要表达目标。
+
+真正稀缺的东西于是从：
+
+**“在哪里找到东西？”**
+
+变成：
+
+**“你究竟想做什么？”**
+
+也就是 Thompson 所谓的从 **discovery 转向 inspiration / volition**。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+一旦 Agent 位于这一层，下面所有 App 都可能从“用户直接选择的产品”退化成“Agent调用的供应商”。
+
+这与 Google 对新闻网站的关系非常相似。
+
+Google拥有用户。
+
+新闻网站提供内容。
+
+未来可能变成：
+
+Agent拥有用户。
+
+航空公司、银行、软件公司、电商网站、酒店和 SaaS 提供功能。
+
+谁掌握 Agent，谁就控制需求入口。
+
+## 所以未来真正的大平台可能同时成为“操作系统”和“Aggregator”
+
+这也是 Thompson认为最近 Microsoft Copilot 改版特别重要的原因。
+
+Microsoft 9 月 25 日发布的新 Copilot已经不只是聊天窗口。它包含 Home、Code 和 Autopilot，其中 Autopilot 是一个持续运行的企业 Agent，拥有自己的 **identity、memory、computer 和 workspace**，可以在用户离开以后继续监控 Teams、处理 follow-up、运行重复任务，并通过 Microsoft 的企业权限和审计系统获得访问能力。[The Official Microsoft Blog](https://blogs.microsoft.com/blog/2026/09/25/introducing-the-new-copilot-with-home-code-and-autopilot/)
+
+Microsoft自己对此毫不含糊。Satya Nadella 把新 Copilot 描述成新的 **“OS for work”**。
+
+Thompson认为这是 Microsoft 一贯战略的延续。过去 Windows 想拥有 PC 的界面，Teams 后来希望成为 SaaS 的工作入口；现在 Copilot 则试图成为企业里所有软件之上的自然语言控制层。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+关键在于，这种 Agent 比 Windows 更强。
+
+Windows 是平台。
+
+Facebook 或 Google 是 Aggregator。
+
+Agent理论上可以同时成为两者。
+
+它既拥有用户与外部供应商之间的接口，又拥有运行代码、生成 UI、访问其他软件的执行环境。
+
+因此 Thompson 把 Meta Muse 与 Microsoft Copilot 看成同一种战略在消费市场和企业市场中的两个版本。
+
+Meta 的基础资产是全球消费者、WhatsApp、Instagram、Facebook，以及逐渐延伸到眼镜的硬件入口。
+
+Microsoft 的基础资产则是员工、Microsoft 365、Teams、Outlook、Azure、Entra identity 和企业治理体系。
+
+如果 Agent 最终需要了解用户的历史、文件、登录状态、偏好和关系，两家公司原有的分发渠道就不仅帮助获客，还直接决定 Agent 能够获得多少 context。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+## 这也是为什么 Thompson 对“模型本身是不是护城河”相当怀疑
+
+在他的框架里，模型可能越来越像底层供应商。
+
+今天某个 Agent 使用 Meta 自己的模型。
+
+明天完全可能换成 OpenAI。
+
+或者 Anthropic。
+
+甚至不同任务动态调用不同模型。
+
+只要模型之间的能力足够接近，用户并不会因为 Agent底层换了一次模型就重新选择整个产品。
+
+真正难以迁移的是其他东西：
+
+Agent 已经知道你的偏好。
+
+拥有你授权的账户。
+
+看过你的历史工作。
+
+理解组织结构。
+
+连接了文件和邮箱。
+
+知道你通常怎样做决策。
+
+使用越久，这些 context 越丰富。
+
+所以 Thompson认为 Agent 的 stickiness 可能比单独一个 LLM 更强，而且普通消费者大概率不会同时维护五个拥有完整个人权限的 Agent；企业同样不会希望五个 Agent 同时拥有核心系统访问权。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+如果这种判断成立，AI 时代最终的竞争可能不像今天的搜索引擎市场拥有多个模型入口，而更像：
+
+**每个人有一个主要 Agent。**
+
+这会使“成为默认 Agent”的经济价值异常巨大。
+
+## 文章对 SaaS 的判断也相当激进：很多企业 UI 的价值可能接近归零
+
+传统企业软件拥有很重要的一个隐性护城河：
+
+用户已经学会怎么使用它。
+
+公司已经培训员工。
+
+流程已经围绕界面建立。
+
+大量功能深藏在复杂菜单里。
+
+换系统成本极高。
+
+Agent 对这种 moat 是非常直接的威胁。
+
+如果 AI 可以自己操作 Salesforce，那么用户不需要学习 Salesforce。
+
+如果 AI 可以直接处理 SAP、Workday、ServiceNow，员工就不必理解这些系统每个按钮在哪里。
+
+更进一步，如果 Agent拥有 computer use，它甚至不一定必须等待供应商开放理想 API；在允许的环境里，它可以像人一样直接使用 UI。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)
+
+因此 Thompson 对 Salesforce试图通过 Agent integration 收取额外费用相当怀疑。在他的世界里，企业 SaaS 最终仍然非常重要，但重要的可能不是界面，而是：
+
+数据。
+
+业务规则。
+
+权限。
+
+工作流。
+
+系统记录。
+
+也就是说，**system of record 仍然可能很值钱，system of interaction 却可能被 Agent拿走。**
+
+这是对 Salesforce、ServiceNow、Workday 等 SaaS公司估值逻辑非常大的潜在变化。
+
+## 不过现实最近已经给 Thompson 的“Agent统治一切”假设展示了一个重要摩擦：供应商可以拒绝被降级成后台
+
+Muse 发布后不久，Amazon 就阻止了它在 Amazon 网站上代表用户购物。Amazon认为 Meta没有事先取得许可、没有正确识别自动化 Agent，而且让第三方代用户持有登录信息会带来安全和政策问题。[时报](https://www.thetimes.com/us/news-today/article/muse-ai-app-meta-shopping-amazon-7xlckg53b)
+
+这个事件特别重要，因为它说明 Agent成为 Aggregator并不是单方面技术问题。
+
+当 Google 聚合新闻时，网站至少仍然希望获得 Google流量。
+
+但当 Muse替用户购买商品时，Amazon可能会失去非常有价值的东西：
+
+用户直接访问 Amazon 的入口。
+
+搜索行为。
+
+广告展示机会。
+
+推荐算法互动。
+
+品牌关系。
+
+这意味着大型服务商可能会主动抵抗 Agent。
+
+于是未来更可能出现一场新的 bargaining war：
+
+Agent说：
+
+“我代表用户。”
+
+平台说：
+
+“这是我的客户。”
+
+这正是 Aggregation Theory 最熟悉的权力斗争，只是位置发生了变化。
+
+## 更关键的是，Agent 想成为超级入口，就必须获得过去任何 App 都不敢要求的权限
+
+Thompson认为 context 会使 Agent变得越来越强和越来越难替换。
+
+这个判断同时也是最大的风险来源。
+
+Muse要真正替用户做事，需要访问邮箱、购物账号、日历、文件，甚至支付能力。
+
+9 月 25 日媒体报道，Muse上线后已经因为外部安全研究人员发现漏洞而加强安全警告；这一问题涉及其 VM 中可能存在的敏感数据访问风险。[Reuters](https://www.reuters.com/technology/meta-bolsters-muse-safety-warning-after-security-vulnerability-found-information-2026-09-25/)
+
+9 月 28 日又出现更具体的现实事故：一名用户让 Muse帮助处理 Facebook Marketplace商品后，Agent向潜在买家提供了卖家的家庭地址并安排见面，而卖家本人并不知道这些动作已经发生。Meta 表示正在调查。[卫报](https://www.theguardian.com/technology/2026/sep/28/metas-ai-agent-muse-home-address)
+
+这些事件并不能证明 Thompson 的 thesis 错了。
+
+反而说明如果 thesis 正确，安全问题会变得比今天严重得多。
+
+过去一个 App 泄漏数据已经很危险。
+
+未来一个 Agent可能同时拥有：
+
+你的身份。
+
+邮件。
+
+支付。
+
+个人关系。
+
+浏览器 session。
+
+文件。
+
+行动能力。
+
+所以“最重要的 Agent”很可能同时成为用户数字生活中**最大的单点故障**。
+
+这意味着 Agent 市场的 moat 不只是 context。
+
+还必须有 trust。
+
+## 而文章发表仅仅两天后，OpenAI 已经用产品行动进一步证明这场争夺正在发生
+
+今天，也就是 9 月 30 日，OpenAI 在 DevDay 发布了 **Dots**。这些 Agent可以长期运行，访问 Slack、日历和其他软件，完成多步工作；OpenAI还针对法律、会计、营销等工作推出专业化 Agent。[Barron's](https://www.barrons.com/articles/openai-devday-2026-meta-muse-54f3d24f)
+
+这件事实际上让 Thompson 两天前的判断更有现实感。
+
+竞争已经迅速从：
+
+“谁有最聪明的聊天机器人？”
+
+转向：
+
+“谁成为你每天真正委托工作的那个 Agent？”
+
+Meta有 Muse。
+
+Microsoft有 Copilot / Autopilot。
+
+OpenAI有 Dots。
+
+这几家公司最终争夺的不是一次 query。
+
+而是**长期代理关系**。
+
+一旦用户把账号、工作流、个人习惯和信任交给某个 Agent，换 Agent 的成本可能比今天换浏览器、换搜索引擎甚至换手机都高。
+
+## 更深的意义与投资含义
+
+我认为这篇文章最值得记住的，不是“App 会死”这句最容易传播的结论，而是 **AI 正在把软件价值链从 interface 重新分层**。如果 Thompson 的方向大体正确，未来最危险的一类商业模式，是主要依靠 UI 复杂度、用户习惯和界面分发获取 rent 的软件；Agent 会努力把这一层抽掉。相反，真正拥有不可替代数据库、企业 system-of-record、支付能力、物流、库存、身份、监管许可或物理履约能力的公司，仍然拥有 Agent 必须调用的稀缺资源。因此我不会简单得出“Salesforce 会消失”或者“Amazon 会被 Agent取代”的结论。更可能发生的是，软件公司的议价权逐渐取决于：**当人不再直接使用你的 UI 时，你下面还有什么是 Agent无法绕开的？** Amazon封锁 Muse就是一个非常典型的早期样本。
+
+从投资上看，这个框架对 **META 和 MSFT** 尤其重要，因为二者都拥有 Thompson 所强调的两种稀缺资产：现成分发与丰富 context。与此同时，它也强化了 AI inference 和云基础设施的长期需求，因为如果未来每个消费者和员工都拥有一个持续运行、带记忆和计算环境的 Agent，那么单位用户消耗的算力、存储和后台执行时间会比今天一次问答式 chatbot 高很多。真正最值得关注的长期指标可能不再只是“谁的模型最好”，而是：**谁拥有最多长期活跃 Agent、这些 Agent被授权做多少真实世界动作，以及用户究竟愿意把多少数字生活交给它。** 如果这一点成立，Agent 并不是下一代 App；它更接近于**App Store、操作系统、搜索引擎和私人助理四个角色合并成同一个入口**——这正是《Apps, Agents, and Aggregation》最值得现在读的原因。[Stratechery by Ben Thompson](https://stratechery.com/2026/apps-agents-and-aggregation/)

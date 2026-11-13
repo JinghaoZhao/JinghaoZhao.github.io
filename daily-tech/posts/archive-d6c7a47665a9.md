@@ -1,0 +1,561 @@
+# 今日科技长文：AI 把内存周期推到了一个过去几乎没见过的位置——真正的问题已经从“价格还能涨多少”变成“2028 年以前哪里还有货”
+
+今天推荐 Financial Times 在 **2026 年 9 月 4 日**刚刚发布的深度访谈 **《Memory chip mania isn’t going away》**。主持人是 FT《The Economics Show》的 Soumaya Keynes，受访者是半导体研究机构 TechInsights 首席战略官 Dan Kim。文章是播客的文字稿，**FT 订阅内容**；[FT 原文 / Transcript](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+今天选它，是因为我们过去几个月一直在追踪 MU、SNDK、HBM 和 AI 数据中心，而这篇访谈提供了一个非常重要的更新：**2026 年的 memory bull cycle 已经不再只是 HBM 的故事。** AI 基础设施对 HBM、普通 DRAM、NAND 和 enterprise storage 的需求正在同时挤压供给，Dan Kim 对当前市场“疯狂程度”的打分已经是 **8/10**，而他的判断是接下来会到 **10/10，并至少持续到 2027 年底**。TechInsights 预计 DRAM 价格同比涨幅可能超过 **200%**，而真正有意义的新供给要到 **2027 年末甚至 2028 年初**才出现。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+这篇文章最值得读的地方，不是又一次告诉我们“AI 需要很多内存”，而是解释了为什么这轮周期可能和过去三十年的 memory cycle 有结构性区别：过去内存涨价会刺激三星、SK Hynix、Micron 疯狂扩产，随后供给过剩、价格崩掉；这一轮，AI 一方面创造了极大的新增需求，另一方面 HBM 又吞掉了大量原本可以生产普通 DRAM 的晶圆和资本，而三大厂经历过太多次周期崩盘之后，扩产反而比过去谨慎得多。于是**价格已经发出了“快来扩产”的极强信号，供给却需要两年才能真正回应。**
+
+## 现在的内存市场到底有多紧：不是“贵”，而是愿意付高价也未必拿得到货
+
+Kim 对当前状态的描述非常直接。
+
+如果把 memory market 的异常程度从 1 打到 10，他现在给 **8**。
+
+但他认为还没到顶。
+
+未来一年左右可能进入 **10/10** 的状态，而且不是短暂几个月，而可能持续到至少 2027 年底。[Benzinga](https://www.benzinga.com/markets/tech/26/09/61623070/ai-memory-crunch-is-about-to-hit-10-out-of-10-craziness)
+
+最反常的信号来自价格。
+
+TechInsights 预计 DRAM 价格同比涨幅将超过 **200%**。
+
+Kim 认为这种幅度从历史角度看都极不寻常。
+
+内存当然一直是高度周期性的 commodity semiconductor，价格翻倍并不是完全没有发生过；真正异常的是如此大的价格上涨，与供给仍然无法快速响应同时出现。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+Kim 对市场的概括可以浓缩成一句话：
+
+现在基本已经**没有多少尚未被预订的供给**。
+
+HBM 最明显。
+
+AI accelerator 所需要的高带宽内存基本已经被提前锁定。
+
+但紧张状态已经开始向 HBM 之外传播。
+
+普通 server DRAM、NAND，以及最终汽车、医疗设备等传统市场都会受到 allocation 的影响。
+
+因此一些客户面临的已经不是：
+
+“价格涨到多少我才愿意买？”
+
+而是：
+
+**“即使接受这个价格，供应商能不能分给我？”** [Benzinga](https://www.benzinga.com/markets/tech/26/09/61623070/ai-memory-crunch-is-about-to-hit-10-out-of-10-craziness)
+
+这也是为什么当前 memory pricing power 非常特殊。
+
+在正常 commodity market 中，价格上涨本身会抑制需求。
+
+但 AI hyperscaler 的经济逻辑不同。
+
+如果一座价值数百亿美元的数据中心因为缺少几十亿美元 memory 而无法上线，那么客户不会因为 DRAM 贵了50%就取消整个项目。
+
+memory 占整个 AI system BOM 的比例固然很高，但缺一块内存意味着价值更大的 GPU、networking、电力和数据中心资产无法充分运行。
+
+因此 hyperscaler 对 memory price 的 elasticity 可以非常低。
+
+## 为什么 AI 会突然吃掉这么多内存：GPU 数量增加只是第一层
+
+最容易理解的需求增长当然来自 AI accelerator 数量。
+
+每增加一颗 GPU 或 ASIC，就需要配套 HBM。
+
+而新一代 accelerator 的单卡 HBM capacity 本身也在增加。
+
+所以 AI compute 增长会形成乘数效应：
+
+accelerator 数量增加，同时**每颗 accelerator 携带的 memory 也增加**。
+
+但这只是 HBM。
+
+真正让整个 memory industry 进入异常状态的是，AI cluster 并不是只有 accelerator + HBM。
+
+CPU server 需要 DRAM。
+
+storage layer 需要 NAND。
+
+training dataset、checkpoint、模型权重、embedding、KV cache 和大量生成数据都需要不同层级的存储。
+
+AI agent 的 token consumption 如果继续高速增长，推理基础设施的 memory footprint 也会跟着增加。
+
+所以这轮需求已经逐渐从一个很窄的“HBM supercycle”，向整个 memory hierarchy 扩散。三星最近也明确表示，随着 AI agent token processing 增长，中长期 memory demand 仍会受到支撑。[theregister](https://www.theregister.com/systems/2026/07/30/samsung-warns-memory-crunch-will-last-through-2028-as-profit-rises-19-fold/5281142)
+
+这对投资判断非常重要。
+
+2024—2025 年最简单的逻辑是：
+
+AI → GPU → HBM → SK Hynix / Micron。
+
+2026 年的链条正在扩展成：
+
+**AI compute → HBM + server DRAM + enterprise NAND + SSD + storage infrastructure。**
+
+也就是说，AI infrastructure 的瓶颈正在从“有没有 GPU”逐渐变成整个系统 BOM 有没有能力同步扩张。
+
+## HBM 有一个非常反直觉的副作用：卖得越多，普通 DRAM 反而越缺
+
+这是理解这轮周期最关键的一层。
+
+HBM 并不是凭空增加出来的一种 memory supply。
+
+它同样需要 DRAM manufacturing capacity。
+
+而且制造 HBM 所消耗的 wafer capacity 明显高于制造同等 bit 数量的普通 DRAM。
+
+其他行业研究估计，HBM 对晶圆容量的消耗可能达到 conventional DRAM 的 **3—4 倍**量级。[Benzinga](https://www.benzinga.com/markets/tech/26/06/52907425/goldman-memory-shortage-2028-samsung-hynix-kioxia-sandisk-micron)
+
+原因包括更复杂的 die、yield、stacking、TSV 和 packaging requirements。
+
+于是出现一个很有意思的结果。
+
+假设 memory 厂商拥有100单位 DRAM capacity。
+
+以前大部分可以做 PC、server 和 mobile DRAM。
+
+现在 HBM 的利润远高于普通产品，客户又愿意签长期合同。
+
+厂商当然会把更多资源转向 HBM。
+
+但一单位 HBM bit 又消耗更多 wafer capacity。
+
+因此：
+
+**AI 不只是直接增加 HBM demand，它还通过挤占晶圆供给，间接减少 conventional DRAM supply。**
+
+这就是为什么即使你根本不买 Nvidia GPU，也可能为 AI boom 买单。
+
+汽车需要 DRAM。
+
+医疗设备需要。
+
+PC 需要。
+
+手机需要。
+
+游戏机需要。
+
+所有这些行业都在争夺同一个底层 semiconductor manufacturing ecosystem。
+
+Kim 特别提到，汽车和医疗设备等传统客户正在越来越多遇到 allocation constraints。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+因此 AI CapEx 的通胀最终会沿供应链向消费电子扩散。
+
+## 为什么价格已经涨这么多，三星、SK Hynix、Micron 还不赶紧把产能翻倍
+
+如果这是普通 commodity 行业，这似乎应该非常简单。
+
+DRAM 价格涨200%。
+
+利润暴涨。
+
+大家扩产。
+
+两年以后产能过剩。
+
+价格崩盘。
+
+memory industry 过去几十年基本就是这样。
+
+但 Kim 强调，memory manufacturing 的现实约束让供给反应极其缓慢。
+
+先进 DRAM fab 不是搭一个厂房、买几台机器就能开工。
+
+需要土地。
+
+厂房。
+
+clean room。
+
+电力。
+
+水。
+
+EUV 和其他 wafer-fab equipment。
+
+设备安装。
+
+process qualification。
+
+yield ramp。
+
+然后才能真正形成高良率 bit output。
+
+所以今天做出的 CapEx 决策，不意味着明年初就有大量新增 DRAM。
+
+Kim 的判断是，真正显著的新 supply **最快要到 2027 年末或 2028 年初**。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+这与三星自己的最新判断非常接近。
+
+三星此前表示，虽然一些新的 DRAM production lines 会在2027年启动，但 construction、equipment installation 和 ramp 都需要时间，因此 substantial incremental output 很难在2028年以前真正出现。公司预计，2026 年没有满足的需求还会继续滚到2027年，使2027年的供需甚至可能比2026年更紧。[theregister](https://www.theregister.com/systems/2026/07/30/samsung-warns-memory-crunch-will-last-through-2028-as-profit-rises-19-fold/5281142)
+
+这意味着今天价格再高，也不能立即制造 supply。
+
+**价格可以一天涨10%，fab 不能一天长出来10%。**
+
+## 而且三大厂这一次明显不想重演过去的“集体自杀”
+
+memory industry 有一个非常特殊的历史。
+
+因为 DRAM 和 NAND 高度标准化，厂家之间很容易进入 CapEx arms race。
+
+市场好时，每家公司都认为：
+
+“既然价格这么高，我应该多建厂抢份额。”
+
+问题是三星这么想。
+
+SK Hynix 这么想。
+
+Micron 也这么想。
+
+三年后所有产能一起上线。
+
+供给突然超过需求。
+
+价格暴跌。
+
+利润消失。
+
+然后全行业削 CapEx。
+
+再过几年供给不足。
+
+新一轮周期重新开始。
+
+这也是为什么 memory 长期被市场给予明显低于很多逻辑芯片公司的 valuation multiple。
+
+它不是因为技术简单。
+
+而是因为投资者很难相信 peak earnings。
+
+今天赚100亿美元，不意味着三年以后还赚100亿美元。
+
+这轮周期中三大厂明显吸取了过去的教训。
+
+客户现在越来越多主动提出 **multiyear supply agreements**。
+
+三星明确说，那些愿意保证未来 captive demand 的客户，会获得更高的供货优先级。[theregister](https://www.theregister.com/systems/2026/07/30/samsung-warns-memory-crunch-will-last-through-2028-as-profit-rises-19-fold/5281142)
+
+Micron 的变化更加明显。
+
+公司今年已经签署 **16份 strategic customer agreements**，其中14份合同对应约 **1000亿美元最低保证收入**，覆盖2026—2030年。
+
+这些客户还提供了大约 **220亿美元现金预付款或具有约束力的资金承诺**。
+
+相关协议覆盖 Micron 到2030年预计 DRAM volume 的约 **20%**，以及 NAND volume 的约 **33%**。
+
+这和过去 spot-driven memory cycle 的经济学已经明显不同。
+
+客户正在说：
+
+我不只是愿意付今天的高价。
+
+**我愿意提前承诺未来几年都买，而且先给你钱，只要你保证给我产能。**
+
+## 所以真正改变周期的可能不是 AI demand，而是“谁承担扩产风险”
+
+这是我认为 FT 这篇访谈最值得延伸思考的地方。
+
+传统 memory cycle 里，厂商承担几乎全部 capacity risk。
+
+Micron 花100亿美元建 fab。
+
+三年以后需求如果没了，Micron 自己承担损失。
+
+因此投资者最怕 CapEx。
+
+但现在 hyperscaler 和大型客户开始用 prepayment、长期采购和 minimum-volume commitments 锁产能。
+
+等于客户在告诉 memory producer：
+
+**“你扩产，我帮你承担一部分需求风险。”**
+
+如果这种模式继续扩大，memory industry 的资本周期可能发生结构变化。
+
+厂商不再需要完全凭自己的宏观预测下注未来需求。
+
+它可以拿着五年 purchase commitment 再决定建厂。
+
+这会降低 capacity investment 的风险。
+
+同时也降低未来 panic oversupply 的概率。
+
+所以真正值得 MU 投资者关注的，并不只是 DRAM spot price。
+
+而是 **long-term contracted volume 占比是否持续提高**。
+
+如果提高，这轮 cycle 的 earnings durability 就可能比历史周期更强。
+
+## 三星、SK Hynix、Micron 为什么仍然拥有一个异常强的行业结构
+
+Kim 还特别强调了 memory market 的 concentration。
+
+mainstream DRAM 实际上仍然高度集中在 Samsung Electronics、SK hynix 和 Micron Technology 三家公司手里。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+这不是因为没人想进入。
+
+而是 DRAM 是一个非常奇怪的行业：
+
+产品看起来像 commodity。
+
+制造难度却接近世界最复杂的 semiconductor manufacturing。
+
+进入者不仅需要数百亿美元 capital，还需要长期积累 process know-how、yield management、equipment integration 和 customer qualification。
+
+先进 DRAM 又越来越依赖 EUV。
+
+而 memory market 极端的 boom-bust history 本身又构成一个 barrier。
+
+一个新 entrant 不仅要有能力建厂，还必须有资本承受第一次行业 downturn。
+
+因此过去几十年 DRAM 厂商不断退出或被整合，最终形成今天的 oligopoly。
+
+这也是为什么这一轮涨价可以持续如此猛烈。
+
+如果这是一个拥有20家生产商的 commodity market，200%的涨价早就吸引大量 marginal supply。
+
+DRAM 没有这种供给弹性。
+
+## 但真正正在改变这个寡头结构的是中国，而且速度比过去想象得快
+
+FT 访谈随后把重点转向中国。
+
+这里主要有两家公司。
+
+DRAM 是 ChangXin Memory Technologies，即 CXMT。
+
+NAND 是 Yangtze Memory Technologies，即 YMTC。
+
+中国政府长期把 semiconductor self-sufficiency 当作战略目标，而 memory 是其中少数已经建立大规模国产生产能力的领域之一。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+最新市场数据已经非常值得警惕。
+
+CXMT 在2026年第二季度的 DRAM market share 已经达到约 **10%**，一年前只有约 **4%**。
+
+YMTC 的 NAND share 则从约 **9%升到14%**。[Barron's](https://www.barrons.com/articles/micron-stock-memory-chip-market-share-china-sk-hynix-493ec42b)
+
+这已经不是实验性产量。
+
+CXMT 正在逐渐成为真正能够影响 global DRAM supply-demand balance 的厂商。
+
+而且技术进展也在加速。
+
+8月29日的最新报道显示，CXMT 将为小米即将推出的折叠旗舰 18 Fold 提供 **LPDDR6**，距离公司上一代 LPDDR5 进入量产还不到一年。[Reuters](https://www.reuters.com/world/asia-pacific/chinas-cxmt-supply-memory-chip-xiaomis-upcoming-folding-phone-2026-08-29/)
+
+更值得注意的是 HBM。
+
+CXMT 据报已经进入 **HBM3E risk production**，包括阿里旗下 T-Head 和 Cambricon 在内的中国 AI chip companies 正在测试，潜在 commercial deployment 时间可能在2027年。[Tom's Hardware](https://www.tomshardware.com/pc-components/dram/cxmt-reportedly-begins-risk-production-of-hbm3e-memory-in-breakthrough-for-chinese-dram-production-company-could-be-in-mass-production-in-2027)
+
+现在全球最领先供应商已经进入 HBM4，因此 CXMT 仍然存在代际差距。
+
+但问题已经不再是：
+
+“中国能不能制造 DRAM？”
+
+而是：
+
+**中国多快可以缩小到足以满足本土 AI accelerator 的差距？**
+
+## 美国出口管制最大的效果之一，可能是把中国的“买国外芯片”问题变成了“必须自己解决”的国家工程
+
+Kim 对中国竞争的判断并不是“美国限制完全没用”。
+
+先进 memory manufacturing 仍然需要大量高端设备。
+
+EUV access 尤其重要。
+
+出口管制确实限制了中国 memory makers 获得最先进 manufacturing technology 的速度。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)
+
+但另一面同样重要。
+
+一旦中国企业无法确定未来还能不能稳定购买 Micron、Samsung、SK Hynix 或先进 semiconductor equipment，建立 domestic supply chain 就从商业选择变成 strategic necessity。
+
+这意味着中国 memory companies 的投资回报函数与普通企业不同。
+
+一家普通 memory startup 面对行业 downturn 可能破产。
+
+一个被国家视作 strategic semiconductor capability 的企业，则可能继续获得资本、政策和客户支持。
+
+因此不能用传统 private-market ROI 判断它们什么时候会停止扩产。
+
+这对未来 memory cycle 是一个很大的变量。
+
+短期供给仍然由三大厂主导。
+
+长期 marginal supply 很可能越来越多来自中国。
+
+## 一个非常有意思的现象是：SK Hynix 的 DRAM 市占率下降，反而未必是坏消息
+
+最新二季度数据里，SK Hynix 的 overall DRAM share 从约 **29%降到25%**。
+
+表面看是竞争力下降。
+
+但背后很大一部分原因是公司把资源向利润更高、AI demand 更强的 HBM 转移。[Barron's](https://www.barrons.com/articles/micron-stock-memory-chip-market-share-china-sk-hynix-493ec42b)
+
+与此同时，Micron 的 DRAM share 升到约 **24%**。
+
+CXMT 升到10%。
+
+因此以后再看 memory share，不能只看 bit share。
+
+需要问：
+
+这些 bits 是什么？
+
+DDR？
+
+LPDDR？
+
+HBM3E？
+
+HBM4？
+
+HBM4E？
+
+同样1GB memory 的 economic value 可以完全不同。
+
+这也是为什么 AI 时代 memory companies 越来越不像过去那个纯 commodity industry。
+
+产品 mix 本身正在成为利润率的重要变量。
+
+## NAND 也开始进入同一个故事，但它和 DRAM 的供给节奏可能不完全一样
+
+AI storage demand 同样在快速增长。
+
+NAND 价格因此也出现非常猛烈的上涨。
+
+当前行业数据甚至显示 DRAM 和 NAND 二季度收入分别环比增长约 **57%和70%**。[Barron's](https://www.barrons.com/articles/micron-stock-memory-chip-market-share-china-sk-hynix-493ec42b)
+
+但 NAND 与 DRAM 的 supply outlook 有一个值得注意的区别。
+
+TrendForce 等机构预计，随着更多 layer migration 和新 fab 在2027年逐渐 ramp，NAND bit supply 的增长可能比 DRAM 更快，因此 NAND shortage 有可能比 DRAM 更早开始缓解。[theregister](https://www.theregister.com/systems/2026/07/30/samsung-warns-memory-crunch-will-last-through-2028-as-profit-rises-19-fold/5281142)
+
+这意味着不能简单把“memory supercycle”看成所有产品同步涨到2028年。
+
+HBM 可能最紧。
+
+DRAM 次之。
+
+NAND 的供给反应可能更快。
+
+产品之间会开始出现明显 divergence。
+
+这对于 Micron 与 SanDisk 的投资逻辑也非常重要。
+
+## 对 MU 来说，现在真正的问题已经不是“这一季度 EPS 会不会 beat”
+
+下面进入我的判断，不是 FT 或 Dan Kim 的直接观点。
+
+我认为现在看 MU 最大的错误，是继续完全按照传统 memory cycle 的方式只盯下一季度 DRAM ASP。
+
+市场当然已经知道价格很强。
+
+甚至分析师现在预计本季度 DRAM pricing 还可能再上涨约 **50%**，NAND 约 **60%**。[Barron's](https://www.barrons.com/articles/micron-stock-price-earnings-2793d6ec)
+
+真正决定 MU 能不能获得结构性 valuation rerating 的，是三个更深的问题。
+
+第一是 shortage 持续时间。
+
+现在 TechInsights、Samsung、Micron 自身越来越一致地把 meaningful relief 推到 **2028年前后**。[Benzinga](https://www.benzinga.com/markets/tech/26/09/61623070/ai-memory-crunch-is-about-to-hit-10-out-of-10-craziness)
+
+如果成立，这就不是一个两三个季度的 pricing spike。
+
+第二是 contract structure。
+
+如果1000亿美元级别的 minimum commitments、220亿美元预付款，以及越来越多 multiyear agreements 成为行业常态，那么未来 earnings volatility 应该下降。
+
+第三是 CapEx discipline。
+
+如果三大厂没有因为今天的超高利润重新进入疯狂 market-share war，那么这一轮 peak margins 的持续时间就可能明显超过历史。
+
+这三个变量比“DRAM 下个月涨5%还是8%”重要得多。
+
+## 对 SNDK 来说，逻辑类似，但要更警惕 NAND 的供给弹性
+
+SanDisk 的情况则不同。
+
+AI storage 需求确实在帮助 NAND。
+
+enterprise SSD 也明显受益于 AI infrastructure。
+
+但 NAND 本身更容易通过 layer count、bit density 和新 capacity 提升供给。
+
+而中国 YMTC 的竞争也明显强于中国在全球高端 HBM 市场里的位置。
+
+YMTC 当前 NAND share 已经约14%，SanDisk 则从约13%下降到11%。[Barron's](https://www.barrons.com/articles/micron-stock-memory-chip-market-share-china-sk-hynix-493ec42b)
+
+所以如果把 MU 与 SNDK 放在同一个“memory shortage”篮子里，我会认为 **MU 的结构性 thesis 目前更干净**。
+
+因为 DRAM/HBM 的供给瓶颈更硬。
+
+NAND 则需要更密切观察2027年新增 bit supply。
+
+这不意味着 SNDK 没有盈利弹性；相反，当前 NAND pricing 可以让利润非常强。
+
+但 peak earnings 的 durability 未必和 HBM/DRAM 一样。
+
+## 这篇 FT 访谈真正改变我的一个判断：AI CapEx 可能正在把 memory 从“周期品”部分改造成“预售型基础设施”
+
+过去 memory 的基本商业模式是：
+
+先建厂。
+
+生产。
+
+等客户下单。
+
+库存增加。
+
+降价清库存。
+
+这就是为什么库存周期如此剧烈。
+
+今天正在出现另一种结构：
+
+hyperscaler 先规划 AI cluster。
+
+发现2028年需要巨量 memory。
+
+于是现在就去找 Micron、Samsung、SK Hynix。
+
+签 multiyear contract。
+
+提供 prepayment。
+
+锁定 volume。
+
+memory maker 再拿这些 commitments 去规划 capacity。
+
+如果这种模式继续扩大，memory industry 会越来越接近航空发动机、LNG 或大型电力设备：
+
+**客户不是等产品生产出来再买，而是在产能建出来以前几年就把未来供给预订掉。**
+
+这会产生一个很重要的资本市场结果。
+
+过去投资者不给 MU 高 multiple，因为没人相信明年的利润。
+
+未来如果相当一部分2028—2030收入已经通过 minimum purchase agreements 被锁定，那么 earnings visibility 就发生了根本变化。
+
+memory 不会因此停止周期性。
+
+但 cycle amplitude 有可能下降，而 trough earnings 有可能提高。
+
+如果这一点最终得到验证，MU 真正的 bull case 就不只是：
+
+“DRAM涨价 → EPS暴增。”
+
+而是：
+
+**“AI 改变 memory industry 的 contracting structure → earnings duration 上升 → valuation multiple 上升。”**
+
+后者的价值远大于前者。
+
+最后，这篇文章还让我觉得 AI 基础设施的投资主线正在进入第二阶段。2023—2025 年最稀缺的是 GPU，所以整个市场围绕 Nvidia 定价；2025—2026 年逐渐转向 networking、HBM、power、transformer 和 cooling；现在越来越明显的是，**一个 AI factory 是一个完整系统，任何一层不能同步扩张都会成为新的 shadow price。**
+
+当价值数百亿美元的 GPU cluster 因为缺 memory 而无法上线时，memory 的价格就不再由“制造一颗 DRAM 要多少钱”决定，而更多由“少这一颗 DRAM 会让多少其他资本闲置”决定。
+
+这也是为什么我认为 Dan Kim 那个 **8/10 → 10/10** 的判断值得认真记住。[Benzinga](https://www.benzinga.com/markets/tech/26/09/61623070/ai-memory-crunch-is-about-to-hit-10-out-of-10-craziness)
+
+真正需要警惕的反转信号也因此非常明确：不是 MU 某季度毛利率见顶，而是三星、SK Hynix、Micron 和 CXMT 的新增 wafer capacity 开始同时快速 ramp，HBM 对 conventional DRAM capacity 的挤压缓解，客户从“抢 allocation”重新变成“消化 inventory”。按照目前产业给出的时间表，这个供给拐点更像是 **2027 年末至 2028 年的问题，而不是未来几个季度的问题**。[金融时报](https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af)

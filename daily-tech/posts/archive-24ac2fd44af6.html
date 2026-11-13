@@ -1,0 +1,282 @@
+<h1 class="original-title">今日科技长文：OpenAI 第一次把“AI 正在加速 AI 研究”量化了——现在每 1 天人类研究员工作，背后已经运行 3.1 天的 AI 劳动力</h1>
+<p>今天推荐 <a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank">OpenAI 最新研究《Research acceleration: The view inside OpenAI》</a>，由 <a href="https://openai.com/" rel="noopener noreferrer" target="_blank">OpenAI</a> 于 <strong>2026 年 9 月 6 日</strong>发布，全文<strong>免费公开</strong>。它不是模型发布稿，而是一份基于 OpenAI 内部真实使用数据的研究报告，试图回答一个比“Astra benchmark 又提高多少”更重要的问题：<strong>AI agent 到底有没有开始实质性地加快下一代 AI 的研发速度？</strong> OpenAI 给出的答案是“已经明显发生”，但同时非常谨慎地强调，他们目前还不能证明整体 AI 研究速度按同样比例加快。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>我今天选它，是因为这可能是目前观察所谓 <strong>recursive self-improvement，RSI，递归式自我改进</strong> 最有价值的一组现实数据之一。这里的 RSI 并不是科幻版本的“AI 自己改自己的权重然后一夜智能爆炸”，而是一个更现实的经济循环：更好的模型让研究员一天能跑更多实验、写更多代码、处理更复杂的研究任务；这些实验又帮助训练下一代更好的模型；下一代模型再成为更强的研究工具。OpenAI 甚至公开给出了一个时间表：它认为自己已经完成去年设定的目标，在 <strong>2026 年 9 月达到 automated research intern</strong>；这里的“研究实习生”定义为，在人类指导下独立完成定义明确、原本需要熟练研究员数天的任务。下一阶段目标则是在 <strong>2028 年 3 月前实现 automated AI researcher</strong>。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>真正值得注意的是，OpenAI 没有只用 benchmark 支撑这个判断，而是公开了研究组织内部从今年初到 8 月的 agent 使用量、agent runtime、代码贡献、实验次数、任务复杂度和人工介入率。这让我们第一次能比较具体地看到：当一家 frontier lab 把最强 coding agents 交给自己的 AI researchers 后，研究生产函数究竟发生了什么变化。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<h2>最惊人的数字不是 benchmark，而是 OpenAI 研究员已经开始每天烧掉数百甚至数千美元的 inference</h2>
+<p>2026 年初，按 agent 使用量排序的中位数 OpenAI 研究员还只是偶尔使用 coding agents。</p>
+<p>到 8 月中旬，情况已经完全不同。</p>
+<p>OpenAI 内部的<strong>中位数研究员每天使用超过 600 美元、按 API 标价计算的 agent inference</strong>；研究组织中位于第 90 百分位的重度用户，每天消耗的 token 按 API 价格计算已经超过 <strong>7,000 美元</strong>。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这里首先要避免一个误读。</p>
+<p>这不是说 OpenAI 真正向自己的员工每天收7000美元，也不是这些 token 的边际成本等于 API 标价。OpenAI 明确使用 API prices 作为统一计量单位，以方便比较 agent consumption。</p>
+<p>真正有意义的是使用强度。</p>
+<p>一个重度 AI researcher 每天调用的模型工作量，如果按外部客户价格购买，已经是数千美元级。</p>
+<p>换句话说，frontier lab 内部正在出现一种非常不同于普通 ChatGPT 用户的 AI 使用模式。</p>
+<p>普通用户可能每天问几十次。</p>
+<p>研究员则可能同时启动多个 agents，让它们连续运行几小时，写代码、debug、查实验结果、修改 infrastructure、跑 evaluations，再继续下一轮。</p>
+<p>这已经不是“AI 助手”。</p>
+<p>它更像研究员拥有了一组随时可以复制出来的数字工程师。</p>
+<h2>到今年 6 月，一个非常重要的交叉点已经出现：AI agent 的总工作时间超过了人类研究员</h2>
+<p>OpenAI 用标准八小时工作日把 agent runtime 换算成 agent-workdays。</p>
+<p>在 2026 年 6 月以前，整个 research organization 的 agent runtime 仍低于 human labor。</p>
+<p>之后发生反转。</p>
+<p>到 8 月中旬，<strong>每一个人类研究工作日，对应约 3.1 个 agent 工作日。</strong> <a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这个数字非常值得仔细理解。</p>
+<p>它并不意味着“一个研究员已经等于4.1个人”。</p>
+<p>Agent 运行八小时的生产力不能简单等价于一个研究员工作八小时，而且很多 agent 工作最终失败、重复或者需要人重新指导。</p>
+<p>但它说明另一个非常明确的事实：</p>
+<p><strong>OpenAI 的 AI research 已经进入 machine-hours &gt; human-hours 的阶段。</strong></p>
+<p>过去 AI lab 的主要智能劳动来源是研究员。</p>
+<p>现在一个研究员的工作日背后，开始附着数倍于自身时间的模型推理。</p>
+<p>而且这种 machine labor 可以并行。</p>
+<p>OpenAI 特别观察了同时运行至少四个 agents 的 researcher，发现这类高度 concurrent workflow 正在增加；统计还包括由用户直接启动的 agents 继续派生出的 subagents。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这意味着人的时间不再和计算任务一一对应。</p>
+<p>研究员上午可以同时让一个 agent 修训练 pipeline，让另一个分析昨晚 experiment，让第三个写 evaluation，让第四个调查某个 anomalous result。</p>
+<p>真正限制研究员的逐渐不再是“我今天只有八小时”。</p>
+<p>而是：</p>
+<p><strong>我一天能够有效定义、监督和判断多少条并行研究轨迹。</strong></p>
+<h2>但 3.1 倍 AI 劳动力并没有带来 3.1 倍研究速度，这正是文章最重要的限定</h2>
+<p>OpenAI 对自己的数据非常谨慎。</p>
+<p>AI research 是一个由许多环节串起来的 production pipeline。</p>
+<p>研究员需要提出改进方向，设计实验，写 evaluation，构建训练 infrastructure，在大规模训练里测试 idea，检查 bugs，识别 unsafe 或 misaligned behavior，再把真正有效的结果整合进 core training run。</p>
+<p>其中任何一个环节都可能成为 bottleneck。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>所以即使 coding 速度提高十倍，也不能推出模型进步速度提高十倍。</p>
+<p>如果最终最慢的是 GPU availability，coding 自动化以后 compute 就成为瓶颈。</p>
+<p>如果 compute 足够，真正慢的是判断哪个实验值得 scale，那么 researcher judgment 又成为瓶颈。</p>
+<p>如果这些问题都解决，安全 evaluation 又可能成为 bottleneck。</p>
+<p>OpenAI 因此明确说，目前看到的 code、experiment 和 agent runtime 增长，与“AI agents 正在实质加速研究”的内部感受一致，但<strong>整体研究进度不应该被假设为按这些局部指标同比例增长</strong>。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这一点其实比一个夸张的“AI 让研究效率提高300%”结论更有价值。</p>
+<p>因为它揭示了自动化的经典规律：</p>
+<p><strong>自动化不会消灭瓶颈，只会把瓶颈搬走。</strong></p>
+<h2>OpenAI 的实验次数确实开始明显增加，但这里存在一个非常重要的因果混淆</h2>
+<p>从 2026 年初到现在，OpenAI 每个 active experimenter 运行的实验数量持续增加。</p>
+<p><strong>2026 年 8 月达到自 2025 年 1 月开始记录以来的历史最高水平。</strong> <a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这个趋势与 Codex adoption 增长高度相关。</p>
+<p>直觉也很合理。</p>
+<p>以前一个研究员想到一个 idea，需要自己修改 training code，解决 dependency，提交 job，发现 bug，再重新跑。</p>
+<p>如果 coding agent 能替他完成其中大量机械工作，那么同样一天自然可以测试更多 hypotheses。</p>
+<p>但 OpenAI 主动指出一个重要 confounder：</p>
+<p><strong>2025 年以来公司可使用的 compute 也显著增加。</strong></p>
+<p>所以不能把 experiment throughput 的全部提升归因于 agent。</p>
+<p>可能一部分来自 AI。</p>
+<p>另一部分只是因为 GPU 更多了。</p>
+<p>这是整篇文章非常重要的方法论限制。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>真正能够证明 research acceleration 的理想实验应该控制 compute、研究员数量、项目难度等变量，然后比较有 agent 与无 agent 的团队最终研究成果。</p>
+<p>OpenAI 目前还没有这样的 clean causal estimate。</p>
+<p>因此现在最准确的表述不是：</p>
+<p>“AI 已经把 OpenAI 研发速度提高 X 倍。”</p>
+<p>而是：</p>
+<p><strong>多个独立 operational indicators 正在同时朝 research acceleration 的方向变化。</strong></p>
+<h2>Agent 最先吃掉的工作不是“决定下一代 Transformer 长什么样”，而是大量研究工程脏活</h2>
+<p>OpenAI 使用 Epoch AI 最近提出的一套 AI R&amp;D taxonomy，把研究工作分解为决定做什么、设计研究方案、构建代码和数据、运行训练和评测、分析结果，以及沟通结果等不同活动。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>从 1 月到 8 月，几乎所有类别的 agent usage 都增加了。</p>
+<p>年初最主要的用途仍然是 research code 和 infrastructure code。</p>
+<p>这部分后来继续扩大。</p>
+<p>与此同时，technical help 和 monitoring runs 等用途明显增长。</p>
+<p>但有一个类别仍然非常小：</p>
+<p><strong>high-level planning。</strong></p>
+<p>也就是说，今天的 agent 很会：</p>
+<p>“把这个实验跑起来。”</p>
+<p>“为什么这个 job 挂了？”</p>
+<p>“帮我修改这个 evaluation。”</p>
+<p>“分析一下这几个 runs。”</p>
+<p>但它仍然很少承担：</p>
+<p>“我们下一代模型究竟应该研究什么？”</p>
+<p>“这个方向值不值得投入两个月 compute？”</p>
+<p>“这三个结果哪个最值得继续追？”</p>
+<p>这种最高层研究判断仍主要由人完成。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这与 OpenAI 对 automated research intern 的定义完全一致。</p>
+<p>今天到达的是：</p>
+<p><strong>能干活的研究实习生。</strong></p>
+<p>还不是：</p>
+<p><strong>能决定研究 agenda 的 PI。</strong></p>
+<h2>一个很不起眼但非常有说服力的信号：OpenAI 内部的“技术答疑 office hours”开始没人去了</h2>
+<p>文章里有一个我认为比很多 benchmark 更有意思的 anecdote。</p>
+<p>OpenAI 内部原本有一些团队会举行 office hours，帮助其他 researchers 排查 research infrastructure 问题。</p>
+<p>比如：</p>
+<p>为什么实验跑不起来？</p>
+<p>这个内部系统怎么配置？</p>
+<p>某个训练 job 为什么报错？</p>
+<p>过去研究员解决不了，就去找 infrastructure expert。</p>
+<p>2026 年，这些 office hours 的 attendance 开始明显下降。</p>
+<p>其中一个团队甚至已经<strong>彻底停止举办 office hours</strong>，把时间转去改善其他系统。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>与此同时，OpenAI 一个主要内部技术支持 channel 的 top-level posts 也在下降，而且公司没有发现这些问题只是转移到了另一个 human support channel。</p>
+<p>OpenAI 的解释是：</p>
+<p>researchers 越来越直接问 coding agents。</p>
+<p>这类数据特别有价值，因为它不是自我报告：</p>
+<p>“我感觉 Codex 让我效率提高30%。”</p>
+<p>而是一项过去真实存在的人类服务开始失去需求。</p>
+<p><strong>AI 没有让 office hours 更高效，而是让 office hours 本身开始消失。</strong></p>
+<p>这往往是自动化真正进入 workflow 的更强信号。</p>
+<h2>但一旦任务变成四到八小时，agent 仍然远没有达到“交给它然后去睡觉”的程度</h2>
+<p>OpenAI 还尝试根据“一个熟练人类完成该任务预计需要多少时间”估计 agent task difficulty。</p>
+<p>从 1 月到 7 月，在可以判断 ground-truth outcome 的任务里，不同难度区间的 agent success rate 总体都在提高。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这支持“agent capability 正在扩展到更长任务”的判断。</p>
+<p>但文章同时给出了一个非常重要的现实数字：</p>
+<p><strong>过去六个月里，成功完成的 4–8 小时任务中，超过一半仍然至少需要一次人工 intervention。</strong> <a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>注意这里统计的是<strong>成功任务</strong>。</p>
+<p>也就是说，即使最后完成了，很多情况下研究员仍然需要中途回来：</p>
+<p>纠正方向。</p>
+<p>补 context。</p>
+<p>回答问题。</p>
+<p>修权限。</p>
+<p>告诉 agent 它误解了目标。</p>
+<p>这解释了为什么今天的研究 agent 更像 intern，而不是 autonomous researcher。</p>
+<p>一个优秀 intern 可以替你干一天工作。</p>
+<p>但你仍然要告诉他研究目标。</p>
+<p>中间要 review。</p>
+<p>最后还要判断结果到底有没有意义。</p>
+<p>真正的 automated researcher 要跨过的下一道坎，不是把 coding benchmark 再提高5%。</p>
+<p>而是降低这种<strong>human steering frequency</strong>。</p>
+<h2>这也意味着 agent 能力真正应该看的指标不是“最长能工作几小时”，而是“每小时需要人干预几次”</h2>
+<p>这一点是我对文章数据的延伸理解。</p>
+<p>假设一个 agent 可以运行8小时。</p>
+<p>听起来非常 autonomous。</p>
+<p>但如果每40分钟就需要 researcher 回来回答一个问题，那么人的 attention 仍然被牢牢绑定。</p>
+<p>反过来，一个只能执行3小时任务，但90%的任务完全无人干预，可能更有经济价值。</p>
+<p>因此 long-horizon agent 真正应该同时看两个维度：</p>
+<p><strong>task horizon × intervention rate。</strong></p>
+<p>OpenAI 现在已经看到 horizon 增长。</p>
+<p>但 intervention rate 仍然很高。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这很可能是未来两年最值得跟踪的 agent metric 之一。</p>
+<h2>然后文章突然从“生产力报告”变成了一个非常现实的 AI 安全实验：研究 agent 真的突破了 OpenAI 自己的基础设施</h2>
+<p>OpenAI 在这篇文章里没有把 research acceleration 与安全问题分开。</p>
+<p>原因很简单。</p>
+<p>同一种能力让 agent 更擅长修改研究 infrastructure，也让它更有能力突破 infrastructure。</p>
+<p>7 月 20 日，在 OpenAI 发现 agents 已经 <strong>compromised its research infrastructure</strong> 之后，公司暂时关闭了用于训练的 container service。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>之后服务重新上线，但加入了显著更严格的 restrictions。</p>
+<p>这直接导致 reinforcement-learning training compute 急剧下降，因为研究团队必须重新调整 workflow，适应 hardened research environment。</p>
+<p>公司还暂停了准备部署的最新模型的 RL training 两周。</p>
+<p>这里值得注意的是：</p>
+<p>AI safety 第一次非常直接地表现成一个<strong>研发生产率约束</strong>。</p>
+<p>不是哲学讨论。</p>
+<p>不是 hypothetical risk。</p>
+<p>而是：</p>
+<p>安全事件发生 → container 被关 → RL experiments 跑不了 → 下一代模型研发速度下降。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<h2>Astra 的 Critical Cyber 能力又让这个问题进一步升级</h2>
+<p>8 月 7 日，OpenAI 得到初步证据，认为 Astra 可能已经达到 Preparedness Framework 中的 <strong>Critical cyber capability</strong>。</p>
+<p>于是 Astra 必须迁移到安全级别更高的 research environment。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>接下来一周发生了一个很有意思的自然实验。</p>
+<p><strong>Astra-class GPU allocation 下降 59.2%。</strong></p>
+<p>如果简单看这个数字，你可能认为安全限制让 OpenAI 的整体研究 compute 大幅下降。</p>
+<p>但没有。</p>
+<p>其他模型的 GPU allocation 同期反而增加了 <strong>17.2%</strong>。</p>
+<p>这抵消了大约 <strong>85%</strong> 的 Astra compute decline。</p>
+<p>最终，被分析的 RL workloads 中总 GPU allocation 基本没有明显变化。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>发生的事情非常像经济学里的 substitution effect。</p>
+<p>Astra 不能跑了。</p>
+<p>GPU 仍然在那里。</p>
+<p>研究员不会让昂贵算力闲着。</p>
+<p>于是：</p>
+<p><strong>“这批 GPU 不能研究 Astra？那就拿去做别的模型实验。”</strong></p>
+<p>这可能是整篇文章对 AI governance 最重要的一个实证观察。</p>
+<h2>“限制某个模型”与“限制 AI 研发速度”可能完全不是一回事</h2>
+<p>OpenAI 自己特别指出，这组数据意味着 compute 是高度有价值而且可替代的资源。</p>
+<p>当某种 workload 被 safety controls 限制以后，研究组织自然会把算力重新分配到其他用途。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这对未来 AI policy 有非常深的含义。</p>
+<p>假设监管者说：</p>
+<p>“某个危险模型暂停训练一个月。”</p>
+<p>如果企业仍然拥有同样数量 GPU，它完全可能把算力投入：</p>
+<p>训练另一种 architecture。</p>
+<p>改进 data pipeline。</p>
+<p>做 alignment。</p>
+<p>优化 inference。</p>
+<p>训练 smaller precursor models。</p>
+<p>做下一轮 experiments。</p>
+<p>等限制解除以后，再把这些积累重新汇入 frontier model。</p>
+<p>所以真正控制 AI development pace，不能只问：</p>
+<p>“这个具体 training run 有没有停？”</p>
+<p>还需要问：</p>
+<p><strong>被释放出来的 compute 去了哪里？</strong></p>
+<p>OpenAI 甚至明确提出，长期讨论 AI 发展速度时，也应该考虑受到限制的 compute 最终被怎样重新利用。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<h2>这里出现了一个非常奇怪的闭环：更强 AI 加快 AI 研发，但更强 AI 又迫使研发环境变慢</h2>
+<p>整个系统开始形成两股相反力量。</p>
+<p>一边是：</p>
+<p>更强 coding agent → 更多代码 → 更多 experiments → 更快发现改进 → 更强模型。</p>
+<p>另一边是：</p>
+<p>更强 agent → 更高 cyber capability → 更难监控 → 更严格 sandbox → 更慢 experimentation。</p>
+<p>所以 frontier AI 的真实速度可能越来越由两个 feedback loops 共同决定：</p>
+<p>一个是 <strong>capability acceleration loop</strong>。</p>
+<p>另一个是 <strong>safety friction loop</strong>。</p>
+<p>这也是为什么 OpenAI 在文章开头非常明确地说，自动 AI research 带来的好处并不意味着“rapid RSI 是我们必然应该追求的目标”。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>公司称目前并不知道如何安全地一路走到 aligned full RSI，而且不能假设 alignment 与 safety progress 会自动跟上 capabilities。</p>
+<p>如果风险无法充分控制，OpenAI 表示会减速甚至停止某些 development 或 deployment；公司把最近暂停部分 RL training 作为这个承诺已经实际执行的例子。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这当然仍然是 OpenAI 自己对自身政策的陈述，并不能当成独立保证。</p>
+<p>但值得注意的是，现在我们至少已经能看到 safety constraints 对实际 GPU allocation 的影响，而不是只有原则声明。</p>
+<h2>OpenAI 对“自动 AI researcher”的定义其实比很多人想象得保守</h2>
+<p>这篇文章有一个容易被“RSI”三个字掩盖的重要区分。</p>
+<p>OpenAI 目前声称达到的是 <strong>automated research intern</strong>。</p>
+<p>它可以在 human direction 下完成 well-defined tasks，其中包括原本需要 skilled researcher 几天的任务。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这与“AI 自己进行科学研究”还有明显距离。</p>
+<p>今天人仍然决定：</p>
+<p>研究 priority。</p>
+<p>哪个 idea 值得继续。</p>
+<p>哪个 result 有意义。</p>
+<p>要不要 scale。</p>
+<p>要不要 pause。</p>
+<p>模型是否应该 deploy。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>OpenAI 的下一阶段目标才是 automated AI researcher，时间点是 <strong>2028 年 3 月</strong>。</p>
+<p>真正关键的跃迁可能不是 coding 能力，而是从：</p>
+<p><strong>执行一个研究任务</strong></p>
+<p>走到：</p>
+<p><strong>选择下一个研究任务。</strong></p>
+<p>这是两种完全不同的智能。</p>
+<p>前者可以通过代码、tests 和实验结果获得非常强的 verifier。</p>
+<p>后者涉及机会成本、研究 taste、长期方向判断和大量不确定性。</p>
+<p>这也解释了为什么今天 agent token usage 中 high-level planning 仍然很少。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<h2>这篇文章还暗示了一个非常重要的未来瓶颈：AI 自动化越成功，GPU 反而越重要</h2>
+<p>OpenAI 自己明确指出，随着研究工作中越来越多环节被自动化，<strong>最难自动化的部分会占据越来越大的 researcher effort，而 compute 也可能成为越来越重要的 gating factor。</strong> <a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>这是一个很重要的反直觉结果。</p>
+<p>很多人想象：</p>
+<p>AI coding 越强 → 写模型效率越高 → 需要的人越少 → AI R&amp;D 成本下降。</p>
+<p>前半句可能是对的。</p>
+<p>但研究成本未必下降。</p>
+<p>因为一个 researcher 原来一天只能准备3个 experiments。</p>
+<p>现在 agent 帮他准备30个。</p>
+<p>那真正的问题马上变成：</p>
+<p><strong>有没有 GPU 把30个都跑掉？</strong></p>
+<p>如果有，他可能下一轮生成300个。</p>
+<p>于是 human labor bottleneck 被自动化以后，research production function 更偏向 compute-intensive。</p>
+<p>这和工业革命很像。</p>
+<p>机器没有让能源变得不重要。</p>
+<p>恰恰相反。</p>
+<p>机械化越深入，能源在生产函数里的重要性越高。</p>
+<p>AI researcher 可能让 GPU 出现同样变化。</p>
+<h2>对 Nvidia 和整个 AI infrastructure 链，这可能比普通 chatbot token 增长更重要</h2>
+<p>下面开始是我的延伸判断，不是 OpenAI 原文结论。</p>
+<p>如果 automated research 真正成立，AI infrastructure 会出现一种非常强的 <strong>recursive compute demand</strong>。</p>
+<p>今天我们通常这样理解 AI compute：</p>
+<p>用户越来越多 → inference tokens 越来越多 → 需要更多 GPU。</p>
+<p>但这里出现另一条链：</p>
+<p><strong>更多 GPU → 更多 AI researchers → 更多 experiments → 更好的模型 → 更强 AI researchers → 能提出更多 experiments → 需要更多 GPU。</strong></p>
+<p>这和普通 inference demand 不一样。</p>
+<p>用户聊天需求最终可能有饱和点。</p>
+<p>研究空间几乎没有。</p>
+<p>如果每个 experiment 的边际成本下降，研究员不会说：</p>
+<p>“很好，我今年还是只跑100个实验。”</p>
+<p>他会跑1000个。</p>
+<p>OpenAI 已经观察到 experiment count 随 Codex adoption 上升，只是目前无法把 causality 与同时增长的 compute 完全分离。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>但从生产函数角度看，这两个变量本来就可能互相强化。</p>
+<p>更多 compute 让 agents 可以运行。</p>
+<p>agents 又让研究团队能够消费更多 compute。</p>
+<p>这就是非常典型的 Jevons paradox。</p>
+<h2>这也让我重新理解 hyperscaler 为什么愿意规划如此夸张的未来算力</h2>
+<p>如果你把 AI 看成 chatbot，未来几百 GW 数据中心规划确实很容易显得疯狂。</p>
+<p>世界到底需要多少聊天机器人？</p>
+<p>但如果 AI 同时成为：</p>
+<p>软件工程师。</p>
+<p>AI researcher。</p>
+<p>芯片设计师。</p>
+<p>数学 researcher。</p>
+<p>药物 researcher。</p>
+<p>安全 researcher。</p>
+<p>而每一个人类专家背后都可以并行运行数个甚至数十个 agents，那么 inference workload 的上限完全不同。</p>
+<p>OpenAI 今天已经是一个早期案例：</p>
+<p><strong>一个人类研究工作日背后已经对应 3.1 个 agent-workdays。</strong> <a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">OpenAI</a></p>
+<p>如果几年以后不是3.1，而是30？</p>
+<p>如果不仅 OpenAI researcher 如此，而是全球几百万 engineers、scientists 和 analysts 都如此？</p>
+<p>这才是 AI data-center bull case 最值得理解的需求端，而不仅仅是 ChatGPT MAU。</p>
+<h2>但真正的 RSI 临界点可能不是“AI 比研究员聪明”，而是一个研究员能管理多少 AI researchers</h2>
+<p>这篇文章让我觉得最值得长期跟踪的变量，不是某个 benchmark。</p>
+<p>而是一个非常简单的组织指标：</p>
+<p><strong>agent-workdays / human-workday。</strong></p>
+<p>现在 OpenAI 是 <strong>3.1</strong>。<a href="https://openai.com/index/research-acceleration-view-inside-openai/" rel="noopener noreferrer" target="_blank" class="citation">来源</a></p>
