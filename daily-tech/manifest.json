@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-12",
+  "updated_at": "2026-11-13",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1772,6 +1772,27 @@
       "reading_minutes": 17,
       "archive_body_sha256": "c4ff21f43bc7d8971da3a4b55fa7543ae3bfecd17ebcd33283dbd367d0cf55ff",
       "sequence": 25
+    },
+    {
+      "id": "2026-11-13-ai-scientific-discovery-real-use",
+      "sequence": 85,
+      "title": "AI 正在加速科研，但它最擅长的工作，可能不是科学家最需要的工作",
+      "source_title": "AI for scientific discovery: How researchers use Claude",
+      "source_author": "Johannes Hermle, Ben Jones, Lukas Althoff, Ryan Heller, Thomas Lyttelton, Carolyn Stein, Nathan Wilmers, Maxim Massenkoff, Peter McCrory",
+      "source_date": "2026-11-05",
+      "source_url": "https://www.anthropic.com/research/how-researchers-use-claude",
+      "delivery_date": "2026-11-13",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-13-ai-scientific-discovery-real-use.md",
+      "tags": [
+        "AI for Science",
+        "科研",
+        "AI Agent",
+        "经济"
+      ],
+      "excerpt": "从约20.7万次真实科研会话、528名研究者调查与跨学科任务模型，理解为何AI优先加速数据分析，却尚未解决科学发现中最难的假设与实验瓶颈。",
+      "reading_minutes": 18
     }
   ]
 }
