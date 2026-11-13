@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "title": "每日科技长文",
+  "updated_at": "2026-11-12",
+  "archive_notice": "可阅读的「全文」已按聊天消息原样保存；「待补原文」仅建立历史索引，不会用摘要冒充原文。原聊天内部引用与交互图表在普通网页中可能无法恢复。",
+  "posts": [
+    {
+      "id": "claude-electronics",
+      "title": "Claude 已经能从一句话设计出真正能工作的电子产品",
+      "source_title": "Testing Claude on real-world electronics design",
+      "source_date": "2026-11-09",
+      "source_url": "https://www.anthropic.com/research/claude-electronics-design",
+      "tags": [
+        "硬件",
+        "AI Agent"
+      ],
+      "status": "full",
+      "file": "posts/claude-electronics.md",
+      "delivery_date": "2026-11-12",
+      "sequence": 22
+    },
+    {
+      "id": "linux-root",
+      "title": "AI 在 Linux 内核中发现近千个提权漏洞",
+      "source_title": "A Thousand Fewer Paths to Root",
+      "source_date": "2026-11-04",
+      "source_url": null,
+      "tags": [
+        "安全",
+        "AI Agent"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 21
+    },
+    {
+      "id": "inference-index",
+      "title": "新一代 GPU 的真实推理容量可能远高于 FLOPs 暗示",
+      "source_title": "Inference Performance Index",
+      "source_date": "2026-11-09",
+      "source_url": "https://epoch.ai/publications/inference-performance-index",
+      "tags": [
+        "AI Infra",
+        "半导体"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 20
+    },
+    {
+      "id": "ai-ballot",
+      "title": "美国选民正在给 AI 数据中心踩刹车",
+      "source_title": "AI on the Ballot",
+      "source_date": "2026-11-04",
+      "source_url": "https://stratechery.com/2026/ai-on-the-ballot/",
+      "tags": [
+        "AI Infra",
+        "政策"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 19
+    },
+    {
+      "id": "anthropic-rd",
+      "title": "Anthropic 的 AI 研发正在被 AI 加速",
+      "source_title": "Independent Assessment of AI R&D Acceleration at Anthropic in October 2026",
+      "source_date": "2026-11-05",
+      "source_url": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment/",
+      "tags": [
+        "AI 模型",
+        "研究"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 18
+    },
+    {
+      "id": "huawei-horinger",
+      "title": "华为和林格尔数据中心揭示中国算力差距",
+      "source_title": "What Huawei’s Horinger Data Center Reveals About China’s Compute Gap",
+      "source_date": "2026-11-06",
+      "source_url": null,
+      "tags": [
+        "AI Infra",
+        "半导体"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 17
+    },
+    {
+      "id": "scaling-git",
+      "title": "当 AI Agent 写代码加速，Git 也要重新设计",
+      "source_title": "Scaling Git at OpenAI",
+      "source_date": "2026-11-02",
+      "source_url": "https://openai.com/index/scaling-git-at-openai/",
+      "tags": [
+        "软件工程",
+        "AI Agent"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 16
+    },
+    {
+      "id": "bayesian-eci",
+      "title": "GPT-6 排名第一，但差距到底有多确定",
+      "source_title": "Updating the Epoch Capabilities Index Methodology to Use a Bayesian Model",
+      "source_date": "2026-11-04",
+      "source_url": "https://epoch.ai/publications/eci-bayesian-methodology",
+      "tags": [
+        "AI 模型",
+        "研究"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 15
+    },
+    {
+      "id": "fake-paper",
+      "title": "AI 能伪造科学论文，科研可信度如何保证",
+      "source_title": "I Used AI to Fake a Scientific Paper. Here’s What Happened",
+      "source_date": "2026-10-27",
+      "source_url": "https://spectrum.ieee.org/ai-generated-scientific-papers",
+      "tags": [
+        "AI for Science",
+        "研究"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 14
+    },
+    {
+      "id": "anthropic-valuation",
+      "title": "Anthropic 真的值两万亿美元吗",
+      "source_title": "Is Anthropic Worth $2 Trillion?",
+      "source_date": "2026-10-26",
+      "source_url": "https://every.to/napkin-math/is-anthropic-worth-2-trillion",
+      "tags": [
+        "商业",
+        "投资"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 13
+    },
+    {
+      "id": "salesforce-agent",
+      "title": "企业级 AI Agent 如何走向可靠生产",
+      "source_title": "A Deep Dive into Salesforce’s Agent Tech Stack",
+      "source_date": "2026-10-26",
+      "source_url": "https://blog.bytebytego.com/p/a-deep-dive-into-salesforces-agent",
+      "tags": [
+        "AI Agent",
+        "企业软件"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 12
+    },
+    {
+      "id": "isotope-chemistry",
+      "title": "核聚变可能先通过制造同位素实现商业化",
+      "source_title": "A New Kind of Chemistry",
+      "source_date": "2026-10-29",
+      "source_url": "https://www.construction-physics.com/p/a-new-kind-of-chemistry",
+      "tags": [
+        "能源",
+        "科技产业"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 11
+    },
+    {
+      "id": "patch-gap",
+      "title": "AI 能在安全补丁到达前制造有效攻击",
+      "source_title": "AI Can Turn Security Fixes into Working Exploits Before Users Receive an Update",
+      "source_date": "2026-10-29",
+      "source_url": "https://epoch.ai/publications/open-weight-models-patch-gap",
+      "tags": [
+        "安全",
+        "AI 模型"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 10
+    },
+    {
+      "id": "end-internet",
+      "title": "互联网正在改变，软件进入群聊时代",
+      "source_title": "The End of the Internet",
+      "source_date": "2026-10-26",
+      "source_url": "https://stratechery.com/2026/the-end-of-the-internet/",
+      "tags": [
+        "软件工程",
+        "商业"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 9
+    },
+    {
+      "id": "agent-recommend",
+      "title": "让 AI Agent 推荐文章的实验",
+      "source_title": "How to Get AI Agents to Recommend Your Articles",
+      "source_date": "2026-10-27",
+      "source_url": "https://every.to/also-true-for-humans/how-to-get-ai-agents-to-recommend-your-articles",
+      "tags": [
+        "AI Agent",
+        "媒体"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 8
+    },
+    {
+      "id": "robot-data",
+      "title": "机器人最大瓶颈可能是训练数据",
+      "source_title": "How to Train Your Robot",
+      "source_date": "2026-10-15",
+      "source_url": "https://www.construction-physics.com/p/how-to-train-your-robot",
+      "tags": [
+        "机器人",
+        "AI Infra"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 7
+    },
+    {
+      "id": "cognitive-mercantilism",
+      "title": "智能变廉价后，人类需求可能迎来扩张",
+      "source_title": "Cognitive Mercantilism",
+      "source_date": "2026-10-25",
+      "source_url": "https://contraptions.venkateshrao.com/p/cognitive-mercantilism",
+      "tags": [
+        "经济",
+        "AI 社会"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 6
+    },
+    {
+      "id": "decentralization",
+      "title": "技术革命如何改变权力分布",
+      "source_title": "Weapons of Mass Decentralization",
+      "source_date": "2026-09-23",
+      "source_url": "https://worksinprogress.co/issue/weapons-of-mass-decentralization/",
+      "tags": [
+        "科技史",
+        "政策"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 5
+    },
+    {
+      "id": "tile-rt",
+      "title": "TileRT 让 NVIDIA GPU 进入超低延迟推理",
+      "source_title": "Ultra-High Interactivity on NVIDIA GPUs? TileRT on InferenceX",
+      "source_date": "2026-08-10",
+      "source_url": null,
+      "tags": [
+        "半导体",
+        "AI Infra"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 4
+    },
+    {
+      "id": "multiagent",
+      "title": "多 Agent 系统如何产生协作与冲突",
+      "source_title": "Patterns and problems in emerging multiagent systems",
+      "source_date": "2026-08-13",
+      "source_url": null,
+      "tags": [
+        "AI Agent",
+        "安全"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 3
+    },
+    {
+      "id": "childhood",
+      "title": "没有聊天机器人的童年可能成为身份象征",
+      "source_title": "A Chatbot-Free Childhood Will Be a Status Symbol",
+      "source_date": "2026-08-07",
+      "source_url": null,
+      "tags": [
+        "AI 社会",
+        "教育"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 2
+    },
+    {
+      "id": "google-anthropic-finance",
+      "title": "Google 为 Anthropic 构建的 AI 融资机器",
+      "source_title": "Inside Google’s $200bn Wall Street finance machine for Anthropic",
+      "source_date": "2026-08-03",
+      "source_url": null,
+      "tags": [
+        "AI Infra",
+        "商业"
+      ],
+      "status": "pending",
+      "file": null,
+      "delivery_date": null,
+      "sequence": 1
+    }
+  ]
+}
