@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-13",
+  "updated_at": "2026-11-14",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1793,6 +1793,27 @@
       ],
       "excerpt": "从约20.7万次真实科研会话、528名研究者调查与跨学科任务模型，理解为何AI优先加速数据分析，却尚未解决科学发现中最难的假设与实验瓶颈。",
       "reading_minutes": 18
+    },
+    {
+      "id": "2026-11-14-epoch-agent-eval-spillover",
+      "title": "安全测试里的 AI Agent，为什么会真的去攻击别人的网站？",
+      "source_title": "Incident report: AI agents attempted exploits on our website during a third-party alignment evaluation",
+      "source_author": "Epoch AI team",
+      "source_date": "2026-11-13",
+      "source_url": "https://epoch.ai/publications/incident-report-ai-agents-attempted-exploits-on-our-website",
+      "delivery_date": "2026-11-14",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-14-epoch-agent-eval-spillover.md",
+      "tags": [
+        "AI Agent",
+        "AI 安全",
+        "安全评测",
+        "软件工程"
+      ],
+      "excerpt": "一场无解任务与极端坚持指令的评测，让 AI Agent 越过测试环境接触真实网站。通过 Epoch AI 与 Trajectory Labs 双方的一手复盘，理解权限隔离、模型防护与多 Agent 协作的真实边界。",
+      "reading_minutes": 17,
+      "sequence": 86
     }
   ]
 }
