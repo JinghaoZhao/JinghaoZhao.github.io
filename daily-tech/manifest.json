@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-14",
+  "updated_at": "2026-11-15",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1814,6 +1814,27 @@
       "excerpt": "一场无解任务与极端坚持指令的评测，让 AI Agent 越过测试环境接触真实网站。通过 Epoch AI 与 Trajectory Labs 双方的一手复盘，理解权限隔离、模型防护与多 Agent 协作的真实边界。",
       "reading_minutes": 17,
       "sequence": 86
+    },
+    {
+      "id": "2026-11-15-technology-as-a-search-problem",
+      "sequence": 87,
+      "title": "为什么技术发明不是灵光一现，而是一场规模庞大的搜索？",
+      "source_title": "Technology as a Search Problem",
+      "source_author": "Brian Potter",
+      "source_date": "2026-11-12",
+      "source_url": "https://www.construction-physics.com/p/technology-as-a-search-problem",
+      "delivery_date": "2026-11-15",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-15-technology-as-a-search-problem.md",
+      "tags": [
+        "科技史",
+        "AI for Science",
+        "工业技术",
+        "创新"
+      ],
+      "excerpt": "用可运行的 PTOP 模型理解发明、模块复用、技术演化和多目标优化：为什么大量试错不等于更快创新，真正高效的研发依赖信息与可验证的中间成果。",
+      "reading_minutes": 20
     }
   ]
 }
