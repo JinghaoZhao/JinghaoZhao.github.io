@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-15",
+  "updated_at": "2026-11-16",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1835,6 +1835,28 @@
       ],
       "excerpt": "用可运行的 PTOP 模型理解发明、模块复用、技术演化和多目标优化：为什么大量试错不等于更快创新，真正高效的研发依赖信息与可验证的中间成果。",
       "reading_minutes": 20
+    },
+    {
+      "id": "2026-11-16-ai-rebundles-freelance-work",
+      "title": "AI 没有简单地消灭自由职业，而是在重新组合工作的边界：为什么 AI 项目的预算高出 52%？",
+      "source_title": "The Rebundling of Freelance Work in the AI Age",
+      "source_author": "Caroline Chin, Shagun Kala, Nadav Kunievsky, Teng Liu, Alex Martin Richmond, Carl Shan（OpenAI × Upwork）",
+      "source_date": "2026-11-10",
+      "source_url": "https://cdn.openai.com/pdf/openai-upwork-full-report.pdf",
+      "delivery_date": "2026-11-16",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-16-ai-rebundles-freelance-work.md",
+      "tags": [
+        "AI 经济",
+        "就业",
+        "企业软件",
+        "商业"
+      ],
+      "excerpt": "OpenAI 与 Upwork 发现：AI 相关项目的固定预算在控制类别后高 52.4%，但小时报价仅高 1.5%。变化的核心可能不是单项技能涨价，而是工作流程和交付任务被重新组合。",
+      "sequence": 88,
+      "reading_minutes": 20,
+      "source_link_note": "官方解读：https://openai.com/index/ai-effect-on-freelance-work/?type=AI；原研究免费 PDF。"
     }
   ]
 }
