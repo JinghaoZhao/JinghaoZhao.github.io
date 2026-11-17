@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-16",
+  "updated_at": "2026-11-17",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1857,6 +1857,27 @@
       "sequence": 88,
       "reading_minutes": 20,
       "source_link_note": "官方解读：https://openai.com/index/ai-effect-on-freelance-work/?type=AI；原研究免费 PDF。"
+    },
+    {
+      "id": "2026-11-17-gemini-robotics-2-5-factory-reliability",
+      "sequence": 89,
+      "title": "从实验室到奔驰产线：Gemini Robotics 2.5 的 96% 成功率，距离真正可靠的机器人还有多远？",
+      "source_title": "Gemini Robotics 2.5 accelerates real-world general dexterity",
+      "source_author": "Carolina Parada（Google DeepMind）",
+      "source_date": "2026-11-10",
+      "source_url": "https://deepmind.google/blog/gemini-robotics-2-5-accelerates-real-world-physical-intelligence/",
+      "delivery_date": "2026-11-17",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-17-gemini-robotics-2-5-factory-reliability.md",
+      "tags": [
+        "机器人",
+        "具身智能",
+        "AI Agent",
+        "工业自动化"
+      ],
+      "excerpt": "从奔驰真实产线的96%分拣成功率、200多项精细操作任务，到Argon用数字孪生训练机器人及物理安全评测，厘清演示、试验与规模商业部署之间的鸿沟。",
+      "reading_minutes": 19
     }
   ]
 }
