@@ -215,7 +215,13 @@
       draw();
     }
     function draw() {
-      const time = sceneTime * 0.0001;
+      const time = sceneTime * 0.00028;
+      const driftX = finePointer.matches
+        ? pointerX
+        : Math.sin(time * 0.45) * 0.35;
+      const driftY = finePointer.matches
+        ? pointerY
+        : Math.cos(time * 0.35) * 0.28;
       ctx.clearRect(0, 0, width, height);
       const background = ctx.createLinearGradient(0, 0, width * 0.15, height);
       background.addColorStop(0, "#061124");
@@ -240,13 +246,13 @@
           Math.sin((point.x / width) * 7 + 0.5) * height * 0.055;
         point.px =
           point.x +
-          Math.sin(time + point.phase) * 9 +
-          pointerX * (5 + point.depth * 8);
+          Math.sin(time + point.phase) * 11 +
+          driftX * (5 + point.depth * 8);
         point.py =
           point.y +
           landscape +
-          Math.cos(time * 0.7 + point.phase) * 10 +
-          pointerY * (3 + point.depth * 8);
+          Math.cos(time * 0.7 + point.phase) * 12 +
+          driftY * (3 + point.depth * 8);
       });
       faces.forEach((face) => {
         const p = face.ids.map((id) => points[id]);
@@ -280,7 +286,7 @@
             Math.sin(time * fleck.speed + fleck.phase) * 35 +
             width) %
             width) +
-          pointerX * 8;
+          driftX * 8;
         const y = ((fleck.y + time * 0.012 * fleck.speed) % 1) * height;
         const alpha = y < height * 0.55 ? 0.1 : 0.28;
         ctx.save();
@@ -439,7 +445,9 @@
   ];
   let topicPoints = [],
     circles = [],
-    selectedField = "all";
+    selectedField = "all",
+    hoveredIndex = -1,
+    selectedIndex = -1;
   // CSV quoted fields can contain commas; parse rather than splitting blindly.
   function parseCSV(text) {
     const rows = [];
@@ -470,17 +478,32 @@
     }
     return rows;
   }
+  function isPointActive(i) {
+    return (
+      selectedField === "all" || topicPoints[i].field === Number(selectedField)
+    );
+  }
+  function syncCircleHighlight(index) {
+    if (index < 0 || !circles[index]) return;
+    const circle = circles[index];
+    const isSelected = index === selectedIndex;
+    const isHovered = index === hoveredIndex;
+    circle.classList.toggle("is-selected", isSelected);
+    circle.classList.toggle("is-hovered", isHovered);
+    circle.setAttribute("r", isSelected ? "4.5" : isHovered ? "4.2" : "2.2");
+  }
   function updateMap() {
     selectedField = fieldSelect.value;
+    hoveredIndex = -1;
+    selectedIndex = -1;
     let count = 0;
     topicSelect.replaceChildren(new Option("Choose a topic", ""));
     circles.forEach((circle, i) => {
-      const active =
-        selectedField === "all" ||
-        topicPoints[i].field === Number(selectedField);
+      const active = isPointActive(i);
       circle.setAttribute("opacity", active ? ".85" : ".045");
+      circle.setAttribute("r", "2.2");
       circle.style.pointerEvents = active ? "auto" : "none";
-      circle.classList.remove("is-selected");
+      circle.classList.remove("is-selected", "is-hovered");
       if (active) {
         count++;
         topicSelect.add(new Option(topicPoints[i].name, String(i)));
@@ -491,6 +514,26 @@
     mapStatus.textContent = `${label} · ${count.toLocaleString()} topics.`;
     $("#map-title").textContent =
       `Acemap topic map: ${label}, ${count} topics. Choose a research field using the dropdown below.`;
+  }
+  const topicMapSvg = $("#topic-map");
+  function findNearestPoint(clientX, clientY, maxDist) {
+    const rect = topicMapSvg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return -1;
+    const vx = ((clientX - rect.left) / rect.width) * 600;
+    const vy = ((clientY - rect.top) / rect.height) * 360;
+    let best = -1;
+    let bestDistSq = maxDist * maxDist;
+    for (let i = 0; i < topicPoints.length; i++) {
+      if (!isPointActive(i)) continue;
+      const dx = topicPoints[i].cx - vx;
+      const dy = topicPoints[i].cy - vy;
+      const d2 = dx * dx + dy * dy;
+      if (d2 <= bestDistSq) {
+        bestDistSq = d2;
+        best = i;
+      }
+    }
+    return best;
   }
   mapLoad.addEventListener("click", async () => {
     mapLoad.disabled = true;
@@ -507,6 +550,8 @@
           name: r[3],
           color: r[4],
           field: colors.indexOf(r[4]),
+          cx: 0,
+          cy: 0,
         }))
         .filter(
           (p) => Number.isFinite(p.x) && Number.isFinite(p.y) && p.field >= 0,
@@ -525,19 +570,15 @@
       group.id = "topic-points";
       const fragment = document.createDocumentFragment();
       topicPoints.forEach((point, i) => {
+        point.cx = Number(((point.x - minX) * scale + offsetX).toFixed(2));
+        point.cy = Number(((point.y - minY) * scale + offsetY).toFixed(2));
         const circle = document.createElementNS(
           "http://www.w3.org/2000/svg",
           "circle",
         );
-        circle.setAttribute(
-          "cx",
-          ((point.x - minX) * scale + offsetX).toFixed(2),
-        );
-        circle.setAttribute(
-          "cy",
-          ((point.y - minY) * scale + offsetY).toFixed(2),
-        );
-        circle.setAttribute("r", "1.9");
+        circle.setAttribute("cx", String(point.cx));
+        circle.setAttribute("cy", String(point.cy));
+        circle.setAttribute("r", "2.2");
         circle.setAttribute("fill", displayColors[point.field]);
         circle.setAttribute("class", "map-point");
         circle.dataset.point = i;
@@ -552,14 +593,34 @@
         option.textContent = field;
         fieldSelect.appendChild(option);
       });
-      function showTopic(event) {
-        const index = event.target.dataset.point;
-        if (index === undefined) return;
-        const point = topicPoints[Number(index)];
+      topicMapSvg.addEventListener("pointermove", (event) => {
+        const idx = findNearestPoint(event.clientX, event.clientY, 16);
+        if (idx === hoveredIndex) return;
+        const prev = hoveredIndex;
+        hoveredIndex = idx;
+        syncCircleHighlight(prev);
+        syncCircleHighlight(idx);
+        if (idx >= 0) {
+          const point = topicPoints[idx];
+          mapStatus.textContent = `${point.name} · ${fields[point.field]}`;
+        }
+      });
+      topicMapSvg.addEventListener("pointerleave", () => {
+        const prev = hoveredIndex;
+        hoveredIndex = -1;
+        syncCircleHighlight(prev);
+      });
+      topicMapSvg.addEventListener("click", (event) => {
+        const idx = findNearestPoint(event.clientX, event.clientY, 18);
+        if (idx < 0) return;
+        const prev = selectedIndex;
+        selectedIndex = idx;
+        syncCircleHighlight(prev);
+        syncCircleHighlight(idx);
+        topicSelect.value = String(idx);
+        const point = topicPoints[idx];
         mapStatus.textContent = `${point.name} · ${fields[point.field]}`;
-      }
-      group.addEventListener("pointerover", showTopic);
-      group.addEventListener("click", showTopic);
+      });
       mapLoad.hidden = true;
       $(".field-select").hidden = false;
       $(".topic-select").hidden = false;
@@ -574,11 +635,18 @@
   });
   fieldSelect.addEventListener("change", updateMap);
   topicSelect.addEventListener("change", () => {
-    circles.forEach((circle) => circle.classList.remove("is-selected"));
-    if (topicSelect.value === "") return;
-    const index = Number(topicSelect.value),
-      point = topicPoints[index];
-    circles[index].classList.add("is-selected");
+    const prev = selectedIndex;
+    selectedIndex = topicSelect.value === "" ? -1 : Number(topicSelect.value);
+    syncCircleHighlight(prev);
+    syncCircleHighlight(selectedIndex);
+    if (selectedIndex < 0) {
+      const label =
+        selectedField === "all" ? "All fields" : fields[Number(selectedField)];
+      const count = topicSelect.options.length - 1;
+      mapStatus.textContent = `${label} · ${count.toLocaleString()} topics.`;
+      return;
+    }
+    const point = topicPoints[selectedIndex];
     mapStatus.textContent = `${point.name} · ${fields[point.field]}`;
   });
 })();
