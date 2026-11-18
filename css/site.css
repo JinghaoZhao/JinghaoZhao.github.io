@@ -794,7 +794,7 @@ article[id],
   font-size: 10.5px;
   letter-spacing: 1.3px;
   align-self: center;
-  color: #61788f;
+  color: #526a82;
 }
 .portrait-corner {
   position: absolute;
@@ -959,7 +959,7 @@ article[id],
   padding: 95px 0;
 }
 .contact-section .eyebrow {
-  color: #5c7790;
+  color: #47637d;
   font-size: 11px;
 }
 .contact-layout {
@@ -1139,6 +1139,10 @@ html:has(.motion-paused) {
   .compute-figure {
     padding: 17px;
   }
+  .compute-art {
+    width: calc(100% + 16px);
+    margin: 5px -8px 0;
+  }
   .diagram-labels {
     font-size: 10.5px;
   }
@@ -1209,6 +1213,10 @@ html:has(.motion-paused) {
     gap: 14px;
     font-size: 11.5px;
   }
+  .hero-footer .social-links a,
+  .footer-links a {
+    padding: 6px 0;
+  }
   .scroll-cue {
     font-size: 10.5px;
     letter-spacing: 1.2px;
@@ -1267,6 +1275,9 @@ html:has(.motion-paused) {
   }
   .compute-art {
     max-height: 350px;
+  }
+  .diagram-labels {
+    font-size: 13px;
   }
   .work-pillars {
     margin-top: 40px;
@@ -1409,11 +1420,14 @@ html:has(.motion-paused) {
     min-height: 710px;
   }
   .hero h1 {
-    font-size: 60px;
+    font-size: clamp(46px, 13.8vw, 60px);
     letter-spacing: -0.016em;
   }
   .hero-description {
     font-size: 13px;
+  }
+  .hero-description br {
+    display: none;
   }
   .hero-role {
     font-size: 10px;
@@ -1494,9 +1508,6 @@ html:has(.motion-paused) {
   }
 }
 @media (max-width: 360px) {
-  .hero h1 {
-    font-size: 53px;
-  }
   .site-header nav {
     gap: 13px;
   }
@@ -1528,6 +1539,7 @@ html:has(.motion-paused) {
   .publication-filters button span {
     margin-left: 4px;
   }
+  h2,
   .work-copy h2,
   .about-copy h2 {
     font-size: 33px;

@@ -115,9 +115,11 @@
         state.remaining = duration;
         paint();
         // Reset CSS timelines as well as the explanatory stages.
-        element.getAnimations({ subtree: true }).forEach((animation) => {
-          animation.currentTime = 0;
-        });
+        if (typeof element.getAnimations === "function") {
+          element.getAnimations({ subtree: true }).forEach((animation) => {
+            animation.currentTime = 0;
+          });
+        }
         sync();
       });
       state.sync = sync;
