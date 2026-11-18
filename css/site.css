@@ -91,8 +91,8 @@ p + p {
 h2 {
   font-size: clamp(36px, 4.3vw, 61px);
   font-weight: 450;
-  letter-spacing: -2.4px;
-  line-height: 1.12;
+  letter-spacing: -0.01em;
+  line-height: 1.18;
 }
 h3 {
   font-weight: 500;
@@ -238,7 +238,7 @@ article[id],
   font-size: 34px;
   line-height: 1;
   font-weight: 550;
-  letter-spacing: -3px;
+  letter-spacing: -0.03em;
   padding-right: 5px;
 }
 .wordmark-dot {
@@ -343,8 +343,8 @@ article[id],
   font-family: Raleway, sans-serif;
   font-size: clamp(70px, 9.6vw, 146px);
   font-weight: 300;
-  letter-spacing: -5px;
-  line-height: 1.12;
+  letter-spacing: -0.02em;
+  line-height: 1.14;
   white-space: nowrap;
   text-shadow: 0 2px 35px #07162b44;
 }
@@ -500,7 +500,8 @@ article[id],
 .work-copy h2 {
   font-size: clamp(42px, 4.4vw, 62px);
   font-weight: 450;
-  letter-spacing: -2.4px;
+  letter-spacing: -0.01em;
+  line-height: 1.18;
   margin-bottom: 28px;
   color: #f0f6fd;
 }
@@ -675,7 +676,7 @@ article[id],
   margin-top: 18px;
   font-size: 29px;
   font-weight: 450;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.01em;
   line-height: 1.3;
 }
 .case-heading h3 span {
@@ -824,7 +825,7 @@ article[id],
 }
 .journey strong {
   font-size: 20px;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.01em;
   font-weight: 500;
 }
 .journey > div > span:last-child {
@@ -843,7 +844,8 @@ article[id],
 }
 .project h3 {
   font-size: 29px;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.01em;
+  line-height: 1.22;
   margin-bottom: 14px;
 }
 .project p {
@@ -925,7 +927,7 @@ article[id],
   font-size: 17px;
   line-height: 1.5;
   font-weight: 500;
-  letter-spacing: -0.25px;
+  letter-spacing: -0.005em;
 }
 .publication h4 a:hover {
   color: var(--blue);
@@ -970,7 +972,8 @@ article[id],
 .contact-layout h2 {
   font-size: clamp(38px, 5vw, 70px);
   font-weight: 400;
-  letter-spacing: -2.7px;
+  letter-spacing: -0.012em;
+  line-height: 1.18;
 }
 .contact-layout h2 > span {
   color: #4c8dc9;
@@ -1176,7 +1179,7 @@ html:has(.motion-paused) {
   }
   .hero h1 {
     font-size: clamp(58px, 12.5vw, 96px);
-    letter-spacing: -3px;
+    letter-spacing: -0.018em;
     white-space: normal;
   }
   .hero-role {
@@ -1249,7 +1252,7 @@ html:has(.motion-paused) {
     max-width: 580px;
   }
   .work-copy h2 {
-    font-size: 46px;
+    font-size: 42px;
   }
   .work-platform {
     font-size: 14px;
@@ -1369,7 +1372,6 @@ html:has(.motion-paused) {
   }
   .contact-layout h2 {
     font-size: 43px;
-    letter-spacing: -1.8px;
   }
   .contact-arrow {
     width: 64px;
@@ -1395,8 +1397,11 @@ html:has(.motion-paused) {
   .site-footer p {
     margin-left: auto;
   }
-  h2 {
-    letter-spacing: -1.6px;
+  h2,
+  .work-copy h2,
+  .contact-layout h2 {
+    letter-spacing: -0.006em;
+    line-height: 1.2;
   }
 }
 @media (max-width: 500px) {
@@ -1405,7 +1410,7 @@ html:has(.motion-paused) {
   }
   .hero h1 {
     font-size: 60px;
-    letter-spacing: -3.1px;
+    letter-spacing: -0.016em;
   }
   .hero-description {
     font-size: 13px;
@@ -1450,7 +1455,7 @@ html:has(.motion-paused) {
   }
   .about-copy h2,
   .work-copy h2 {
-    font-size: 41px;
+    font-size: 36px;
   }
   .about-links {
     gap: 16px 24px;
@@ -1463,7 +1468,6 @@ html:has(.motion-paused) {
   }
   .contact-layout h2 {
     font-size: 35px;
-    letter-spacing: -1.4px;
   }
   .contact-arrow {
     width: 48px;
@@ -1526,7 +1530,7 @@ html:has(.motion-paused) {
   }
   .work-copy h2,
   .about-copy h2 {
-    font-size: 37px;
+    font-size: 33px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
