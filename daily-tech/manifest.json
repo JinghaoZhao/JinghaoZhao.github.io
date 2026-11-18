@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-17",
+  "updated_at": "2026-11-18",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1877,6 +1877,28 @@
         "工业自动化"
       ],
       "excerpt": "从奔驰真实产线的96%分拣成功率、200多项精细操作任务，到Argon用数字孪生训练机器人及物理安全评测，厘清演示、试验与规模商业部署之间的鸿沟。",
+      "reading_minutes": 19
+    },
+    {
+      "id": "2026-11-18-epoch-real-work-evaluation",
+      "sequence": 90,
+      "title": "基准榜并列第一，真实工作却差了17分：AI最缺的不是知识，而是研究判断",
+      "source_title": "How good are Fable 5.2 and GPT-6.2 Astra at real work?",
+      "source_author": "Kelly Hong（Epoch AI）",
+      "source_date": "2026-11-17",
+      "source_url": "https://epoch.ai/publications/how-good-are-fable-5-2-and-gpt-6-2-astra-at-real-work",
+      "delivery_date": "2026-11-18",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-18-epoch-real-work-evaluation.md",
+      "tags": [
+        "AI 模型",
+        "Agent",
+        "科研自动化",
+        "能力评测",
+        "知识工作"
+      ],
+      "excerpt": "Epoch AI 用真实的研究、数据中心调查与视觉设计任务测试六套前沿 Agent：Fable 5.2 平均82%，GPT-6.2 Astra为65%。更重要的是模型在实验设计、自我复查与专业判断上的缺口。",
       "reading_minutes": 19
     }
   ]
