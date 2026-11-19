@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fbfcfe" />
+    <title>Jinghao Zhao — Engineer &amp; Designer (Kinetic Spatial Studio)</title>
+    <meta
+      name="description"
+      content="Jinghao Zhao is a software engineer on Google’s GCE Bare Metal team, bringing an end-to-end systems perspective to cloud infrastructure. UCLA Ph.D., systems and networking researcher."
+    />
+    <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      href="../../fonts/dm-sans.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Scroll Progress Rail -->
+    <div class="scroll-progress" aria-hidden="true">
+      <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Floating Pill Navigation Dock -->
+    <header class="site-header" id="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="#top" aria-label="Jinghao Zhao, home">
+          jz<span class="wordmark-dot">.</span>
+        </a>
+
+        <nav class="nav-dock" aria-label="Main navigation" id="nav-dock">
+          <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+          <a href="#work" data-nav="work">Work</a>
+          <a href="#Bio" data-nav="Bio">About</a>
+          <a href="#projects" data-nav="projects">Projects</a>
+          <a href="#publications" data-nav="publications">Research</a>
+        </nav>
+
+        <div class="header-right">
+          <div class="concept-switcher" aria-label="Design concept switcher">
+            <a href="../" class="switcher-link">All 5 Concepts</a>
+            <span class="switcher-sep" aria-hidden="true">·</span>
+            <a href="../../" class="switcher-link">Current Site</a>
+          </div>
+          <a
+            class="header-cta magnetic"
+            href="https://www.linkedin.com/in/jinghaozhao/"
+            data-magnetic="0.22"
+          >
+            <span>Connect</span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- HERO: Kinetic Spatial Aurora -->
+      <section class="hero" id="large-header" aria-labelledby="hero-title">
+        <canvas id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero-aurora-fallback" aria-hidden="true"></div>
+        <div class="hero-grid-overlay" aria-hidden="true"></div>
+
+        <div class="container hero-container">
+          <div class="hero-content">
+            <div class="hero-badge reveal-hero">
+              <span class="badge-pulse" aria-hidden="true"></span>
+              <span class="hero-role">ENGINEER <span>&amp;</span> DESIGNER</span>
+            </div>
+
+            <h1 id="hero-title" class="hero-title reveal-hero">
+              Jinghao Zhao<span class="accent-dot">.</span>
+            </h1>
+
+            <p class="hero-description reveal-hero">
+              Architecting cloud and networked systems from bare metal up—with an
+              eye for clarity, craft, and interaction.
+            </p>
+
+            <div class="hero-actions reveal-hero">
+              <a
+                class="btn btn-primary magnetic"
+                href="#work"
+                data-magnetic="0.28"
+              >
+                <span>Explore my work</span>
+                <span class="btn-icon" aria-hidden="true">↘</span>
+              </a>
+              <a
+                class="btn btn-glass magnetic"
+                href="#Bio"
+                data-magnetic="0.22"
+              >
+                <span>A little about me</span>
+                <span class="btn-icon" aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-footer reveal-hero">
+            <a class="scroll-cue" href="#work">
+              <span class="scroll-pill" aria-hidden="true">
+                <span class="scroll-dot"></span>
+              </span>
+              <span>SCROLL TO EXPLORE</span>
+            </a>
+
+            <div class="social-links" aria-label="Social and academic profiles">
+              <a
+                href="https://github.com/JinghaoZhao"
+                aria-label="Jinghao Zhao on GitHub"
+              >
+                GitHub <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+                aria-label="Jinghao Zhao on Google Scholar"
+              >
+                Scholar <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/jinghaozhao/"
+                aria-label="Jinghao Zhao on LinkedIn"
+              >
+                LinkedIn <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://drive.google.com/file/d/1w_XJ42SjzV_rB1WRCMU-FlWVH3ZQ_RF9/view?usp=sharing"
+                aria-label="Jinghao Zhao CV"
+              >
+                CV <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 01: CURRENT FOCUS (Deep Midnight Showcase Band) -->
+      <section
+        class="work-section section-midnight"
+        id="work"
+        aria-labelledby="work-title"
+      >
+        <div class="midnight-glow midnight-glow-1" aria-hidden="true"></div>
+        <div class="midnight-glow midnight-glow-2" aria-hidden="true"></div>
+
+        <div class="container">
+          <div class="section-heading section-heading-dark reveal">
+            <p class="eyebrow">
+              <span class="section-number">01 /</span> CURRENT FOCUS
+            </p>
+            <span class="section-aside">Google Cloud Infrastructure</span>
+          </div>
+
+          <div class="work-layout">
+            <div class="work-copy reveal">
+              <div class="platform-pill">
+                <span class="platform-dot" aria-hidden="true"></span>
+                <span>Google Cloud · GCE Bare Metal</span>
+              </div>
+              <h2 id="work-title" class="display-h2">
+                Dedicated hardware,<br />
+                <span class="text-gradient-aurora"
+                  >architected for the cloud.</span
+                >
+              </h2>
+              <p class="work-intro">
+                On Google’s <strong>GCE Bare Metal</strong> team, I focus on how
+                dedicated physical machines behave as first-class citizens of a
+                cloud platform.
+              </p>
+              <p class="work-description">
+                Making bare metal feel cloud-native means bridging hardware
+                boundaries, automated fleet lifecycle, and predictable fabric
+                performance across the stack.
+              </p>
+            </div>
+
+            <figure
+              class="compute-figure reveal"
+              aria-labelledby="compute-caption"
+            >
+              <div class="figure-topline">
+                <span class="mono-label">COMPUTE / CONTROL / CONNECT</span>
+                <span class="telemetry-live" aria-hidden="true">
+                  <span class="telemetry-dot"></span>
+                </span>
+              </div>
+              <svg
+                class="compute-art"
+                viewBox="0 0 600 460"
+                role="img"
+                aria-label="Illustration of layered bare metal compute connected by flowing network signals"
+              >
+                <defs>
+                  <linearGradient id="v5-slab-top" x2="1" y2="1">
+                    <stop stop-color="#2563eb" stop-opacity="0.88" />
+                    <stop offset="1" stop-color="#0f2952" />
+                  </linearGradient>
+                  <linearGradient id="v5-slab-side">
+                    <stop stop-color="#1e3a6d" />
+                    <stop offset="1" stop-color="#0a162c" />
+                  </linearGradient>
+                  <linearGradient id="v5-chip-top" x2="1" y2="1">
+                    <stop stop-color="#bae6fd" />
+                    <stop offset="0.55" stop-color="#38bdf8" />
+                    <stop offset="1" stop-color="#6366f1" />
+                  </linearGradient>
+                  <radialGradient id="v5-chip-glow">
+                    <stop stop-color="#38bdf8" stop-opacity="0.32" />
+                    <stop offset="0.6" stop-color="#6366f1" stop-opacity="0.1" />
+                    <stop offset="1" stop-color="#090e1a" stop-opacity="0" />
+                  </radialGradient>
+                </defs>
+                <ellipse
+                  cx="300"
+                  cy="248"
+                  rx="265"
+                  ry="190"
+                  fill="url(#v5-chip-glow)"
+                />
+                <g
+                  class="diagram-grid"
+                  fill="none"
+                  stroke="#93c5fd"
+                  stroke-opacity="0.12"
+                >
+                  <path
+                    d="M30 290 300 135 570 290 300 445Z M30 245 300 90 570 245 M30 335 300 180 570 335 M110 200 380 355 M190 155 460 310 M410 155 140 310 M490 200 220 355"
+                  />
+                </g>
+                <g
+                  class="circuit-lines"
+                  fill="none"
+                  stroke="#38bdf8"
+                  stroke-opacity="0.45"
+                  stroke-width="1.3"
+                >
+                  <path d="M300 367 300 415 515 290 515 262" />
+                  <path d="M124 266 65 300 65 180 200 102" />
+                  <path d="M476 266 552 222 552 150 442 87" />
+                </g>
+                <g
+                  class="signal-paths"
+                  fill="none"
+                  stroke="#e0f2fe"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                >
+                  <path d="M300 367 300 415 515 290 515 262" />
+                  <path d="M124 266 65 300 65 180 200 102" />
+                  <path d="M476 266 552 222 552 150 442 87" />
+                </g>
+                <g fill="#7dd3fc">
+                  <circle cx="515" cy="262" r="3.5" />
+                  <circle cx="200" cy="102" r="3.5" />
+                  <circle cx="442" cy="87" r="3.5" />
+                </g>
+                <g class="compute-layer layer-bottom">
+                  <path
+                    d="M124 266 300 164 476 266 300 369Z"
+                    fill="url(#v5-slab-top)"
+                    stroke="#60a5fa"
+                    stroke-opacity="0.6"
+                  />
+                  <path
+                    d="M124 266 300 369 300 388 124 286Z M300 369 476 266 476 286 300 388Z"
+                    fill="url(#v5-slab-side)"
+                    stroke="#3b82f6"
+                    stroke-opacity="0.45"
+                  />
+                  <path
+                    d="M146 285 220 328 M146 291 197 321 M326 366 449 295"
+                    stroke="#93c5fd"
+                    stroke-opacity="0.7"
+                  />
+                </g>
+                <g class="compute-layer layer-middle">
+                  <path
+                    d="M124 208 300 106 476 208 300 310Z"
+                    fill="url(#v5-slab-top)"
+                    stroke="#7dd3fc"
+                    stroke-opacity="0.75"
+                  />
+                  <path
+                    d="M124 208 300 310 300 328 124 226Z M300 310 476 208 476 226 300 328Z"
+                    fill="url(#v5-slab-side)"
+                    stroke="#38bdf8"
+                    stroke-opacity="0.5"
+                  />
+                  <g fill="none" stroke="#93c5fd" stroke-opacity="0.55">
+                    <path
+                      d="M150 208 300 121 450 208 300 295Z M195 208 300 147 405 208 300 269Z M150 208 450 208 M300 121 300 295"
+                    />
+                  </g>
+                  <g fill="#bae6fd">
+                    <circle cx="145" cy="225" r="2.2" />
+                    <circle cx="156" cy="231" r="2.2" />
+                    <circle cx="167" cy="237" r="2.2" />
+                  </g>
+                </g>
+                <g class="compute-layer layer-top">
+                  <path
+                    d="M218 157 300 110 382 157 300 205Z"
+                    fill="url(#v5-chip-top)"
+                    stroke="#e0f2fe"
+                  />
+                  <path
+                    d="M218 157 300 205 300 224 218 176Z M300 205 382 157 382 176 300 224Z"
+                    fill="#1e40af"
+                    stroke="#93c5fd"
+                  />
+                  <path
+                    d="M237 157 300 121 363 157 300 194Z"
+                    fill="none"
+                    stroke="#f0f9ff"
+                    stroke-opacity="0.7"
+                  />
+                  <text
+                    x="300"
+                    y="162"
+                    text-anchor="middle"
+                    fill="#071326"
+                    font-size="13"
+                    font-family="'Plus Jakarta Sans', 'DM Sans', sans-serif"
+                    font-weight="700"
+                    letter-spacing="0.8"
+                  >
+                    BARE METAL
+                  </text>
+                </g>
+                <g
+                  class="diagram-labels"
+                  font-family="'JetBrains Mono', monospace"
+                  font-size="10.5"
+                  letter-spacing="1.4"
+                  fill="#94a3b8"
+                >
+                  <text x="190" y="92" text-anchor="end">CONTROL PLANE</text>
+                  <text x="452" y="77" text-anchor="start">CLOUD SERVICES</text>
+                </g>
+              </svg>
+              <figcaption id="compute-caption">
+                <span>Physical hosts, control planes, and cloud fabric</span>
+                <span class="diagram-note">Conceptual illustration</span>
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="work-pillars reveal">
+            <div class="pillar-card">
+              <span class="pillar-index">01</span>
+              <h3>Host &amp; fabric</h3>
+              <p>
+                Dedicated silicon, high-speed networking, and storage I/O
+                boundaries.
+              </p>
+            </div>
+            <div class="pillar-card">
+              <span class="pillar-index">02</span>
+              <h3>Fleet lifecycle</h3>
+              <p>
+                Automated provisioning, orchestration, and safe control-plane
+                transitions.
+              </p>
+            </div>
+            <div class="pillar-card">
+              <span class="pillar-index">03</span>
+              <h3>End-to-end behavior</h3>
+              <p>
+                Predictable latency, fault isolation, and operability at scale.
+              </p>
+            </div>
+          </div>
+
+          <article class="work-case reveal" aria-labelledby="cme-title">
+            <div class="case-heading">
+              <p class="eyebrow">IN PRACTICE / SELECTED WORK</p>
+              <h3 id="cme-title">
+                Google Cloud <span class="case-times">×</span><br />CME Group
+              </h3>
+              <span class="case-focus-pill">Ultra-low-latency trading</span>
+            </div>
+            <div class="case-copy">
+              <p>
+                One place this architecture comes together is the low-latency
+                trading platform built through the Google Cloud and CME Group
+                collaboration, which I contribute to on the GCE Bare Metal side.
+              </p>
+              <p>
+                The collaboration brings dedicated bare metal compute and
+                deterministic networking to financial markets—combining the
+                precision of physical infrastructure with the flexibility of the
+                cloud.
+              </p>
+              <div class="case-links">
+                <a
+                  class="pill-link pill-link-dark"
+                  href="https://cloud.google.com/blog/topics/financial-services/ultra-low-latency-solution-with-u4-enables-high-velocity-trading"
+                >
+                  <span>Read the Google Cloud story</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  class="pill-link pill-link-dark"
+                  href="https://www.cmegroup.com/media-room/press-releases/2026/10/12/cme_group_announcescloudmigrationmilestones.html"
+                >
+                  <span>CME migration update · Oct 2026</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <p class="source-note">
+                Platform context from public Google Cloud and CME Group
+                materials.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- SECTION 02: ABOUT & JOURNEY -->
+      <section class="about-section section" id="Bio" aria-labelledby="about-title">
+        <div class="container">
+          <div class="about-layout">
+            <div class="about-copy reveal">
+              <p class="eyebrow">
+                <span class="section-number">02 /</span> A LITTLE ABOUT ME
+              </p>
+              <h2 id="about-title" class="display-h2">
+                Deep in the stack.<br />
+                <span class="text-muted">Deliberate on the surface.</span>
+              </h2>
+              <p class="large-copy">
+                I care as much about how a system behaves under the hood as how
+                an interface feels in someone’s hands.
+              </p>
+              <p>
+                Before Google, I received my Ph.D. in Computer Science from the
+                University of California, Los Angeles, advised by Prof. Songwu
+                Lu, and my B.S. in Electronic Engineering from Shanghai Jiao
+                Tong University. My research spans networked systems, mobile
+                security, and edge and cloud infrastructure—tracing how real
+                systems fail, recover, and perform.
+              </p>
+              <p>
+                Alongside systems engineering, I’m drawn to product interaction
+                and visual aesthetics: clear hierarchy, purposeful motion, and
+                interfaces that make complex technical ideas feel effortless.
+              </p>
+              <div class="about-links">
+                <a
+                  class="pill-link pill-link-light"
+                  href="https://drive.google.com/file/d/1w_XJ42SjzV_rB1WRCMU-FlWVH3ZQ_RF9/view?usp=sharing"
+                >
+                  <span>View my CV</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  class="pill-link pill-link-light"
+                  href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+                >
+                  <span>Google Scholar</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  class="pill-link pill-link-light"
+                  href="https://www.linkedin.com/in/jinghaozhao/"
+                >
+                  <span>Connect on LinkedIn</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
+
+            <figure class="portrait reveal">
+              <div class="portrait-card">
+                <div class="portrait-frame">
+                  <img
+                    src="../../images/optimized/bio.webp"
+                    alt="Jinghao Zhao"
+                    width="647"
+                    height="771"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption class="portrait-caption">
+                  <span class="portrait-name">Jinghao Zhao</span>
+                  <span class="portrait-role">ENGINEER &amp; DESIGNER</span>
+                </figcaption>
+              </div>
+            </figure>
+          </div>
+
+          <div class="journey-grid reveal" aria-label="Career and education timeline">
+            <div class="journey-card">
+              <span class="journey-label">NOW</span>
+              <strong>Google</strong>
+              <span>GCE Bare Metal</span>
+            </div>
+            <div class="journey-card">
+              <span class="journey-label">RESEARCH</span>
+              <strong>UCLA</strong>
+              <span>Ph.D. · Computer Science</span>
+            </div>
+            <div class="journey-card">
+              <span class="journey-label">FOUNDATIONS</span>
+              <strong>Shanghai Jiao Tong</strong>
+              <span>B.S. · Electronic Engineering</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 03: SELECTED PROJECTS (Interactive Split-Stage Showcase) -->
+      <section
+        class="projects-section section"
+        id="projects"
+        aria-labelledby="projects-title"
+      >
+        <div class="container">
+          <div class="section-heading reveal">
+            <div>
+              <p class="eyebrow">
+                <span class="section-number">03 /</span> SELECTED PROJECTS
+              </p>
+              <h2 id="projects-title" class="display-h2">
+                Systems &amp; explorations.
+              </h2>
+            </div>
+            <span class="section-aside">
+              Research prototypes, open testbeds, and interactive tools
+            </span>
+          </div>
+
+          <!-- Split-Stage Showcase: Interactive List (Left) + Sticky Morphing Stage (Right) -->
+          <div class="split-stage" id="split-stage">
+            <div class="project-list" role="list">
+              <!-- 01: SEED -->
+              <article
+                class="project-item is-active"
+                id="seed"
+                data-project="seed"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="true"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">01</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>SEED</h3>
+                      <span class="project-tag">SIGCOMM ’22</span>
+                    </div>
+                    <p class="project-desc">
+                      Diagnosing and recovering from 5G failures through the SIM.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div class="project-mobile-stage" data-mobile-slot="seed"></div>
+                <div class="project-item-footer">
+                  <a
+                    class="inline-link"
+                    href="../../docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
+                  >
+                    Read the SIGCOMM ’22 paper <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+
+              <!-- 02: SecureSIM -->
+              <article
+                class="project-item"
+                id="secureSIM"
+                data-project="secureSIM"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="false"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">02</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>SecureSIM</h3>
+                      <span class="project-tag">MobiCom ’21</span>
+                    </div>
+                    <p class="project-desc">
+                      Authentication and fine-grained access control for SIM and
+                      eSIM.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div class="project-mobile-stage" data-mobile-slot="secureSIM"></div>
+                <div class="project-item-footer">
+                  <a
+                    class="inline-link"
+                    href="https://dl.acm.org/doi/pdf/10.1145/3447993.3483254"
+                  >
+                    Read the MobiCom ’21 paper <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+
+              <!-- 03: GPT-Code-Learner -->
+              <article
+                class="project-item"
+                id="gptcodelearner"
+                data-project="gptcodelearner"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="false"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">03</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>GPT-Code-Learner</h3>
+                      <span class="project-tag">Open Source</span>
+                    </div>
+                    <p class="project-desc">
+                      Explore a codebase through questions, context, and GPT.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div
+                  class="project-mobile-stage"
+                  data-mobile-slot="gptcodelearner"
+                ></div>
+                <div class="project-item-footer">
+                  <a
+                    class="inline-link"
+                    href="https://github.com/JinghaoZhao/GPT-Code-Learner"
+                  >
+                    Explore on GitHub <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+
+              <!-- 04: Sonica -->
+              <article
+                class="project-item"
+                id="sonica"
+                data-project="sonica"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="false"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">04</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>Sonica</h3>
+                      <span class="project-tag">NB-IoT Testbed</span>
+                    </div>
+                    <p class="project-desc">
+                      An open NB-IoT network for experiments with real devices.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div class="project-mobile-stage" data-mobile-slot="sonica"></div>
+                <div class="project-item-footer">
+                  <a
+                    class="inline-link"
+                    href="https://github.com/sonica-nbiot/sonica"
+                  >
+                    Explore on GitHub <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+
+              <!-- 05: Flora -->
+              <article
+                class="project-item"
+                id="flora"
+                data-project="flora"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="false"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">05</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>Flora</h3>
+                      <span class="project-tag">SDR Mobile Stack</span>
+                    </div>
+                    <p class="project-desc">
+                      A software-defined mobile network spanning eSIM, radio,
+                      core, and edge.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div class="project-mobile-stage" data-mobile-slot="flora"></div>
+                <div class="project-item-footer">
+                  <a
+                    class="inline-link"
+                    href="https://project-flora.github.io/Flora/"
+                  >
+                    Explore the project <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+
+              <!-- 06: Mobile VR Latency -->
+              <article
+                class="project-item"
+                id="lrp"
+                data-project="lrp"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="false"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">06</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>Mobile VR Latency</h3>
+                      <span class="project-tag">NSDI ’21</span>
+                    </div>
+                    <p class="project-desc">
+                      Proactive LTE uplink scheduling for interactive mobile
+                      VR—less delay, more immersion.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div class="project-mobile-stage" data-mobile-slot="lrp"></div>
+                <div class="project-item-footer">
+                  <a
+                    class="inline-link"
+                    href="https://www.usenix.org/system/files/nsdi21-tan.pdf"
+                  >
+                    Read the NSDI ’21 paper <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+
+              <!-- 07: Acemap -->
+              <article
+                class="project-item"
+                id="acemap-item"
+                data-project="acemap"
+                role="listitem"
+              >
+                <button
+                  type="button"
+                  class="project-trigger"
+                  aria-expanded="false"
+                  aria-controls="stage-visual"
+                >
+                  <span class="project-num">07</span>
+                  <div class="project-meta">
+                    <div class="project-header-row">
+                      <h3>Acemap</h3>
+                      <span class="project-tag">Knowledge Graph</span>
+                    </div>
+                    <p class="project-desc">
+                      An academic knowledge graph mapping connections across
+                      2,208 research topics and 19 disciplines.
+                    </p>
+                  </div>
+                  <span class="project-chevron" aria-hidden="true">→</span>
+                </button>
+                <div class="project-mobile-stage" data-mobile-slot="acemap"></div>
+                <div class="project-item-footer">
+                  <a class="inline-link" href="https://acemap.sjtu.edu.cn/">
+                    Explore Acemap <span aria-hidden="true">↗</span>
+                  </a>
+                  <a class="inline-link inline-link-accent" href="#acemap">
+                    Interactive 2,208-topic explorer
+                    <span aria-hidden="true">↓</span>
+                  </a>
+                </div>
+              </article>
+            </div>
+
+            <!-- Sticky Visual Stage (Desktop) -->
+            <aside class="stage-column" aria-label="Interactive project visual stage">
+              <div class="stage-card" id="stage-visual" data-step="0">
+                <div class="stage-topbar">
+                  <div class="stage-title-group">
+                    <span class="stage-index" id="stage-index">01 / 07</span>
+                    <strong class="stage-name" id="stage-name">SEED</strong>
+                  </div>
+                  <div class="stage-controls">
+                    <div class="stage-steps" id="stage-steps" aria-label="Diagram phase">
+                      <button type="button" class="step-dot is-active" data-step-btn="1" aria-label="Step 1"></button>
+                      <button type="button" class="step-dot" data-step-btn="2" aria-label="Step 2"></button>
+                      <button type="button" class="step-dot" data-step-btn="3" aria-label="Step 3"></button>
+                    </div>
+                    <button
+                      type="button"
+                      class="stage-replay"
+                      id="stage-replay"
+                      aria-label="Replay architecture walkthrough"
+                    >
+                      <span aria-hidden="true">↻</span> Replay
+                    </button>
+                  </div>
+                </div>
+
+                <div class="stage-viewport" id="stage-viewport">
+                  <!-- Bespoke SVG diagrams live here and morph cleanly -->
+                  <div class="stage-svg-slot" id="stage-svg-slot"></div>
+                </div>
+
+                <div class="stage-bottombar">
+                  <p class="stage-caption" id="stage-caption">
+                    A device reports a failure to the SEED SIM applet. SIM and
+                    core-network diagnosis inform a recovery action.
+                  </p>
+                  <a
+                    class="stage-action"
+                    id="stage-action"
+                    href="../../docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
+                  >
+                    <span id="stage-action-label">Read the SIGCOMM ’22 paper</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <!-- FULL-WIDTH INTERACTIVE ACEMAP 2,208-TOPIC EXPLORER -->
+          <article
+            class="acemap-studio reveal"
+            id="acemap"
+            aria-labelledby="acemap-studio-title"
+          >
+            <div class="acemap-studio-header">
+              <div class="acemap-studio-intro">
+                <p class="eyebrow">INTERACTIVE EXPLORER · ACEMAP</p>
+                <h3 id="acemap-studio-title">
+                  2,208 research topics across 19 disciplines.
+                </h3>
+                <p class="acemap-studio-desc">
+                  Load the live Acemap coordinate dataset on demand to filter by
+                  discipline, search topics instantaneously, and inspect
+                  neighborhoods across the academic knowledge graph.
+                </p>
+              </div>
+              <div class="acemap-studio-actions">
+                <button
+                  type="button"
+                  class="btn btn-primary magnetic"
+                  id="acemap-load-btn"
+                  data-magnetic="0.22"
+                >
+                  <span>Load 2,208 topics</span>
+                  <span class="btn-icon" aria-hidden="true">↗</span>
+                </button>
+                <a
+                  class="pill-link pill-link-light"
+                  href="https://acemap.sjtu.edu.cn/"
+                >
+                  <span>Visit Acemap</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Interactive Toolbar (Revealed after data loads) -->
+            <div class="acemap-toolbar" id="acemap-toolbar" hidden>
+              <div class="acemap-search-wrap">
+                <label class="sr-only" for="acemap-search">Search topics</label>
+                <svg
+                  class="search-icon"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="9"
+                    cy="9"
+                    r="6"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+                  <path
+                    d="M13.5 13.5L17.5 17.5"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <input
+                  type="search"
+                  id="acemap-search"
+                  class="acemap-search"
+                  placeholder="Search 2,208 topics (e.g. Neural network, 5G, Quantum)…"
+                  autocomplete="off"
+                />
+                <button
+                  type="button"
+                  id="acemap-clear-search"
+                  class="search-clear"
+                  hidden
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="acemap-meta-readout">
+                <span class="acemap-status" id="acemap-status" role="status">
+                  Ready to load dataset (../../data/data.csv)
+                </span>
+              </div>
+            </div>
+
+            <!-- Field Filter Pills (Populated on load) -->
+            <div
+              class="acemap-pills"
+              id="acemap-pills"
+              role="group"
+              aria-label="Filter by research discipline"
+              hidden
+            ></div>
+
+            <!-- Interactive Stage -->
+            <div class="acemap-canvas-wrap" id="acemap-canvas-wrap">
+              <!-- Initial SVG Constellation Preview -->
+              <svg
+                id="acemap-preview-svg"
+                class="acemap-preview-svg"
+                viewBox="0 0 960 440"
+                role="img"
+                aria-labelledby="acemap-preview-title"
+              >
+                <title id="acemap-preview-title">
+                  Preview of the Acemap academic topic map. Click Load 2,208
+                  topics to explore research fields interactively.
+                </title>
+                <g fill="none" stroke="#94a3b8" stroke-opacity="0.28">
+                  <ellipse
+                    cx="480"
+                    cy="220"
+                    rx="320"
+                    ry="135"
+                    transform="rotate(-14 480 220)"
+                  />
+                  <ellipse
+                    cx="480"
+                    cy="220"
+                    rx="250"
+                    ry="165"
+                    transform="rotate(19 480 220)"
+                  />
+                  <ellipse
+                    cx="480"
+                    cy="220"
+                    rx="145"
+                    ry="185"
+                    transform="rotate(42 480 220)"
+                  />
+                </g>
+                <path
+                  class="acemap-preview-lines"
+                  d="M210 145 L480 65 L730 130 L765 295 L505 375 L235 315 Z M210 145 L765 295 M730 130 L235 315 M480 65 L505 375"
+                  fill="none"
+                  stroke="#1d63ff"
+                  stroke-opacity="0.32"
+                  stroke-width="1.2"
+                />
+                <g class="acemap-preview-nodes">
+                  <circle cx="210" cy="145" r="7" fill="#1d63ff" />
+                  <circle cx="480" cy="65" r="6" fill="#0ea5e9" />
+                  <circle cx="730" cy="130" r="8" fill="#6366f1" />
+                  <circle cx="765" cy="295" r="5" fill="#1d63ff" />
+                  <circle cx="505" cy="375" r="7" fill="#0ea5e9" />
+                  <circle cx="235" cy="315" r="5" fill="#6366f1" />
+                  <circle cx="480" cy="220" r="12" fill="#1d63ff" />
+                  <circle
+                    cx="480"
+                    cy="220"
+                    r="24"
+                    fill="none"
+                    stroke="#1d63ff"
+                    stroke-opacity="0.25"
+                  />
+                </g>
+              </svg>
+
+              <!-- Live Interactive Canvas -->
+              <canvas
+                id="acemap-canvas"
+                class="acemap-canvas"
+                hidden
+                aria-label="Interactive scatter plot of 2,208 Acemap research topics"
+              ></canvas>
+
+              <!-- Floating Tooltip -->
+              <div
+                class="acemap-tooltip"
+                id="acemap-tooltip"
+                role="tooltip"
+                hidden
+              >
+                <span class="tooltip-dot" id="tooltip-dot"></span>
+                <div class="tooltip-body">
+                  <strong class="tooltip-title" id="tooltip-title"></strong>
+                  <span class="tooltip-field" id="tooltip-field"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="acemap-footer-bar" id="acemap-footer-bar">
+              <span id="acemap-selected-readout" class="acemap-selected-readout">
+                Hover or click any point to inspect topic details.
+              </span>
+              <span class="acemap-hint mono-label">19 DISCIPLINES · CSV ON DEMAND</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- SECTION 04: PUBLICATIONS (Tactile Segmented-Pill Filter) -->
+      <section
+        class="publications-section section"
+        id="publications"
+        aria-labelledby="publications-title"
+      >
+        <div class="container">
+          <div class="section-heading reveal">
+            <div>
+              <p class="eyebrow">
+                <span class="section-number">04 /</span> PUBLICATIONS
+              </p>
+              <h2 id="publications-title" class="display-h2">
+                Published research.
+              </h2>
+            </div>
+            <div class="heading-links">
+              <a
+                class="pill-link pill-link-light"
+                href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+              >
+                <span>Google Scholar</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                class="pill-link pill-link-light"
+                href="https://drive.google.com/file/d/1w_XJ42SjzV_rB1WRCMU-FlWVH3ZQ_RF9/view?usp=sharing"
+              >
+                <span>Full CV</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="publication-toolbar reveal">
+            <div
+              class="segmented-control"
+              id="pub-segmented"
+              role="group"
+              aria-label="Filter publications"
+            >
+              <span
+                class="segmented-thumb"
+                id="pub-thumb"
+                aria-hidden="true"
+              ></span>
+              <button
+                type="button"
+                class="seg-btn is-active"
+                data-filter="all"
+                aria-pressed="true"
+              >
+                All <span class="seg-count">12</span>
+              </button>
+              <button
+                type="button"
+                class="seg-btn"
+                data-filter="conference"
+                aria-pressed="false"
+              >
+                Conferences <span class="seg-count">9</span>
+              </button>
+              <button
+                type="button"
+                class="seg-btn"
+                data-filter="journal"
+                aria-pressed="false"
+              >
+                Journals <span class="seg-count">3</span>
+              </button>
+            </div>
+
+            <div class="pub-count-badge" id="publication-count" role="status">
+              <span class="pub-count-num" id="pub-count-num">12</span>
+              <span id="pub-count-label">publications · 2019–2023</span>
+            </div>
+          </div>
+
+          <div class="publication-group" data-kind="conference" id="conf">
+            <h3 class="publication-group-title">Conference publications</h3>
+            <div class="publication-list">
+              <article class="publication">
+                <span class="publication-year">2023</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1145/3570361.3613260">
+                      Sign-to-911: Enabling 911 Service for Sign Language Users
+                      on Assistive AR Glasses<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Yunqi Guo, <strong>Jinghao Zhao</strong>, Boyan Ding,
+                    Congkai Tan, Weichong Lin, Zhaowei Tan, Hongzhe Du, Jennifer
+                    Miyaki, Songwu Lu.
+                  </p>
+                  <p class="venue">ACM MobiCom 2023.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2023</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://www.usenix.org/system/files/nsdi23-tan.pdf">
+                      CellDAM: User-Space, Rootless Detection and Mitigation for
+                      5G Data Plane<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Zhaowei Tan, <strong>Jinghao Zhao</strong>, Boyan Ding,
+                    Songwu Lu.
+                  </p>
+                  <p class="venue">USENIX NSDI 2023.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2022</span>
+                <div class="publication-body">
+                  <h4>
+                    <a
+                      href="../../docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
+                    >
+                      SEED: A SIM-Based Solution to 5G Failures<span
+                        aria-hidden="true"
+                      >
+                        ↗</span
+                      >
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    <strong>Jinghao Zhao</strong>, Zhaowei Tan, Yifei Xu, Zhehui
+                    Zhang, Songwu Lu.
+                  </p>
+                  <p class="venue">ACM SIGCOMM 2022.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2022</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1109/CNS56114.2022.9947238">
+                      5G Messaging: System Insecurity and Defenses<span
+                        aria-hidden="true"
+                      >
+                        ↗</span
+                      >
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    <strong>Jinghao Zhao</strong>, Qianru Li, Zengwen Yuan,
+                    Zhehui Zhang, Songwu Lu.
+                  </p>
+                  <p class="venue">IEEE CNS 2022.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2021</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://dl.acm.org/doi/10.1145/3447993.3483254">
+                      SecureSIM: Rethinking Authentication and Access Control
+                      for SIM/eSIM<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    <strong>Jinghao Zhao</strong>, Boyan Ding, Yunqi Guo,
+                    Zhaowei Tan, Songwu Lu.
+                  </p>
+                  <p class="venue">ACM MobiCom 2021.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2021</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1145/3447993.3483255">
+                      Data-Plane Signaling in Cellular IoT: Attacks and
+                      Defense<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Zhaowei Tan, Boyan Ding, <strong>Jinghao Zhao</strong>,
+                    Yunqi Guo, Songwu Lu.
+                  </p>
+                  <p class="venue">ACM MobiCom 2021.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2021</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1145/3447993.3448138">
+                      Experience: A Five-Year Retrospective of
+                      MobileInsight<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Yuanjie Li, Chunyi Peng, Zhehui Zhang, Zhaowei Tan, Haotian
+                    Deng, <strong>Jinghao Zhao</strong>, Qianru Li, Yunqi Guo,
+                    Kai Ling, Boyan Ding, Hewu Li, Songwu Lu.
+                  </p>
+                  <p class="venue">ACM MobiCom 2021.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2021</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://www.usenix.org/system/files/nsdi21-tan.pdf">
+                      Device-Based LTE Latency Reduction at the Application
+                      Layer<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Zhaowei Tan, <strong>Jinghao Zhao</strong>, Yuanjie Li,
+                    Yifei Xu, Songwu Lu.
+                  </p>
+                  <p class="venue">USENIX NSDI 2021.</p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2019</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1109/IJCNN.2019.8852003">
+                      Skip The Question You Don’t Know: An Embedding Space
+                      Approach<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Kaiyuan Chen, <strong>Jinghao Zhao</strong>.
+                  </p>
+                  <p class="venue">IJCNN 2019.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="publication-group" data-kind="journal" id="journal">
+            <h3 class="publication-group-title">Journal publications</h3>
+            <div class="publication-list">
+              <article class="publication">
+                <span class="publication-year">2023</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1109/TMC.2023.3267805">
+                      LDRP: Device-Centric Latency Diagnostic and Reduction for
+                      Cellular Networks without Root<span aria-hidden="true">
+                        ↗</span
+                      >
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Zhaowei Tan, <strong>Jinghao Zhao</strong>, Yuanjie Li,
+                    Yifei Xu, Songwu Lu.
+                  </p>
+                  <p class="venue">
+                    IEEE Transactions on Mobile Computing (TMC) 2023.
+                  </p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2022</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1109/TNET.2022.3190788">
+                      Movement-Based Reliable Mobility Management for Beyond 5G
+                      Cellular Networks<span aria-hidden="true"> ↗</span>
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Zhehui Zhang, Yuanjie Li, Qianru Li,
+                    <strong>Jinghao Zhao</strong>, Ghufran Baig, Lili Qiu,
+                    Songwu Lu.
+                  </p>
+                  <p class="venue">
+                    IEEE/ACM Transactions on Networking (TON) 2022.
+                  </p>
+                </div>
+              </article>
+
+              <article class="publication">
+                <span class="publication-year">2022</span>
+                <div class="publication-body">
+                  <h4>
+                    <a href="https://doi.org/10.1145/3534124">
+                      Breaking Cellular IoT with Forged Data-Plane Signaling:
+                      Attacks and Countermeasure<span aria-hidden="true">
+                        ↗</span
+                      >
+                    </a>
+                  </h4>
+                  <p class="authors">
+                    Zhaowei Tan, Boyan Ding, <strong>Jinghao Zhao</strong>,
+                    Yunqi Guo, Songwu Lu.
+                  </p>
+                  <p class="venue">
+                    ACM Transactions on Sensor Networks (TOSN) 2022.
+                  </p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 05: CONTACT -->
+      <section
+        class="contact-section section"
+        id="contact"
+        aria-labelledby="contact-title"
+      >
+        <div class="container">
+          <div class="contact-card reveal">
+            <div class="contact-card-glow" aria-hidden="true"></div>
+            <p class="eyebrow">ALWAYS CURIOUS ABOUT WHAT’S NEXT</p>
+            <div class="contact-layout">
+              <h2 id="contact-title" class="contact-title">
+                Good things start<br />with a conversation<span
+                  class="accent-dot"
+                  >.</span
+                >
+              </h2>
+              <a
+                class="contact-arrow magnetic"
+                href="https://www.linkedin.com/in/jinghaozhao/"
+                aria-label="Connect with Jinghao Zhao on LinkedIn"
+                data-magnetic="0.3"
+              >
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div class="contact-actions">
+              <a
+                class="btn btn-primary magnetic"
+                href="https://www.linkedin.com/in/jinghaozhao/"
+                data-magnetic="0.22"
+              >
+                <span>Connect on LinkedIn</span>
+                <span class="btn-icon" aria-hidden="true">↗</span>
+              </a>
+              <a
+                class="pill-link pill-link-light"
+                href="https://drive.google.com/file/d/1w_XJ42SjzV_rB1WRCMU-FlWVH3ZQ_RF9/view?usp=sharing"
+              >
+                <span>Download CV</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <a class="wordmark" href="#top" aria-label="Back to top">
+            jz<span class="wordmark-dot">.</span>
+          </a>
+          <p>© 2016–<span id="year">2026</span> Jinghao Zhao</p>
+        </div>
+
+        <div class="footer-switcher" aria-label="Concept switcher">
+          <a href="../">All 5 Concepts</a>
+          <span aria-hidden="true">·</span>
+          <a href="../../">Current Site</a>
+        </div>
+
+        <div class="footer-links">
+          <a href="https://github.com/JinghaoZhao"
+            >GitHub <span aria-hidden="true">↗</span></a
+          >
+          <a href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+            >Scholar <span aria-hidden="true">↗</span></a
+          >
+          <a href="https://www.linkedin.com/in/jinghaozhao/"
+            >LinkedIn <span aria-hidden="true">↗</span></a
+          >
+          <a
+            href="https://drive.google.com/file/d/1w_XJ42SjzV_rB1WRCMU-FlWVH3ZQ_RF9/view?usp=sharing"
+            >CV <span aria-hidden="true">↗</span></a
+          >
+          <a href="#top">Top <span aria-hidden="true">↑</span></a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
