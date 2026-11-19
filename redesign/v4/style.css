@@ -1,6 +1,10 @@
 /* ==========================================================================
-   V4 — Cyanotype Systems Blueprint / Engineering Drafting Monograph
+   V4 — Cyanotype Systems Blueprint / Live Interactive CAD Workstation
    ========================================================================== */
+
+[hidden] {
+  display: none !important;
+}
 
 @font-face {
   font-family: "Raleway";
@@ -85,7 +89,8 @@ body {
 }
 
 img,
-svg {
+svg,
+canvas {
   display: block;
   max-width: 100%;
 }
@@ -161,10 +166,12 @@ select {
 }
 
 .section {
-  padding: clamp(64px, 8vw, 108px) 0;
+  padding: clamp(60px, 7.5vw, 102px) 0;
 }
 
-/* Registration Crosshairs */
+/* ==========================================================================
+   CAD DRAW-IN CHOREOGRAPHY & REGISTRATION CROSSHAIRS
+   ========================================================================== */
 .crosshair {
   position: absolute;
   font-family: var(--font-mono);
@@ -174,14 +181,16 @@ select {
   user-select: none;
   pointer-events: none;
   z-index: 3;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease;
 }
 
 .sheet-vellum .crosshair {
   color: var(--vl-accent);
 }
 
-.blueprint-plate .crosshair,
-.acemap-plate .crosshair {
+.simulator-console .crosshair,
+.acemap-plate .crosshair,
+.contact-card .crosshair {
   color: var(--bp-cyan);
 }
 
@@ -190,20 +199,59 @@ select {
 .ch-bl { bottom: -7px; left: -5px; }
 .ch-br { bottom: -7px; right: -5px; }
 
-/* Reveal Animation */
-.reveal {
+.cad-reveal {
   opacity: 1;
   transform: none;
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.reveal.is-pending {
+.cad-reveal.is-pending {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(20px);
+}
+
+.cad-reveal.is-pending .crosshair {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.35);
+}
+
+.cad-reveal::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--bp-cyan), var(--bp-amber), transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cad-reveal.just-drawn::after {
+  animation: cad-line-draw 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cad-line-draw {
+  0% {
+    transform: scaleX(0);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scaleX(1);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
 }
 
 /* ==========================================================================
-   HEADER
+   HEADER & SCROLL PROGRESS
    ========================================================================== */
 .blueprint-header {
   position: sticky;
@@ -228,7 +276,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
   padding: 8px 0;
 }
 
@@ -252,29 +300,48 @@ select {
 }
 
 .sheet-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.08em;
   color: var(--bp-cyan);
   padding: 3px 8px;
   border: 1px solid var(--bp-line);
   background: rgba(12, 43, 86, 0.7);
+  white-space: nowrap;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bp-amber);
+  box-shadow: 0 0 8px var(--bp-amber);
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.8); }
 }
 
 .main-nav {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
 }
 
 .main-nav a {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   letter-spacing: 0.04em;
   color: var(--bp-ink-soft);
   padding: 4px 0;
-  border-bottom: 1px solid transparent;
+  border-bottom: 2px solid transparent;
   transition: color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
 }
 
 .main-nav a:hover,
@@ -285,13 +352,13 @@ select {
 
 .nav-idx {
   color: var(--bp-cyan);
-  margin-right: 4px;
+  margin-right: 3px;
 }
 
 .header-utilities {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -303,10 +370,10 @@ select {
 
 .switcher-pill {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.04em;
   color: var(--bp-ink-soft);
-  padding: 5px 9px;
+  padding: 5px 8px;
   border: 1px solid var(--bp-line);
   background: rgba(12, 43, 86, 0.55);
   border-radius: var(--radius-sm);
@@ -317,18 +384,18 @@ select {
 .switcher-pill:hover {
   color: var(--bp-ink);
   border-color: var(--bp-cyan);
-  background: rgba(112, 204, 255, 0.12);
+  background: rgba(112, 204, 255, 0.14);
 }
 
 .header-connect {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.74rem;
+  font-weight: 600;
   color: var(--bp-deep);
   background: var(--bp-cyan);
-  padding: 6px 12px;
+  padding: 6px 11px;
   border-radius: var(--radius-sm);
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease;
   white-space: nowrap;
 }
 
@@ -336,16 +403,34 @@ select {
   background: var(--bp-ink);
 }
 
+.scroll-progress-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: rgba(112, 204, 255, 0.12);
+}
+
+.scroll-progress-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--bp-cyan), var(--bp-amber));
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
 /* ==========================================================================
-   HERO: CYANOTYPE TITLE BLOCK
+   HERO: INTERACTIVE CAD DRAFTING WORKSTATION
    ========================================================================== */
 .hero-sheet {
   min-height: calc(100svh - 62px);
   display: flex;
   align-items: center;
-  padding: clamp(32px, 5vw, 56px) 0;
+  padding: clamp(28px, 4.5vw, 52px) 0;
   overflow: hidden;
   border-top: none;
+  cursor: crosshair;
 }
 
 #blueprint-canvas {
@@ -362,10 +447,10 @@ select {
   inset: 0;
   z-index: 1;
   background: radial-gradient(
-    ellipse at 32% 45%,
-    rgba(8, 33, 68, 0.45) 0%,
-    rgba(6, 24, 51, 0.76) 72%,
-    rgba(5, 19, 41, 0.88) 100%
+    ellipse at 30% 45%,
+    rgba(8, 33, 68, 0.28) 0%,
+    rgba(6, 24, 51, 0.65) 70%,
+    rgba(5, 19, 41, 0.84) 100%
   );
   pointer-events: none;
 }
@@ -374,7 +459,7 @@ select {
   position: relative;
   z-index: 2;
   border: 1px solid var(--bp-line-strong);
-  background: rgba(8, 33, 68, 0.62);
+  background: rgba(8, 33, 68, 0.56);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   padding: clamp(20px, 3.5vw, 40px);
@@ -386,16 +471,29 @@ select {
   flex-wrap: wrap;
   gap: 10px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
   color: var(--bp-ink-muted);
-  padding-bottom: 16px;
-  margin-bottom: clamp(24px, 4vw, 44px);
+  padding-bottom: 14px;
+  margin-bottom: clamp(24px, 3.8vw, 40px);
   border-bottom: 1px solid var(--bp-line);
+}
+
+.cad-live-coords {
+  color: var(--bp-cyan);
+  font-variant-numeric: tabular-nums;
+  padding: 2px 7px;
+  border: 1px solid rgba(112, 204, 255, 0.35);
+  background: rgba(6, 24, 51, 0.72);
 }
 
 .meta-spacer {
   flex: 1;
+}
+
+.meta-hint {
+  color: var(--bp-ink-muted);
+  font-size: 0.66rem;
 }
 
 .meta-rev {
@@ -411,7 +509,7 @@ select {
 }
 
 .blueprint-kicker {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   font-family: var(--font-mono);
   font-size: 0.76rem;
   letter-spacing: 0.14em;
@@ -421,7 +519,7 @@ select {
 .hero-primary h1 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.65rem, 6vw, 4.7rem);
+  font-size: clamp(2.7rem, 6vw, 4.75rem);
   font-weight: 100;
   line-height: 1.03;
   letter-spacing: -0.025em;
@@ -442,7 +540,7 @@ select {
   letter-spacing: 0.2em;
   color: var(--bp-amber);
   padding: 6px 12px;
-  border: 1px solid rgba(245, 185, 99, 0.42);
+  border: 1px solid rgba(245, 185, 99, 0.45);
   background: rgba(245, 185, 99, 0.08);
 }
 
@@ -470,10 +568,10 @@ select {
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  padding: 12px 20px;
+  padding: 12px 18px;
   background: var(--bp-cyan);
   color: var(--bp-deep);
   border: 1px solid var(--bp-cyan);
@@ -485,6 +583,7 @@ select {
 .btn-blueprint:hover {
   background: var(--bp-ink);
   border-color: var(--bp-ink);
+  transform: translateY(-1px);
 }
 
 .btn-blueprint:disabled {
@@ -495,27 +594,30 @@ select {
 .btn-outline-light {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   letter-spacing: 0.04em;
-  padding: 12px 20px;
+  padding: 11px 18px;
   color: var(--bp-ink);
   border: 1px solid var(--bp-line-strong);
   background: rgba(12, 43, 86, 0.5);
   border-radius: var(--radius-sm);
+  cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .btn-outline-light:hover {
   border-color: var(--bp-cyan);
-  background: rgba(112, 204, 255, 0.12);
+  background: rgba(112, 204, 255, 0.14);
 }
 
 /* ISO Engineering Title Block Card */
 .title-block-card {
   border: 1px solid var(--bp-line-strong);
-  background: rgba(6, 24, 51, 0.84);
+  background: rgba(6, 24, 51, 0.86);
+  cursor: default;
 }
 
 .tb-header {
@@ -537,7 +639,7 @@ select {
 
 .tb-row {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-columns: 114px minmax(0, 1fr);
   border-bottom: 1px solid var(--bp-line);
 }
 
@@ -587,7 +689,7 @@ select {
 }
 
 .hero-bottom-bar {
-  margin-top: clamp(28px, 4vw, 44px);
+  margin-top: clamp(26px, 3.8vw, 40px);
   padding-top: 16px;
   border-top: 1px solid var(--bp-line);
   display: flex;
@@ -640,13 +742,14 @@ select {
    SHARED SECTION HEADERS & LINKS
    ========================================================================== */
 .section-header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
   gap: 20px;
-  padding-bottom: 24px;
-  margin-bottom: clamp(32px, 4.5vw, 52px);
+  padding-bottom: 22px;
+  margin-bottom: clamp(28px, 4vw, 44px);
   border-bottom: 1px solid var(--vl-line-strong);
 }
 
@@ -660,8 +763,8 @@ select {
   align-items: center;
   gap: 10px;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  font-size: 0.74rem;
+  letter-spacing: 0.09em;
   color: var(--vl-ink-muted);
 }
 
@@ -686,7 +789,7 @@ select {
 .section h2 {
   margin: 0;
   font-family: var(--font-body);
-  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-size: clamp(2rem, 4vw, 3.05rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -762,124 +865,205 @@ select {
 }
 
 /* ==========================================================================
-   SECTION 01: CURRENT FOCUS (VELLUM)
+   SECTION 01: INTERACTIVE BARE METAL ARCHITECTURE SIMULATOR
    ========================================================================== */
-.work-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: clamp(28px, 4.5vw, 56px);
-  align-items: start;
-}
-
-.platform-badge {
-  margin: 0 0 14px;
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--vl-accent);
-  padding: 4px 10px;
-  border: 1px solid var(--vl-line-strong);
-  background: var(--vl-plate);
-}
-
-.lead-copy {
-  margin: 0 0 16px;
-  font-size: 1.15rem;
-  line-height: 1.62;
-  color: var(--vl-ink);
-}
-
-.body-copy {
-  margin: 0;
-  color: var(--vl-ink-soft);
-}
-
-.pillars-stack {
-  margin-top: 28px;
-  border-top: 1px solid var(--vl-line-strong);
-}
-
-.pillar-item {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--vl-line);
-}
-
-.pillar-num {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--vl-amber);
-  padding-top: 2px;
-}
-
-.pillar-item h3 {
-  margin: 0 0 4px;
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--vl-ink);
-}
-
-.pillar-item p {
-  margin: 0;
-  font-size: 0.94rem;
-  color: var(--vl-ink-soft);
-}
-
-/* Blueprint Plate (Dark cyanotype inset on Vellum) */
-.blueprint-plate {
+.simulator-console {
   position: relative;
-  margin: 0;
   background-color: var(--bp-navy);
   background-image:
     linear-gradient(to right, var(--bp-grid-minor) 1px, transparent 1px),
     linear-gradient(to bottom, var(--bp-grid-minor) 1px, transparent 1px);
   background-size: 24px 24px;
   border: 1px solid var(--bp-cobalt);
-  box-shadow: 0 18px 42px rgba(8, 33, 68, 0.14);
+  box-shadow: 0 22px 48px rgba(8, 33, 68, 0.16);
   color: var(--bp-ink);
 }
 
-.plate-topline {
+.sim-topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--bp-line);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--bp-line-strong);
+  background: rgba(6, 24, 51, 0.85);
+}
+
+.sim-title-cluster {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sim-code {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   letter-spacing: 0.1em;
   color: var(--bp-cyan);
 }
 
-.plate-status {
+.sim-live-pill {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: rgba(245, 185, 99, 0.16);
+  border: 1px solid rgba(245, 185, 99, 0.55);
   color: var(--bp-amber);
+}
+
+.sim-mode-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sim-mode-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 7px 12px;
+  background: rgba(12, 43, 86, 0.7);
+  color: var(--bp-ink-soft);
+  border: 1px solid var(--bp-line-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.sim-mode-btn:hover {
+  border-color: var(--bp-cyan);
+  color: var(--bp-ink);
+}
+
+.sim-mode-btn.is-active {
+  background: var(--bp-cyan);
+  border-color: var(--bp-cyan);
+  color: var(--bp-deep);
+  font-weight: 700;
+}
+
+.sim-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(290px, 0.85fr);
+  align-items: stretch;
+}
+
+.sim-stage {
+  margin: 0;
+  border-right: 1px solid var(--bp-line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .compute-art {
   width: 100%;
   height: auto;
-  padding: 8px 12px 0;
+  padding: 12px 14px 4px;
+}
+
+.compute-layer {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, filter 0.4s ease;
+}
+
+.bypass-rail {
+  opacity: 0.18;
+  transition: opacity 0.35s ease, stroke 0.35s ease;
 }
 
 .signal-paths path {
-  stroke-dasharray: 22 140;
-  animation: signal-glide 4.2s linear infinite;
+  stroke-dasharray: 24 136;
+  animation: signal-glide 3.4s linear infinite;
+  transition: stroke 0.3s ease, opacity 0.3s ease;
+}
+
+.signal-bypass {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.sim-nodes circle {
+  animation: node-ping 2.6s ease-in-out infinite;
 }
 
 @keyframes signal-glide {
-  from {
-    stroke-dashoffset: 162;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
+  from { stroke-dashoffset: 160; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes node-ping {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* Simulator Mode 1: NORMAL FABRIC */
+.simulator-console[data-sim-mode="normal"] .signal-control path,
+.simulator-console[data-sim-mode="normal"] .signal-fabric path {
+  animation-duration: 3.2s;
+  stroke: #70ccff;
+}
+
+/* Simulator Mode 2: PROVISIONING */
+.simulator-console[data-sim-mode="provisioning"] .layer-control {
+  transform: translateY(-7px);
+  filter: drop-shadow(0 0 12px rgba(245, 185, 99, 0.42));
+}
+
+.simulator-console[data-sim-mode="provisioning"] .layer-fabric {
+  opacity: 0.55;
+}
+
+.simulator-console[data-sim-mode="provisioning"] .signal-control path {
+  stroke: #f5b963;
+  stroke-width: 3.4;
+  animation-duration: 1.5s;
+}
+
+.simulator-console[data-sim-mode="provisioning"] .signal-fabric path {
+  opacity: 0.4;
+  animation-duration: 4.5s;
+}
+
+/* Simulator Mode 3: CME ULTRA-LOW-LATENCY */
+.simulator-console[data-sim-mode="cme"] .layer-silicon {
+  transform: translateY(-8px);
+  filter: drop-shadow(0 0 14px rgba(112, 204, 255, 0.55));
+}
+
+.simulator-console[data-sim-mode="cme"] .layer-control {
+  opacity: 0.42;
+}
+
+.simulator-console[data-sim-mode="cme"] .layer-fabric {
+  filter: drop-shadow(0 0 10px rgba(245, 185, 99, 0.35));
+}
+
+.simulator-console[data-sim-mode="cme"] .bypass-rail {
+  opacity: 0.85;
+  stroke: #f5b963;
+}
+
+.simulator-console[data-sim-mode="cme"] .signal-bypass {
+  opacity: 1;
+}
+
+.simulator-console[data-sim-mode="cme"] .signal-bypass path {
+  stroke-dasharray: 34 96;
+  animation-duration: 1.15s;
+}
+
+.simulator-console[data-sim-mode="cme"] .signal-fabric path {
+  stroke: #70ccff;
+  stroke-width: 3.2;
+  animation-duration: 1.25s;
+}
+
+.simulator-console[data-sim-mode="cme"] .signal-control path {
+  opacity: 0.28;
 }
 
 .plate-caption {
@@ -888,7 +1072,7 @@ select {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 16px;
+  padding: 11px 16px;
   border-top: 1px solid var(--bp-line);
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -899,10 +1083,144 @@ select {
   color: var(--bp-ink-muted);
 }
 
+.sim-inspector-panel {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  background: rgba(6, 24, 51, 0.55);
+}
+
+.sim-telemetry-box {
+  border: 1px solid var(--bp-line-strong);
+  background: rgba(6, 24, 51, 0.82);
+  padding: 14px 16px;
+}
+
+.tele-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--bp-line);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--bp-ink-muted);
+}
+
+.tele-row strong {
+  color: var(--bp-cyan);
+  text-align: right;
+}
+
+.tele-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 16px;
+}
+
+.tele-bar {
+  width: 5px;
+  background: var(--bp-cyan);
+  border-radius: 1px;
+  animation: tele-eq 1.8s ease-in-out infinite;
+}
+
+.tele-bar.b1 { height: 7px; animation-delay: 0s; }
+.tele-bar.b2 { height: 13px; animation-delay: 0.2s; }
+.tele-bar.b3 { height: 10px; animation-delay: 0.4s; }
+.tele-bar.b4 { height: 15px; animation-delay: 0.6s; }
+.tele-bar.b5 { height: 9px; animation-delay: 0.8s; }
+
+.simulator-console[data-sim-mode="provisioning"] .tele-bar {
+  background: var(--bp-amber);
+  animation-duration: 1.2s;
+}
+
+.simulator-console[data-sim-mode="cme"] .tele-bar {
+  background: var(--bp-amber);
+  animation-duration: 0.65s;
+}
+
+@keyframes tele-eq {
+  0%, 100% { transform: scaleY(0.45); transform-origin: bottom; }
+  50% { transform: scaleY(1); transform-origin: bottom; }
+}
+
+.sim-mode-note {
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--bp-ink-soft);
+}
+
+.lead-copy-dark {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--bp-ink);
+}
+
+.body-copy-dark {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--bp-ink-soft);
+}
+
+/* 3-Column Spec Pillars */
+.pillars-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.pillar-card {
+  padding: 20px 22px;
+  background: var(--vl-plate);
+  border: 1px solid var(--vl-line-strong);
+  border-top: 3px solid var(--vl-line-strong);
+  transition: border-top-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pillar-card.is-highlighted {
+  border-top-color: var(--vl-accent);
+  box-shadow: 0 10px 26px rgba(8, 33, 68, 0.08);
+  transform: translateY(-2px);
+}
+
+.pillar-num {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--vl-amber);
+  margin-bottom: 8px;
+}
+
+.pillar-card h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-body);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--vl-ink);
+}
+
+.pillar-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--vl-ink-soft);
+}
+
 /* Selected Work Callout (CME Group) */
 .case-callout {
   position: relative;
-  margin-top: clamp(36px, 5vw, 56px);
+  margin-top: 24px;
   display: grid;
   grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.35fr);
   gap: clamp(24px, 4vw, 48px);
@@ -961,7 +1279,7 @@ select {
 }
 
 /* ==========================================================================
-   SECTION 02: ABOUT (DEEP CYANOTYPE)
+   SECTION 02: ABOUT DOSSIER (DEEP CYANOTYPE)
    ========================================================================== */
 .about-grid {
   display: grid;
@@ -1036,7 +1354,8 @@ select {
 }
 
 .trajectory-strip {
-  margin-top: clamp(36px, 5vw, 56px);
+  position: relative;
+  margin-top: clamp(32px, 4.5vw, 52px);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border: 1px solid var(--bp-line-strong);
@@ -1075,7 +1394,7 @@ select {
 }
 
 /* ==========================================================================
-   SECTION 03: SCHEMATIC INSPECTOR (VELLUM)
+   SECTION 03: CONTINUOUS-FLOW SCHEMATIC WORKBENCH (VELLUM)
    ========================================================================== */
 .schematic-grid {
   display: grid;
@@ -1084,11 +1403,18 @@ select {
 }
 
 .schematic-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--vl-plate);
   border: 1px solid var(--vl-line-strong);
   box-shadow: 0 10px 26px rgba(8, 33, 68, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.schematic-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(8, 33, 68, 0.11);
 }
 
 .schematic-head {
@@ -1111,6 +1437,7 @@ select {
   padding: 2px 8px;
   background: var(--vl-ink);
   color: var(--vl-bg);
+  white-space: nowrap;
 }
 
 .fig-badge-dark {
@@ -1143,7 +1470,7 @@ select {
   color: var(--vl-ink-soft);
 }
 
-/* Interactive Inspector Stage (White-on-Cyanotype SVG Plate) */
+/* White-on-Cyanotype Continuous Animated SVG Plate */
 .inspector-stage {
   margin: 0 16px;
   border: 1px solid var(--bp-cobalt);
@@ -1162,10 +1489,10 @@ select {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 5px;
   padding: 8px 10px;
   border-bottom: 1px solid var(--bp-line);
-  background: rgba(6, 24, 51, 0.78);
+  background: rgba(6, 24, 51, 0.8);
 }
 
 .stage-tab,
@@ -1173,7 +1500,7 @@ select {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.06em;
-  padding: 5px 8px;
+  padding: 5px 9px;
   border: 1px solid var(--bp-line);
   background: transparent;
   color: var(--bp-ink-soft);
@@ -1192,12 +1519,12 @@ select {
   background: var(--bp-cyan);
   border-color: var(--bp-cyan);
   color: var(--bp-deep);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .stage-play {
   margin-left: auto;
-  border-color: rgba(245, 185, 99, 0.5);
+  border-color: rgba(245, 185, 99, 0.55);
   color: var(--bp-amber);
 }
 
@@ -1205,7 +1532,7 @@ select {
   background: var(--bp-amber);
   border-color: var(--bp-amber);
   color: var(--bp-deep);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .schematic-canvas {
@@ -1213,7 +1540,7 @@ select {
   padding: 8px 10px;
 }
 
-/* Blueprint SVG Technical Line Styles */
+/* Continuous Blueprint SVG Animations */
 .project-art {
   width: 100%;
   height: auto;
@@ -1221,25 +1548,40 @@ select {
 
 .project-art .art-route {
   fill: none;
-  stroke: rgba(130, 195, 255, 0.28);
-  stroke-width: 1.5;
+  stroke: rgba(130, 195, 255, 0.34);
+  stroke-width: 1.4;
   stroke-dasharray: 4 4;
+  animation: route-march 14s linear infinite;
+}
+
+@keyframes route-march {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -80; }
 }
 
 .project-art .art-flow {
   fill: none;
   stroke: var(--bp-cyan);
-  stroke-width: 2.6;
+  stroke-width: 2.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 0.55s ease, opacity 0.25s ease;
+  stroke-dasharray: 24 76;
+  animation: schematic-packet 2.8s linear infinite;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.project-art .flow-d1 { animation-delay: 0s; }
+.project-art .flow-d2 { animation-delay: -0.9s; }
+.project-art .flow-d3 { animation-delay: -1.8s; }
+
+@keyframes schematic-packet {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
 }
 
 .project-art .art-device,
 .project-art .art-panel {
-  fill: rgba(12, 43, 86, 0.9);
+  fill: rgba(12, 43, 86, 0.92);
   stroke: #b9ddff;
   stroke-width: 1.5;
 }
@@ -1263,16 +1605,30 @@ select {
 .project-art .art-radio {
   fill: none;
   stroke: var(--bp-cyan);
-  stroke-width: 1.6;
+  stroke-width: 1.7;
   stroke-linecap: round;
+  animation: radio-wave 2.4s ease-in-out infinite;
+}
+
+@keyframes radio-wave {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
 }
 
 .project-art .art-trace {
   fill: none;
   stroke: var(--bp-amber);
-  stroke-width: 1.8;
+  stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
+  stroke-dasharray: 180;
+  animation: trace-sweep 3.6s ease-in-out infinite;
+}
+
+@keyframes trace-sweep {
+  0% { stroke-dashoffset: 180; opacity: 0.4; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -180; opacity: 0.4; }
 }
 
 .project-art .art-answer {
@@ -1284,6 +1640,7 @@ select {
 
 .project-art .art-dot {
   fill: var(--bp-amber);
+  animation: node-ping 2.2s ease-in-out infinite;
 }
 
 .project-art .art-alert {
@@ -1364,7 +1721,7 @@ select {
   font-size: 11.5px;
 }
 
-/* Stage Highlighting */
+/* Stage Scrubbing Focus */
 .inspector-stage .art-part {
   transition: opacity 0.3s ease;
 }
@@ -1372,21 +1729,22 @@ select {
 .inspector-stage[data-step="1"] .art-part:not([data-part~="1"]),
 .inspector-stage[data-step="2"] .art-part:not([data-part~="2"]),
 .inspector-stage[data-step="3"] .art-part:not([data-part~="3"]) {
-  opacity: 0.22;
+  opacity: 0.2;
 }
 
 .inspector-stage[data-step="1"] .art-part[data-part~="1"] .art-flow,
 .inspector-stage[data-step="2"] .art-part[data-part~="2"] .art-flow,
 .inspector-stage[data-step="3"] .art-part[data-part~="3"] .art-flow {
   stroke: var(--bp-amber);
-  stroke-width: 3;
+  stroke-width: 3.3;
+  animation-duration: 1.35s;
 }
 
 .stage-readout {
   margin: 0;
   padding: 10px 12px;
   border-top: 1px solid var(--bp-line);
-  background: rgba(6, 24, 51, 0.72);
+  background: rgba(6, 24, 51, 0.74);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   line-height: 1.5;
@@ -1398,23 +1756,17 @@ select {
 }
 
 /* ==========================================================================
-   FIG. 07: ACEMAP COORDINATE PLOT
+   SECTION 04: ACEMAP CYANOTYPE SONAR RADAR SWEEP
    ========================================================================== */
 .acemap-plate {
   position: relative;
-  margin-top: 28px;
   display: grid;
-  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.35fr);
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.38fr);
   gap: 28px;
   padding: clamp(22px, 3.2vw, 34px);
-  background-color: var(--bp-navy);
-  background-image:
-    linear-gradient(to right, var(--bp-grid-minor) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--bp-grid-minor) 1px, transparent 1px);
-  background-size: 24px 24px;
-  border: 1px solid var(--bp-cobalt);
+  background: rgba(6, 24, 51, 0.8);
+  border: 1px solid var(--bp-line-strong);
   color: var(--bp-ink);
-  box-shadow: 0 18px 42px rgba(8, 33, 68, 0.16);
 }
 
 .acemap-info {
@@ -1448,10 +1800,6 @@ select {
   gap: 10px;
 }
 
-.map-selectors[hidden] {
-  display: none;
-}
-
 .select-field {
   display: flex;
   flex-direction: column;
@@ -1475,11 +1823,16 @@ select {
   font-size: 0.86rem;
 }
 
+.radar-rescan {
+  width: 100%;
+  margin-top: 2px;
+}
+
 .reticle-readout {
   margin-top: 16px;
   padding: 12px;
   border: 1px solid var(--bp-line);
-  background: rgba(6, 24, 51, 0.8);
+  background: rgba(8, 33, 68, 0.72);
 }
 
 .readout-coords {
@@ -1514,9 +1867,10 @@ select {
 
 .acemap-viewport {
   border: 1px solid var(--bp-line-strong);
-  background: rgba(6, 24, 51, 0.88);
+  background: #041328;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .viewport-bar {
@@ -1536,44 +1890,23 @@ select {
   color: var(--bp-amber);
 }
 
-#topic-map {
+.radar-canvas-shell {
+  position: relative;
   width: 100%;
-  height: auto;
+  max-width: 100%;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+}
+
+#acemap-canvas {
+  width: 100%;
+  height: 100%;
   display: block;
   cursor: crosshair;
 }
 
-.plot-grid line {
-  stroke: rgba(130, 195, 255, 0.14);
-  stroke-width: 1;
-}
-
-.map-point {
-  transition: r 0.14s ease, opacity 0.2s ease;
-}
-
-.map-point.is-hovered,
-.map-point.is-selected {
-  stroke: #eef6ff;
-  stroke-width: 1.2;
-}
-
-.map-reticle line {
-  stroke: rgba(245, 185, 99, 0.65);
-  stroke-width: 1;
-  stroke-dasharray: 4 3;
-  pointer-events: none;
-}
-
-.map-reticle circle {
-  fill: none;
-  stroke: var(--bp-amber);
-  stroke-width: 1.6;
-  pointer-events: none;
-}
-
 /* ==========================================================================
-   SECTION 04: PUBLICATIONS REGISTER (DEEP CYANOTYPE)
+   SECTION 05: PUBLICATIONS REGISTER (VELLUM LIGHT SHEET)
    ========================================================================== */
 .heading-links {
   display: flex;
@@ -1587,7 +1920,7 @@ select {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .publication-filters {
@@ -1601,9 +1934,9 @@ select {
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   padding: 8px 14px;
-  background: rgba(12, 43, 86, 0.65);
-  color: var(--bp-ink-soft);
-  border: 1px solid var(--bp-line-strong);
+  background: var(--vl-plate);
+  color: var(--vl-ink-soft);
+  border: 1px solid var(--vl-line-strong);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -1615,14 +1948,14 @@ select {
 }
 
 .publication-filters button:hover {
-  border-color: var(--bp-cyan);
-  color: var(--bp-ink);
+  border-color: var(--vl-accent);
+  color: var(--vl-ink);
 }
 
 .publication-filters button[aria-pressed="true"] {
-  background: var(--bp-cyan);
-  border-color: var(--bp-cyan);
-  color: var(--bp-deep);
+  background: var(--vl-ink);
+  border-color: var(--vl-ink);
+  color: var(--bp-ink);
   font-weight: 600;
 }
 
@@ -1630,22 +1963,20 @@ select {
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--bp-amber);
+  font-weight: 600;
+  color: var(--vl-amber);
   font-variant-numeric: tabular-nums;
 }
 
 .publication-group {
-  margin-bottom: 36px;
-  border: 1px solid var(--bp-line-strong);
-  background: rgba(6, 24, 51, 0.65);
+  position: relative;
+  margin-bottom: 32px;
+  border: 1px solid var(--vl-line-strong);
+  background: var(--vl-plate);
 }
 
 .publication-group:last-child {
   margin-bottom: 0;
-}
-
-.publication-group[hidden] {
-  display: none;
 }
 
 .register-group-header {
@@ -1654,24 +1985,25 @@ select {
   align-items: center;
   gap: 12px;
   padding: 12px 18px;
-  background: rgba(12, 43, 86, 0.85);
-  border-bottom: 1px solid var(--bp-line-strong);
+  background: var(--vl-inset);
+  border-bottom: 1px solid var(--vl-line-strong);
 }
 
 .publication-group-title {
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.78rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--bp-cyan);
+  color: var(--vl-ink);
 }
 
 .register-col-hint {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.08em;
-  color: var(--bp-ink-muted);
+  color: var(--vl-ink-muted);
 }
 
 .pub-row {
@@ -1680,7 +2012,7 @@ select {
   gap: 16px;
   align-items: baseline;
   padding: 16px 18px;
-  border-bottom: 1px solid var(--bp-line);
+  border-bottom: 1px solid var(--vl-line);
   transition: background-color 0.2s ease;
 }
 
@@ -1689,21 +2021,22 @@ select {
 }
 
 .pub-row:hover {
-  background: rgba(112, 204, 255, 0.06);
+  background: rgba(15, 78, 153, 0.05);
 }
 
 .pub-ref {
   font-family: var(--font-mono);
   font-size: 0.74rem;
-  color: var(--bp-amber);
+  font-weight: 600;
+  color: var(--vl-amber);
   font-variant-numeric: tabular-nums;
 }
 
 .publication-year {
   font-family: var(--font-mono);
   font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--bp-cyan);
+  font-weight: 700;
+  color: var(--vl-accent);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1711,25 +2044,25 @@ select {
   margin: 0 0 6px;
   font-family: var(--font-body);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
-  color: var(--bp-ink);
+  color: var(--vl-ink);
 }
 
 .pub-main h4 a:hover {
-  color: var(--bp-cyan);
+  color: var(--vl-accent);
 }
 
 .authors {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.5;
-  color: var(--bp-ink-muted);
+  color: var(--vl-ink-muted);
 }
 
 .authors strong {
-  color: var(--bp-ink);
-  font-weight: 600;
+  color: var(--vl-ink);
+  font-weight: 700;
 }
 
 .venue {
@@ -1737,12 +2070,12 @@ select {
   font-family: var(--font-mono);
   font-size: 0.76rem;
   line-height: 1.45;
-  color: var(--bp-ink-soft);
+  color: var(--vl-ink-soft);
   text-align: right;
 }
 
 /* ==========================================================================
-   SECTION 05: CONTACT & FOOTER
+   SECTION 06: CONTACT & FOOTER
    ========================================================================== */
 .contact-sheet {
   padding: clamp(56px, 7vw, 88px) 0;
@@ -1751,8 +2084,8 @@ select {
 .contact-card {
   position: relative;
   padding: clamp(28px, 4vw, 48px);
-  background: var(--vl-plate);
-  border: 1px solid var(--vl-line-strong);
+  background: rgba(6, 24, 51, 0.8);
+  border: 1px solid var(--bp-line-strong);
 }
 
 .contact-row {
@@ -1763,28 +2096,35 @@ select {
   gap: 24px;
 }
 
+.contact-card h2 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--bp-ink);
+}
+
 .contact-cta {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   font-family: var(--font-mono);
   font-size: 0.86rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 14px 22px;
-  background: var(--vl-ink);
-  color: var(--bp-ink);
-  border: 1px solid var(--vl-ink);
+  background: var(--bp-cyan);
+  color: var(--bp-deep);
+  border: 1px solid var(--bp-cyan);
   border-radius: var(--radius-sm);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .contact-cta:hover {
-  background: var(--vl-accent);
-  border-color: var(--vl-accent);
+  background: var(--bp-ink);
+  border-color: var(--bp-ink);
+  transform: translateY(-1px);
 }
 
 .cta-arrow {
-  color: var(--bp-cyan);
+  color: var(--bp-deep);
 }
 
 .blueprint-footer {
@@ -1836,20 +2176,27 @@ select {
 /* ==========================================================================
    RESPONSIVE (1440px down to 360px, zero horizontal overflow)
    ========================================================================== */
-@media (max-width: 1040px) {
-  .sheet-code {
+@media (max-width: 1080px) {
+  .sheet-code,
+  .meta-hint {
     display: none;
   }
 
   .hero-grid,
-  .work-grid,
+  .sim-body,
   .about-grid,
   .case-callout,
-  .acemap-plate {
+  .acemap-plate,
+  .schematic-grid {
     grid-template-columns: 1fr;
   }
 
-  .schematic-grid {
+  .sim-stage {
+    border-right: none;
+    border-bottom: 1px solid var(--bp-line);
+  }
+
+  .pillars-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1865,7 +2212,7 @@ select {
     grid-column: 3;
     text-align: left;
     margin-top: -6px;
-    color: var(--bp-cyan);
+    color: var(--vl-accent);
   }
 }
 
@@ -1883,13 +2230,13 @@ select {
     order: 3;
     width: 100%;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     padding-top: 6px;
     border-top: 1px solid var(--bp-line);
   }
 
   .main-nav a {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
 
   .trajectory-strip {
@@ -1924,8 +2271,22 @@ select {
     display: none;
   }
 
+  .main-nav {
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+
+  .main-nav a {
+    font-size: 0.68rem;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-idx {
+    display: none;
+  }
+
   .hero-frame {
-    padding: 18px 16px;
+    padding: 18px 14px;
   }
 
   .tb-row {
@@ -1934,6 +2295,11 @@ select {
 
   .tb-row dt {
     padding: 9px 10px;
+  }
+
+  .sim-mode-btn {
+    font-size: 0.65rem;
+    padding: 6px 8px;
   }
 
   .pub-row {
@@ -1969,7 +2335,7 @@ select {
   .stage-tab,
   .stage-play {
     font-size: 0.64rem;
-    padding: 4px 6px;
+    padding: 4px 7px;
   }
 }
 
@@ -1981,20 +2347,31 @@ select {
     scroll-behavior: auto;
   }
 
-  .reveal,
-  .reveal.is-pending {
+  .cad-reveal,
+  .cad-reveal.is-pending,
+  .crosshair {
     opacity: 1;
     transform: none;
     transition: none;
   }
 
-  .signal-paths path {
+  .cad-reveal.just-drawn::after {
     animation: none;
-    stroke-dasharray: none;
   }
 
+  .live-dot,
+  .signal-paths path,
+  .sim-nodes circle,
+  .tele-bar,
+  .project-art .art-route,
   .project-art .art-flow,
-  .inspector-stage .art-part {
-    transition: none;
+  .project-art .art-radio,
+  .project-art .art-trace,
+  .project-art .art-dot {
+    animation: none;
+  }
+
+  .project-art .art-flow {
+    stroke-dasharray: none;
   }
 }
