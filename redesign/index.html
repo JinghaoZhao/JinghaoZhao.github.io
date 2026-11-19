@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#07162b" />
     <title>Jinghao Zhao — Homepage Redesign Concepts</title>
-    <meta
+      <meta
       name="description"
-      content="Five distinct visual design concepts for Jinghao Zhao's personal homepage—preserving the same bare-metal systems focus, project studies, and publications."
+      content="Twelve distinct visual design concepts for Jinghao Zhao's personal homepage—preserving the same bare-metal systems focus, project studies, and publications."
     />
     <meta name="robots" content="noindex, follow" />
     <link rel="icon" href="../images/favicon.svg" type="image/svg+xml" />
@@ -178,6 +178,30 @@
         grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
         gap: 24px;
       }
+      .wave-section + .wave-section {
+        margin-top: 56px;
+      }
+      .wave-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 0 0 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .wave-title {
+        margin: 0;
+        font-size: 11.5px;
+        font-weight: 650;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .wave-meta {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
       .concept-card {
         display: flex;
         flex-direction: column;
@@ -304,7 +328,7 @@
         >
         <div class="topbar-actions">
           <span class="status-pill"
-            ><span class="status-dot" aria-hidden="true"></span>5 of 5 concepts live</span
+            ><span class="status-dot" aria-hidden="true"></span>5 of 12 concepts live</span
           >
           <a class="back-link" href="../"
             ><span aria-hidden="true">←</span> Current Site</a
@@ -317,14 +341,19 @@
       <div class="container">
         <div class="intro">
           <p class="eyebrow">HOMEPAGE EXPLORATIONS · 2026</p>
-          <h1>Five design monographs for Jinghao Zhao.</h1>
+          <h1>Twelve design monographs for Jinghao Zhao.</h1>
           <p class="subtitle">
             Alternative editorial, architectural, and interactive expressions of the
             same GCE Bare Metal work, 7 systems studies, and 12-paper archive.
           </p>
         </div>
 
-        <section class="gallery" aria-label="Approved redesign concepts">
+        <section class="wave-section" aria-label="First wave concepts v1 to v5">
+          <div class="wave-header">
+            <h2 class="wave-title">First Wave · V1–V5</h2>
+            <span class="wave-meta">Original five editorial &amp; kinetic monographs</span>
+          </div>
+          <div class="gallery">
           <a class="concept-card" href="./v1/">
             <div class="card-top">
               <span class="edition">CONCEPT 01</span>
@@ -378,9 +407,10 @@
             </div>
             <h2>Architectural Gallery</h2>
             <p class="concept-tagline">
-              Cinematic museum monograph with masked portrait reveal, magnetic
-              lens cursor, 7-room horizontal folio slider, calligraphy SVG
-              plates, and an Ink-Bloom 2,208-topic atlas.
+              Rebuilt 7-room kinetic exhibition with masked portrait reveal,
+              magnetic lens cursor, bespoke canvas installations (5G healing,
+              astrolabe vault, 2.5D code graph, RF waves, 3D Flora, VR sync),
+              and Ink-Bloom Acemap.
             </p>
             <div class="card-footer">
               <span>Explore v3</span>
@@ -429,6 +459,7 @@
               <span class="card-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
+          </div>
         </section>
       </div>
     </main>

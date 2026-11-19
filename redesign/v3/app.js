@@ -1,4 +1,4 @@
-/* Architectural Monograph — Cinematic Museum Exhibition & Motion System */
+/* Architectural Monograph — Cinematic Museum Exhibition & 7 Kinetic Installations */
 (() => {
   "use strict";
 
@@ -13,6 +13,20 @@
   if (yearEl) {
     yearEl.textContent = String(new Date().getFullYear());
   }
+
+  /* Palette constants matching Warm Architectural Gallery */
+  const PALETTE = {
+    paper: "#f7f3eb",
+    cream: "#faf7f2",
+    ink: "#1d1b18",
+    muted: "#665f56",
+    border: "#ded7cb",
+    borderStrong: "#c8bfb0",
+    teal: "#1f5452",
+    tealBright: "#2c7572",
+    bronze: "#9c5a3c",
+    gold: "#c2884f",
+  };
 
   /* ============================================================
      1. HERO CURTAIN / MASK-REVEAL & AMBIENT LIGHT SHIFT
@@ -103,7 +117,6 @@
       { passive: true },
     );
 
-    // Subtle magnetic pull on primary monograph CTAs
     $$(".magnetic").forEach((el) => {
       el.addEventListener("pointermove", (event) => {
         if (!motionEnabled) return;
@@ -188,18 +201,6 @@
     { passive: true },
   );
 
-  function syncMotion() {
-    motionEnabled = !reduceMotion.matches;
-    if (!motionEnabled) {
-      document.body.classList.remove("hero-arming");
-      $$(".reveal.is-pending").forEach((el) => el.classList.remove("is-pending"));
-      if (cursorEl) cursorEl.classList.remove("is-visible", "has-label");
-    }
-    updateScroll();
-  }
-  reduceMotion.addEventListener("change", syncMotion);
-  syncMotion();
-
   if ("IntersectionObserver" in window && motionEnabled) {
     const revealObserver = new IntersectionObserver(
       (entries) => {
@@ -262,7 +263,7 @@
   });
 
   /* ============================================================
-     5. INTERACTIVE 7-ROOM MUSEUM GALLERY TRACK & CALLIGRAPHY DRAW-IN
+     5. INTERACTIVE 7-ROOM MUSEUM GALLERY TRACK
      ============================================================ */
   const roomIds = [
     "seed",
@@ -286,16 +287,8 @@
   const viewToggleButtons = $$("[data-view]");
 
   let activeRoom = 0;
-
-  function triggerCalligraphy(roomEl) {
-    if (!roomEl || !motionEnabled) return;
-    roomEl.classList.remove("is-drawing");
-    void roomEl.offsetWidth;
-    roomEl.classList.add("is-drawing");
-    setTimeout(() => {
-      roomEl.classList.remove("is-drawing");
-    }, 1250);
-  }
+  let exhibitionInView = true;
+  let syncInstallations = () => {};
 
   function setActiveRoom(index, focusTab = false) {
     const wrapped = (index + roomIds.length) % roomIds.length;
@@ -314,9 +307,7 @@
     });
 
     galleryRooms.forEach((room, i) => {
-      const active = i === wrapped;
-      room.classList.toggle("is-active", active);
-      if (active) triggerCalligraphy(room);
+      room.classList.toggle("is-active", i === wrapped);
     });
 
     if (roomCounter) {
@@ -325,6 +316,8 @@
     if (roomProgressFill) {
       roomProgressFill.style.width = `${(((wrapped + 1) / roomIds.length) * 100).toFixed(2)}%`;
     }
+
+    syncInstallations();
   }
 
   roomTabs.forEach((tab, index) => {
@@ -347,7 +340,6 @@
     roomNext.addEventListener("click", () => setActiveRoom(activeRoom + 1));
   }
 
-  // Smooth horizontal drag/swipe on the Gallery Track
   if (galleryViewport && galleryTrack) {
     let dragging = false;
     let startX = 0;
@@ -355,7 +347,7 @@
 
     galleryViewport.addEventListener("pointerdown", (event) => {
       if (galleryViewport.dataset.mode !== "gallery") return;
-      if (event.target.closest("button, a, select, #topic-map")) return;
+      if (event.target.closest("button, a, select, canvas, #topic-map")) return;
       dragging = true;
       startX = event.clientX;
       deltaX = 0;
@@ -377,13 +369,9 @@
       if (!dragging) return;
       dragging = false;
       galleryViewport.classList.remove("is-dragging");
-      if (deltaX < -55) {
-        setActiveRoom(activeRoom + 1);
-      } else if (deltaX > 55) {
-        setActiveRoom(activeRoom - 1);
-      } else {
-        setActiveRoom(activeRoom);
-      }
+      if (deltaX < -55) setActiveRoom(activeRoom + 1);
+      else if (deltaX > 55) setActiveRoom(activeRoom - 1);
+      else setActiveRoom(activeRoom);
       deltaX = 0;
     };
 
@@ -407,74 +395,1197 @@
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-pressed", String(active));
     });
+
+    syncInstallations();
   }
 
   viewToggleButtons.forEach((btn) => {
     btn.addEventListener("click", () => setViewMode(btn.dataset.view));
   });
 
-  // Trigger initial calligraphy draw-in when Room 01 enters viewport
-  if ("IntersectionObserver" in window && motionEnabled && galleryRooms[0]) {
-    const firstRoomObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(({ isIntersecting }) => {
-          if (!isIntersecting) return;
-          triggerCalligraphy(galleryRooms[activeRoom]);
-          firstRoomObserver.disconnect();
-        });
-      },
-      { threshold: 0.2 },
-    );
-    firstRoomObserver.observe(galleryViewport);
+  /* ============================================================
+     6. SIX BESPOKE KINETIC CANVAS INSTALLATIONS (ROOMS I–VI)
+     ============================================================ */
+  const W = 600;
+  const H = 360;
+
+  function setupCanvas(canvas) {
+    if (!canvas) return null;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return ctx;
   }
 
-  // Diagram 3-step interactive walkthroughs
-  $$("[data-motion-study]").forEach((figure) => {
-    const stepButtons = $$("[data-step-btn]", figure);
-    const replayBtn = $(".study-replay", figure);
-    let timerIds = [];
+  function drawArchitecturalGrid(ctx) {
+    ctx.fillStyle = PALETTE.paper;
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(200, 191, 176, 0.35)";
+    ctx.lineWidth = 0.75;
+    ctx.beginPath();
+    ctx.rect(14, 14, W - 28, H - 28);
+    ctx.moveTo(W / 2, 14);
+    ctx.lineTo(W / 2, 24);
+    ctx.moveTo(W / 2, H - 14);
+    ctx.lineTo(W / 2, H - 24);
+    ctx.moveTo(14, H / 2);
+    ctx.lineTo(24, H / 2);
+    ctx.moveTo(W - 14, H / 2);
+    ctx.lineTo(W - 24, H / 2);
+    ctx.stroke();
+  }
 
-    function clearTimers() {
-      timerIds.forEach((id) => clearTimeout(id));
-      timerIds = [];
+  /* --- ROOM I: SEED — Concentric 5G Fault & Self-Healing Observatory --- */
+  function createSeedInstallation() {
+    const canvas = $("#canvas-seed");
+    const ctx = setupCanvas(canvas);
+    if (!ctx) return null;
+    const stateEl = $("#seed-state");
+    const btn = $("#seed-fault-btn");
+
+    let phase = "harmonic"; // harmonic | fault | diagnose | heal
+    let phaseTime = 0;
+    let faultAngle = -0.65;
+    let autoTimer = 3.5;
+
+    function setPhase(next, label, isBronze = false) {
+      phase = next;
+      phaseTime = 0;
+      if (stateEl) {
+        stateEl.textContent = label;
+        stateEl.classList.toggle("is-bronze", isBronze);
+      }
     }
 
-    function setStep(step) {
-      figure.dataset.step = String(step);
-      stepButtons.forEach((btn) => {
-        btn.classList.toggle("is-active", Number(btn.dataset.stepBtn) === step);
-      });
+    function triggerFault() {
+      faultAngle = -Math.PI * 0.75 + Math.random() * Math.PI * 1.5;
+      autoTimer = 10;
+      setPhase("fault", "FAULT DETECTED", true);
     }
 
-    stepButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        clearTimers();
-        const targetStep = Number(btn.dataset.stepBtn);
-        setStep(Number(figure.dataset.step) === targetStep ? 0 : targetStep);
+    if (btn) btn.addEventListener("click", triggerFault);
+    canvas.addEventListener("click", triggerFault);
+
+    return {
+      roomIndex: 0,
+      draw(t, dt) {
+        phaseTime += dt;
+        if (motionEnabled) {
+          if (phase === "harmonic") {
+            autoTimer -= dt;
+            if (autoTimer <= 0) triggerFault();
+          } else if (phase === "fault" && phaseTime > 1.35) {
+            setPhase("diagnose", "SIM + CORE DIAGNOSIS", true);
+          } else if (phase === "diagnose" && phaseTime > 1.85) {
+            setPhase("heal", "RECOVERING", false);
+          } else if (phase === "heal" && phaseTime > 1.35) {
+            setPhase("harmonic", "HARMONIC", false);
+            autoTimer = 7.5;
+          }
+        }
+
+        drawArchitecturalGrid(ctx);
+        const cx = W / 2;
+        const cy = H / 2;
+
+        // Outer compass ticks
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.strokeStyle = "rgba(102, 95, 86, 0.3)";
+        ctx.lineWidth = 0.8;
+        for (let i = 0; i < 48; i++) {
+          const a = (i / 48) * Math.PI * 2;
+          const r1 = i % 4 === 0 ? 142 : 146;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+          ctx.lineTo(Math.cos(a) * 150, Math.sin(a) * 150);
+          ctx.stroke();
+        }
+
+        // Fault intensity curve
+        let fracture = 0;
+        if (phase === "fault") fracture = Math.min(1, phaseTime * 2.4);
+        else if (phase === "diagnose") fracture = 1 - phaseTime * 0.25;
+        else if (phase === "heal") fracture = Math.max(0, 1 - phaseTime / 1.1);
+
+        // 5 Concentric Harmonic Signal Rings
+        const radii = [48, 72, 96, 118, 136];
+        radii.forEach((baseR, idx) => {
+          const isOuter = idx >= 2;
+          const ringFracture = isOuter ? fracture : fracture * 0.25;
+          ctx.beginPath();
+          const steps = 120;
+          for (let s = 0; s <= steps; s++) {
+            const a = (s / steps) * Math.PI * 2;
+            const angDiff = Math.atan2(Math.sin(a - faultAngle), Math.cos(a - faultAngle));
+            const locality = Math.exp(-(angDiff * angDiff) / 0.28);
+            const breathe = Math.sin(t * 1.4 - idx * 0.6) * 1.6;
+            const jitter =
+              ringFracture *
+              locality *
+              (Math.sin(a * 14 + t * 10) * 9.5 + Math.cos(a * 7 - t * 6) * 5.5);
+            const r = baseR + breathe + jitter;
+            const x = Math.cos(a) * r;
+            const y = Math.sin(a) * r;
+            if (s === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.strokeStyle =
+            ringFracture > 0.35 && isOuter
+              ? `rgba(156, 90, 60, ${0.45 + idx * 0.1})`
+              : `rgba(31, 84, 82, ${0.28 + idx * 0.12})`;
+          ctx.lineWidth = idx === 3 ? 1.8 : 1.15;
+          ctx.stroke();
+        });
+
+        // Diagnostic radar sweep from SIM core
+        if (phase === "diagnose") {
+          const sweepA = faultAngle - 1.1 + phaseTime * 2.2;
+          const grad = ctx.createRadialGradient(0, 0, 12, 0, 0, 144);
+          grad.addColorStop(0, "rgba(194, 136, 79, 0.34)");
+          grad.addColorStop(1, "rgba(194, 136, 79, 0.02)");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, 144, sweepA - 0.55, sweepA);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.strokeStyle = PALETTE.bronze;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(sweepA) * 144, Math.sin(sweepA) * 144);
+          ctx.stroke();
+        }
+
+        // Healing teal restoration wave
+        if (phase === "heal") {
+          const hr = 24 + (phaseTime / 1.35) * 130;
+          ctx.strokeStyle = `rgba(31, 84, 82, ${Math.max(0, 1 - phaseTime / 1.35)})`;
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.arc(0, 0, hr, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Orbiting 5G signal nodes
+        for (let k = 0; k < 3; k++) {
+          const orbitR = radii[k + 1];
+          const a = t * (0.45 - k * 0.08) + k * 2.1;
+          ctx.fillStyle = k === 1 && fracture > 0.3 ? PALETTE.bronze : PALETTE.teal;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * orbitR, Math.sin(a) * orbitR, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Central SIM brass/cream core medallion
+        ctx.fillStyle = PALETTE.cream;
+        ctx.strokeStyle = fracture > 0.35 ? PALETTE.bronze : PALETTE.ink;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(0, 0, 26, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = PALETTE.ink;
+        ctx.font = '600 9.5px "DM Sans", sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("SIM", 0, -4);
+        ctx.fillStyle = PALETTE.bronze;
+        ctx.font = '600 8px "DM Sans", sans-serif';
+        ctx.fillText("SEED", 0, 8);
+        ctx.restore();
+
+        // Corner labels
+        ctx.fillStyle = PALETTE.muted;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "left";
+        ctx.fillText("5G SIGNAL HARMONICS", 26, 32);
+        ctx.textAlign = "right";
+        ctx.fillText("SIM-CORE RECOVERY", W - 26, H - 24);
+      },
+    };
+  }
+
+  /* --- ROOM II: SecureSIM — Rotating Astrolabe / Architectural Vault Lock --- */
+  function createSecureSimInstallation() {
+    const canvas = $("#canvas-securesim");
+    const ctx = setupCanvas(canvas);
+    if (!ctx) return null;
+    const stateEl = $("#securesim-state");
+    const verifyBtn = $("#securesim-verify-btn");
+    const denyBtn = $("#securesim-deny-btn");
+
+    let mode = "verify"; // verify | deny
+    let modeTime = 0;
+    const rings = [
+      { r: 124, angle: 0.9, target: 0, vel: 0, label: "CERT", gap: 0.28 },
+      { r: 88, angle: -1.4, target: 0, vel: 0, label: "POLICY", gap: 0.32 },
+      { r: 54, angle: 1.8, target: 0, vel: 0, label: "ACL", gap: 0.36 },
+    ];
+
+    function setMode(next) {
+      mode = next;
+      modeTime = 0;
+      if (next === "verify") {
+        rings[0].target = 0;
+        rings[1].target = 0;
+        rings[2].target = 0;
+        if (stateEl) {
+          stateEl.textContent = "AUTHORIZED";
+          stateEl.classList.remove("is-bronze");
+        }
+      } else {
+        rings[0].target = 0;
+        rings[1].target = 1.65;
+        rings[2].target = -1.2;
+        if (stateEl) {
+          stateEl.textContent = "ACCESS DENIED";
+          stateEl.classList.add("is-bronze");
+        }
+      }
+    }
+
+    if (verifyBtn) {
+      verifyBtn.addEventListener("click", () => {
+        rings[0].angle += 1.4;
+        rings[1].angle -= 1.8;
+        rings[2].angle += 1.1;
+        setMode("verify");
       });
+    }
+    if (denyBtn) {
+      denyBtn.addEventListener("click", () => setMode("deny"));
+    }
+    canvas.addEventListener("click", () => {
+      setMode(mode === "verify" ? "deny" : "verify");
     });
 
-    if (replayBtn) {
-      replayBtn.addEventListener("click", () => {
-        clearTimers();
-        if (!motionEnabled) {
-          setStep(0);
-          return;
+    setMode("verify");
+
+    return {
+      roomIndex: 1,
+      draw(t, dt) {
+        modeTime += dt;
+        drawArchitecturalGrid(ctx);
+        const cx = W / 2 + 24;
+        const cy = H / 2;
+
+        // Spring physics for the 3 astrolabe dials
+        rings.forEach((ring, idx) => {
+          if (!motionEnabled) {
+            ring.angle = ring.target;
+            return;
+          }
+          const k = 28 - idx * 4;
+          const damp = 6.2;
+          const accel = (ring.target - ring.angle) * k - ring.vel * damp;
+          ring.vel += accel * dt;
+          ring.angle += ring.vel * dt;
+        });
+
+        const aligned =
+          mode === "verify" &&
+          Math.abs(rings[0].angle) < 0.08 &&
+          Math.abs(rings[1].angle) < 0.08 &&
+          Math.abs(rings[2].angle) < 0.08;
+
+        // Engraved horizontal axis guide
+        ctx.strokeStyle = "rgba(102, 95, 86, 0.25)";
+        ctx.setLineDash([3, 5]);
+        ctx.beginPath();
+        ctx.moveTo(40, cy);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw 3 concentric astrolabe dial rings with precision apertures on the left (PI)
+        rings.forEach((ring, idx) => {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(ring.angle);
+
+          // Main engraved arc with gap at PI (left side)
+          const halfGap = ring.gap / 2;
+          ctx.strokeStyle = idx === 1 && mode === "deny" ? PALETTE.bronze : PALETTE.ink;
+          ctx.lineWidth = idx === 0 ? 2 : 1.6;
+          ctx.beginPath();
+          ctx.arc(0, 0, ring.r, Math.PI + halfGap, Math.PI * 3 - halfGap);
+          ctx.stroke();
+
+          // Inner hairline groove
+          ctx.strokeStyle = "rgba(156, 90, 60, 0.45)";
+          ctx.lineWidth = 0.85;
+          ctx.beginPath();
+          ctx.arc(0, 0, ring.r - 6, Math.PI + halfGap, Math.PI * 3 - halfGap);
+          ctx.stroke();
+
+          // Precision degree ticks
+          const tickCount = 24 - idx * 4;
+          ctx.strokeStyle = "rgba(102, 95, 86, 0.42)";
+          for (let i = 0; i < tickCount; i++) {
+            const a = (i / tickCount) * Math.PI * 2;
+            const d = Math.abs(Math.atan2(Math.sin(a - Math.PI), Math.cos(a - Math.PI)));
+            if (d < halfGap + 0.08) continue;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a) * (ring.r - 4), Math.sin(a) * (ring.r - 4));
+            ctx.lineTo(Math.cos(a) * (ring.r + 4), Math.sin(a) * (ring.r + 4));
+            ctx.stroke();
+          }
+
+          // Aperture brackets
+          ctx.fillStyle = PALETTE.teal;
+          [Math.PI - halfGap, Math.PI + halfGap].forEach((a) => {
+            ctx.beginPath();
+            ctx.arc(Math.cos(a) * ring.r, Math.sin(a) * ring.r, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          ctx.restore();
+        });
+
+        // Authorized teal beam OR Denied bronze deflection
+        if (aligned) {
+          const beamProgress = Math.min(1, Math.max(0.25, (modeTime - 0.35) * 1.4));
+          const xStart = 58;
+          const xEnd = xStart + (cx - 26 - xStart) * beamProgress;
+          const grad = ctx.createLinearGradient(xStart, cy, cx, cy);
+          grad.addColorStop(0, "rgba(31, 84, 82, 0.25)");
+          grad.addColorStop(1, PALETTE.teal);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(xStart, cy);
+          ctx.lineTo(xEnd, cy);
+          ctx.stroke();
+
+          // Gliding auth pulse
+          const px = xStart + ((t * 140) % (cx - 28 - xStart));
+          ctx.fillStyle = PALETTE.teal;
+          ctx.beginPath();
+          ctx.arc(px, cy, 4, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (mode === "deny") {
+          const hitX = cx - rings[1].r - 2;
+          const pulse = (t * 1.35) % 1;
+          const px = 58 + (hitX - 58) * Math.min(1, pulse * 1.5);
+          ctx.strokeStyle = PALETTE.bronze;
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(58, cy);
+          ctx.lineTo(px, cy);
+          ctx.stroke();
+
+          if (pulse > 0.62) {
+            const r = (pulse - 0.62) * 85;
+            ctx.strokeStyle = `rgba(156, 90, 60, ${Math.max(0, 1 - (pulse - 0.62) * 2.6)})`;
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.arc(hitX, cy, r, Math.PI * 0.65, Math.PI * 1.35);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(hitX, cy);
+            ctx.lineTo(hitX - r * 0.85, cy - r * 0.65);
+            ctx.moveTo(hitX, cy);
+            ctx.lineTo(hitX - r * 0.85, cy + r * 0.65);
+            ctx.stroke();
+          }
         }
-        const room = figure.closest(".gallery-room");
-        if (room) triggerCalligraphy(room);
-        setStep(1);
-        timerIds.push(setTimeout(() => setStep(2), 1100));
-        timerIds.push(setTimeout(() => setStep(3), 2200));
-        timerIds.push(setTimeout(() => setStep(0), 3400));
+
+        // Inner SIM Core
+        ctx.fillStyle = aligned ? PALETTE.teal : PALETTE.cream;
+        ctx.strokeStyle = aligned ? PALETTE.teal : PALETTE.ink;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = aligned ? PALETTE.cream : PALETTE.ink;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("SIM", cx, cy - 3);
+        ctx.font = '500 7.5px "DM Sans", sans-serif';
+        ctx.fillText("CORE", cx, cy + 7);
+
+        // Request source node on the left
+        ctx.fillStyle = PALETTE.cream;
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(58, cy, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = PALETTE.ink;
+        ctx.font = '600 8px "DM Sans", sans-serif';
+        ctx.fillText("REQ", 58, cy + 0.5);
+
+        ctx.fillStyle = PALETTE.muted;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "left";
+        ctx.fillText("CERT · POLICY · ACL DIALS", 26, 32);
+      },
+    };
+  }
+
+  /* --- ROOM III: GPT-Code-Learner — 2.5D Typographic Code-Constellation --- */
+  function createGptInstallation() {
+    const canvas = $("#canvas-gpt");
+    const ctx = setupCanvas(canvas);
+    if (!ctx) return null;
+    const stateEl = $("#gpt-state");
+    const modeBtns = $$("[data-gpt-mode]");
+
+    let activeMode = "search"; // search | explain
+    let ptrX = 0;
+    let ptrY = 0;
+    let curX = 0;
+    let curY = 0;
+
+    const nodes = [
+      { id: 0, label: "repo/", x: 108, y: 112, z: 0.4, group: "search" },
+      { id: 1, label: "src/parser", x: 205, y: 78, z: 0.85, group: "search" },
+      { id: 2, label: "src/index", x: 185, y: 204, z: 0.6, group: "search" },
+      { id: 3, label: "docs/arch", x: 118, y: 268, z: 0.3, group: "search" },
+      { id: 4, label: "context.py", x: 318, y: 152, z: 1.0, group: "both" },
+      { id: 5, label: "search()", x: 298, y: 266, z: 0.7, group: "search" },
+      { id: 6, label: "prompt.ts", x: 432, y: 108, z: 0.8, group: "explain" },
+      { id: 7, label: "GPT", x: 486, y: 205, z: 1.0, group: "explain" },
+      { id: 8, label: "explain()", x: 422, y: 282, z: 0.55, group: "explain" },
+    ];
+
+    const edges = [
+      [0, 1, "search"],
+      [0, 2, "search"],
+      [2, 3, "search"],
+      [1, 4, "search"],
+      [2, 4, "search"],
+      [2, 5, "search"],
+      [5, 4, "search"],
+      [4, 6, "explain"],
+      [4, 7, "explain"],
+      [6, 7, "explain"],
+      [7, 8, "explain"],
+      [5, 8, "explain"],
+    ];
+
+    function setGptMode(m) {
+      activeMode = m;
+      modeBtns.forEach((b) => {
+        const on = b.dataset.gptMode === m;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      if (stateEl) {
+        stateEl.textContent = m === "search" ? "SEARCH SUBGRAPH" : "EXPLAIN FLOW";
+        stateEl.classList.toggle("is-bronze", m === "search");
+      }
+    }
+
+    modeBtns.forEach((b) => {
+      b.addEventListener("click", () => setGptMode(b.dataset.gptMode));
+    });
+
+    canvas.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect();
+        ptrX = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
+        ptrY = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
+      },
+      { passive: true },
+    );
+    canvas.addEventListener("pointerleave", () => {
+      ptrX = 0;
+      ptrY = 0;
+    });
+
+    return {
+      roomIndex: 2,
+      draw(t, dt) {
+        curX += (ptrX - curX) * Math.min(1, dt * 5);
+        curY += (ptrY - curY) * Math.min(1, dt * 5);
+
+        drawArchitecturalGrid(ctx);
+
+        const pos = nodes.map((n, i) => {
+          const driftX = motionEnabled ? Math.sin(t * 0.7 + i * 1.1) * 4 * n.z : 0;
+          const driftY = motionEnabled ? Math.cos(t * 0.6 + i * 0.9) * 4 * n.z : 0;
+          return {
+            x: n.x + curX * 22 * n.z + driftX,
+            y: n.y + curY * 14 * n.z + driftY,
+            node: n,
+          };
+        });
+
+        // Draw constellation edges & traveling luminous threads
+        edges.forEach(([a, b, kind], idx) => {
+          const p1 = pos[a];
+          const p2 = pos[b];
+          const isActive = kind === activeMode;
+          ctx.strokeStyle = isActive
+            ? activeMode === "search"
+              ? "rgba(156, 90, 60, 0.55)"
+              : "rgba(31, 84, 82, 0.6)"
+            : "rgba(102, 95, 86, 0.18)";
+          ctx.lineWidth = isActive ? 1.5 : 0.9;
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+
+          if (isActive && motionEnabled) {
+            const u = (t * 0.55 + idx * 0.19) % 1;
+            const px = p1.x + (p2.x - p1.x) * u;
+            const py = p1.y + (p2.y - p1.y) * u;
+            ctx.fillStyle = activeMode === "search" ? PALETTE.bronze : PALETTE.teal;
+            ctx.beginPath();
+            ctx.arc(px, py, 3.1, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // Draw architectural typographic node plaques
+        pos.forEach(({ x, y, node }) => {
+          const lit = node.group === activeMode || node.group === "both";
+          ctx.font = '500 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+          const tw = ctx.measureText(node.label).width;
+          const pw = tw + 20;
+          const ph = 26;
+
+          ctx.fillStyle = lit ? PALETTE.cream : "rgba(250, 247, 242, 0.65)";
+          ctx.strokeStyle = lit
+            ? activeMode === "search"
+              ? PALETTE.bronze
+              : PALETTE.teal
+            : PALETTE.borderStrong;
+          ctx.lineWidth = lit ? 1.4 : 0.9;
+          ctx.beginPath();
+          ctx.rect(x - pw / 2, y - ph / 2, pw, ph);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = lit ? PALETTE.ink : PALETTE.muted;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(node.label, x, y + 0.5);
+        });
+
+        ctx.fillStyle = PALETTE.muted;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "left";
+        ctx.fillText("REPOSITORY CONTEXT GRAPH", 26, 32);
+      },
+    };
+  }
+
+  /* --- ROOM IV: Sonica — Topographic Narrowband RF Wave Sculpture --- */
+  function createSonicaInstallation() {
+    const canvas = $("#canvas-sonica");
+    const ctx = setupCanvas(canvas);
+    if (!ctx) return null;
+    const stateEl = $("#sonica-state");
+    const chBtns = $$("[data-sonica-ch]");
+
+    const channels = [
+      { name: "CH · UPLINK", x: 185 },
+      { name: "CH · CONTROL", x: 315 },
+      { name: "CH · DOWNLINK", x: 445 },
+    ];
+    let targetTuneX = channels[0].x;
+    let tuneX = channels[0].x;
+    const packets = [];
+
+    function firePacket(xPos) {
+      packets.push({ x: xPos, radius: 6, life: 1 });
+    }
+
+    function selectChannel(idx) {
+      const ch = channels[idx] || channels[0];
+      targetTuneX = ch.x;
+      firePacket(ch.x);
+      chBtns.forEach((b) => {
+        const on = Number(b.dataset.sonicaCh) === idx;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      if (stateEl) stateEl.textContent = ch.name;
+    }
+
+    chBtns.forEach((b) => {
+      b.addEventListener("click", () => selectChannel(Number(b.dataset.sonicaCh)));
+    });
+
+    canvas.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / Math.max(1, rect.width)) * W;
+        targetTuneX = Math.max(48, Math.min(W - 48, x));
+      },
+      { passive: true },
+    );
+
+    canvas.addEventListener("click", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / Math.max(1, rect.width)) * W;
+      targetTuneX = Math.max(48, Math.min(W - 48, x));
+      firePacket(targetTuneX);
+    });
+
+    return {
+      roomIndex: 3,
+      draw(t, dt) {
+        tuneX += (targetTuneX - tuneX) * Math.min(1, dt * 8);
+        drawArchitecturalGrid(ctx);
+
+        // Vertical narrowband tuning reticle
+        ctx.strokeStyle = "rgba(156, 90, 60, 0.45)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 4]);
+        ctx.beginPath();
+        ctx.moveTo(tuneX, 24);
+        ctx.lineTo(tuneX, H - 24);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 9 Braun-inspired topographic narrowband RF ribbons
+        const ribbonCount = 9;
+        for (let r = 0; r < ribbonCount; r++) {
+          const baseY = 74 + r * 28;
+          ctx.beginPath();
+          for (let x = 28; x <= W - 28; x += 4) {
+            const dist = (x - tuneX) / 56;
+            const resonance = Math.exp(-(dist * dist));
+            const carrier =
+              Math.sin(x * 0.032 + t * (1.8 + r * 0.14) + r * 0.7) * (5 + resonance * 18);
+            const harmonic =
+              Math.cos(x * 0.075 - t * 2.6 + r) * (2.2 + resonance * 8);
+            const y = baseY + carrier + harmonic;
+            if (x === 28) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+
+          if (r === 4) {
+            ctx.strokeStyle = PALETTE.teal;
+            ctx.lineWidth = 2.1;
+          } else if (r === 2 || r === 6) {
+            ctx.strokeStyle = PALETTE.bronze;
+            ctx.lineWidth = 1.35;
+          } else {
+            ctx.strokeStyle = `rgba(29, 27, 24, ${0.18 + (r % 3) * 0.1})`;
+            ctx.lineWidth = 1;
+          }
+          ctx.stroke();
+        }
+
+        // Traveling narrowband packet crests
+        for (let i = packets.length - 1; i >= 0; i--) {
+          const p = packets[i];
+          p.radius += dt * 150;
+          p.life -= dt * 0.85;
+          if (p.life <= 0) {
+            packets.splice(i, 1);
+            continue;
+          }
+          ctx.strokeStyle = `rgba(31, 84, 82, ${p.life * 0.75})`;
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.arc(p.x, H / 2, p.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Subtle autonomous packet pulse
+        if (motionEnabled && Math.floor(t * 0.5) !== Math.floor((t - dt) * 0.5)) {
+          if (packets.length < 2) firePacket(tuneX);
+        }
+
+        // Reticle badge
+        ctx.fillStyle = PALETTE.bronze;
+        ctx.beginPath();
+        ctx.arc(tuneX, 42, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = PALETTE.muted;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "left";
+        ctx.fillText("NB-IoT SPECTRUM · OTA", 26, 32);
+      },
+    };
+  }
+
+  /* --- ROOM V: Flora — 3D-Projected Architectural Plane Stack --- */
+  function createFloraInstallation() {
+    const canvas = $("#canvas-flora");
+    const ctx = setupCanvas(canvas);
+    if (!ctx) return null;
+    const stateEl = $("#flora-state");
+    const layerBtns = $$("[data-flora-layer]");
+
+    const layerMeta = [
+      { name: "01 · eSIM", color: PALETTE.bronze },
+      { name: "02 · RAN", color: PALETTE.ink },
+      { name: "03 · CORE", color: PALETTE.teal },
+      { name: "04 · EDGE VR", color: PALETTE.tealBright },
+    ];
+
+    let selectedLayer = -1; // -1 = all
+    let ptrX = 0;
+    let ptrY = 0;
+    let yaw = 0.62;
+    let pitch = 0.54;
+
+    function setFloraLayer(idx) {
+      selectedLayer = idx;
+      layerBtns.forEach((b) => {
+        const on = Number(b.dataset.floraLayer) === idx;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      if (stateEl) {
+        stateEl.textContent = idx < 0 ? "ALL 4 PLANES" : layerMeta[idx].name;
+      }
+    }
+
+    layerBtns.forEach((b) => {
+      b.addEventListener("click", () => setFloraLayer(Number(b.dataset.floraLayer)));
+    });
+
+    canvas.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect();
+        ptrX = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
+        ptrY = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
+      },
+      { passive: true },
+    );
+    canvas.addEventListener("pointerleave", () => {
+      ptrX = 0;
+      ptrY = 0;
+    });
+
+    function project3D(x, y, z, curYaw, curPitch) {
+      const cy = Math.cos(curYaw);
+      const sy = Math.sin(curYaw);
+      const cp = Math.cos(curPitch);
+      const sp = Math.sin(curPitch);
+
+      const x1 = x * cy - z * sy;
+      const z1 = x * sy + z * cy;
+      const y2 = y * cp - z1 * sp;
+      const z2 = y * sp + z1 * cp;
+
+      const fov = 560;
+      const scale = fov / (fov + z2 + 220);
+      return {
+        sx: W / 2 + x1 * scale,
+        sy: H / 2 + y2 * scale,
+        scale,
+      };
+    }
+
+    return {
+      roomIndex: 4,
+      draw(t, dt) {
+        const targetYaw = 0.62 + ptrX * 0.35 + (motionEnabled ? Math.sin(t * 0.45) * 0.08 : 0);
+        const targetPitch = 0.52 + ptrY * 0.22;
+        yaw += (targetYaw - yaw) * Math.min(1, dt * 6);
+        pitch += (targetPitch - pitch) * Math.min(1, dt * 6);
+
+        drawArchitecturalGrid(ctx);
+
+        const planeW = 128;
+        const planeD = 88;
+        const baseSpacing = selectedLayer >= 0 ? 52 : 42;
+
+        // Draw from bottom (0) to top (3)
+        const anchors = [];
+        for (let i = 0; i < 4; i++) {
+          const isSel = selectedLayer === i;
+          const dimmed = selectedLayer >= 0 && !isSel;
+          const elevOffset = isSel ? -14 : 0;
+          const yPos = 68 - i * baseSpacing + elevOffset;
+          const corners = [
+            project3D(-planeW, yPos, -planeD, yaw, pitch),
+            project3D(planeW, yPos, -planeD, yaw, pitch),
+            project3D(planeW, yPos, planeD, yaw, pitch),
+            project3D(-planeW, yPos, planeD, yaw, pitch),
+          ];
+          const center = project3D(0, yPos, 0, yaw, pitch);
+          anchors.push(center);
+
+          ctx.beginPath();
+          ctx.moveTo(corners[0].sx, corners[0].sy);
+          for (let c = 1; c < 4; c++) ctx.lineTo(corners[c].sx, corners[c].sy);
+          ctx.closePath();
+
+          ctx.fillStyle = isSel
+            ? "rgba(31, 84, 82, 0.14)"
+            : dimmed
+              ? "rgba(250, 247, 242, 0.45)"
+              : "rgba(250, 247, 242, 0.82)";
+          ctx.fill();
+
+          ctx.strokeStyle = isSel
+            ? PALETTE.teal
+            : dimmed
+              ? "rgba(102, 95, 86, 0.25)"
+              : layerMeta[i].color;
+          ctx.lineWidth = isSel ? 2 : 1.15;
+          ctx.stroke();
+
+          // Architectural cross-grid on each plane
+          const m1 = project3D(0, yPos, -planeD, yaw, pitch);
+          const m2 = project3D(0, yPos, planeD, yaw, pitch);
+          const m3 = project3D(-planeW, yPos, 0, yaw, pitch);
+          const m4 = project3D(planeW, yPos, 0, yaw, pitch);
+          ctx.strokeStyle = dimmed ? "rgba(102, 95, 86, 0.1)" : "rgba(102, 95, 86, 0.22)";
+          ctx.lineWidth = 0.75;
+          ctx.beginPath();
+          ctx.moveTo(m1.sx, m1.sy);
+          ctx.lineTo(m2.sx, m2.sy);
+          ctx.moveTo(m3.sx, m3.sy);
+          ctx.lineTo(m4.sx, m4.sy);
+          ctx.stroke();
+
+          // Plane architectural label on right corner
+          ctx.fillStyle = dimmed ? "rgba(102, 95, 86, 0.4)" : PALETTE.ink;
+          ctx.font = '600 9.5px "DM Sans", sans-serif';
+          ctx.textAlign = "left";
+          ctx.fillText(layerMeta[i].name, corners[1].sx + 10, corners[1].sy + 3);
+        }
+
+        // Curved Bezier light filaments & gliding particles connecting the 4 layers
+        for (let f = 0; f < 3; f++) {
+          const p0 = anchors[0];
+          const p3 = anchors[3];
+          const bend = (f - 1) * 56;
+          const cp1x = anchors[1].sx + bend;
+          const cp1y = anchors[1].sy;
+          const cp2x = anchors[2].sx - bend * 0.7;
+          const cp2y = anchors[2].sy;
+
+          ctx.strokeStyle = f === 1 ? "rgba(31, 84, 82, 0.55)" : "rgba(156, 90, 60, 0.45)";
+          ctx.lineWidth = 1.25;
+          ctx.beginPath();
+          ctx.moveTo(p0.sx, p0.sy);
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p3.sx, p3.sy);
+          ctx.stroke();
+
+          if (motionEnabled) {
+            const u = (t * 0.36 + f * 0.33) % 1;
+            const mu = 1 - u;
+            const px =
+              mu * mu * mu * p0.sx +
+              3 * mu * mu * u * cp1x +
+              3 * mu * u * u * cp2x +
+              u * u * u * p3.sx;
+            const py =
+              mu * mu * mu * p0.sy +
+              3 * mu * mu * u * cp1y +
+              3 * mu * u * u * cp2y +
+              u * u * u * p3.sy;
+            ctx.fillStyle = f === 1 ? PALETTE.teal : PALETTE.bronze;
+            ctx.beginPath();
+            ctx.arc(px, py, 3.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.fillStyle = PALETTE.muted;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "left";
+        ctx.fillText("END-TO-END SOFTWARE-DEFINED STACK", 26, 32);
+      },
+    };
+  }
+
+  /* --- ROOM VI: Mobile VR Latency — 3D Wireframe Polyhedron & Tracking-Sync --- */
+  function createVrInstallation() {
+    const canvas = $("#canvas-vr");
+    const ctx = setupCanvas(canvas);
+    if (!ctx) return null;
+    const stateEl = $("#vr-state");
+    const modeBtns = $$("[data-vr-mode]");
+
+    let vrMode = "proactive"; // proactive | standard
+    let ptrActive = false;
+    let targetYaw = 0;
+    let targetPitch = 0;
+    let leadYaw = 0;
+    let leadPitch = 0;
+    let ghostYaw = 0;
+    let ghostPitch = 0;
+
+    // Regular Icosahedron vertices & edges
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const rawVerts = [
+      [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+      [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+      [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1],
+    ];
+    const verts = rawVerts.map(([x, y, z]) => {
+      const len = Math.hypot(x, y, z);
+      return [x / len, y / len, z / len];
+    });
+    const edges = [];
+    for (let i = 0; i < verts.length; i++) {
+      for (let j = i + 1; j < verts.length; j++) {
+        const d = Math.hypot(
+          verts[i][0] - verts[j][0],
+          verts[i][1] - verts[j][1],
+          verts[i][2] - verts[j][2],
+        );
+        if (d < 1.15) edges.push([i, j]);
+      }
+    }
+
+    function setVrMode(m) {
+      vrMode = m;
+      modeBtns.forEach((b) => {
+        const on = b.dataset.vrMode === m;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      if (stateEl) {
+        stateEl.textContent = m === "proactive" ? "PROACTIVE SYNC" : "STANDARD LAG";
+        stateEl.classList.toggle("is-bronze", m === "standard");
+      }
+    }
+
+    modeBtns.forEach((b) => {
+      b.addEventListener("click", () => setVrMode(b.dataset.vrMode));
+    });
+
+    canvas.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect();
+        ptrActive = true;
+        targetYaw = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2.8;
+        targetPitch = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2.1;
+      },
+      { passive: true },
+    );
+    canvas.addEventListener("pointerleave", () => {
+      ptrActive = false;
+    });
+
+    function projectPoly(ry, rx, offsetX, scaleR) {
+      const cy = Math.cos(ry);
+      const sy = Math.sin(ry);
+      const cx = Math.cos(rx);
+      const sx = Math.sin(rx);
+      return verts.map(([vx, vy, vz]) => {
+        const x1 = vx * cy - vz * sy;
+        const z1 = vx * sy + vz * cy;
+        const y2 = vy * cx - z1 * sx;
+        const z2 = vy * sx + z1 * cx;
+        const persp = 360 / (360 + z2 * scaleR + 120);
+        return {
+          x: W / 2 + offsetX + x1 * scaleR * persp,
+          y: H / 2 - 14 + y2 * scaleR * persp,
+        };
       });
     }
 
-    setStep(0);
-  });
+    return {
+      roomIndex: 5,
+      draw(t, dt) {
+        if (!ptrActive && motionEnabled) {
+          targetYaw = Math.sin(t * 0.9) * 1.45 + t * 0.42;
+          targetPitch = Math.cos(t * 0.72) * 0.75;
+        }
+
+        leadYaw += (targetYaw - leadYaw) * Math.min(1, dt * 10);
+        leadPitch += (targetPitch - leadPitch) * Math.min(1, dt * 10);
+
+        const followRate = vrMode === "proactive" ? 9.5 : 1.7;
+        ghostYaw += (leadYaw - ghostYaw) * Math.min(1, dt * followRate);
+        ghostPitch += (leadPitch - ghostPitch) * Math.min(1, dt * followRate);
+
+        drawArchitecturalGrid(ctx);
+
+        const lagShift = vrMode === "standard" ? (leadYaw - ghostYaw) * 24 : 0;
+        const leadPts = projectPoly(leadYaw, leadPitch, 0, 96);
+        const ghostPts = projectPoly(ghostYaw, ghostPitch, -lagShift, 96);
+
+        // Draw bronze ghost rendered wireframe (trails behind in Standard, snaps tight in Proactive)
+        ctx.strokeStyle =
+          vrMode === "standard"
+            ? "rgba(156, 90, 60, 0.72)"
+            : "rgba(31, 84, 82, 0.42)";
+        ctx.lineWidth = vrMode === "standard" ? 1.5 : 1.1;
+        if (vrMode === "standard") ctx.setLineDash([4, 4]);
+        edges.forEach(([a, b]) => {
+          ctx.beginPath();
+          ctx.moveTo(ghostPts[a].x, ghostPts[a].y);
+          ctx.lineTo(ghostPts[b].x, ghostPts[b].y);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+
+        // Connecting drift vectors in Standard mode
+        if (vrMode === "standard") {
+          ctx.strokeStyle = "rgba(156, 90, 60, 0.28)";
+          ctx.lineWidth = 0.85;
+          for (let i = 0; i < verts.length; i += 2) {
+            ctx.beginPath();
+            ctx.moveTo(leadPts[i].x, leadPts[i].y);
+            ctx.lineTo(ghostPts[i].x, ghostPts[i].y);
+            ctx.stroke();
+          }
+        }
+
+        // Draw live motion wireframe in crisp espresso / forest teal
+        ctx.strokeStyle = vrMode === "proactive" ? PALETTE.teal : PALETTE.ink;
+        ctx.lineWidth = 1.45;
+        edges.forEach(([a, b]) => {
+          ctx.beginPath();
+          ctx.moveTo(leadPts[a].x, leadPts[a].y);
+          ctx.lineTo(leadPts[b].x, leadPts[b].y);
+          ctx.stroke();
+        });
+
+        leadPts.forEach((p) => {
+          ctx.fillStyle = vrMode === "proactive" ? PALETTE.teal : PALETTE.ink;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2.3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Bottom proactive uplink scheduling rail
+        const railY = H - 38;
+        ctx.strokeStyle = PALETTE.borderStrong;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(110, railY);
+        ctx.lineTo(W - 110, railY);
+        ctx.stroke();
+
+        const slots = 8;
+        const activeSlot = Math.floor(t * (vrMode === "proactive" ? 5 : 1.6)) % slots;
+        for (let s = 0; s < slots; s++) {
+          const sx = 138 + s * 46;
+          const isPulse = s === activeSlot;
+          ctx.fillStyle = isPulse
+            ? vrMode === "proactive"
+              ? PALETTE.teal
+              : PALETTE.bronze
+            : PALETTE.cream;
+          ctx.strokeStyle = isPulse ? ctx.fillStyle : PALETTE.borderStrong;
+          ctx.lineWidth = 1;
+          ctx.fillRect(sx - 6, railY - 8, 12, 16);
+          ctx.strokeRect(sx - 6, railY - 8, 12, 16);
+        }
+
+        ctx.fillStyle = PALETTE.muted;
+        ctx.font = '600 9px "DM Sans", sans-serif';
+        ctx.textAlign = "left";
+        ctx.fillText(
+          vrMode === "proactive" ? "MOTION + RENDERED FRAME IN SYNC" : "MOTION TARGET vs. TRAILING RENDER",
+          26,
+          32,
+        );
+      },
+    };
+  }
+
+  /* --- Unified Visibility-Aware Installation Loop (60fps, zero idle burn) --- */
+  const installations = [
+    createSeedInstallation(),
+    createSecureSimInstallation(),
+    createGptInstallation(),
+    createSonicaInstallation(),
+    createFloraInstallation(),
+    createVrInstallation(),
+  ].filter(Boolean);
+
+  let loopRaf = 0;
+  let lastNow = 0;
+  let clock = 0;
+
+  function drawAllStatic() {
+    installations.forEach((inst) => inst.draw(clock, 0));
+  }
+
+  function tickInstallations(now) {
+    loopRaf = 0;
+    if (!motionEnabled || !exhibitionInView || document.hidden) {
+      lastNow = 0;
+      return;
+    }
+    const dt = lastNow ? Math.min(0.05, (now - lastNow) / 1000) : 0.016;
+    lastNow = now;
+    clock += dt;
+
+    const isIndex = galleryViewport && galleryViewport.dataset.mode === "index";
+    installations.forEach((inst) => {
+      if (isIndex || inst.roomIndex === activeRoom) {
+        inst.draw(clock, dt);
+      }
+    });
+
+    if (isIndex || activeRoom < 6) {
+      loopRaf = requestAnimationFrame(tickInstallations);
+    }
+  }
+
+  syncInstallations = () => {
+    const isIndex = galleryViewport && galleryViewport.dataset.mode === "index";
+    const needsLoop =
+      motionEnabled &&
+      exhibitionInView &&
+      !document.hidden &&
+      (isIndex || activeRoom < 6);
+
+    if (needsLoop) {
+      if (!loopRaf) loopRaf = requestAnimationFrame(tickInstallations);
+    } else {
+      cancelAnimationFrame(loopRaf);
+      loopRaf = 0;
+      lastNow = 0;
+      drawAllStatic();
+    }
+  };
+
+  if ("IntersectionObserver" in window && galleryViewport) {
+    new IntersectionObserver(
+      ([entry]) => {
+        exhibitionInView = entry.isIntersecting;
+        syncInstallations();
+      },
+      { threshold: 0.05 },
+    ).observe(galleryViewport);
+  }
+
+  document.addEventListener("visibilitychange", syncInstallations);
+  drawAllStatic();
+  syncInstallations();
+
+  function syncMotion() {
+    motionEnabled = !reduceMotion.matches;
+    if (!motionEnabled) {
+      document.body.classList.remove("hero-arming");
+      $$(".reveal.is-pending").forEach((el) => el.classList.remove("is-pending"));
+      if (cursorEl) cursorEl.classList.remove("is-visible", "has-label");
+    }
+    updateScroll();
+    syncInstallations();
+  }
+  reduceMotion.addEventListener("change", syncMotion);
+  updateScroll();
 
   /* ============================================================
-     6. ACEMAP INK-BLOOM CARTOGRAPHIC ATLAS (2,208 TOPICS)
+     7. ROOM VII: ACEMAP INK-BLOOM & DISCIPLINE-ZOOM ATLAS
      ============================================================ */
   const mapLoad = $("#map-load");
   const mapStatus = $("#map-status");
@@ -483,6 +1594,7 @@
   const fieldSelectWrap = $(".field-select");
   const topicSelectWrap = $(".topic-select");
   const topicMapSvg = $("#topic-map");
+  const atlasCamera = $("#atlas-camera");
   const atlasViewport = $("#atlas-viewport");
   const inkRipplesLayer = $("#ink-ripples");
   const callout = $("#atlas-callout");
@@ -513,47 +1625,17 @@
   ];
 
   const csvColors = [
-    "#ffc1fc",
-    "#beeb74",
-    "#e0d4ff",
-    "#ffb290",
-    "#ffbd71",
-    "#ded75f",
-    "#9cd8fc",
-    "#f5bc7b",
-    "#5eebc7",
-    "#d1beda",
-    "#52eaf9",
-    "#9ed5c2",
-    "#c9d188",
-    "#91d289",
-    "#ffbccc",
-    "#ffac9e",
-    "#ffaabb",
-    "#8df8a0",
-    "#ffce63",
+    "#ffc1fc", "#beeb74", "#e0d4ff", "#ffb290", "#ffbd71",
+    "#ded75f", "#9cd8fc", "#f5bc7b", "#5eebc7", "#d1beda",
+    "#52eaf9", "#9ed5c2", "#c9d188", "#91d289", "#ffbccc",
+    "#ffac9e", "#ffaabb", "#8df8a0", "#ffce63",
   ];
 
   const mineralColors = [
-    "#7d567e",
-    "#5f7a42",
-    "#585c8c",
-    "#a85c42",
-    "#1f5452",
-    "#8c7432",
-    "#2f6f8a",
-    "#9c5a3c",
-    "#257063",
-    "#785f74",
-    "#2c6e78",
-    "#4e7866",
-    "#8a773c",
-    "#4b734b",
-    "#995a72",
-    "#a66253",
-    "#964f60",
-    "#3f7553",
-    "#917134",
+    "#7d567e", "#5f7a42", "#585c8c", "#a85c42", "#1f5452",
+    "#8c7432", "#2f6f8a", "#9c5a3c", "#257063", "#785f74",
+    "#2c6e78", "#4e7866", "#8a773c", "#4b734b", "#995a72",
+    "#a66253", "#964f60", "#3f7553", "#917134",
   ];
 
   let topicPoints = [];
@@ -561,6 +1643,9 @@
   let selectedField = "all";
   let hoveredIndex = -1;
   let selectedIndex = -1;
+  let camScale = 1;
+  let camTx = 0;
+  let camTy = 0;
 
   function parseCSV(text) {
     const rows = [];
@@ -602,6 +1687,42 @@
     );
   }
 
+  function applyAtlasCamera(scale, tx, ty) {
+    camScale = scale;
+    camTx = tx;
+    camTy = ty;
+    if (atlasCamera) {
+      atlasCamera.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+    }
+  }
+
+  function focusDisciplineCamera(fieldVal) {
+    if (fieldVal === "all") {
+      applyAtlasCamera(1, 0, 0);
+      return;
+    }
+    const fIdx = Number(fieldVal);
+    const pts = topicPoints.filter((p) => p.field === fIdx);
+    if (!pts.length) {
+      applyAtlasCamera(1, 0, 0);
+      return;
+    }
+    const xs = pts.map((p) => p.cx);
+    const ys = pts.map((p) => p.cy);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const bw = Math.max(90, maxX - minX + 60);
+    const bh = Math.max(70, maxY - minY + 50);
+    const zoom = Math.min(2.15, Math.max(1.15, Math.min(540 / bw, 310 / bh)));
+    const midX = (minX + maxX) / 2;
+    const midY = (minY + maxY) / 2;
+    const tx = 320 - midX * zoom;
+    const ty = 190 - midY * zoom;
+    applyAtlasCamera(zoom, tx, ty);
+  }
+
   function syncCircleHighlight(index) {
     if (index < 0 || !circles[index]) return;
     const circle = circles[index];
@@ -609,7 +1730,7 @@
     const isHovered = index === hoveredIndex;
     circle.classList.toggle("is-selected", isSelected);
     circle.classList.toggle("is-hovered", isHovered);
-    circle.setAttribute("r", isSelected ? "4.8" : isHovered ? "4.3" : "2.15");
+    circle.setAttribute("r", isSelected ? "4.4" : isHovered ? "3.9" : "2.15");
   }
 
   function spawnInkRipples(point) {
@@ -638,8 +1759,10 @@
 
     const svgRect = topicMapSvg.getBoundingClientRect();
     const wrapRect = atlasViewport.getBoundingClientRect();
-    const px = (point.cx / 640) * svgRect.width + (svgRect.left - wrapRect.left);
-    const py = (point.cy / 380) * svgRect.height + (svgRect.top - wrapRect.top);
+    const vx = point.cx * camScale + camTx;
+    const vy = point.cy * camScale + camTy;
+    const px = (vx / 640) * svgRect.width + (svgRect.left - wrapRect.left);
+    const py = (vy / 380) * svgRect.height + (svgRect.top - wrapRect.top);
 
     calloutSwatch.style.backgroundColor = mineralColors[point.field];
     calloutTopic.textContent = point.name;
@@ -680,6 +1803,8 @@
       }
     });
 
+    focusDisciplineCamera(selectedField);
+
     const label =
       selectedField === "all"
         ? "All 19 disciplines"
@@ -694,10 +1819,12 @@
   function findNearestPoint(clientX, clientY, maxDist) {
     const rect = topicMapSvg.getBoundingClientRect();
     if (!rect.width || !rect.height) return -1;
-    const vx = ((clientX - rect.left) / rect.width) * 640;
-    const vy = ((clientY - rect.top) / rect.height) * 380;
+    const rawX = ((clientX - rect.left) / rect.width) * 640;
+    const rawY = ((clientY - rect.top) / rect.height) * 380;
+    const vx = (rawX - camTx) / camScale;
+    const vy = (rawY - camTy) / camScale;
     let best = -1;
-    let bestDistSq = maxDist * maxDist;
+    let bestDistSq = (maxDist / camScale) * (maxDist / camScale);
     for (let i = 0; i < topicPoints.length; i++) {
       if (!isPointActive(i)) continue;
       const dx = topicPoints[i].cx - vx;
@@ -756,7 +1883,6 @@
         const offsetX = (640 - (maxX - minX) * scale) / 2;
         const offsetY = (380 - (maxY - minY) * scale) / 2;
 
-        // Compute discipline centroids so each cluster blooms organically from its own heart
         const clusterSums = fields.map(() => ({ sx: 0, sy: 0, n: 0 }));
         topicPoints.forEach((point) => {
           point.cx = Number(((point.x - minX) * scale + offsetX).toFixed(2));
@@ -775,9 +1901,7 @@
           g.setAttribute("class", motionEnabled ? "discipline-cluster is-blooming" : "discipline-cluster");
           const c = clusterSums[fIdx];
           if (c.n > 0) {
-            const ox = (c.sx / c.n).toFixed(1);
-            const oy = (c.sy / c.n).toFixed(1);
-            g.style.transformOrigin = `${ox}px ${oy}px`;
+            g.style.transformOrigin = `${(c.sx / c.n).toFixed(1)}px ${(c.sy / c.n).toFixed(1)}px`;
           }
           g.style.setProperty("--bloom-delay", `${(fIdx * 0.042).toFixed(3)}s`);
           rootGroup.appendChild(g);
@@ -802,7 +1926,7 @@
 
         const preview = $("#map-preview");
         if (preview) preview.replaceWith(rootGroup);
-        else topicMapSvg.insertBefore(rootGroup, inkRipplesLayer || null);
+        else if (atlasCamera) atlasCamera.insertBefore(rootGroup, inkRipplesLayer || null);
 
         fields.forEach((field, i) => {
           const option = document.createElement("option");
@@ -894,7 +2018,7 @@
   }
 
   /* ============================================================
-     7. PUBLICATIONS BOOK-INDEX FILTER & HASH SYNC
+     8. PUBLICATIONS BOOK-INDEX FILTER & HASH SYNC
      ============================================================ */
   const filterButtons = $$("[data-filter]");
   const pubGroups = $$(".pub-group");

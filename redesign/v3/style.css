@@ -1277,337 +1277,107 @@ body.hero-arming .portrait-aperture img {
 }
 
 /* ============================================================
-   CALLIGRAPHY INK DRAW-IN & CONTINUOUS AMBIENT SVG MOTION
+   BESPOKE KINETIC CANVAS INSTALLATIONS (ROOMS I–VI)
    ============================================================ */
-.project-art {
+.installation-frame {
+  margin: 0;
+  background: var(--ground);
+  border: 1px solid var(--border);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.installation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.installation-state {
+  color: var(--teal);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.installation-state.is-bronze {
+  color: var(--bronze-ink);
+}
+
+.canvas-stage {
+  position: relative;
   width: 100%;
-  height: auto;
+  aspect-ratio: 600 / 360;
+  background: #f7f3eb;
+  border: 1px solid var(--border);
+  overflow: hidden;
 }
 
-.project-art .art-route {
-  fill: none;
-  stroke: #cfc6b6;
-  stroke-width: 1.3;
-  stroke-dasharray: 4 4;
+.kinetic-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
 }
 
-.project-art .art-flow {
-  fill: none;
-  stroke: var(--teal);
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 0.85s var(--ease-editorial), opacity 0.35s ease;
-}
-
-/* Continuous ambient signal pulse along architectural routes */
-.project-art .art-pulse {
-  fill: none;
-  stroke: var(--bronze);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-dasharray: 14 86;
-  stroke-dashoffset: 100;
-  animation: ink-pulse 3.8s linear infinite;
-}
-
-.project-art .pulse-d2 {
-  animation-delay: -1.25s;
-}
-
-.project-art .pulse-d3 {
-  animation-delay: -2.5s;
-}
-
-@keyframes ink-pulse {
-  to { stroke-dashoffset: 0; }
-}
-
-/* Calligraphy Ink Draw-In when a room activates */
-.gallery-room.is-drawing .ink-draw {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: ink-calligraphy 0.95s var(--ease-editorial) forwards;
-}
-
-.gallery-room.is-drawing .art-flow {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: ink-calligraphy 1.05s var(--ease-editorial) 0.15s forwards;
-}
-
-@keyframes ink-calligraphy {
-  to { stroke-dashoffset: 0; }
-}
-
-.project-art .art-device,
-.project-art .art-panel {
-  fill: var(--surface);
-  stroke: var(--ink);
-  stroke-width: 1.3;
-}
-
-.project-art .art-screen {
-  fill: var(--ground);
-  stroke: var(--border-strong);
-  stroke-width: 1;
-}
-
-.project-art .art-chip {
-  fill: var(--bronze-soft);
-  stroke: var(--bronze);
-  stroke-width: 1.15;
-}
-
-.project-art .art-line {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.15;
-  stroke-linecap: round;
-}
-
-.project-art .art-device-line {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.35;
-  stroke-linejoin: round;
-}
-
-.project-art .art-dot {
-  fill: var(--teal);
-}
-
-.project-art .art-beacon {
-  fill: none;
-  stroke: var(--bronze);
-  stroke-width: 1.3;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: beacon-ring 2.6s ease-out infinite;
-}
-
-@keyframes beacon-ring {
-  0% { transform: scale(0.75); opacity: 0.75; }
-  100% { transform: scale(1.65); opacity: 0; }
-}
-
-.project-art .art-alert {
-  fill: var(--bronze);
-}
-
-.project-art .art-alert-text {
-  fill: var(--surface);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.project-art .art-shield {
-  fill: rgba(31, 84, 82, 0.14);
-  stroke: var(--teal);
-  stroke-width: 1.6;
-}
-
-.project-art .shield-breathe {
-  animation: shield-pulse 3.2s ease-in-out infinite;
-}
-
-@keyframes shield-pulse {
-  0%, 100% { fill: rgba(31, 84, 82, 0.1); }
-  50% { fill: rgba(31, 84, 82, 0.24); }
-}
-
-.project-art .art-check {
-  fill: none;
-  stroke: var(--teal);
-  stroke-width: 2.3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.project-art .art-radio {
-  fill: none;
-  stroke: var(--bronze);
-  stroke-width: 1.4;
-  stroke-linecap: round;
-}
-
-.radio-w1 { animation: radio-wave 2.4s ease-in-out infinite 0s; }
-.radio-w2 { animation: radio-wave 2.4s ease-in-out infinite 0.35s; }
-.radio-w3 { animation: radio-wave 2.4s ease-in-out infinite 0.7s; }
-
-@keyframes radio-wave {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 1; }
-}
-
-.project-art .art-answer {
-  fill: none;
-  stroke: var(--teal);
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.answer-shimmer {
-  animation: answer-glow 2.8s ease-in-out infinite;
-}
-
-@keyframes answer-glow {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
-}
-
-.project-art .art-context {
-  fill: var(--teal);
-}
-
-.project-art .art-symbol {
-  fill: var(--surface);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.project-art .art-trace {
-  fill: none;
-  stroke: var(--bronze);
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.trace-live {
-  stroke-dasharray: 28 12;
-  animation: trace-scroll 3.4s linear infinite;
-}
-
-@keyframes trace-scroll {
-  to { stroke-dashoffset: -40; }
-}
-
-.project-art .art-slot {
-  fill: var(--surface);
-  stroke: var(--border-strong);
-  stroke-width: 1.1;
-}
-
-.project-art .art-slot-active {
-  fill: var(--teal);
-  stroke: var(--teal);
-}
-
-.slot-s1 { animation: slot-cycle 3.6s ease-in-out infinite 0s; }
-.slot-s2 { animation: slot-cycle 3.6s ease-in-out infinite 0.6s; }
-.slot-s3 { animation: slot-cycle 3.6s ease-in-out infinite 1.2s; }
-.slot-s4 { animation: slot-cycle 3.6s ease-in-out infinite 1.8s; }
-.slot-s5 { animation: slot-cycle 3.6s ease-in-out infinite 2.4s; }
-.slot-s6 { animation: slot-cycle 3.6s ease-in-out infinite 3s; }
-
-@keyframes slot-cycle {
-  0%, 75%, 100% { fill: var(--surface); stroke: var(--border-strong); }
-  20%, 40% { fill: var(--teal); stroke: var(--teal); }
-}
-
-.project-art .art-label {
-  fill: var(--ink);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.project-art .art-kicker {
-  fill: var(--bronze-ink);
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.3px;
-}
-
-.project-art .art-small {
-  fill: var(--muted);
-  font-family: var(--font-sans);
-  font-size: 11px;
-}
-
-.project-art .art-code {
-  fill: var(--ink);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 11.5px;
-}
-
-/* Interactive step focus states */
-.plate-canvas .art-part {
-  transition: opacity 0.35s ease;
-}
-
-.plate-canvas[data-step="1"] .art-part:not([data-part~="1"]),
-.plate-canvas[data-step="2"] .art-part:not([data-part~="2"]),
-.plate-canvas[data-step="3"] .art-part:not([data-part~="3"]) {
-  opacity: 0.22;
-}
-
-.plate-canvas[data-step="1"] .art-part:not([data-part~="1"]) .art-flow,
-.plate-canvas[data-step="2"] .art-part:not([data-part~="2"]) .art-flow,
-.plate-canvas[data-step="3"] .art-part:not([data-part~="3"]) .art-flow {
-  stroke-dashoffset: 100;
-}
-
-.study-controls {
-  margin-top: 0.85rem;
-  padding-top: 0.75rem;
+.installation-controls {
+  padding-top: 0.65rem;
   border-top: 1px solid var(--border);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.65rem;
+  gap: 0.6rem 1rem;
 }
 
-.study-steps {
+.control-group {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
 }
 
-.step-pill {
+.ctrl-btn {
   border: 1px solid var(--border-strong);
   background: var(--surface);
-  padding: 0.28rem 0.68rem;
-  font-size: 0.72rem;
+  padding: 0.36rem 0.8rem;
+  font-size: 0.74rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+  letter-spacing: 0.05em;
+  color: var(--ink);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.step-pill:hover {
+.ctrl-btn:hover {
   border-color: var(--teal);
-  color: var(--ink);
+  background: var(--teal-soft);
 }
 
-.step-pill.is-active {
+.ctrl-btn.is-active,
+.ctrl-btn.ctrl-accent {
   background: var(--teal);
   border-color: var(--teal);
   color: var(--surface);
 }
 
-.study-replay {
-  border: 0;
-  background: transparent;
-  padding: 0.28rem 0.4rem;
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bronze-ink);
-  cursor: pointer;
-  transition: color 0.2s ease;
+.ctrl-btn.ctrl-accent:hover {
+  background: #173f3d;
+  border-color: #173f3d;
 }
 
-.study-replay:hover {
-  color: var(--ink);
+.control-hint {
+  font-size: 0.74rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
 }
 
 /* Gallery Room Pager & Progress Rail */
@@ -1707,20 +1477,29 @@ body.hero-arming .portrait-aperture img {
   display: block;
 }
 
-.atlas-orbit {
+.atlas-camera {
+  transform-origin: 0 0;
+  transition: transform 0.85s var(--ease-editorial);
+}
+
+.celestial-wheel {
   transform-box: fill-box;
   transform-origin: center;
-  animation: orbit-sway 18s ease-in-out infinite alternate;
+  animation: celestial-drift 64s linear infinite;
 }
 
-.orbit-rev {
-  animation-direction: alternate-reverse;
-  animation-duration: 22s;
+.celestial-stars circle {
+  animation: star-twinkle 4.5s ease-in-out infinite alternate;
 }
 
-@keyframes orbit-sway {
-  from { opacity: 0.35; }
-  to { opacity: 0.65; }
+@keyframes celestial-drift {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes star-twinkle {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
 }
 
 /* Discipline Cluster Ink-Bloom */
