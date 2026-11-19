@@ -1,4 +1,4 @@
-/* Architectural Monograph — Progressive Enhancement */
+/* Architectural Monograph — Cinematic Museum Exhibition & Motion System */
 (() => {
   "use strict";
 
@@ -6,6 +6,7 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
   let motionEnabled = !reduceMotion.matches;
 
   const yearEl = $("#year");
@@ -14,10 +15,116 @@
   }
 
   /* ============================================================
-     1. QUIET SCROLL CHOREOGRAPHY & REVEALS
+     1. HERO CURTAIN / MASK-REVEAL & AMBIENT LIGHT SHIFT
+     ============================================================ */
+  if (motionEnabled) {
+    document.body.classList.add("hero-arming");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove("hero-arming");
+      });
+    });
+  }
+
+  const heroEl = $("#hero");
+  const orbWarm = $("#orb-warm");
+  const orbTeal = $("#orb-teal");
+  if (heroEl && orbWarm && orbTeal && finePointer.matches) {
+    heroEl.addEventListener(
+      "pointermove",
+      (event) => {
+        if (!motionEnabled) return;
+        const rect = heroEl.getBoundingClientRect();
+        const nx = (event.clientX - rect.left) / Math.max(1, rect.width) - 0.5;
+        const ny = (event.clientY - rect.top) / Math.max(1, rect.height) - 0.5;
+        orbWarm.style.transform = `translate3d(${(nx * -34).toFixed(1)}px, ${(ny * -24).toFixed(1)}px, 0)`;
+        orbTeal.style.transform = `translate3d(${(nx * 28).toFixed(1)}px, ${(ny * 20).toFixed(1)}px, 0)`;
+      },
+      { passive: true },
+    );
+  }
+
+  /* ============================================================
+     2. CUSTOM EDITORIAL CURSOR LENS & MAGNETIC CTAS (FINE POINTER)
+     ============================================================ */
+  const cursorEl = $("#editorial-cursor");
+  const cursorLabel = $("#cursor-label");
+
+  if (cursorEl && cursorLabel && finePointer.matches) {
+    let cx = -100;
+    let cy = -100;
+    let tx = -100;
+    let ty = -100;
+    let rafId = 0;
+
+    function tickCursor() {
+      rafId = 0;
+      cx += (tx - cx) * 0.2;
+      cy += (ty - cy) * 0.2;
+      cursorEl.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0) translate(-50%, -50%)`;
+      if (Math.abs(tx - cx) > 0.35 || Math.abs(ty - cy) > 0.35) {
+        rafId = requestAnimationFrame(tickCursor);
+      }
+    }
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (!motionEnabled) return;
+        tx = event.clientX;
+        ty = event.clientY;
+        if (!cursorEl.classList.contains("is-visible")) {
+          cx = tx;
+          cy = ty;
+          cursorEl.classList.add("is-visible");
+        }
+        if (!rafId) rafId = requestAnimationFrame(tickCursor);
+      },
+      { passive: true },
+    );
+
+    document.addEventListener("pointerleave", () => {
+      cursorEl.classList.remove("is-visible", "has-label");
+    });
+
+    document.addEventListener(
+      "pointerover",
+      (event) => {
+        if (!motionEnabled) return;
+        const target = event.target.closest("[data-cursor]");
+        if (target) {
+          const text = target.getAttribute("data-cursor") || "";
+          cursorLabel.textContent = text;
+          cursorEl.classList.toggle("has-label", Boolean(text));
+        } else {
+          cursorEl.classList.remove("has-label");
+        }
+      },
+      { passive: true },
+    );
+
+    // Subtle magnetic pull on primary monograph CTAs
+    $$(".magnetic").forEach((el) => {
+      el.addEventListener("pointermove", (event) => {
+        if (!motionEnabled) return;
+        const rect = el.getBoundingClientRect();
+        const dx = (event.clientX - (rect.left + rect.width / 2)) * 0.16;
+        const dy = (event.clientY - (rect.top + rect.height / 2)) * 0.16;
+        el.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0)`;
+      });
+      el.addEventListener("pointerleave", () => {
+        el.style.transform = "";
+      });
+    });
+  }
+
+  /* ============================================================
+     3. SCROLL CHOREOGRAPHY, READING PROGRESS & REVEALS
      ============================================================ */
   const header = $("#site-header");
   const heroPlate = $("#hero-plate");
+  const heroPortraitImg = $("#hero-portrait-img");
+  const progressBar = $("#reading-progress-bar");
   const navLinks = $$(".primary-nav a");
   const navSections = navLinks
     .map((link) => document.querySelector(link.getAttribute("href")))
@@ -27,6 +134,16 @@
   function updateScroll() {
     scrollQueued = false;
     const y = window.scrollY;
+    const docHeight = Math.max(
+      1,
+      document.documentElement.scrollHeight - window.innerHeight,
+    );
+    const progress = Math.min(1, Math.max(0, y / docHeight));
+
+    if (progressBar) {
+      progressBar.style.transform = `scaleX(${progress.toFixed(4)})`;
+    }
+
     if (header) {
       header.classList.toggle("is-scrolled", y > 24);
     }
@@ -46,11 +163,16 @@
     });
 
     if (heroPlate) {
-      if (motionEnabled && y < window.innerHeight * 1.1) {
-        const offset = Math.min(y * 0.045, 28);
+      if (motionEnabled && y < window.innerHeight * 1.15) {
+        const offset = Math.min(y * 0.055, 34);
         heroPlate.style.transform = `translateY(${offset.toFixed(1)}px)`;
+        if (heroPortraitImg) {
+          const scale = 1 + Math.min(y * 0.00012, 0.06);
+          heroPortraitImg.style.transform = `scale(${scale.toFixed(4)})`;
+        }
       } else {
         heroPlate.style.transform = "";
+        if (heroPortraitImg) heroPortraitImg.style.transform = "";
       }
     }
   }
@@ -69,7 +191,9 @@
   function syncMotion() {
     motionEnabled = !reduceMotion.matches;
     if (!motionEnabled) {
+      document.body.classList.remove("hero-arming");
       $$(".reveal.is-pending").forEach((el) => el.classList.remove("is-pending"));
+      if (cursorEl) cursorEl.classList.remove("is-visible", "has-label");
     }
     updateScroll();
   }
@@ -97,36 +221,91 @@
   }
 
   /* ============================================================
-     2. CURATED EXHIBITION PLATES (I–VI) & STEP WALKTHROUGHS
+     4. INTERACTIVE GCE BARE METAL ISOMETRIC ELEVATION
      ============================================================ */
-  const plateOrder = [
+  const computePlate = $("#compute-plate");
+  const computeLayerLabel = $("#compute-layer-label");
+  const pillarButtons = $$("[data-stack-layer]");
+  let lockedLayer = "all";
+
+  function applyStackLayer(layer, labelText) {
+    if (!computePlate) return;
+    computePlate.dataset.activeLayer = layer;
+    if (computeLayerLabel) {
+      computeLayerLabel.textContent = labelText || "FULL STACK";
+    }
+    pillarButtons.forEach((btn) => {
+      btn.classList.toggle("is-selected", btn.dataset.stackLayer === layer);
+    });
+  }
+
+  pillarButtons.forEach((btn) => {
+    btn.addEventListener("mouseenter", () => {
+      applyStackLayer(btn.dataset.stackLayer, btn.dataset.layerLabel);
+    });
+    btn.addEventListener("mouseleave", () => {
+      const lockedBtn = pillarButtons.find((b) => b.dataset.stackLayer === lockedLayer);
+      applyStackLayer(
+        lockedLayer,
+        lockedBtn ? lockedBtn.dataset.layerLabel : "FULL STACK",
+      );
+    });
+    btn.addEventListener("click", () => {
+      if (lockedLayer === btn.dataset.stackLayer) {
+        lockedLayer = "all";
+        applyStackLayer("all", "FULL STACK");
+      } else {
+        lockedLayer = btn.dataset.stackLayer;
+        applyStackLayer(lockedLayer, btn.dataset.layerLabel);
+      }
+    });
+  });
+
+  /* ============================================================
+     5. INTERACTIVE 7-ROOM MUSEUM GALLERY TRACK & CALLIGRAPHY DRAW-IN
+     ============================================================ */
+  const roomIds = [
     "seed",
     "secureSIM",
     "gptcodelearner",
     "sonica",
     "flora",
     "lrp",
+    "acemap",
   ];
-  const romans = ["I", "II", "III", "IV", "V", "VI"];
-
-  const plateTabs = $$(".plate-tab");
-  const platePanels = $$(".exhibition-plate");
-  const platesStage = $("#plates-stage");
-  const plateTabsBar = $("#plate-tabs");
-  const platePager = $("#plate-pager");
-  const platePrev = $("#plate-prev");
-  const plateNext = $("#plate-next");
-  const plateCounter = $("#plate-counter");
+  const roomTabs = $$(".room-tab");
+  const galleryRooms = $$(".gallery-room");
+  const galleryViewport = $("#gallery-viewport");
+  const galleryTrack = $("#gallery-track");
+  const roomTabsBar = $("#room-tabs");
+  const roomPager = $("#room-pager");
+  const roomPrev = $("#room-prev");
+  const roomNext = $("#room-next");
+  const roomCounter = $("#room-counter");
+  const roomProgressFill = $("#room-progress-fill");
   const viewToggleButtons = $$("[data-view]");
 
-  let activePlateIndex = 0;
+  let activeRoom = 0;
 
-  function setActivePlate(index, focusTab = false) {
-    const wrapped = (index + plateOrder.length) % plateOrder.length;
-    activePlateIndex = wrapped;
-    const id = plateOrder[wrapped];
+  function triggerCalligraphy(roomEl) {
+    if (!roomEl || !motionEnabled) return;
+    roomEl.classList.remove("is-drawing");
+    void roomEl.offsetWidth;
+    roomEl.classList.add("is-drawing");
+    setTimeout(() => {
+      roomEl.classList.remove("is-drawing");
+    }, 1250);
+  }
 
-    plateTabs.forEach((tab, i) => {
+  function setActiveRoom(index, focusTab = false) {
+    const wrapped = (index + roomIds.length) % roomIds.length;
+    activeRoom = wrapped;
+
+    if (galleryTrack && galleryViewport && galleryViewport.dataset.mode === "gallery") {
+      galleryTrack.style.transform = `translate3d(-${wrapped * 100}%, 0, 0)`;
+    }
+
+    roomTabs.forEach((tab, i) => {
       const selected = i === wrapped;
       tab.classList.toggle("is-active", selected);
       tab.setAttribute("aria-selected", String(selected));
@@ -134,42 +313,94 @@
       if (selected && focusTab) tab.focus();
     });
 
-    platePanels.forEach((panel) => {
-      const active = panel.dataset.platePanel === id;
-      panel.classList.toggle("is-active", active);
+    galleryRooms.forEach((room, i) => {
+      const active = i === wrapped;
+      room.classList.toggle("is-active", active);
+      if (active) triggerCalligraphy(room);
     });
 
-    if (plateCounter) {
-      plateCounter.textContent = `PLATE ${romans[wrapped]} OF VI`;
+    if (roomCounter) {
+      roomCounter.textContent = `ROOM 0${wrapped + 1} / 0${roomIds.length}`;
+    }
+    if (roomProgressFill) {
+      roomProgressFill.style.width = `${(((wrapped + 1) / roomIds.length) * 100).toFixed(2)}%`;
     }
   }
 
-  plateTabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => setActivePlate(index));
+  roomTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => setActiveRoom(index));
     tab.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        setActivePlate(index + 1, true);
+        setActiveRoom(index + 1, true);
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        setActivePlate(index - 1, true);
+        setActiveRoom(index - 1, true);
       }
     });
   });
 
-  if (platePrev) {
-    platePrev.addEventListener("click", () => setActivePlate(activePlateIndex - 1));
+  if (roomPrev) {
+    roomPrev.addEventListener("click", () => setActiveRoom(activeRoom - 1));
   }
-  if (plateNext) {
-    plateNext.addEventListener("click", () => setActivePlate(activePlateIndex + 1));
+  if (roomNext) {
+    roomNext.addEventListener("click", () => setActiveRoom(activeRoom + 1));
+  }
+
+  // Smooth horizontal drag/swipe on the Gallery Track
+  if (galleryViewport && galleryTrack) {
+    let dragging = false;
+    let startX = 0;
+    let deltaX = 0;
+
+    galleryViewport.addEventListener("pointerdown", (event) => {
+      if (galleryViewport.dataset.mode !== "gallery") return;
+      if (event.target.closest("button, a, select, #topic-map")) return;
+      dragging = true;
+      startX = event.clientX;
+      deltaX = 0;
+      galleryViewport.classList.add("is-dragging");
+    });
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (!dragging) return;
+        deltaX = event.clientX - startX;
+        const pct = (deltaX / Math.max(1, galleryViewport.clientWidth)) * 100;
+        galleryTrack.style.transform = `translate3d(${(-activeRoom * 100 + pct).toFixed(2)}%, 0, 0)`;
+      },
+      { passive: true },
+    );
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      galleryViewport.classList.remove("is-dragging");
+      if (deltaX < -55) {
+        setActiveRoom(activeRoom + 1);
+      } else if (deltaX > 55) {
+        setActiveRoom(activeRoom - 1);
+      } else {
+        setActiveRoom(activeRoom);
+      }
+      deltaX = 0;
+    };
+
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
   }
 
   function setViewMode(mode) {
-    if (!platesStage) return;
-    platesStage.dataset.mode = mode;
-    const isPlateMode = mode === "plate";
-    if (plateTabsBar) plateTabsBar.hidden = !isPlateMode;
-    if (platePager) platePager.hidden = !isPlateMode;
+    if (!galleryViewport) return;
+    galleryViewport.dataset.mode = mode;
+    const isGallery = mode === "gallery";
+    if (roomTabsBar) roomTabsBar.hidden = !isGallery;
+    if (roomPager) roomPager.hidden = !isGallery;
+
+    if (isGallery && galleryTrack) {
+      galleryTrack.style.transform = `translate3d(-${activeRoom * 100}%, 0, 0)`;
+    }
 
     viewToggleButtons.forEach((btn) => {
       const active = btn.dataset.view === mode;
@@ -181,6 +412,21 @@
   viewToggleButtons.forEach((btn) => {
     btn.addEventListener("click", () => setViewMode(btn.dataset.view));
   });
+
+  // Trigger initial calligraphy draw-in when Room 01 enters viewport
+  if ("IntersectionObserver" in window && motionEnabled && galleryRooms[0]) {
+    const firstRoomObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(({ isIntersecting }) => {
+          if (!isIntersecting) return;
+          triggerCalligraphy(galleryRooms[activeRoom]);
+          firstRoomObserver.disconnect();
+        });
+      },
+      { threshold: 0.2 },
+    );
+    firstRoomObserver.observe(galleryViewport);
+  }
 
   // Diagram 3-step interactive walkthroughs
   $$("[data-motion-study]").forEach((figure) => {
@@ -204,11 +450,7 @@
       btn.addEventListener("click", () => {
         clearTimers();
         const targetStep = Number(btn.dataset.stepBtn);
-        if (Number(figure.dataset.step) === targetStep) {
-          setStep(0);
-        } else {
-          setStep(targetStep);
-        }
+        setStep(Number(figure.dataset.step) === targetStep ? 0 : targetStep);
       });
     });
 
@@ -219,6 +461,8 @@
           setStep(0);
           return;
         }
+        const room = figure.closest(".gallery-room");
+        if (room) triggerCalligraphy(room);
         setStep(1);
         timerIds.push(setTimeout(() => setStep(2), 1100));
         timerIds.push(setTimeout(() => setStep(3), 2200));
@@ -226,12 +470,11 @@
       });
     }
 
-    // Start in full overview state so every diagram is crisp and legible on load
     setStep(0);
   });
 
   /* ============================================================
-     3. ACEMAP 2,208-TOPIC CARTOGRAPHIC ATLAS (ON-DEMAND)
+     6. ACEMAP INK-BLOOM CARTOGRAPHIC ATLAS (2,208 TOPICS)
      ============================================================ */
   const mapLoad = $("#map-load");
   const mapStatus = $("#map-status");
@@ -241,6 +484,7 @@
   const topicSelectWrap = $(".topic-select");
   const topicMapSvg = $("#topic-map");
   const atlasViewport = $("#atlas-viewport");
+  const inkRipplesLayer = $("#ink-ripples");
   const callout = $("#atlas-callout");
   const calloutSwatch = $("#callout-swatch");
   const calloutTopic = $("#callout-topic");
@@ -268,7 +512,6 @@
     "Geography",
   ];
 
-  // Original CSV hex keys used to classify the 19 disciplines
   const csvColors = [
     "#ffc1fc",
     "#beeb74",
@@ -291,27 +534,26 @@
     "#ffce63",
   ];
 
-  // Fine-art mineral pigment palette tuned for warm cream rag paper (#f7f3eb)
   const mineralColors = [
-    "#7d567e", // Psychology (mineral plum)
-    "#5f7a42", // Political Science (moss)
-    "#585c8c", // Mathematics (slate indigo)
-    "#a85c42", // Environmental Science (terracotta)
-    "#1f5452", // Computer Science (deep forest teal)
-    "#8c7432", // Medicine (ochre)
-    "#2f6f8a", // Biology (cerulean slate)
-    "#9c5a3c", // History (burnished bronze)
-    "#257063", // Physics (verdigris)
-    "#785f74", // Geology (warm basalt)
-    "#2c6e78", // Engineering (deep petrol)
-    "#4e7866", // Philosophy (sage)
-    "#8a773c", // Art (raw sienna)
-    "#4b734b", // Sociology (botanical green)
-    "#995a72", // Business (muted rosewood)
-    "#a66253", // Economics (burnt clay)
-    "#964f60", // Chemistry (madder lake)
-    "#3f7553", // Materials Science (malachite)
-    "#917134", // Geography (amber earth)
+    "#7d567e",
+    "#5f7a42",
+    "#585c8c",
+    "#a85c42",
+    "#1f5452",
+    "#8c7432",
+    "#2f6f8a",
+    "#9c5a3c",
+    "#257063",
+    "#785f74",
+    "#2c6e78",
+    "#4e7866",
+    "#8a773c",
+    "#4b734b",
+    "#995a72",
+    "#a66253",
+    "#964f60",
+    "#3f7553",
+    "#917134",
   ];
 
   let topicPoints = [];
@@ -367,7 +609,23 @@
     const isHovered = index === hoveredIndex;
     circle.classList.toggle("is-selected", isSelected);
     circle.classList.toggle("is-hovered", isHovered);
-    circle.setAttribute("r", isSelected ? "4.6" : isHovered ? "4.2" : "2.15");
+    circle.setAttribute("r", isSelected ? "4.8" : isHovered ? "4.3" : "2.15");
+  }
+
+  function spawnInkRipples(point) {
+    if (!inkRipplesLayer || !point || !motionEnabled) return;
+    inkRipplesLayer.replaceChildren();
+    const color = mineralColors[point.field] || "#1f5452";
+    for (let ring = 0; ring < 3; ring++) {
+      const r = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      r.setAttribute("cx", String(point.cx));
+      r.setAttribute("cy", String(point.cy));
+      r.setAttribute("r", String(6 + ring * 3.5));
+      r.setAttribute("stroke", color);
+      r.setAttribute("class", "ink-ripple");
+      r.style.setProperty("--rd", `${ring * 0.14}s`);
+      inkRipplesLayer.appendChild(r);
+    }
   }
 
   function showCallout(index) {
@@ -393,7 +651,10 @@
     const maxX = Math.max(12, wrapRect.width - cw - 12);
     const maxY = Math.max(12, wrapRect.height - ch - 12);
     const left = Math.min(Math.max(12, px + 14), maxX);
-    const top = Math.min(Math.max(12, py - ch - 10 < 12 ? py + 14 : py - ch - 10), maxY);
+    const top = Math.min(
+      Math.max(12, py - ch - 10 < 12 ? py + 14 : py - ch - 10),
+      maxY,
+    );
     callout.style.transform = `translate(${left.toFixed(1)}px, ${top.toFixed(1)}px)`;
   }
 
@@ -402,6 +663,7 @@
     hoveredIndex = -1;
     selectedIndex = -1;
     if (callout) callout.hidden = true;
+    if (inkRipplesLayer) inkRipplesLayer.replaceChildren();
 
     let count = 0;
     topicSelect.replaceChildren(new Option("Choose a topic", ""));
@@ -451,8 +713,12 @@
 
   if (mapLoad && topicMapSvg) {
     mapLoad.addEventListener("click", async () => {
+      if (galleryViewport && galleryViewport.dataset.mode === "gallery" && activeRoom !== 6) {
+        setActiveRoom(6);
+      }
+
       mapLoad.disabled = true;
-      mapLoad.textContent = "Loading 2,208 topics…";
+      mapLoad.textContent = "Blooming 2,208 topics…";
       mapStatus.textContent = "Fetching original Acemap coordinates…";
 
       try {
@@ -490,13 +756,36 @@
         const offsetX = (640 - (maxX - minX) * scale) / 2;
         const offsetY = (380 - (maxY - minY) * scale) / 2;
 
-        const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        group.id = "topic-points";
-        const fragment = document.createDocumentFragment();
-
-        topicPoints.forEach((point, i) => {
+        // Compute discipline centroids so each cluster blooms organically from its own heart
+        const clusterSums = fields.map(() => ({ sx: 0, sy: 0, n: 0 }));
+        topicPoints.forEach((point) => {
           point.cx = Number(((point.x - minX) * scale + offsetX).toFixed(2));
           point.cy = Number(((point.y - minY) * scale + offsetY).toFixed(2));
+          const c = clusterSums[point.field];
+          c.sx += point.cx;
+          c.sy += point.cy;
+          c.n += 1;
+        });
+
+        const rootGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        rootGroup.id = "topic-points";
+
+        const clusterGroups = fields.map((_, fIdx) => {
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          g.setAttribute("class", motionEnabled ? "discipline-cluster is-blooming" : "discipline-cluster");
+          const c = clusterSums[fIdx];
+          if (c.n > 0) {
+            const ox = (c.sx / c.n).toFixed(1);
+            const oy = (c.sy / c.n).toFixed(1);
+            g.style.transformOrigin = `${ox}px ${oy}px`;
+          }
+          g.style.setProperty("--bloom-delay", `${(fIdx * 0.042).toFixed(3)}s`);
+          rootGroup.appendChild(g);
+          return g;
+        });
+
+        circles = new Array(topicPoints.length);
+        topicPoints.forEach((point, i) => {
           const circle = document.createElementNS(
             "http://www.w3.org/2000/svg",
             "circle",
@@ -507,15 +796,13 @@
           circle.setAttribute("fill", mineralColors[point.field]);
           circle.setAttribute("class", "map-point");
           circle.dataset.point = String(i);
-          fragment.appendChild(circle);
+          clusterGroups[point.field].appendChild(circle);
+          circles[i] = circle;
         });
 
-        group.appendChild(fragment);
         const preview = $("#map-preview");
-        if (preview) preview.replaceWith(group);
-        else topicMapSvg.appendChild(group);
-
-        circles = [...group.children];
+        if (preview) preview.replaceWith(rootGroup);
+        else topicMapSvg.insertBefore(rootGroup, inkRipplesLayer || null);
 
         fields.forEach((field, i) => {
           const option = document.createElement("option");
@@ -535,6 +822,7 @@
             const point = topicPoints[idx];
             mapStatus.textContent = `${point.name} · ${fields[point.field]}`;
             showCallout(idx);
+            spawnInkRipples(point);
           } else if (selectedIndex >= 0) {
             showCallout(selectedIndex);
           } else if (callout) {
@@ -564,6 +852,7 @@
           const point = topicPoints[idx];
           mapStatus.textContent = `${point.name} · ${fields[point.field]}`;
           showCallout(idx);
+          spawnInkRipples(point);
         });
 
         mapLoad.hidden = true;
@@ -588,6 +877,7 @@
       syncCircleHighlight(selectedIndex);
       if (selectedIndex < 0) {
         if (callout) callout.hidden = true;
+        if (inkRipplesLayer) inkRipplesLayer.replaceChildren();
         const label =
           selectedField === "all"
             ? "All 19 disciplines"
@@ -599,11 +889,12 @@
       const point = topicPoints[selectedIndex];
       mapStatus.textContent = `${point.name} · ${fields[point.field]}`;
       showCallout(selectedIndex);
+      spawnInkRipples(point);
     });
   }
 
   /* ============================================================
-     4. PUBLICATIONS BOOK-INDEX FILTER
+     7. PUBLICATIONS BOOK-INDEX FILTER & HASH SYNC
      ============================================================ */
   const filterButtons = $$("[data-filter]");
   const pubGroups = $$(".pub-group");
@@ -650,9 +941,9 @@
     } else if (hash === "journal") {
       filterPublications("journal");
     } else {
-      const plateIdx = plateOrder.indexOf(hash);
-      if (plateIdx >= 0) {
-        setActivePlate(plateIdx);
+      const roomIdx = roomIds.indexOf(hash);
+      if (roomIdx >= 0) {
+        setActiveRoom(roomIdx);
       }
     }
   }
