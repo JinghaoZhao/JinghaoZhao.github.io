@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-18",
+  "updated_at": "2026-11-19",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1900,6 +1900,27 @@
       ],
       "excerpt": "Epoch AI 用真实的研究、数据中心调查与视觉设计任务测试六套前沿 Agent：Fable 5.2 平均82%，GPT-6.2 Astra为65%。更重要的是模型在实验设计、自我复查与专业判断上的缺口。",
       "reading_minutes": 19
+    },
+    {
+      "id": "2026-11-19-inside-codex-sandbox",
+      "sequence": 91,
+      "title": "不把开发环境关进 Docker：Codex 如何在你的电脑上为 AI 划出真正的安全边界？",
+      "source_title": "Inside the Codex sandbox",
+      "source_author": "Michael Bolin（OpenAI Engineering）",
+      "source_date": "2026-11-18",
+      "source_url": "https://openai.com/index/inside-the-codex-sandbox/",
+      "delivery_date": "2026-11-19",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-19-inside-codex-sandbox.md",
+      "tags": [
+        "AI Agent",
+        "软件工程",
+        "系统安全",
+        "开发工具"
+      ],
+      "excerpt": "OpenAI 揭开 Codex 的本机沙箱架构：为什么不直接用 Docker，怎样用权限配置、网络代理和 Mac/Linux/Windows 原生内核能力保护 Agent 工具调用，以及 MCP 服务器可能遗漏的安全边界。",
+      "reading_minutes": 17
     }
   ]
 }
