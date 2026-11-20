@@ -1040,7 +1040,7 @@ code {
 }
 
 .bus-scope-bezel {
-  height: clamp(230px, 30vw, 310px);
+  height: clamp(270px, 34vw, 360px);
 }
 
 .spec-cards {
@@ -1141,6 +1141,22 @@ code {
   background: var(--amber-soft);
   border: 1px solid var(--rule-amber);
   border-radius: var(--radius-xs);
+}
+
+.cme-mini-bezel {
+  margin-top: 16px;
+  height: 138px;
+  border-color: var(--rule-amber);
+}
+
+.cme-mini-bezel .scope-overlay-top,
+.cme-mini-bezel .scope-overlay-bottom {
+  padding: 6px 10px;
+  font-size: 0.62rem;
+}
+
+.cme-mini-bezel .scope-overlay-top span:first-child {
+  color: var(--amber);
 }
 
 .cme-body-col p {
@@ -1395,8 +1411,36 @@ code {
   border-color: var(--mint);
 }
 
+.scope-slider-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--bg-well);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  max-width: 100%;
+}
+
+.scope-slider-wrap input[type="range"] {
+  width: 96px;
+  accent-color: var(--mint);
+  cursor: pointer;
+}
+
+.slider-readout {
+  color: var(--mint);
+  font-weight: 600;
+  min-width: 48px;
+  font-variant-numeric: tabular-nums;
+}
+
 .main-scope-bezel {
-  height: clamp(320px, 42vw, 430px);
+  height: clamp(355px, 44vw, 460px);
   cursor: crosshair;
 }
 

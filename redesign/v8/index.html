@@ -449,12 +449,12 @@
                 <span class="tele-value">MODEL JZ-V8 · PHOSPHOR P31</span>
               </div>
               <div class="telemetry-group">
-                <span class="tele-label">X:Y HARMONIC</span>
-                <span class="tele-value tele-mint" id="hero-ratio">3.00 : 2.00</span>
+                <span class="tele-label">SYSTEM BUS</span>
+                <span class="tele-value tele-mint" id="hero-ratio">BARE METAL · 3 RAILS</span>
               </div>
               <div class="telemetry-group">
-                <span class="tele-label">PHASE δ</span>
-                <span class="tele-value tele-amber" id="hero-phase">0.78 rad</span>
+                <span class="tele-label">FABRIC SYNC</span>
+                <span class="tele-value tele-amber" id="hero-phase">PHASE LOCKED</span>
               </div>
               <div class="telemetry-group telemetry-right">
                 <span class="tele-label">TRACE</span>
@@ -496,39 +496,39 @@
               <!-- Tactile Vector-Scope Tuning Panel -->
               <aside
                 class="scope-tuner"
-                aria-label="Vector oscilloscope harmonic tuning controls"
+                aria-label="Vector oscilloscope system telemetry modes"
               >
                 <div class="tuner-head">
-                  <span>BEAM MODULATION</span>
-                  <span class="tuner-sub">MOVE CURSOR TO TUNE</span>
+                  <span>SYSTEM SCOPE MODE</span>
+                  <span class="tuner-sub">MOVE CURSOR TO PROBE</span>
                 </div>
-                <div class="tuner-presets" role="group" aria-label="Harmonic preset ratios">
+                <div class="tuner-presets" role="group" aria-label="Bare metal scope modes">
                   <button
                     type="button"
                     class="tuner-key"
-                    data-harmonic="3,2"
+                    data-hero-mode="baremetal"
                     aria-pressed="true"
                   >
                     <span class="key-code">P1</span>
-                    <span class="key-label">3:2 HARMONIC</span>
+                    <span class="key-label">BARE METAL BUS</span>
                   </button>
                   <button
                     type="button"
                     class="tuner-key"
-                    data-harmonic="5,4"
+                    data-hero-mode="fabric"
                     aria-pressed="false"
                   >
                     <span class="key-code">P2</span>
-                    <span class="key-label">5:4 QUADRATURE</span>
+                    <span class="key-label">FABRIC MATRIX</span>
                   </button>
                   <button
                     type="button"
                     class="tuner-key"
-                    data-harmonic="7,5"
+                    data-hero-mode="stack"
                     aria-pressed="false"
                   >
                     <span class="key-code">P3</span>
-                    <span class="key-label">7:5 TOROID</span>
+                    <span class="key-label">FULL-STACK SYNC</span>
                   </button>
                 </div>
                 <div class="tuner-footer">
@@ -541,7 +541,7 @@
                     <span class="led led-amber" aria-hidden="true"></span>
                     HOLD TRACE
                   </button>
-                  <span class="tuner-note">P31 / P11 DUAL BEAM</span>
+                  <span class="tuner-note">DIRECT SILICON · ZERO HYPERVISOR</span>
                 </div>
               </aside>
             </div>
@@ -640,7 +640,17 @@
                 >
                   <span class="switch-led" aria-hidden="true"></span>
                   <span class="switch-id">BUS-B</span>
-                  <span class="switch-name">LIFECYCLE</span>
+                  <span class="switch-name">FLEET LIFECYCLE</span>
+                </button>
+                <button
+                  type="button"
+                  class="mode-switch"
+                  data-bus-mode="e2e"
+                  aria-pressed="false"
+                >
+                  <span class="switch-led" aria-hidden="true"></span>
+                  <span class="switch-id">BUS-C</span>
+                  <span class="switch-name">END-TO-END</span>
                 </button>
                 <button
                   type="button"
@@ -649,14 +659,14 @@
                   aria-pressed="false"
                 >
                   <span class="switch-led" aria-hidden="true"></span>
-                  <span class="switch-id">BUS-C</span>
+                  <span class="switch-id">BUS-D</span>
                   <span class="switch-name">CME LOW-LATENCY</span>
                 </button>
               </div>
               <div class="bus-legend" aria-live="polite">
                 <span class="legend-item">
                   <span class="swatch swatch-mint" aria-hidden="true"></span>
-                  <span id="bus-ch-a">CH-A: PHYSICAL SILICON &amp; FABRIC</span>
+                  <span id="bus-ch-a">CH-A: DIRECT SILICON NIC → FABRIC</span>
                 </span>
                 <span class="legend-item">
                   <span class="swatch swatch-amber" aria-hidden="true"></span>
@@ -669,18 +679,18 @@
               <canvas
                 id="bus-scope"
                 class="scope-canvas"
-                aria-label="Conceptual dual-trace phosphor waveform illustrating bare metal system architecture"
+                aria-label="Conceptual vector oscilloscope illustrating GCE Bare Metal host fabric, fleet lifecycle, end-to-end determinism, and CME trading fabric"
                 role="img"
               ></canvas>
               <div class="scope-overlay-top" aria-hidden="true">
-                <span id="bus-scope-tag">MODE: HOST / FABRIC</span>
+                <span id="bus-scope-tag">MODE: HOST / FABRIC · ZERO HYPERVISOR</span>
                 <span>ILLUSTRATIVE CONCEPTUAL TRACE · NOT A BENCHMARK</span>
               </div>
               <div class="scope-overlay-bottom" aria-hidden="true">
                 <span id="bus-scope-detail"
-                  >COMPUTE / CONTROL / CONNECT — PHYSICAL HOSTS &amp; CLOUD FABRIC</span
+                  >DEDICATED CPU + DIRECT NIC BYPASSING HYPERVISOR STRAIGHT TO CLOUD FABRIC</span
                 >
-                <span>DUAL-BEAM TRIGGER: LOCKED</span>
+                <span>VECTOR TRIGGER: LOCKED</span>
               </div>
             </div>
 
@@ -718,7 +728,7 @@
               </article>
               <article
                 class="spec-card"
-                data-bus-card="cme"
+                data-bus-card="e2e"
                 role="listitem"
               >
                 <div class="spec-head">
@@ -742,6 +752,20 @@
                 Google Cloud <span class="text-amber">×</span> CME Group
               </h3>
               <p class="cme-pill">Ultra-low-latency trading</p>
+              <div class="scope-bezel cme-mini-bezel">
+                <canvas
+                  id="cme-scope"
+                  class="scope-canvas"
+                  role="img"
+                  aria-label="Conceptual phosphor pulse wave showing market orders traversing dedicated bare metal fabric between trading gateways and matching engine"
+                ></canvas>
+                <div class="scope-overlay-top" aria-hidden="true">
+                  <span>GATEWAY ↔ BARE METAL ↔ MATCH ENGINE</span>
+                </div>
+                <div class="scope-overlay-bottom" aria-hidden="true">
+                  <span>CONCEPTUAL ORDER-PULSE · NO BENCHMARK</span>
+                </div>
+              </div>
             </div>
             <div class="cme-body-col">
               <p>
@@ -959,10 +983,10 @@
                       id="seed-fault-btn"
                     >
                       <span class="led led-amber" aria-hidden="true"></span>
-                      INJECT FAULT
+                      INJECT 5G FAULT
                     </button>
                     <span class="ctrl-status" id="seed-status" role="status"
-                      >STATE: PHASE-LOCKED</span
+                      >5G BEARER: LOCKED</span
                     >
                   </div>
 
@@ -974,7 +998,7 @@
                       id="sim-auth-allow"
                       aria-pressed="true"
                     >
-                      AUTH: VALID CERT
+                      VALID CERT
                     </button>
                     <button
                       type="button"
@@ -982,78 +1006,127 @@
                       id="sim-auth-deny"
                       aria-pressed="false"
                     >
-                      PROBE: DENIED REQ
+                      UNAUTH REQ
                     </button>
+                    <span class="ctrl-status" id="sim-status" role="status"
+                      >GATE: SCOPED PARTITION ALLOWED</span
+                    >
                   </div>
 
-                  <!-- CH-03 GPT-Code-Learner Trigger -->
+                  <!-- CH-03 GPT-Code-Learner Query Selectors -->
                   <div class="ch-ctrl-group" data-ctrl-for="gptcode" hidden>
                     <button
                       type="button"
                       class="ctrl-btn ctrl-mint"
-                      id="gpt-query-btn"
+                      data-gpt-query="0"
+                      aria-pressed="true"
                     >
-                      SWEEP NEXT QUERY
+                      Trace auth flow
                     </button>
-                    <span class="ctrl-status" id="gpt-status" role="status"
-                      >TARGET: src/context_toolkit</span
-                    >
-                  </div>
-
-                  <!-- CH-04 Sonica Trigger -->
-                  <div class="ch-ctrl-group" data-ctrl-for="sonica" hidden>
                     <button
                       type="button"
                       class="ctrl-btn ctrl-mint"
-                      id="sonica-span-btn"
+                      data-gpt-query="1"
                       aria-pressed="false"
                     >
-                      SPAN: NARROWBAND
+                      Explain routing
                     </button>
-                    <span class="ctrl-status" id="sonica-status" role="status"
-                      >COTS UE ↔ eNodeB · EPC + CIoT</span
+                    <button
+                      type="button"
+                      class="ctrl-btn ctrl-mint"
+                      data-gpt-query="2"
+                      aria-pressed="false"
                     >
+                      Find entry points
+                    </button>
                   </div>
 
-                  <!-- CH-05 Flora Trigger -->
+                  <!-- CH-04 Sonica Frequency/Channel Tuning Dial -->
+                  <div class="ch-ctrl-group" data-ctrl-for="sonica" hidden>
+                    <label class="scope-slider-wrap" for="sonica-tune-slider">
+                      <span>CH TUNE</span>
+                      <input
+                        id="sonica-tune-slider"
+                        type="range"
+                        min="1"
+                        max="12"
+                        value="5"
+                        aria-label="Tune NB-IoT narrowband uplink subcarrier channel"
+                      />
+                      <span class="slider-readout" id="sonica-ch-readout"
+                        >SUB-05</span
+                      >
+                    </label>
+                    <button
+                      type="button"
+                      class="ctrl-btn ctrl-amber"
+                      id="sonica-burst-btn"
+                    >
+                      EMIT SENSOR BURST
+                    </button>
+                  </div>
+
+                  <!-- CH-05 Flora Programmable Layer Hooks -->
                   <div class="ch-ctrl-group" data-ctrl-for="flora" hidden>
                     <button
                       type="button"
                       class="ctrl-btn ctrl-mint"
-                      id="flora-burst-btn"
+                      data-flora-hook="esim"
+                      aria-pressed="true"
                     >
-                      PULSE E2E FRAME
+                      eSIM: PROF-A
                     </button>
-                    <span class="ctrl-status" id="flora-status" role="status"
-                      >4-CH SYNC: eSIM · RAN · CORE · VR</span
-                    >
-                  </div>
-
-                  <!-- CH-06 Mobile VR Latency Trigger -->
-                  <div class="ch-ctrl-group" data-ctrl-for="lrp" hidden>
                     <button
                       type="button"
                       class="ctrl-btn ctrl-mint"
-                      data-lrp-mode="dual"
+                      data-flora-hook="ran"
                       aria-pressed="true"
                     >
-                      DUAL COMPARE
+                      RAN: SLICE
                     </button>
+                    <button
+                      type="button"
+                      class="ctrl-btn ctrl-mint"
+                      data-flora-hook="core"
+                      aria-pressed="false"
+                    >
+                      CORE: BREAKOUT
+                    </button>
+                    <button
+                      type="button"
+                      class="ctrl-btn ctrl-mint"
+                      data-flora-hook="edge"
+                      aria-pressed="true"
+                    >
+                      EDGE: OFFLOAD
+                    </button>
+                  </div>
+
+                  <!-- CH-06 Mobile VR Latency Mode Toggles -->
+                  <div class="ch-ctrl-group" data-ctrl-for="lrp" hidden>
                     <button
                       type="button"
                       class="ctrl-btn ctrl-amber"
                       data-lrp-mode="std"
                       aria-pressed="false"
                     >
-                      STD LTE
+                      STANDARD (REACTIVE)
                     </button>
                     <button
                       type="button"
                       class="ctrl-btn ctrl-mint"
                       data-lrp-mode="proactive"
+                      aria-pressed="true"
+                    >
+                      PROACTIVE (PREDICTED)
+                    </button>
+                    <button
+                      type="button"
+                      class="ctrl-btn ctrl-mint"
+                      data-lrp-mode="dual"
                       aria-pressed="false"
                     >
-                      PROACTIVE
+                      COMPARE
                     </button>
                   </div>
 
