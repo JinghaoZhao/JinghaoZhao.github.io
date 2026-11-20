@@ -4,22 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#07162b" />
-    <title>Jinghao Zhao — 7-Day Rotating Editions &amp; Design Gallery</title>
+    <title>Jinghao Zhao — 7 Daily Editions</title>
     <meta
       name="description"
-      content="Explore Jinghao Zhao's 7-day rotating homepage editions (Classic Sunday through V6–V12 Monday–Saturday) and full archive of 12 design monographs."
+      content="Seven daily editions of Jinghao Zhao's personal website—rotating automatically by weekday across Classic, Prism, Monolith, Scope, Cinema, Orbital, and Spatial."
     />
     <meta name="author" content="Jinghao Zhao" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://zhaojinghao.com/redesign/" />
+    <link rel="canonical" href="https://zhaojinghao.com/editions/" />
     <link rel="icon" href="../images/favicon.svg" type="image/svg+xml" />
-    <link
-      rel="preload"
-      href="../fonts/raleway.ttf"
-      as="font"
-      type="font/ttf"
-      crossorigin
-    />
     <link
       rel="preload"
       href="../fonts/dm-sans.ttf"
@@ -28,13 +21,6 @@
       crossorigin
     />
     <style>
-      @font-face {
-        font-family: Raleway;
-        src: url("../fonts/raleway.ttf") format("truetype");
-        font-style: normal;
-        font-weight: 100;
-        font-display: swap;
-      }
       @font-face {
         font-family: "DM Sans";
         src: url("../fonts/dm-sans.ttf") format("truetype");
@@ -234,10 +220,7 @@
         border-color: var(--accent);
         color: #ffffff;
       }
-      .wave-section + .wave-section {
-        margin-top: 56px;
-      }
-      .wave-header {
+      .schedule-header {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
@@ -247,7 +230,7 @@
         padding-bottom: 12px;
         border-bottom: 1px solid var(--line);
       }
-      .wave-title {
+      .schedule-title {
         margin: 0;
         font-size: 11.5px;
         font-weight: 700;
@@ -255,7 +238,7 @@
         text-transform: uppercase;
         color: var(--ink);
       }
-      .wave-meta {
+      .schedule-meta {
         font-size: 13px;
         color: var(--muted);
       }
@@ -264,7 +247,7 @@
         grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
         gap: 22px;
       }
-      .concept-card {
+      .edition-card {
         display: flex;
         flex-direction: column;
         background: var(--surface);
@@ -276,12 +259,12 @@
           border-color 0.25s var(--ease),
           box-shadow 0.3s var(--ease);
       }
-      .concept-card:hover {
+      .edition-card:hover {
         transform: translateY(-3px);
         border-color: #9cb3cc;
         box-shadow: 0 14px 32px rgba(19, 34, 56, 0.06);
       }
-      .concept-card.is-today {
+      .edition-card.is-today {
         border-color: var(--accent);
         box-shadow:
           0 0 0 1px var(--accent),
@@ -294,13 +277,13 @@
         gap: 10px;
         margin-bottom: 18px;
       }
-      .edition-wrap {
+      .day-wrap {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
       }
-      .edition {
+      .day-label {
         font-size: 11px;
         font-weight: 650;
         letter-spacing: 1.7px;
@@ -330,14 +313,14 @@
         border-radius: 50%;
         border: 1px solid rgba(19, 34, 56, 0.18);
       }
-      .concept-card h2 {
+      .edition-card h2 {
         margin: 0 0 10px;
         font-size: 22px;
         font-weight: 600;
         letter-spacing: -0.015em;
         line-height: 1.25;
       }
-      .concept-tagline {
+      .edition-summary {
         margin: 0 0 20px;
         font-size: 14.5px;
         color: var(--muted);
@@ -358,7 +341,7 @@
         display: inline-block;
         transition: transform 0.25s var(--ease);
       }
-      .concept-card:hover .card-arrow {
+      .edition-card:hover .card-arrow {
         transform: translate(3px, -3px);
       }
       .site-footer {
@@ -397,18 +380,18 @@
         .status-pill {
           display: none;
         }
-        .concept-card {
+        .edition-card {
           padding: 20px;
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        .concept-card,
+        .edition-card,
         .card-arrow,
         .nav-btn,
         .cta-btn {
           transition: none;
         }
-        .concept-card:hover,
+        .edition-card:hover,
         .cta-btn:hover {
           transform: none;
         }
@@ -427,13 +410,13 @@
         <div class="topbar-actions">
           <span class="status-pill" id="today-pill"
             ><span class="status-dot" aria-hidden="true"></span
-            ><span id="today-pill-text">7-Day Rotation Live</span></span
+            ><span id="today-pill-text">7 Daily Editions</span></span
           >
           <a class="nav-btn" href="../?edition=classic"
-            ><span aria-hidden="true">←</span> Classic Site</a
+            ><span aria-hidden="true">←</span> Classic</a
           >
           <a class="nav-btn nav-btn-primary" href="../"
-            >Today’s Auto-Route <span aria-hidden="true">↗</span></a
+            >Open Today’s Edition <span aria-hidden="true">↗</span></a
           >
         </div>
       </div>
@@ -442,44 +425,42 @@
     <main>
       <div class="container">
         <div class="intro">
-          <p class="eyebrow">7-DAY ROTATING HOMEPAGE · 2026</p>
-          <h1>Seven daily editions, twelve design monographs.</h1>
+          <p class="eyebrow">SEVEN DAILY EDITIONS · SUN–SAT</p>
+          <h1>Seven daily editions for Jinghao Zhao.</h1>
           <p class="subtitle">
-            Every weekday at <code>zhaojinghao.com</code> opens a distinct
-            interactive edition of Jinghao Zhao’s GCE Bare Metal work, 7
-            systems projects, and 12-paper archive—plus 5 additional design
-            monographs below.
+            Each day of the week at <code>zhaojinghao.com</code> opens a
+            dedicated visual and interactive study of Jinghao Zhao’s GCE Bare
+            Metal work, seven systems projects, and twelve-paper research
+            record.
           </p>
           <div class="hero-cta-row">
             <a class="cta-btn cta-btn-primary" href="../" id="auto-route-cta"
-              >Open Today’s Auto-Route <span aria-hidden="true">↗</span></a
+              >Open Today’s Edition <span aria-hidden="true">↗</span></a
             >
             <a class="cta-btn" href="../?edition=classic"
-              >Open Classic Edition (Sun)</a
+              >Open Sunday Classic</a
             >
           </div>
         </div>
 
-        <section
-          class="wave-section"
-          aria-label="Live 7-Day Weekday Rotation Schedule"
-        >
-          <div class="wave-header">
-            <h2 class="wave-title">Live 7-Day Weekday Rotation · Sun–Sat</h2>
-            <span class="wave-meta"
+        <section aria-label="Seven Daily Editions Schedule">
+          <div class="schedule-header">
+            <h2 class="schedule-title">Weekly Schedule · Sun–Sat</h2>
+            <span class="schedule-meta"
               >Automatically routed at zhaojinghao.com by local weekday</span
             >
           </div>
+
           <div class="gallery">
             <a
-              class="concept-card"
+              class="edition-card"
               href="../?edition=classic"
               data-weekday="0"
               data-edition-label="Sun · Classic"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">SUNDAY · CLASSIC</span>
+                <div class="day-wrap">
+                  <span class="day-label">SUN · CLASSIC</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -488,27 +469,27 @@
                   <span class="swatch" style="background: #f7f9fb"></span>
                 </span>
               </div>
-              <h2>Classic Blue Geometric</h2>
-              <p class="concept-tagline">
-                Original navy and paper editorial homepage with 30fps geometric
-                hero mesh, layered Bare Metal compute figure, 7 inline SVG
-                project walkthroughs, and Acemap explorer.
+              <h2>Classic</h2>
+              <p class="edition-summary">
+                Deep navy and crisp paper editorial edition with 30fps geometric
+                hero canvas, layered Bare Metal compute figure, seven inline SVG
+                system walkthroughs, and Acemap explorer.
               </p>
               <div class="card-footer">
-                <span>Open Sunday (Classic)</span>
+                <span>Open Classic</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
             <a
-              class="concept-card"
-              href="./v6/"
+              class="edition-card"
+              href="prism/"
               data-weekday="1"
-              data-edition-label="Mon · V6 Prism"
+              data-edition-label="Mon · Prism"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">MONDAY · V6</span>
+                <div class="day-wrap">
+                  <span class="day-label">MON · PRISM</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -517,27 +498,27 @@
                   <span class="swatch" style="background: #c7a6ff"></span>
                 </span>
               </div>
-              <h2>Liquid Glass &amp; Prism Atelier</h2>
-              <p class="concept-tagline">
-                Refractive glass optics with Bare Metal blade lanes, 3-mode
-                optical compute stack + CME stream, 7 domain-true Prism Chamber
-                scenes, and labeled 2,208-star spectral Acemap.
+              <h2>Prism</h2>
+              <p class="edition-summary">
+                Refractive obsidian glass optics with Bare Metal blade lanes,
+                three-mode optical compute stack and CME stream, seven Prism
+                Chamber scenes, and labeled 2,208-star spectral Acemap.
               </p>
               <div class="card-footer">
-                <span>Open Monday (v6)</span>
+                <span>Open Prism</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
             <a
-              class="concept-card"
-              href="./v7/"
+              class="edition-card"
+              href="monolith/"
               data-weekday="2"
-              data-edition-label="Tue · V7 Monolith"
+              data-edition-label="Tue · Monolith"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">TUESDAY · V7</span>
+                <div class="day-wrap">
+                  <span class="day-label">TUE · MONOLITH</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -546,27 +527,27 @@
                   <span class="swatch" style="background: #c8ff00"></span>
                 </span>
               </div>
-              <h2>Neo-Brutalist Kinetic Monolith</h2>
-              <p class="concept-tagline">
-                Concrete &amp; Acid-Chartreuse monolith with blade-bus hero,
-                3-mode Bare Metal matrix + CME order rail, 7 unobstructed domain
-                system studies, and cluster-labeled 2,208-topic Acemap.
+              <h2>Monolith</h2>
+              <p class="edition-summary">
+                Concrete and acid-chartreuse kinetic monolith with blade-bus
+                hero, three-mode Bare Metal matrix and CME order rail, seven
+                domain system studies, and cluster-labeled 2,208-topic Acemap.
               </p>
               <div class="card-footer">
-                <span>Open Tuesday (v7)</span>
+                <span>Open Monolith</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
             <a
-              class="concept-card"
-              href="./v8/"
+              class="edition-card"
+              href="scope/"
               data-weekday="3"
-              data-edition-label="Wed · V8 Scope"
+              data-edition-label="Wed · Scope"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">WEDNESDAY · V8</span>
+                <div class="day-wrap">
+                  <span class="day-label">WED · SCOPE</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -575,27 +556,28 @@
                   <span class="swatch" style="background: #ffb833"></span>
                 </span>
               </div>
-              <h2>Cybernetic Phosphor Oscilloscope</h2>
-              <p class="concept-tagline">
-                Calibrated P31 green &amp; amber phosphor CRT lab with 3-mode
-                blade hero, 4-mode Bare Metal &amp; CME dual-beam scope, 7
-                patch-bay domain simulations, and labeled 2,208-topic radar.
+              <h2>Scope</h2>
+              <p class="edition-summary">
+                Calibrated green and amber phosphor oscilloscope lab with
+                three-mode blade hero, four-mode Bare Metal and CME dual-beam
+                scope, seven patch-bay simulations, and labeled 2,208-topic
+                radar.
               </p>
               <div class="card-footer">
-                <span>Open Wednesday (v8)</span>
+                <span>Open Scope</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
             <a
-              class="concept-card"
-              href="./v9/"
+              class="edition-card"
+              href="cinema/"
               data-weekday="4"
-              data-edition-label="Thu · V9 Cinema"
+              data-edition-label="Thu · Cinema"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">THURSDAY · V9</span>
+                <div class="day-wrap">
+                  <span class="day-label">THU · CINEMA</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -604,27 +586,27 @@
                   <span class="swatch" style="background: #f6f5f0"></span>
                 </span>
               </div>
-              <h2>Monochrome Cinema Editorial</h2>
-              <p class="concept-tagline">
-                Noir obsidian &amp; pearl cinema plates with server-blade light
-                corridors, Bare Metal/CME cutaway &amp; lifecycle strip, 7
-                domain-true system canvases, and labeled silver-print Acemap.
+              <h2>Cinema</h2>
+              <p class="edition-summary">
+                Noir obsidian and archival pearl monograph with server-blade
+                light corridors, Bare Metal and CME cutaway plates, seven
+                monochrome system canvases, and silver-print Acemap.
               </p>
               <div class="card-footer">
-                <span>Open Thursday (v9)</span>
+                <span>Open Cinema</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
             <a
-              class="concept-card"
-              href="./v11/"
+              class="edition-card"
+              href="orbital/"
               data-weekday="5"
-              data-edition-label="Fri · V11 Orbital"
+              data-edition-label="Fri · Orbital"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">FRIDAY · V11</span>
+                <div class="day-wrap">
+                  <span class="day-label">FRI · ORBITAL</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -633,27 +615,27 @@
                   <span class="swatch" style="background: #fbbf24"></span>
                 </span>
               </div>
-              <h2>3D Orbital Particle Universe</h2>
-              <p class="concept-tagline">
-                Cosmic obsidian 3D observatory with Bare Metal fabric globe, 4
-                interactive 3D Bare Metal &amp; CME scenes, 7 unobstructed 3D
-                domain project stations, and cluster-labeled 2,208-star Acemap.
+              <h2>Orbital</h2>
+              <p class="edition-summary">
+                Cosmic obsidian 3D observatory with Bare Metal fabric globe,
+                four interactive 3D Bare Metal and CME scenes, seven 3D project
+                stations, and cluster-labeled 2,208-star Acemap galaxy.
               </p>
               <div class="card-footer">
-                <span>Open Friday (v11)</span>
+                <span>Open Orbital</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
             <a
-              class="concept-card"
-              href="./v12/"
+              class="edition-card"
+              href="spatial/"
               data-weekday="6"
-              data-edition-label="Sat · V12 Spatial OS"
+              data-edition-label="Sat · Spatial"
             >
               <div class="card-top">
-                <div class="edition-wrap">
-                  <span class="edition">SATURDAY · V12</span>
+                <div class="day-wrap">
+                  <span class="day-label">SAT · SPATIAL</span>
                   <span class="today-badge" hidden>TODAY</span>
                 </div>
                 <span class="swatches" aria-hidden="true">
@@ -662,154 +644,14 @@
                   <span class="swatch" style="background: #059669"></span>
                 </span>
               </div>
-              <h2>Tactile Spatial OS Playground</h2>
-              <p class="concept-tagline">
-                Daylight porcelain workbench with 4-mode Bare Metal &amp; CME
-                oscilloscope, Cmd-K Spotlight, 7 authentic domain-simulated
-                project instruments, and neighbor-linked 2,208-topic Acemap.
+              <h2>Spatial</h2>
+              <p class="edition-summary">
+                Daylight porcelain workbench with four-mode Bare Metal and CME
+                oscilloscope, command palette, seven playable domain system
+                instruments, and neighbor-linked 2,208-topic Acemap.
               </p>
               <div class="card-footer">
-                <span>Open Saturday (v12)</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-          </div>
-        </section>
-
-        <section
-          class="wave-section"
-          aria-label="Additional Archive Monographs v1 to v5 and v10"
-        >
-          <div class="wave-header">
-            <h2 class="wave-title">Archive Monographs · V1–V5 &amp; V10</h2>
-            <span class="wave-meta"
-              >Six standalone editorial &amp; experimental studies</span
-            >
-          </div>
-          <div class="gallery">
-            <a class="concept-card" href="./v1/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 01</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #f5f4ef"></span>
-                  <span class="swatch" style="background: #111317"></span>
-                  <span class="swatch" style="background: #d9381e"></span>
-                </span>
-              </div>
-              <h2>Swiss Editorial</h2>
-              <p class="concept-tagline">
-                Kinetic Swiss specimen machine with cursor-tracking column
-                crosshair, velocity ticker, scroll vernier scale, interactive
-                2-pane poster board, and particle-flight 2,208-topic Acemap.
-              </p>
-              <div class="card-footer">
-                <span>Explore v1</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-
-            <a class="concept-card" href="./v2/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 02</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #05080f"></span>
-                  <span class="swatch" style="background: #3b82f6"></span>
-                  <span class="swatch" style="background: #63d8ff"></span>
-                </span>
-              </div>
-              <h2>Precision Silicon Atelier</h2>
-              <p class="concept-tagline">
-                Apple Pro Silicon dark atelier with 3D wafer packet-beam canvas,
-                scroll-choreographed 3D exploded Bare Metal stack, glare bento
-                schematics, and warp-speed 2,208-topic starfield.
-              </p>
-              <div class="card-footer">
-                <span>Explore v2</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-
-            <a class="concept-card" href="./v3/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 03</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #f2ede4"></span>
-                  <span class="swatch" style="background: #1f5452"></span>
-                  <span class="swatch" style="background: #9c5a3c"></span>
-                </span>
-              </div>
-              <h2>Architectural Gallery</h2>
-              <p class="concept-tagline">
-                Rebuilt 7-room kinetic exhibition with masked portrait reveal,
-                magnetic lens cursor, bespoke canvas installations (5G healing,
-                astrolabe vault, 2.5D code graph, RF waves, 3D Flora, VR sync),
-                and Ink-Bloom Acemap.
-              </p>
-              <div class="card-footer">
-                <span>Explore v3</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-
-            <a class="concept-card" href="./v4/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 04</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #082144"></span>
-                  <span class="swatch" style="background: #70ccff"></span>
-                  <span class="swatch" style="background: #f5b963"></span>
-                </span>
-              </div>
-              <h2>Cyanotype Systems Blueprint</h2>
-              <p class="concept-tagline">
-                Live cyanotype CAD drafting canvas with Bare Metal telemetry
-                simulator, continuous-flow blueprint schematics, and a
-                2,208-topic sonar radar coordinate plot.
-              </p>
-              <div class="card-footer">
-                <span>Explore v4</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-
-            <a class="concept-card" href="./v5/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 05</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #fbfcfe"></span>
-                  <span class="swatch" style="background: #1d63ff"></span>
-                  <span class="swatch" style="background: #6366f1"></span>
-                </span>
-              </div>
-              <h2>Kinetic Spatial Studio</h2>
-              <p class="concept-tagline">
-                Liquid chromatic aurora studio with 4-chapter atmosphere
-                morphing, spring-sliding pill dock, 3D split-stage SVG
-                walkthroughs, and a spring-physics 2,208-topic Acemap field.
-              </p>
-              <div class="card-footer">
-                <span>Explore v5</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-
-            <a class="concept-card" href="./v10/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 10</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #f4f0e7"></span>
-                  <span class="swatch" style="background: #1d3b5c"></span>
-                  <span class="swatch" style="background: #c23b22"></span>
-                </span>
-              </div>
-              <h2>Japanese Zen Ink-Wash Studio</h2>
-              <p class="concept-tagline">
-                Warm kozo washi and Sumi-e fluid ink hero with sliding cedar
-                Shoji Bare Metal doors, unfolding 7-leaf Byōbu canvas screen,
-                and an Indigo-on-Washi 2,208-topic Acemap scroll.
-              </p>
-              <div class="card-footer">
-                <span>Explore v10</span>
+                <span>Open Spatial</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
@@ -826,7 +668,7 @@
             >Classic edition (Sun)</a
           >
           <a class="footer-link" href="../"
-            >Today’s auto-route <span aria-hidden="true">↗</span></a
+            >Open today’s edition <span aria-hidden="true">↗</span></a
           >
         </div>
       </div>

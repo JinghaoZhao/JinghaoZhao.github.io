@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Version 12 — Tactile Spatial OS & Playable Domain Micro-App Playground
+   Spatial Edition — Tactile Spatial OS & Playable Domain Micro-App Playground
    Vanilla JS, zero dependencies, offscreen-paused canvases, reduced-motion safe.
    ========================================================================== */
 
@@ -3026,10 +3026,10 @@
     },
     {
       group: "Links",
-      title: "7-Day Redesign Gallery",
+      title: "All 7 Daily Editions",
       sub: "../",
       tag: "Switch",
-      keywords: "redesign versions gallery switcher 7 day",
+      keywords: "editions switcher 7 day daily prism monolith scope cinema orbital spatial",
       action: () => {
         window.location.href = "../";
       },
@@ -3211,7 +3211,7 @@
   });
 
   // --------------------------------------------------------------------------
-  // Collapsible 7-Day Edition Switcher Popover (SAT · V12)
+  // Collapsible 7-Day Edition Switcher Popover (SAT · Spatial)
   // --------------------------------------------------------------------------
   const editionSwitcher = $("#edition-switcher");
   const editionTrigger = $("#edition-trigger");

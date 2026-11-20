@@ -1,4 +1,4 @@
-/* Version 7 — Neo-Brutalist Kinetic Monolith & Avant-Garde Poster
+/* Monolith Edition — Neo-Brutalist Kinetic Monolith & Avant-Garde Poster
    Domain-Customized Systems & Networking Kinetic Engines */
 (() => {
   "use strict";
@@ -944,7 +944,7 @@
       actionLabel: "Reset Map ⌖",
       showAction: true,
       hud: "LOAD CSV FOR 2,208 TOPICS, CLUSTER LABELS & NEIGHBOR LINKS",
-      status: "Preview mode · Click Load Dataset to fetch ../../data/data.csv",
+      status: "Ready · Click Load Dataset to fetch ../../data/data.csv",
     },
   };
 
@@ -2660,7 +2660,7 @@
         ctx.restore();
       });
 
-      const previewLabels = ["COMP SCI", "PHYSICS", "MEDICINE", "ENGINEERING", "MATH"];
+      const clusterLabels = ["COMP SCI", "PHYSICS", "MEDICINE", "ENGINEERING", "MATH"];
       for (let i = 0; i < 40; i++) {
         const a = (i / 40) * Math.PI * 2 + t * 0.12;
         const rad = 0.25 + ((i * 37) % 100) / 130;
@@ -2669,7 +2669,7 @@
         ctx.fillStyle = i % 7 === 0 ? "#ff4800" : "#c8ff00";
         ctx.fillRect(x - 2.5, y - 2.5, 5, 5);
         if (i % 8 === 0) {
-          const lbl = previewLabels[(i / 8) % previewLabels.length];
+          const lbl = clusterLabels[(i / 8) % clusterLabels.length];
           ctx.fillStyle = "rgba(234,232,225,0.65)";
           ctx.font = "700 8.5px 'JetBrains Mono', monospace";
           ctx.textAlign = "left";

@@ -17,7 +17,7 @@
   }
 
   /* -------------------------------------------------------------------------
-   * 7-Day Edition Switcher Popover (THU · V9)
+   * 7-Day Edition Switcher Popover (THU · Cinema)
    * ---------------------------------------------------------------------- */
   const editionSwitcher = $("#edition-switcher");
   const editionToggle = $("#edition-toggle");

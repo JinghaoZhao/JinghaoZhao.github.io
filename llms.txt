@@ -63,13 +63,13 @@ Jinghao Zhao contributes on the GCE Bare Metal side to the low-latency trading p
 
 ## 7-Day Rotating Homepage Editions
 
-The canonical homepage (`https://zhaojinghao.com/`) rotates automatically across seven visual editions by local weekday (Sunday–Saturday), all sharing identical verified content and canonical identity:
+The canonical homepage (`https://zhaojinghao.com/`) rotates automatically across seven daily visual editions by local weekday (Sunday–Saturday), all sharing identical verified content and canonical identity:
 
-- **Sunday — Classic Original**: https://zhaojinghao.com/?edition=classic
-- **Monday — V6 (Liquid Glass & Prism Atelier)**: https://zhaojinghao.com/redesign/v6/
-- **Tuesday — V7 (Neo-Brutalist Kinetic Monolith)**: https://zhaojinghao.com/redesign/v7/
-- **Wednesday — V8 (Cybernetic Phosphor Oscilloscope)**: https://zhaojinghao.com/redesign/v8/
-- **Thursday — V9 (Monochrome Cinema Editorial)**: https://zhaojinghao.com/redesign/v9/
-- **Friday — V11 (3D Orbital Particle Universe)**: https://zhaojinghao.com/redesign/v11/
-- **Saturday — V12 (Tactile Spatial OS Playground)**: https://zhaojinghao.com/redesign/v12/
-- **All 12 Editions Gallery**: https://zhaojinghao.com/redesign/
+- **Sunday — Classic**: https://zhaojinghao.com/?edition=classic
+- **Monday — Prism (Liquid Glass & Prism Atelier)**: https://zhaojinghao.com/editions/prism/
+- **Tuesday — Monolith (Neo-Brutalist Kinetic Monolith)**: https://zhaojinghao.com/editions/monolith/
+- **Wednesday — Scope (Cybernetic Phosphor Oscilloscope)**: https://zhaojinghao.com/editions/scope/
+- **Thursday — Cinema (Monochrome Cinema Editorial)**: https://zhaojinghao.com/editions/cinema/
+- **Friday — Orbital (3D Orbital Particle Universe)**: https://zhaojinghao.com/editions/orbital/
+- **Saturday — Spatial (Tactile Spatial OS Playground)**: https://zhaojinghao.com/editions/spatial/
+- **All 7 Editions**: https://zhaojinghao.com/editions/

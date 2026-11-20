@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VERSION 7 — NEO-BRUTALIST KINETIC MONOLITH & AVANT-GARDE POSTER
+   MONOLITH EDITION — NEO-BRUTALIST KINETIC MONOLITH & AVANT-GARDE POSTER
    Tokyo × Zurich Kinetic Brutalism
    ========================================================================== */
 
@@ -170,7 +170,7 @@ select {
   color: var(--monolith);
 }
 
-.preview-pills {
+.edition-quick-links {
   display: inline-flex;
   align-items: center;
   gap: 6px;

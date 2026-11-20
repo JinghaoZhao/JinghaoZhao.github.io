@@ -60,21 +60,22 @@
     <script>
       (function () {
         try {
-          var routes = {
-            1: "redesign/v6/",
-            2: "redesign/v7/",
-            3: "redesign/v8/",
-            4: "redesign/v9/",
-            5: "redesign/v11/",
-            6: "redesign/v12/",
-          };
+          var routes = [
+            "",
+            "editions/prism/",
+            "editions/monolith/",
+            "editions/scope/",
+            "editions/cinema/",
+            "editions/orbital/",
+            "editions/spatial/",
+          ];
           var editions = {
-            v6: "redesign/v6/",
-            v7: "redesign/v7/",
-            v8: "redesign/v8/",
-            v9: "redesign/v9/",
-            v11: "redesign/v11/",
-            v12: "redesign/v12/",
+            prism: "editions/prism/",
+            monolith: "editions/monolith/",
+            scope: "editions/scope/",
+            cinema: "editions/cinema/",
+            orbital: "editions/orbital/",
+            spatial: "editions/spatial/",
           };
           var params = new URLSearchParams(window.location.search);
           var edition = (params.get("edition") || "").toLowerCase();
@@ -84,8 +85,8 @@
             return;
           }
           var hash = window.location.hash || "";
-          if (day && routes[day]) {
-            window.location.replace(routes[day] + hash);
+          if (day && /^[1-6]$/.test(day)) {
+            window.location.replace(routes[Number(day)] + hash);
             return;
           }
           if (edition && editions[edition]) {
@@ -93,7 +94,7 @@
             return;
           }
           var d = new Date().getDay();
-          if (d !== 0 && routes[d]) {
+          if (d >= 1 && d <= 6 && routes[d]) {
             window.location.replace(routes[d] + hash);
           }
         } catch (e) {}
@@ -2457,44 +2458,44 @@
             >
           </li>
           <li>
-            <a class="edition-item" href="redesign/v6/" data-day="1"
+            <a class="edition-item" href="editions/prism/" data-day="1"
               ><span class="edition-day">MON</span
-              ><span class="edition-name">V6 Prism</span></a
+              ><span class="edition-name">Prism</span></a
             >
           </li>
           <li>
-            <a class="edition-item" href="redesign/v7/" data-day="2"
+            <a class="edition-item" href="editions/monolith/" data-day="2"
               ><span class="edition-day">TUE</span
-              ><span class="edition-name">V7 Monolith</span></a
+              ><span class="edition-name">Monolith</span></a
             >
           </li>
           <li>
-            <a class="edition-item" href="redesign/v8/" data-day="3"
+            <a class="edition-item" href="editions/scope/" data-day="3"
               ><span class="edition-day">WED</span
-              ><span class="edition-name">V8 Scope</span></a
+              ><span class="edition-name">Scope</span></a
             >
           </li>
           <li>
-            <a class="edition-item" href="redesign/v9/" data-day="4"
+            <a class="edition-item" href="editions/cinema/" data-day="4"
               ><span class="edition-day">THU</span
-              ><span class="edition-name">V9 Cinema</span></a
+              ><span class="edition-name">Cinema</span></a
             >
           </li>
           <li>
-            <a class="edition-item" href="redesign/v11/" data-day="5"
+            <a class="edition-item" href="editions/orbital/" data-day="5"
               ><span class="edition-day">FRI</span
-              ><span class="edition-name">V11 Orbital</span></a
+              ><span class="edition-name">Orbital</span></a
             >
           </li>
           <li>
-            <a class="edition-item" href="redesign/v12/" data-day="6"
+            <a class="edition-item" href="editions/spatial/" data-day="6"
               ><span class="edition-day">SAT</span
-              ><span class="edition-name">V12 Spatial OS</span></a
+              ><span class="edition-name">Spatial</span></a
             >
           </li>
         </ul>
         <div class="edition-menu-foot">
-          <a class="edition-foot-link" href="redesign/">All 12 Gallery</a>
+          <a class="edition-foot-link" href="editions/">All 7 Editions</a>
           <a class="edition-foot-link" href="./">Auto (Today)</a>
         </div>
       </div>

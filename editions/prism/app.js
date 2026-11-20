@@ -1,4 +1,4 @@
-/* Version 6: Liquid Glass & Iridescent Prism Atelier
+/* Prism Edition: Liquid Glass & Iridescent Prism Atelier
  * Domain-customized optical glass simulations across Hero, Bare Metal x CME, and all 7 projects.
  * Progressive enhancement: all verified facts, projects, and publications exist in plain HTML.
  */

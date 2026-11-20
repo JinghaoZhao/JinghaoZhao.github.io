@@ -2906,8 +2906,8 @@
       );
     }
 
-    function drawAcemapPreview(cx, cy, fov, dist, rx, ry, tSec) {
-      // Spiral preview galaxy before user clicks Load 2,208-Topic Galaxy
+    function drawAcemapStandby(cx, cy, fov, dist, rx, ry, tSec) {
+      // Spiral standby galaxy before user clicks Load 2,208-Topic Galaxy
       for (let i = 0; i < 220; i++) {
         const arm = i % 4;
         const t = (i / 220) * 3.8;
@@ -2932,7 +2932,7 @@
         ctx,
         cx,
         22,
-        "ACEMAP PREVIEW · CLICK LOAD TO STREAM 2,208 REAL TOPICS",
+        "ACEMAP GALAXY · CLICK LOAD TO STREAM 2,208 REAL TOPICS",
         "#fbbf24",
         width,
         height,
@@ -3089,7 +3089,7 @@
         drawMobileVrScene(cx, cy, fov, dist, rx, ry, tSec);
       } else if (activeStation === "acemap") {
         if (acemapLoaded) drawAcemapGalaxy(cx, cy, fov, dist);
-        else drawAcemapPreview(cx, cy, fov, dist, rx, ry, tSec);
+        else drawAcemapStandby(cx, cy, fov, dist, rx, ry, tSec);
       }
     }
 
