@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Jinghao Zhao" />
     <meta name="robots" content="noindex, follow" />
     <meta name="theme-color" content="#04060e" />
     <title>
@@ -610,21 +611,168 @@
                   <h3 id="sculpture-active-name">SEED</h3>
                 </div>
                 <div class="sculpture-controls-inline">
-                  <!-- SEED fault trigger -->
+                  <!-- 1. SEED fault trigger -->
                   <button
                     type="button"
                     class="hud-action-btn"
                     id="seed-fault-btn"
                   >
-                    ⚡ Simulate 5G Fault &amp; Self-Heal
+                    ⚡ Trigger 5G Failure
                   </button>
 
-                  <!-- Mobile VR Latency toggle -->
+                  <!-- 2. SecureSIM request mode toggle -->
+                  <div
+                    class="segmented-toggle"
+                    id="securesim-mode-toggle"
+                    role="group"
+                    aria-label="SecureSIM request mode"
+                    hidden
+                  >
+                    <button
+                      type="button"
+                      class="seg-btn is-active"
+                      data-sim-mode="valid"
+                      aria-pressed="true"
+                    >
+                      Valid Cert (Scoped)
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn"
+                      data-sim-mode="unauth"
+                      aria-pressed="false"
+                    >
+                      Unauthorized App
+                    </button>
+                  </div>
+
+                  <!-- 3. GPT-Code-Learner query selector -->
+                  <div
+                    class="segmented-toggle"
+                    id="gpt-query-toggle"
+                    role="group"
+                    aria-label="Codebase query selector"
+                    hidden
+                  >
+                    <button
+                      type="button"
+                      class="seg-btn is-active"
+                      data-gpt-query="auth"
+                      aria-pressed="true"
+                    >
+                      Trace auth flow
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn"
+                      data-gpt-query="routing"
+                      aria-pressed="false"
+                    >
+                      Explain routing
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn"
+                      data-gpt-query="sim"
+                      aria-pressed="false"
+                    >
+                      Find SIM handler
+                    </button>
+                  </div>
+
+                  <!-- 4. Sonica narrowband channel tuner + burst emitter -->
+                  <div
+                    class="inline-control-cluster"
+                    id="sonica-controls"
+                    hidden
+                  >
+                    <div
+                      class="segmented-toggle"
+                      role="group"
+                      aria-label="NB-IoT subcarrier channel"
+                    >
+                      <button
+                        type="button"
+                        class="seg-btn"
+                        data-sonica-ch="0"
+                        aria-pressed="false"
+                      >
+                        CH-1
+                      </button>
+                      <button
+                        type="button"
+                        class="seg-btn is-active"
+                        data-sonica-ch="1"
+                        aria-pressed="true"
+                      >
+                        CH-2
+                      </button>
+                      <button
+                        type="button"
+                        class="seg-btn"
+                        data-sonica-ch="2"
+                        aria-pressed="false"
+                      >
+                        CH-3
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      class="hud-action-btn gold"
+                      id="sonica-burst-btn"
+                    >
+                      Emit IoT Burst
+                    </button>
+                  </div>
+
+                  <!-- 5. Flora programmable cellular stack hooks -->
+                  <div
+                    class="segmented-toggle"
+                    id="flora-hooks-toggle"
+                    role="group"
+                    aria-label="Flora programmable layer hooks"
+                    hidden
+                  >
+                    <button
+                      type="button"
+                      class="seg-btn is-active"
+                      data-flora-hook="esim"
+                      aria-pressed="true"
+                    >
+                      eSIM Profile
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn"
+                      data-flora-hook="ran"
+                      aria-pressed="false"
+                    >
+                      RAN Slice
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn is-active"
+                      data-flora-hook="core"
+                      aria-pressed="true"
+                    >
+                      Core Route
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn"
+                      data-flora-hook="edge"
+                      aria-pressed="false"
+                    >
+                      Edge Offload
+                    </button>
+                  </div>
+
+                  <!-- 6. Mobile VR Latency toggle -->
                   <div
                     class="segmented-toggle"
                     id="vr-mode-toggle"
                     role="group"
-                    aria-label="Mobile VR uplink mode"
+                    aria-label="Mobile VR uplink scheduling mode"
                     hidden
                   >
                     <button
@@ -633,7 +781,7 @@
                       data-vr-mode="standard"
                       aria-pressed="false"
                     >
-                      Standard (Lagged Ghost)
+                      Standard (Reactive)
                     </button>
                     <button
                       type="button"
@@ -641,11 +789,11 @@
                       data-vr-mode="proactive"
                       aria-pressed="true"
                     >
-                      Proactive (Locked Sync)
+                      Proactive (Predicted)
                     </button>
                   </div>
 
-                  <!-- Acemap on-demand loader -->
+                  <!-- 7. Acemap on-demand loader -->
                   <button
                     type="button"
                     class="hud-action-btn gold"
@@ -661,35 +809,35 @@
                 <canvas
                   id="sculpture-canvas"
                   class="interactive-3d-canvas"
-                  aria-label="Interactive 3D particle sculpture morphing between seven systems projects"
+                  aria-label="Interactive 3D domain simulation stage spanning all seven systems projects"
                   role="img"
                 ></canvas>
+              </div>
 
-                <!-- Floating HUD readout inside stage -->
-                <div class="sculpture-hud-overlay">
-                  <div class="hud-readout-block">
-                    <span class="mono-tag" id="sculpture-geometry-tag">
-                      GEODESIC FAULT-RECOVERY SPHERE
-                    </span>
-                    <p id="sculpture-active-desc">
-                      Diagnosing and recovering from 5G failures through the SIM.
-                    </p>
-                    <p class="sculpture-subnote" id="sculpture-subnote">
-                      Periodic surface fractures simulate 5G failures; golden
-                      SIM-core diagnostic rings sweep across and restore
-                      coherence.
-                    </p>
-                  </div>
-                  <div class="hud-readout-action">
-                    <a
-                      id="sculpture-active-link"
-                      class="btn-glass compact"
-                      href="../../docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
-                      rel="noopener"
-                    >
-                      Read the SIGCOMM ’22 paper <span aria-hidden="true">↗</span>
-                    </a>
-                  </div>
+              <!-- Dedicated non-overlapping HUD telemetry footer below canvas -->
+              <div class="sculpture-hud-bar">
+                <div class="hud-readout-block">
+                  <span class="mono-tag sky" id="sculpture-geometry-tag">
+                    3D 5G UE · SIM/SEED CHIP · 5G CORE
+                  </span>
+                  <p id="sculpture-active-desc">
+                    Diagnosing and recovering from 5G failures through the SIM.
+                  </p>
+                  <p class="sculpture-subnote" id="sculpture-subnote">
+                    Trigger a 5G link failure to watch the embedded SIM applet
+                    infer root cause with the 5G Core and snap the bearer back
+                    online.
+                  </p>
+                </div>
+                <div class="hud-readout-action">
+                  <a
+                    id="sculpture-active-link"
+                    class="btn-glass compact"
+                    href="../../docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
+                    rel="noopener"
+                  >
+                    Read the SIGCOMM ’22 paper <span aria-hidden="true">↗</span>
+                  </a>
                 </div>
               </div>
 
@@ -737,7 +885,7 @@
                 >
                   <span class="station-top">
                     <span class="station-num">01</span>
-                    <span class="station-shape">Geodesic Self-Heal</span>
+                    <span class="station-shape">5G SIM Recovery</span>
                   </span>
                   <h4 class="station-name">SEED</h4>
                   <p class="station-desc">
@@ -769,7 +917,7 @@
                 >
                   <span class="station-top">
                     <span class="station-num">02</span>
-                    <span class="station-shape">Gyroscopic Shield</span>
+                    <span class="station-shape">eSIM Policy Gate</span>
                   </span>
                   <h4 class="station-name">SecureSIM</h4>
                   <p class="station-desc">
@@ -802,7 +950,7 @@
                 >
                   <span class="station-top">
                     <span class="station-num">03</span>
-                    <span class="station-shape">Semantic Code-Cube</span>
+                    <span class="station-shape">3D AST Call-Graph</span>
                   </span>
                   <h4 class="station-name">GPT-Code-Learner</h4>
                   <p class="station-desc">
@@ -834,7 +982,7 @@
                 >
                   <span class="station-top">
                     <span class="station-num">04</span>
-                    <span class="station-shape">RF Torus Field</span>
+                    <span class="station-shape">NB-IoT Waterfall</span>
                   </span>
                   <h4 class="station-name">Sonica</h4>
                   <p class="station-desc">
@@ -866,7 +1014,7 @@
                 >
                   <span class="station-top">
                     <span class="station-num">05</span>
-                    <span class="station-shape">4-Tier Monolith</span>
+                    <span class="station-shape">4-Layer Cellular</span>
                   </span>
                   <h4 class="station-name">Flora</h4>
                   <p class="station-desc">
@@ -899,7 +1047,7 @@
                 >
                   <span class="station-top">
                     <span class="station-num">06</span>
-                    <span class="station-shape">Dual Icosahedrons</span>
+                    <span class="station-shape">VR Motion-to-Photon</span>
                   </span>
                   <h4 class="station-name">Mobile VR Latency</h4>
                   <p class="station-desc">

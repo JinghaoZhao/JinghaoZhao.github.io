@@ -974,6 +974,13 @@ h2 {
   gap: 10px;
 }
 
+.inline-control-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
 .hud-action-btn {
   padding: 8px 16px;
   border-radius: var(--radius-pill);
@@ -1036,30 +1043,22 @@ h2 {
 
 .sculpture-canvas-wrap {
   position: relative;
-  height: clamp(390px, 54vh, 540px);
+  height: clamp(410px, 52vh, 520px);
   background:
     radial-gradient(circle at 50% 45%, rgba(129, 140, 248, 0.12), transparent 58%),
     radial-gradient(circle at 20% 70%, rgba(56, 189, 248, 0.08), transparent 55%),
     #04060e;
 }
 
-.sculpture-hud-overlay {
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 18px;
+.sculpture-hud-bar {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 16px;
-  padding: 16px 20px;
-  border-radius: var(--radius-md);
-  background: rgba(6, 10, 22, 0.78);
-  border: 1px solid rgba(148, 184, 255, 0.18);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  pointer-events: none;
+  padding: 16px 22px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(6, 10, 22, 0.84);
 }
 
 .hud-readout-block {
@@ -1669,14 +1668,11 @@ h2 {
   }
 
   .sculpture-canvas-wrap {
-    height: 440px;
+    height: 360px;
   }
 
-  .sculpture-hud-overlay {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    padding: 13px 14px;
+  .sculpture-hud-bar {
+    padding: 14px 16px;
   }
 
   .pub-card {
