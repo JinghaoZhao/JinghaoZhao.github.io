@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Version 12 — Tactile Spatial OS & Playable Micro-App Playground
+   Version 12 — Tactile Spatial OS & Playable Domain Micro-App Playground
    Vanilla JS, zero dependencies, offscreen-paused canvases, reduced-motion safe.
    ========================================================================== */
 
@@ -15,9 +15,121 @@
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
   // --------------------------------------------------------------------------
-  // Canvas Visibility Manager (pauses offscreen animation loops automatically)
+  // Canvas Utilities & Offscreen Pause Manager
   // --------------------------------------------------------------------------
   const animatedLoops = [];
+
+  function drawRoundedRect(ctx, x, y, w, h, r) {
+    if (typeof ctx.roundRect === "function") {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      return;
+    }
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  function drawSimChip(ctx, x, y, w, h, accentColor, label) {
+    const cut = Math.min(10, w * 0.2);
+    ctx.fillStyle = "#162137";
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(x + cut, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x, y + cut);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Metallic contact pad cluster
+    const px = x + w * 0.16;
+    const py = y + h * 0.22;
+    const pw = w * 0.68;
+    const ph = h * 0.42;
+    drawRoundedRect(ctx, px, py, pw, ph, 3);
+    ctx.fillStyle = "rgba(250, 204, 21, 0.22)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(250, 204, 21, 0.72)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(px + pw / 3, py);
+    ctx.lineTo(px + pw / 3, py + ph);
+    ctx.moveTo(px + (pw * 2) / 3, py);
+    ctx.lineTo(px + (pw * 2) / 3, py + ph);
+    ctx.moveTo(px, py + ph / 2);
+    ctx.lineTo(px + pw, py + ph / 2);
+    ctx.stroke();
+
+    if (label) {
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = '600 9px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText(label, x + w / 2, y + h - 5);
+    }
+  }
+
+  function drawDarkGrid(ctx, w, h, step = 28) {
+    ctx.fillStyle = "#0e1627";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.08)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = step; x < w; x += step) {
+      ctx.moveTo(x + 0.5, 0);
+      ctx.lineTo(x + 0.5, h);
+    }
+    for (let y = step; y < h; y += step) {
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(w, y + 0.5);
+    }
+    ctx.stroke();
+  }
+
+  function drawNodeBox(ctx, x, y, w, h, title, sub, borderColor, bg = "#152036") {
+    drawRoundedRect(ctx, x, y, w, h, 8);
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = "#f1f5f9";
+    ctx.font = '700 10px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText(title, x + w / 2, y + (sub ? h * 0.44 : h * 0.57));
+    if (sub) {
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = '500 8.5px "JetBrains Mono", monospace';
+      ctx.fillText(sub, x + w / 2, y + h * 0.76);
+    }
+  }
+
+  function syncCanvasSize(canvas, cssHeight) {
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(240, Math.round(rect.width || canvas.width));
+    const h = Math.round(cssHeight || rect.height || canvas.height);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (
+      canvas.width !== Math.round(w * dpr) ||
+      canvas.height !== Math.round(h * dpr)
+    ) {
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+    }
+    const ctx = canvas.getContext("2d");
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+  }
 
   function registerCanvasLoop(canvas, onFrame) {
     if (!canvas) return null;
@@ -60,11 +172,8 @@
         (entries) => {
           for (const item of entries) {
             entry.visible = item.isIntersecting;
-            if (entry.visible && !reducedMotion) {
-              entry.start();
-            } else {
-              entry.stop();
-            }
+            if (entry.visible && !reducedMotion) entry.start();
+            else entry.stop();
           }
         },
         { threshold: 0.02 }
@@ -75,36 +184,6 @@
     entry.drawOnce();
     if (!reducedMotion) entry.start();
     return entry;
-  }
-
-  function drawRoundedRect(ctx, x, y, w, h, r) {
-    if (typeof ctx.roundRect === "function") {
-      ctx.beginPath();
-      ctx.roundRect(x, y, w, h, r);
-      return;
-    }
-    const rr = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + rr, y);
-    ctx.arcTo(x + w, y, x + w, y + h, rr);
-    ctx.arcTo(x + w, y + h, x, y + h, rr);
-    ctx.arcTo(x, y + h, x, y, rr);
-    ctx.arcTo(x, y, x + w, y, rr);
-    ctx.closePath();
-  }
-
-  function syncCanvasSize(canvas, cssHeight) {
-    const rect = canvas.getBoundingClientRect();
-    const w = Math.max(240, Math.round(rect.width || canvas.width));
-    const h = Math.round(cssHeight || rect.height || canvas.height);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-    }
-    const ctx = canvas.getContext("2d");
-    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return { ctx, w, h };
   }
 
   reduceMotionQuery.addEventListener("change", (ev) => {
@@ -127,6 +206,7 @@
     const thumb = $(".seg-thumb", segmentEl);
     const active = $(".seg-btn.is-active", segmentEl);
     if (!thumb || !active) return;
+    if (getComputedStyle(thumb).display === "none") return;
     thumb.style.width = `${active.offsetWidth}px`;
     thumb.style.transform = `translateX(${active.offsetLeft - 4}px)`;
   }
@@ -194,221 +274,473 @@
   }
 
   // --------------------------------------------------------------------------
-  // HERO WIDGET: Interactive Bare Metal Rack & CME Low-Latency Console
+  // HERO WORKBENCH: 4-Mode GCE Bare Metal Rack & CME Dedicated Fabric
   // --------------------------------------------------------------------------
   const rackConsole = $("#rack-console");
   const rackScope = $("#rack-scope");
+  const rackScopeTitle = $("#rack-scope-title");
   const rackReadout = $("#rack-readout");
   const rackDetail = $("#rack-detail");
   const rackLed = $("#rack-led");
-  const fabricButtons = $$("[data-fabric-mode]");
+  const rackModeButtons = $$("[data-rack-select]");
   const bladeButtons = $$("[data-blade]");
   const pulseBtn = $("#rack-pulse-btn");
 
-  const rackState = {
-    fabric: "cme", // "cme" | "standard"
-    blades: [true, true, true, true],
-    burst: 0,
-    phase: 0,
+  const lifecycleStages = ["PROVISION", "VERIFY", "ACTIVE", "DRAIN", "RECLAIM"];
+
+  const rackModesMeta = {
+    host: {
+      scopeTitle: "HOST & FABRIC · 0 HYPERVISOR",
+      detail:
+        "Dedicated physical CPU & NIC wired directly to cloud storage and network fabric — zero hypervisor layer.",
+    },
+    lifecycle: {
+      scopeTitle: "FLEET LIFECYCLE · AUTOMATED STATE MACHINE",
+      detail:
+        "Blades auto-step Provision → Verify → Active → Drain → Reclaim. Click any blade above to advance/drain it.",
+    },
+    e2e: {
+      scopeTitle: "END-TO-END BEHAVIOR · FLAT-JITTER FABRIC",
+      detail:
+        "Deterministic packet flow across Host NIC → ToR Switch → Control Plane → Peer with steady timing trace.",
+    },
+    cme: {
+      scopeTitle: "GOOGLE CLOUD × CME GROUP · DEDICATED FABRIC",
+      detail:
+        "Ultra-low-latency market-order and execution pulses across dedicated bare metal between gateway & matching engine.",
+    },
   };
 
-  const bladeNames = [
-    "BM-01 Dedicated Host Silicon",
-    "BM-02 Deterministic Fabric NIC",
-    "BM-03 Automated Fleet Control",
-    "BM-04 CME Low-Latency Node",
-  ];
+  const rackState = {
+    mode: "host", // "host" | "lifecycle" | "e2e" | "cme"
+    bladesOnline: [true, true, true, true],
+    bladeStages: [2, 1, 0, 3], // indices into lifecycleStages
+    lifecycleClock: 0,
+    phase: 0,
+    burst: 0,
+  };
 
-  function updateRackReadout(customDetail) {
-    const activeCount = rackState.blades.filter(Boolean).length;
-    if (rackConsole) rackConsole.dataset.fabric = rackState.fabric;
+  function syncRackBladesUI() {
+    const isLC = rackState.mode === "lifecycle";
+    bladeButtons.forEach((btn, idx) => {
+      const stage = rackState.bladeStages[idx];
+      const online = isLC ? stage !== 4 : rackState.bladesOnline[idx];
+      btn.classList.toggle("is-active", online);
+      btn.setAttribute("aria-pressed", String(online));
+      btn.dataset.stage = String(stage);
+      const stateEl = $(".blade-state", btn);
+      if (stateEl) {
+        stateEl.textContent = isLC
+          ? lifecycleStages[stage]
+          : online
+            ? "ACTIVE"
+            : "ISOLATED";
+      }
+    });
+
+    const activeCount = isLC
+      ? rackState.bladeStages.filter((s) => s === 2).length
+      : rackState.bladesOnline.filter(Boolean).length;
+
     if (rackLed) {
       rackLed.className =
-        activeCount === 0
+        activeCount === 0 && !isLC
           ? "led led-coral"
-          : rackState.fabric === "cme"
+          : rackState.mode === "cme"
             ? "led led-emerald"
             : "led led-blue";
     }
     if (rackReadout) {
-      const modeLabel =
-        rackState.fabric === "cme" ? "CME DEDICATED FABRIC" : "STANDARD CLOUD PATH";
-      rackReadout.textContent = `${modeLabel} · ${activeCount}/4 BLADES ACTIVE`;
-    }
-    if (customDetail && rackDetail) {
-      rackDetail.textContent = customDetail;
+      rackReadout.textContent = isLC
+        ? `${activeCount}/4 IN ACTIVE WORKLOAD`
+        : `${activeCount}/4 BLADES ONLINE`;
     }
   }
 
-  function setFabricMode(mode) {
-    rackState.fabric = mode === "standard" ? "standard" : "cme";
+  function setRackMode(mode) {
+    if (!rackModesMeta[mode]) return;
+    rackState.mode = mode;
     rackState.burst = 1.0;
-    fabricButtons.forEach((btn) => {
-      const isMatch = btn.dataset.fabricMode === rackState.fabric;
-      btn.classList.toggle("is-active", isMatch);
-      btn.setAttribute("aria-pressed", String(isMatch));
+    if (rackConsole) rackConsole.dataset.rackMode = mode;
+    rackModeButtons.forEach((btn) => {
+      const match = btn.dataset.rackSelect === mode;
+      btn.classList.toggle("is-active", match);
+      btn.setAttribute("aria-pressed", String(match));
     });
-    positionSegmentThumb($('[data-segment="fabric"]'));
-    updateRackReadout(
-      rackState.fabric === "cme"
-        ? "Dedicated physical path active — phase-locked deterministic fabric."
-        : "Shared virtualized cloud hops — showing multi-hop queuing variance."
-    );
+    positionSegmentThumb($('[data-segment="rack"]'));
+    if (rackScopeTitle) rackScopeTitle.textContent = rackModesMeta[mode].scopeTitle;
+    if (rackDetail) rackDetail.textContent = rackModesMeta[mode].detail;
+    syncRackBladesUI();
     if (rackLoop && reducedMotion) rackLoop.drawOnce();
   }
 
-  fabricButtons.forEach((btn) => {
-    btn.addEventListener("click", () => setFabricMode(btn.dataset.fabricMode));
+  rackModeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => setRackMode(btn.dataset.rackSelect));
   });
 
-  function triggerRackBurst(detail) {
+  // Pillar "Inspect on Rack" & CME jump buttons
+  $$("[data-jump-rack]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRackMode(btn.dataset.jumpRack);
+      jumpTo("#rack");
+    });
+  });
+
+  function triggerRackBurst() {
     rackState.burst = 1.0;
     bladeButtons.forEach((btn, idx) => {
-      if (!rackState.blades[idx]) return;
       btn.classList.remove("is-pulsing");
       void btn.offsetWidth;
       setTimeout(() => {
         btn.classList.add("is-pulsing");
-        setTimeout(() => btn.classList.remove("is-pulsing"), 340);
+        setTimeout(() => btn.classList.remove("is-pulsing"), 320);
       }, idx * 55);
     });
-    if (detail) updateRackReadout(detail);
     if (rackLoop && reducedMotion) rackLoop.drawOnce();
   }
 
   bladeButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.blade);
-      rackState.blades[idx] = !rackState.blades[idx];
-      const online = rackState.blades[idx];
-      btn.classList.toggle("is-active", online);
-      btn.setAttribute("aria-pressed", String(online));
-      const stateEl = $(".blade-state", btn);
-      if (stateEl) stateEl.textContent = online ? "ONLINE" : "ISOLATED";
       rackState.burst = 0.85;
-      updateRackReadout(
-        `${bladeNames[idx]} switched ${online ? "ONLINE" : "to ISOLATED standby"}.`
-      );
+      if (rackState.mode === "lifecycle") {
+        rackState.bladeStages[idx] =
+          (rackState.bladeStages[idx] + 1) % lifecycleStages.length;
+        if (rackDetail) {
+          rackDetail.textContent = `BM-0${idx + 1} transitioned to ${lifecycleStages[rackState.bladeStages[idx]]} stage.`;
+        }
+      } else {
+        rackState.bladesOnline[idx] = !rackState.bladesOnline[idx];
+        if (rackDetail) {
+          rackDetail.textContent = `BM-0${idx + 1} switched ${rackState.bladesOnline[idx] ? "ONLINE" : "to ISOLATED maintenance"}.`;
+        }
+      }
+      syncRackBladesUI();
       if (rackLoop && reducedMotion) rackLoop.drawOnce();
     });
   });
 
-  if (pulseBtn) {
-    pulseBtn.addEventListener("click", () => {
-      triggerRackBurst("Fabric packet burst dispatched across active blades.");
-    });
-  }
+  if (pulseBtn) pulseBtn.addEventListener("click", triggerRackBurst);
+  syncRackBladesUI();
 
-  const rackLoop = registerCanvasLoop(rackScope, (_now, dt) => {
-    const { ctx, w, h } = syncCanvasSize(rackScope, 136);
+  const rackLoop = registerCanvasLoop(rackScope, (_now, dt, isStatic) => {
+    const { ctx, w, h } = syncCanvasSize(rackScope, 182);
     if (!ctx) return;
 
-    const activeCount = rackState.blades.filter(Boolean).length;
-    const isCME = rackState.fabric === "cme";
-    rackState.phase += dt * (isCME ? 5.6 : 3.2);
-    rackState.burst = Math.max(0, rackState.burst - dt * 1.4);
-
-    // Background & precision engineering grid
-    ctx.fillStyle = "#101829";
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.11)";
-    ctx.lineWidth = 1;
-    const stepX = 32;
-    const stepY = 26;
-    ctx.beginPath();
-    for (let x = stepX; x < w; x += stepX) {
-      ctx.moveTo(x + 0.5, 0);
-      ctx.lineTo(x + 0.5, h);
+    const compact = w < 380;
+    if (!isStatic) {
+      rackState.phase += dt * 1.4;
+      rackState.burst = Math.max(0, rackState.burst - dt * 1.3);
+      if (rackState.mode === "lifecycle") {
+        rackState.lifecycleClock += dt;
+        if (rackState.lifecycleClock > 2.4) {
+          rackState.lifecycleClock = 0;
+          const pick = Math.floor(rackState.phase) % 4;
+          rackState.bladeStages[pick] =
+            (rackState.bladeStages[pick] + 1) % lifecycleStages.length;
+          syncRackBladesUI();
+        }
+      }
     }
-    for (let y = stepY; y < h; y += stepY) {
-      ctx.moveTo(0, y + 0.5);
-      ctx.lineTo(w, y + 0.5);
-    }
-    ctx.stroke();
 
-    // Center zero line
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.24)";
-    ctx.beginPath();
-    ctx.moveTo(0, h * 0.5 + 0.5);
-    ctx.lineTo(w, h * 0.5 + 0.5);
-    ctx.stroke();
+    drawDarkGrid(ctx, w, h, 28);
+    ctx.textAlign = "center";
 
-    if (activeCount === 0) {
-      ctx.strokeStyle = "#f43f5e";
+    if (rackState.mode === "host") {
+      // Dedicated Physical CPU + Direct NIC -> [0 HYPERVISOR] -> Cloud Fabric / Storage I/O
+      const pad = compact ? 10 : 18;
+      const boxW = compact ? 96 : 138;
+      const leftX = pad;
+      const rightX = w - pad - boxW;
+      const topY = 26;
+      const boxH = 52;
+
+      drawNodeBox(
+        ctx,
+        leftX,
+        topY,
+        boxW,
+        boxH,
+        compact ? "PHYSICAL CPU" : "DEDICATED CPU",
+        "Bare Metal Silicon",
+        "#3b82f6"
+      );
+      drawNodeBox(
+        ctx,
+        leftX,
+        topY + 68,
+        boxW,
+        boxH,
+        "DIRECT NIC",
+        "Line-Rate I/O",
+        "#10b981"
+      );
+
+      drawNodeBox(
+        ctx,
+        rightX,
+        topY,
+        boxW,
+        boxH,
+        compact ? "CLOUD FABRIC" : "NETWORK FABRIC",
+        "Direct VPC Path",
+        "#3b82f6"
+      );
+      drawNodeBox(
+        ctx,
+        rightX,
+        topY + 68,
+        boxW,
+        boxH,
+        "STORAGE I/O",
+        "Block & NVMe",
+        "#10b981"
+      );
+
+      const x1 = leftX + boxW;
+      const x2 = rightX;
+      const lanes = [topY + 26, topY + 94];
+
+      // Direct physical lanes
+      lanes.forEach((ly, i) => {
+        ctx.strokeStyle = i === 0 ? "rgba(59,130,246,0.45)" : "rgba(16,185,129,0.45)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x1, ly);
+        ctx.lineTo(x2, ly);
+        ctx.stroke();
+
+        // Direct packets
+        for (let k = 0; k < 3; k++) {
+          const t = (rackState.phase * (0.55 + rackState.burst * 0.25) + k / 3 + i * 0.17) % 1;
+          const px = x1 + (x2 - x1) * t;
+          ctx.fillStyle = i === 0 ? "#60a5fa" : "#34d399";
+          ctx.beginPath();
+          ctx.arc(px, ly, 4.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Center 0 HYPERVISOR badge
+      const midX = w / 2;
+      const midY = h / 2 - 4;
+      const pillW = compact ? 102 : 126;
+      drawRoundedRect(ctx, midX - pillW / 2, midY - 15, pillW, 30, 15);
+      ctx.fillStyle = "#0b2e26";
+      ctx.fill();
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+      ctx.fillStyle = "#6ee7b7";
+      ctx.font = '700 9.5px "JetBrains Mono", monospace';
+      ctx.fillText("0 HYPERVISOR", midX, midY + 3.5);
+    } else if (rackState.mode === "lifecycle") {
+      // 5-Stage Automated Fleet Pipeline
+      const pad = compact ? 10 : 18;
+      const cols = 5;
+      const gap = compact ? 5 : 8;
+      const stageW = (w - pad * 2 - gap * (cols - 1)) / cols;
+      const stageY = 24;
+      const stageH = 42;
+      const shortLabels = compact
+        ? ["PROV", "VERIF", "ACTIVE", "DRAIN", "RECL"]
+        : lifecycleStages;
+      const stageColors = ["#3b82f6", "#38bdf8", "#10b981", "#f59e0b", "#64748b"];
+
+      // Connector spine
+      ctx.strokeStyle = "rgba(148,163,184,0.28)";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(0, h * 0.5);
-      ctx.lineTo(w, h * 0.5);
+      ctx.moveTo(pad + stageW / 2, stageY + stageH / 2);
+      ctx.lineTo(w - pad - stageW / 2, stageY + stageH / 2);
       ctx.stroke();
-      return;
-    }
 
-    const energy = 0.28 + (activeCount / 4) * 0.72;
-    const burstGain = 1 + rackState.burst * 0.65;
-
-    // Secondary reference wave (Klein Blue)
-    ctx.strokeStyle = isCME ? "rgba(59, 130, 246, 0.75)" : "rgba(59, 130, 246, 0.92)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for (let x = 0; x <= w; x += 3) {
-      const nx = x / w;
-      let y;
-      if (isCME) {
-        const carrier = Math.sin(nx * 24 - rackState.phase) * 14 * energy * burstGain;
-        const envelope = Math.sin(nx * Math.PI);
-        y = h * 0.5 + carrier * (0.45 + 0.55 * envelope);
-      } else {
-        const jitter =
-          Math.sin(nx * 14 - rackState.phase * 0.85) * 18 +
-          Math.sin(nx * 41 + rackState.phase * 2.4) * 10 +
-          Math.cos(nx * 67 - rackState.phase * 3.1) * 7;
-        y = h * 0.5 + jitter * energy * burstGain * 0.85;
+      for (let i = 0; i < cols; i++) {
+        const sx = pad + i * (stageW + gap);
+        const countHere = rackState.bladeStages.filter((s) => s === i).length;
+        drawRoundedRect(ctx, sx, stageY, stageW, stageH, 8);
+        ctx.fillStyle = countHere > 0 ? "rgba(30, 41, 59, 0.95)" : "#131d31";
+        ctx.fill();
+        ctx.strokeStyle = countHere > 0 ? stageColors[i] : "rgba(148,163,184,0.22)";
+        ctx.lineWidth = countHere > 0 ? 1.8 : 1;
+        ctx.stroke();
+        ctx.fillStyle = countHere > 0 ? "#ffffff" : "#94a3b8";
+        ctx.font = `700 ${compact ? 8 : 9}px "JetBrains Mono", monospace`;
+        ctx.fillText(shortLabels[i], sx + stageW / 2, stageY + 24);
       }
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
 
-    // Primary lock trace (Emerald in CME mode, Soft Cyan-Blue in Standard mode)
-    ctx.strokeStyle = isCME ? "#10b981" : "#60a5fa";
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    for (let x = 0; x <= w; x += 3) {
-      const nx = x / w;
-      let y;
-      if (isCME) {
-        const pulsePos = (rackState.phase * 0.16) % 1;
-        const dist = Math.min(Math.abs(nx - pulsePos), 1 - Math.abs(nx - pulsePos));
-        const spike = Math.exp(-(dist * dist) / 0.0022) * (24 + rackState.burst * 16);
-        const harmonic = Math.sin(nx * 24 - rackState.phase) * 5 * energy;
-        y = h * 0.5 - spike * energy + harmonic;
-      } else {
-        const rough =
-          Math.sin(nx * 19 - rackState.phase * 1.1) * 14 +
-          Math.sin(nx * 53 - rackState.phase * 2.9) * 11;
-        y = h * 0.5 + rough * energy * 0.9;
-      }
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+      // 4 blade rows below showing live state progress bar
+      rackState.bladeStages.forEach((stage, bIdx) => {
+        const rowY = 82 + bIdx * 23;
+        const barX = pad + 44;
+        const barW = w - pad * 2 - 48;
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = '600 9px "JetBrains Mono", monospace';
+        ctx.textAlign = "left";
+        ctx.fillText(`BM-0${bIdx + 1}`, pad, rowY + 11);
 
-    // Blade indicator nodes along bottom edge
-    const pad = 26;
-    const gap = (w - pad * 2) / 3;
-    rackState.blades.forEach((online, i) => {
-      const cx = pad + gap * i;
-      const cy = h - 14;
-      ctx.fillStyle = online ? (isCME ? "#10b981" : "#60a5fa") : "#475569";
+        drawRoundedRect(ctx, barX, rowY + 2, barW, 12, 6);
+        ctx.fillStyle = "rgba(148,163,184,0.12)";
+        ctx.fill();
+
+        const targetX = barX + ((stage + 0.5) / cols) * barW;
+        drawRoundedRect(ctx, barX, rowY + 2, Math.max(14, targetX - barX), 12, 6);
+        ctx.fillStyle = stageColors[stage];
+        ctx.globalAlpha = 0.85;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(targetX, rowY + 8, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.textAlign = "center";
+    } else if (rackState.mode === "e2e") {
+      // Top: Host NIC -> ToR -> Control Plane -> Peer
+      const pad = compact ? 8 : 16;
+      const nodes = compact
+        ? ["NIC", "ToR", "CTRL", "PEER"]
+        : ["HOST NIC", "ToR SWITCH", "CTRL PLANE", "CLOUD PEER"];
+      const boxW = (w - pad * 2 - 30) / 4;
+      const yTop = 20;
+      const boxH = 44;
+
+      // Link line
+      ctx.strokeStyle = "rgba(59,130,246,0.45)";
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.arc(cx, cy, online ? 3.5 : 2.5, 0, Math.PI * 2);
-      ctx.fill();
-    });
+      ctx.moveTo(pad + boxW / 2, yTop + boxH / 2);
+      ctx.lineTo(w - pad - boxW / 2, yTop + boxH / 2);
+      ctx.stroke();
+
+      // Synchronized deterministic packets
+      for (let k = 0; k < 4; k++) {
+        const t = (rackState.phase * 0.55 + k / 4) % 1;
+        const px = pad + boxW / 2 + (w - pad * 2 - boxW) * t;
+        ctx.fillStyle = "#60a5fa";
+        ctx.beginPath();
+        ctx.arc(px, yTop + boxH / 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      nodes.forEach((label, i) => {
+        const nx = pad + i * (boxW + 10);
+        drawNodeBox(ctx, nx, yTop, boxW, boxH, label, "", i === 2 ? "#10b981" : "#3b82f6");
+      });
+
+      // Bottom: Flat-jitter deterministic timing trace
+      const traceY = 128;
+      ctx.strokeStyle = "rgba(148,163,184,0.22)";
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad, traceY);
+      ctx.lineTo(w - pad, traceY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      for (let x = pad; x <= w - pad; x += 3) {
+        const nx = (x - pad) / (w - pad * 2);
+        const beat = Math.sin(nx * 26 - rackState.phase * 4.2) * 3.2;
+        const pulsePos = (rackState.phase * 0.5) % 1;
+        const d = Math.abs(nx - pulsePos);
+        const blip = Math.exp(-(d * d) / 0.0012) * (16 + rackState.burst * 10);
+        const y = traceY - blip + beat;
+        if (x === pad) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "#6ee7b7";
+      ctx.font = '600 9.5px "JetBrains Mono", monospace';
+      ctx.textAlign = "left";
+      ctx.fillText("FLAT-JITTER DETERMINISTIC TRACE", pad, 166);
+      ctx.textAlign = "center";
+    } else {
+      // CME Dedicated Fabric: Trading Gateway <-> Dedicated Bare Metal Fabric <-> Matching Engine
+      const pad = compact ? 10 : 18;
+      const endW = compact ? 92 : 128;
+      const boxH = 88;
+      const boxY = 38;
+      const leftX = pad;
+      const rightX = w - pad - endW;
+
+      drawNodeBox(
+        ctx,
+        leftX,
+        boxY,
+        endW,
+        boxH,
+        compact ? "GATEWAY" : "TRADING GW",
+        "Market Orders",
+        "#3b82f6"
+      );
+      drawNodeBox(
+        ctx,
+        rightX,
+        boxY,
+        endW,
+        boxH,
+        compact ? "MATCHING" : "CME ENGINE",
+        "Order Matching",
+        "#10b981"
+      );
+
+      const x1 = leftX + endW;
+      const x2 = rightX;
+      const upperY = boxY + 28;
+      const lowerY = boxY + 62;
+
+      // Dedicated Order Lane (L -> R)
+      ctx.strokeStyle = "rgba(59,130,246,0.5)";
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(x1, upperY);
+      ctx.lineTo(x2, upperY);
+      ctx.stroke();
+
+      // Execution Ack Lane (R -> L)
+      ctx.strokeStyle = "rgba(16,185,129,0.5)";
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(x1, lowerY);
+      ctx.lineTo(x2, lowerY);
+      ctx.stroke();
+
+      // Tight ultra-fast pulse trains
+      const speed = 0.85 + rackState.burst * 0.45;
+      for (let k = 0; k < 4; k++) {
+        const tOut = (rackState.phase * speed + k / 4) % 1;
+        const ox = x1 + (x2 - x1) * tOut;
+        ctx.fillStyle = "#60a5fa";
+        drawRoundedRect(ctx, ox - 8, upperY - 3, 16, 6, 3);
+        ctx.fill();
+
+        const tIn = (rackState.phase * speed + k / 4 + 0.12) % 1;
+        const ix = x2 - (x2 - x1) * tIn;
+        ctx.fillStyle = "#34d399";
+        drawRoundedRect(ctx, ix - 8, lowerY - 3, 16, 6, 3);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = "#93c5fd";
+      ctx.font = '600 8.5px "JetBrains Mono", monospace';
+      ctx.fillText("ORDER FLOW →", (x1 + x2) / 2, upperY - 10);
+      ctx.fillStyle = "#6ee7b7";
+      ctx.fillText("← FILL / EXEC", (x1 + x2) / 2, lowerY + 18);
+
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = '600 9.5px "JetBrains Mono", monospace';
+      ctx.fillText("DEDICATED BARE METAL FABRIC · ZERO SHARED HOPS", w / 2, 164);
+    }
   });
 
   // --------------------------------------------------------------------------
-  // MINI-APP 1: SEED — Playable 5G Fault Injector & SIM Applet Recovery
+  // MINI-APP 1: SEED — 5G UE + SIM/SEED Chip + 5G Core Failure Recovery
   // --------------------------------------------------------------------------
   const seedStage = $(".seed-stage");
   const seedCanvas = $("#seed-canvas");
@@ -441,9 +773,9 @@
     seedState.mode = "fault";
     if (seedStage) seedStage.dataset.seedState = "fault";
     if (seedLed) seedLed.className = "led led-coral";
-    if (seedStatus) seedStatus.textContent = "5G FAULT INJECTED · SIGNALING DROP";
+    if (seedStatus) seedStatus.textContent = "5G BEARER FRACTURED · SIM ALERTED";
     if (seedFaultBtn) seedFaultBtn.setAttribute("aria-pressed", "true");
-    if (seedBtnLabel) seedBtnLabel.textContent = "Fault Active…";
+    if (seedBtnLabel) seedBtnLabel.textContent = "Failure Active…";
     setSeedSteps(["is-fault", "", ""]);
     if (seedLoop && reducedMotion) seedLoop.drawOnce();
 
@@ -453,12 +785,12 @@
         if (seedStage) seedStage.dataset.seedState = "diagnosing";
         if (seedLed) seedLed.className = "led led-blue";
         if (seedStatus) {
-          seedStatus.textContent = "SEED SIM APPLET · DIAGNOSING WITH 5G CORE";
+          seedStatus.textContent = "SIM/SEED + 5G CORE · INFERRING CAUSE";
         }
         if (seedBtnLabel) seedBtnLabel.textContent = "SIM Diagnosing…";
         setSeedSteps(["is-done", "is-active", ""]);
         if (seedLoop && reducedMotion) seedLoop.drawOnce();
-      }, 950)
+      }, 1050)
     );
 
     seedState.timers.push(
@@ -467,230 +799,531 @@
         if (seedStage) seedStage.dataset.seedState = "healthy";
         if (seedLed) seedLed.className = "led led-emerald";
         if (seedStatus) {
-          seedStatus.textContent = "RECOVERED BY SEED · 5G LINK RESTORED";
+          seedStatus.textContent = "SIM RECOVERY ACTION · 5G ONLINE";
         }
         if (seedFaultBtn) seedFaultBtn.setAttribute("aria-pressed", "false");
-        if (seedBtnLabel) seedBtnLabel.textContent = "Inject 5G Fault";
+        if (seedBtnLabel) seedBtnLabel.textContent = "Inject 5G Failure";
         setSeedSteps(["is-done", "is-done", "is-done"]);
         if (seedLoop && reducedMotion) seedLoop.drawOnce();
-      }, 2250)
+      }, 2400)
     );
 
     seedState.timers.push(
       setTimeout(() => {
         seedState.mode = "healthy";
-        if (seedStatus) {
-          seedStatus.textContent = "5G LINK NOMINAL · SIM MONITOR ARMED";
-        }
-      }, 4600)
+        if (seedStatus) seedStatus.textContent = "5G BEARER HEALTHY · SIM ARMED";
+      }, 4800)
     );
   }
 
-  if (seedFaultBtn) {
-    seedFaultBtn.addEventListener("click", triggerSeedFault);
-  }
+  if (seedFaultBtn) seedFaultBtn.addEventListener("click", triggerSeedFault);
+  if (seedCanvas) seedCanvas.addEventListener("click", triggerSeedFault);
 
-  const seedLoop = registerCanvasLoop(seedCanvas, (_now, dt) => {
-    const { ctx, w, h } = syncCanvasSize(seedCanvas, 128);
+  const seedLoop = registerCanvasLoop(seedCanvas, (_now, dt, isStatic) => {
+    const { ctx, w, h } = syncCanvasSize(seedCanvas, 184);
     if (!ctx) return;
+    if (!isStatic) seedState.phase += dt * 1.5;
 
-    seedState.phase += dt * (seedState.mode === "fault" ? 11 : 4.4);
-    ctx.fillStyle = "#101829";
-    ctx.fillRect(0, 0, w, h);
+    const compact = w < 380;
+    drawDarkGrid(ctx, w, h, 26);
 
-    // Subtle grid
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.1)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, h * 0.5 + 0.5);
-    ctx.lineTo(w, h * 0.5 + 0.5);
-    for (let x = 40; x < w; x += 40) {
-      ctx.moveTo(x + 0.5, 0);
-      ctx.lineTo(x + 0.5, h);
-    }
-    ctx.stroke();
+    const ueX = compact ? 16 : 28;
+    const ueY = 26;
+    const ueW = compact ? 64 : 78;
+    const ueH = 90;
 
-    const color =
-      seedState.mode === "fault"
-        ? "#f43f5e"
-        : seedState.mode === "diagnosing"
-          ? "#3b82f6"
-          : "#10b981";
+    const coreW = compact ? 76 : 96;
+    const coreH = 82;
+    const coreX = w - (compact ? 16 : 28) - coreW;
+    const coreY = 28;
 
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    for (let x = 0; x <= w; x += 3) {
-      const nx = x / w;
-      let y = h * 0.5;
-      if (seedState.mode === "fault") {
-        const drop = nx > 0.34 && nx < 0.68 ? 0.15 : 1;
-        const spike =
-          (Math.sin(nx * 58 + seedState.phase) * 26 +
-            Math.cos(nx * 97 - seedState.phase * 1.8) * 18) *
-          drop;
-        y = h * 0.5 + spike;
-      } else if (seedState.mode === "diagnosing") {
-        const sweep = Math.sin(nx * 24 - seedState.phase * 1.4) * 16;
-        const damp = Math.cos(nx * 46 + seedState.phase) * 7;
-        y = h * 0.5 + sweep + damp;
-      } else {
-        const calm =
-          Math.sin(nx * 18 - seedState.phase) * 18 * Math.sin(nx * Math.PI);
-        const mod = Math.sin(nx * 36 - seedState.phase * 1.5) * 4;
-        y = h * 0.5 + calm + mod;
+    const simW = compact ? 72 : 84;
+    const simH = 54;
+    const simX = w / 2 - simW / 2;
+    const simY = h - simH - 14;
+
+    const isFault = seedState.mode === "fault";
+    const isDiag = seedState.mode === "diagnosing";
+    const isRec = seedState.mode === "recovered";
+
+    // Top 5G Bearer between UE and 5G Core
+    const bY = ueY + 26;
+    const bX1 = ueX + ueW + 6;
+    const bX2 = coreX - 6;
+
+    if (isFault || isDiag) {
+      // Fractured broken coral 5G link
+      ctx.strokeStyle = "#f43f5e";
+      ctx.lineWidth = 2.4;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(bX1, bY);
+      ctx.lineTo((bX1 + bX2) / 2 - 14, bY);
+      ctx.moveTo((bX1 + bX2) / 2 + 14, bY);
+      ctx.lineTo(bX2, bY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Break symbol "✕"
+      const mx = (bX1 + bX2) / 2;
+      ctx.strokeStyle = "#fb7185";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(mx - 6, bY - 6);
+      ctx.lineTo(mx + 6, bY + 6);
+      ctx.moveTo(mx + 6, bY - 6);
+      ctx.lineTo(mx - 6, bY + 6);
+      ctx.stroke();
+
+      ctx.fillStyle = "#fda4af";
+      ctx.font = '700 9px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText("5G BEARER DOWN", mx, bY - 12);
+    } else {
+      // Healthy emerald 5G link
+      ctx.strokeStyle = "rgba(16,185,129,0.5)";
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(bX1, bY);
+      ctx.lineTo(bX2, bY);
+      ctx.stroke();
+
+      for (let k = 0; k < 3; k++) {
+        const t = (seedState.phase * 0.6 + k / 3) % 1;
+        const px = bX1 + (bX2 - bX1) * t;
+        ctx.fillStyle = "#34d399";
+        ctx.beginPath();
+        ctx.arc(px, bY, 4, 0, Math.PI * 2);
+        ctx.fill();
       }
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+
+      ctx.fillStyle = "#6ee7b7";
+      ctx.font = '700 9px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText(
+        isRec ? "5G LINK RESTORED" : "ACTIVE 5G BEARER",
+        (bX1 + bX2) / 2,
+        bY - 10
+      );
     }
+
+    // UE <-> SIM path
+    const ueSimX1 = ueX + ueW / 2;
+    const ueSimY1 = ueY + ueH;
+    const ueSimX2 = simX;
+    const ueSimY2 = simY + simH / 2;
+    ctx.strokeStyle = isFault
+      ? "#f43f5e"
+      : isRec
+        ? "#10b981"
+        : "rgba(148,163,184,0.28)";
+    ctx.lineWidth = isFault || isRec ? 2.4 : 1.4;
+    ctx.beginPath();
+    ctx.moveTo(ueSimX1, ueSimY1);
+    ctx.lineTo(ueSimX1, ueSimY2);
+    ctx.lineTo(ueSimX2, ueSimY2);
     ctx.stroke();
 
-    // Status corner label
-    ctx.fillStyle = color;
-    ctx.font = '600 11px "JetBrains Mono", monospace';
-    const tag =
-      seedState.mode === "fault"
-        ? "ERR: CONTROL-PLANE DROP"
-        : seedState.mode === "diagnosing"
-          ? "SIM APPLET: INFERRING CAUSE"
-          : "5G SIGNAL: HEALTHY";
-    ctx.fillText(tag, 12, 20);
+    if (isFault) {
+      const t = (seedState.phase * 1.1) % 1;
+      const px = ueSimX1 + (ueSimX2 - ueSimX1) * t;
+      ctx.fillStyle = "#f43f5e";
+      ctx.beginPath();
+      ctx.arc(px, ueSimY2, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (isRec) {
+      const t = (seedState.phase * 1.1) % 1;
+      const px = ueSimX2 - (ueSimX2 - ueSimX1) * t;
+      ctx.fillStyle = "#34d399";
+      ctx.beginPath();
+      ctx.arc(px, ueSimY2, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // SIM <-> 5G Core out-of-band diagnosis path
+    const simCoreX1 = simX + simW;
+    const simCoreY1 = simY + simH / 2;
+    const simCoreX2 = coreX + coreW / 2;
+    const simCoreY2 = coreY + coreH;
+    ctx.strokeStyle = isDiag ? "#3b82f6" : "rgba(148,163,184,0.28)";
+    ctx.lineWidth = isDiag ? 2.5 : 1.4;
+    ctx.beginPath();
+    ctx.moveTo(simCoreX1, simCoreY1);
+    ctx.lineTo(simCoreX2, simCoreY1);
+    ctx.lineTo(simCoreX2, simCoreY2);
+    ctx.stroke();
+
+    if (isDiag) {
+      const t = (seedState.phase * 1.2) % 1;
+      const px = simCoreX1 + (simCoreX2 - simCoreX1) * t;
+      ctx.fillStyle = "#60a5fa";
+      ctx.beginPath();
+      ctx.arc(px, simCoreY1, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#93c5fd";
+      ctx.font = '700 8.5px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText("CAUSE INFERENCE", (simCoreX1 + simCoreX2) / 2, simCoreY1 - 9);
+    }
+
+    // Draw 5G Device / UE
+    drawRoundedRect(ctx, ueX, ueY, ueW, ueH, 10);
+    ctx.fillStyle = "#162137";
+    ctx.fill();
+    ctx.strokeStyle = isFault ? "#f43f5e" : "#38bdf8";
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    // Screen inset
+    drawRoundedRect(ctx, ueX + 7, ueY + 11, ueW - 14, ueH - 34, 4);
+    ctx.fillStyle = "#0b1220";
+    ctx.fill();
+    // Signal bars
+    for (let b = 0; b < 4; b++) {
+      const bh = 6 + b * 4;
+      ctx.fillStyle = isFault || isDiag ? "#f43f5e" : "#10b981";
+      ctx.fillRect(ueX + 16 + b * 9, ueY + 46 - bh, 5, bh);
+    }
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = '700 9.5px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText("5G UE", ueX + ueW / 2, ueY + ueH - 7);
+
+    // Draw 5G Core rack blades
+    drawRoundedRect(ctx, coreX, coreY, coreW, coreH, 8);
+    ctx.fillStyle = "#162137";
+    ctx.fill();
+    ctx.strokeStyle = isDiag ? "#3b82f6" : "#64748b";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    for (let r = 0; r < 3; r++) {
+      const ry = coreY + 10 + r * 18;
+      drawRoundedRect(ctx, coreX + 8, ry, coreW - 16, 12, 3);
+      ctx.fillStyle = "#0e1729";
+      ctx.fill();
+      ctx.fillStyle = isDiag ? "#60a5fa" : "#10b981";
+      ctx.beginPath();
+      ctx.arc(coreX + 15, ry + 6, 2.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = '700 9.5px "JetBrains Mono", monospace';
+    ctx.fillText("5G CORE", coreX + coreW / 2, coreY + coreH - 7);
+
+    // Draw SIM / SEED Chip
+    const simAccent = isFault ? "#f43f5e" : isDiag ? "#3b82f6" : "#10b981";
+    drawSimChip(ctx, simX, simY, simW, simH, simAccent, "SIM / SEED");
   });
 
   // --------------------------------------------------------------------------
-  // MINI-APP 2: SecureSIM — Playable Cryptographic Cert & Permission Dial
+  // MINI-APP 2: SecureSIM — eSIM Chip, Cryptographic Policy Gate & Partitions
   // --------------------------------------------------------------------------
   const simStage = $(".securesim-stage");
-  const simCertToggle = $("#sim-cert-toggle");
-  const simPermToggle = $("#sim-perm-toggle");
+  const simCanvas = $("#sim-canvas");
+  const simPresetBtns = $$("[data-sim-preset]");
   const simRequestBtn = $("#sim-request-btn");
   const simVerdict = $("#sim-verdict");
   const simReason = $("#sim-reason");
-  const simDialIcon = $("#sim-dial-icon");
-  const simCertSub = $("#sim-cert-sub");
-  const simPermSub = $("#sim-perm-sub");
 
   const simState = {
-    cert: true,
-    perm: true,
+    preset: "valid", // "valid" | "unauthorized"
+    progress: 0,
+    phase: 0,
   };
 
-  function evaluateSecureSIM(triggerFeedback = false) {
-    const allowed = simState.cert && simState.perm;
+  function setSimPreset(preset, triggerShake = false) {
+    simState.preset = preset === "unauthorized" ? "unauthorized" : "valid";
+    simState.progress = 0;
+    const allowed = simState.preset === "valid";
     if (simStage) {
       simStage.dataset.access = allowed ? "allowed" : "denied";
-      if (triggerFeedback && !allowed) {
+      if (!allowed && triggerShake) {
         simStage.classList.remove("is-shake");
         void simStage.offsetWidth;
         simStage.classList.add("is-shake");
       }
     }
+    simPresetBtns.forEach((btn) => {
+      const active = btn.dataset.simPreset === simState.preset;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
+    positionSegmentThumb($('[data-segment="securesim"]'));
+
     if (simVerdict) simVerdict.textContent = allowed ? "ALLOWED" : "DENIED";
-    if (simDialIcon) simDialIcon.textContent = allowed ? "✓" : "✕";
-
     if (simReason) {
-      if (allowed) {
-        simReason.textContent =
-          "Certificate authenticated · fine-grained scope matched → SIM service";
-      } else if (!simState.cert && !simState.perm) {
-        simReason.textContent =
-          "Blocked: missing signed certificate and service permission";
-      } else if (!simState.cert) {
-        simReason.textContent =
-          "Blocked at SIM: unauthenticated / unsigned certificate";
-      } else {
-        simReason.textContent =
-          "Blocked at SIM: certificate valid, but service scope denied";
-      }
+      simReason.textContent = allowed
+        ? "Signed cert verified · routed strictly to scoped NET AUTH partition"
+        : "Unsigned or over-privileged app deflected by SIM cryptographic policy gate";
     }
-
-    if (simCertToggle) {
-      simCertToggle.classList.toggle("is-on", simState.cert);
-      simCertToggle.setAttribute("aria-pressed", String(simState.cert));
-    }
-    if (simCertSub) {
-      simCertSub.textContent = simState.cert
-        ? "Valid signed identity"
-        : "Unsigned / revoked cert";
-    }
-
-    if (simPermToggle) {
-      simPermToggle.classList.toggle("is-on", simState.perm);
-      simPermToggle.setAttribute("aria-pressed", String(simState.perm));
-    }
-    if (simPermSub) {
-      simPermSub.textContent = simState.perm
-        ? "Fine-grained policy active"
-        : "Access policy restricted";
-    }
+    if (simLoop && reducedMotion) simLoop.drawOnce();
   }
 
-  if (simCertToggle) {
-    simCertToggle.addEventListener("click", () => {
-      simState.cert = !simState.cert;
-      evaluateSecureSIM(true);
-    });
-  }
-  if (simPermToggle) {
-    simPermToggle.addEventListener("click", () => {
-      simState.perm = !simState.perm;
-      evaluateSecureSIM(true);
-    });
-  }
+  simPresetBtns.forEach((btn) => {
+    btn.addEventListener("click", () => setSimPreset(btn.dataset.simPreset, true));
+  });
+
   if (simRequestBtn) {
     simRequestBtn.addEventListener("click", () => {
-      evaluateSecureSIM(true);
+      simState.progress = 0;
+      if (simState.preset === "unauthorized" && simStage) {
+        simStage.classList.remove("is-shake");
+        void simStage.offsetWidth;
+        simStage.classList.add("is-shake");
+      }
+      if (simLoop && reducedMotion) simLoop.drawOnce();
     });
   }
 
+  const simLoop = registerCanvasLoop(simCanvas, (_now, dt, isStatic) => {
+    const { ctx, w, h } = syncCanvasSize(simCanvas, 184);
+    if (!ctx) return;
+
+    const allowed = simState.preset === "valid";
+    if (!isStatic) {
+      simState.phase += dt * 1.4;
+      simState.progress = (simState.progress + dt * 0.58) % 1;
+    } else if (reducedMotion) {
+      simState.progress = allowed ? 0.78 : 0.56;
+    }
+
+    const compact = w < 380;
+    drawDarkGrid(ctx, w, h, 26);
+
+    const pad = compact ? 10 : 18;
+    const appW = compact ? 76 : 94;
+    const appH = 66;
+    const appX = pad;
+    const appY = h / 2 - appH / 2;
+
+    const gateX = w * 0.43;
+    const gateY = 22;
+    const gateH = h - 44;
+
+    const chipW = compact ? 122 : 162;
+    const chipH = h - 32;
+    const chipX = w - pad - chipW;
+    const chipY = 16;
+
+    // App Request source box
+    drawNodeBox(
+      ctx,
+      appX,
+      appY,
+      appW,
+      appH,
+      "APP REQ",
+      allowed ? "Signed Cert" : "Excess Scope",
+      allowed ? "#3b82f6" : "#f43f5e"
+    );
+
+    // Cryptographic Policy Gate
+    ctx.strokeStyle = allowed ? "#10b981" : "#f43f5e";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(gateX, gateY);
+    ctx.lineTo(gateX, gateY + gateH);
+    ctx.stroke();
+
+    // Policy gate header badge
+    drawRoundedRect(ctx, gateX - 38, gateY - 4, 76, 20, 10);
+    ctx.fillStyle = allowed ? "#0b2e26" : "#3b101b";
+    ctx.fill();
+    ctx.strokeStyle = allowed ? "#10b981" : "#f43f5e";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.fillStyle = allowed ? "#6ee7b7" : "#fda4af";
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText("POLICY GATE", gateX, gateY + 9);
+
+    // Draw eSIM Chip body with chamfered corner & 3 partitions
+    const cut = 14;
+    ctx.fillStyle = "#152036";
+    ctx.strokeStyle = allowed ? "#3b82f6" : "#64748b";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(chipX + cut, chipY);
+    ctx.lineTo(chipX + chipW, chipY);
+    ctx.lineTo(chipX + chipW, chipY + chipH);
+    ctx.lineTo(chipX, chipY + chipH);
+    ctx.lineTo(chipX, chipY + cut);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillText("eSIM PARTITIONS", chipX + chipW / 2, chipY + 16);
+
+    // 3 isolated partitions inside eSIM
+    const parts = [
+      { name: "NET AUTH", unlocked: allowed },
+      { name: "CARRIER KEYS", unlocked: false },
+      { name: "PAYMENT SE", unlocked: false },
+    ];
+    const partH = 34;
+    const partGap = 8;
+    parts.forEach((p, i) => {
+      const py = chipY + 26 + i * (partH + partGap);
+      drawRoundedRect(ctx, chipX + 10, py, chipW - 20, partH, 6);
+      ctx.fillStyle = p.unlocked ? "rgba(16,185,129,0.2)" : "#0e1627";
+      ctx.fill();
+      ctx.strokeStyle = p.unlocked ? "#10b981" : "rgba(148,163,184,0.26)";
+      ctx.lineWidth = p.unlocked ? 1.8 : 1;
+      ctx.stroke();
+
+      ctx.fillStyle = p.unlocked ? "#6ee7b7" : "#94a3b8";
+      ctx.font = `700 ${compact ? 8 : 9}px "JetBrains Mono", monospace`;
+      ctx.textAlign = "left";
+      ctx.fillText(p.name, chipX + 18, py + 20);
+      ctx.textAlign = "right";
+      ctx.fillStyle = p.unlocked ? "#34d399" : "#64748b";
+      ctx.fillText(p.unlocked ? "OPEN" : "LOCKED", chipX + chipW - 18, py + 20);
+    });
+    ctx.textAlign = "center";
+
+    // Request packet animation
+    const startX = appX + appW;
+    const startY = h / 2;
+    const targetY = chipY + 26 + partH / 2; // NET AUTH partition
+    const endX = chipX + 10;
+
+    if (allowed) {
+      // Smooth path through policy gate into ONLY NET AUTH partition
+      ctx.strokeStyle = "rgba(16,185,129,0.38)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(gateX, startY);
+      ctx.lineTo(endX, targetY);
+      ctx.stroke();
+
+      const t = simState.progress;
+      let px, py;
+      if (t < 0.5) {
+        const u = t / 0.5;
+        px = startX + (gateX - startX) * u;
+        py = startY;
+      } else {
+        const u = (t - 0.5) / 0.5;
+        px = gateX + (endX - gateX) * u;
+        py = startY + (targetY - startY) * u;
+      }
+      ctx.fillStyle = t < 0.5 ? "#60a5fa" : "#34d399";
+      ctx.beginPath();
+      ctx.arc(px, py, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = '700 8px "JetBrains Mono", monospace';
+      ctx.fillText(t < 0.5 ? "CERT" : "OK", px, py - 10);
+    } else {
+      // Packet travels to gate, hits barrier, bounces/deflects downward-left!
+      const t = simState.progress;
+      let px, py;
+      if (t < 0.5) {
+        const u = t / 0.5;
+        px = startX + (gateX - 8 - startX) * u;
+        py = startY;
+      } else {
+        const u = (t - 0.5) / 0.5;
+        px = gateX - 8 - u * 56;
+        py = startY + u * 44;
+        // Impact shockwave ring at gate
+        ctx.strokeStyle = `rgba(244, 63, 94, ${Math.max(0, 1 - u * 1.4)})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(gateX, startY, 8 + u * 24, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "#f43f5e";
+      ctx.beginPath();
+      ctx.arc(px, py, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#fda4af";
+      ctx.font = '700 8.5px "JetBrains Mono", monospace';
+      ctx.fillText(t >= 0.5 ? "BLOCKED" : "UNAUTH", px, py - 10);
+    }
+  });
+
   // --------------------------------------------------------------------------
-  // MINI-APP 3: GPT-Code-Learner — Playable Code Explorer with Sweep Highlight
+  // MINI-APP 3: GPT-Code-Learner — AST/Module Call-Graph + Code Trace
   // --------------------------------------------------------------------------
+  const codeGraphCanvas = $("#code-graph-canvas");
+  const codePane = $("#code-pane");
+  const codeLinesEl = $("#code-lines");
+  const codePathTag = $("#code-path-tag");
+  const codeAnswerText = $("#code-answer-text");
+  const promptChips = $$("[data-code-q]");
+
+  const codeNodes = [
+    { id: "entry", label: "entry.py", nx: 0.14, ny: 0.5 },
+    { id: "router", label: "router.py", nx: 0.42, ny: 0.26 },
+    { id: "auth", label: "auth.py", nx: 0.42, ny: 0.74 },
+    { id: "context", label: "context.py", nx: 0.74, ny: 0.74 },
+    { id: "fabric", label: "fabric.py", nx: 0.74, ny: 0.26 },
+    { id: "sim_core", label: "sim_core.py", nx: 0.88, ny: 0.5 },
+  ];
+
+  const codeEdges = [
+    ["entry", "router"],
+    ["entry", "auth"],
+    ["router", "fabric"],
+    ["router", "sim_core"],
+    ["auth", "context"],
+    ["context", "sim_core"],
+    ["fabric", "sim_core"],
+  ];
+
   const codeQueries = {
-    routing: {
-      file: "router",
-      lines: [
-        { text: "def dispatch(req, tree):", hl: true },
-        { text: "  match = tree.resolve(req.path)", hl: true },
-        { text: "  ctx = gather_context(match.file)", hl: false },
-        { text: "  return match.handler(req, ctx)", hl: true },
-      ],
-      answer:
-        "<code>dispatch()</code> resolves the request path against the route tree, pulls matching repository context, and invokes the bound handler.",
-    },
     auth: {
-      file: "auth",
+      path: ["entry", "auth", "context"],
+      tag: "PATH 1 → 2 → 3 · entry.py → auth.py → context.py",
       lines: [
-        { text: "def verify_session(headers, store):", hl: true },
-        { text: "  token = parse_bearer(headers)", hl: true },
-        { text: "  claims = store.validate(token)", hl: true },
-        { text: "  return claims.principal", hl: false },
+        { text: "# [1] entry.py -> [2] auth.py -> [3] context.py", hl: true },
+        { text: "token = parse_bearer(req.headers)", hl: true },
+        { text: "claims = auth.verify(token)", hl: true },
+        { text: "return context.bind(claims, req.repo)", hl: false },
       ],
       answer:
-        "<code>verify_session()</code> extracts the bearer token from incoming headers and checks it against the session store before returning the caller principal.",
+        "Starts at <code>entry.py</code>, verifies bearer credentials in <code>auth.py</code>, and binds the caller scope inside <code>context.py</code>.",
     },
-    context: {
-      file: "context",
+    routing: {
+      path: ["entry", "router", "fabric"],
+      tag: "PATH 1 → 2 → 3 · entry.py → router.py → fabric.py",
       lines: [
-        { text: "def gather_context(repo, query):", hl: true },
-        { text: "  hits = code_search(repo, query)", hl: true },
-        { text: "  window = rank_snippets(hits)", hl: true },
-        { text: "  return format_prompt(query, window)", hl: true },
+        { text: "# [1] entry.py -> [2] router.py -> [3] fabric.py", hl: true },
+        { text: "route = router.resolve(req.path)", hl: true },
+        { text: "lane = fabric.select_channel(route)", hl: true },
+        { text: "return lane.dispatch(req)", hl: false },
       ],
       answer:
-        "<code>gather_context()</code> searches the repository for symbols related to the question, ranks relevant code slices, and packs them into the GPT prompt.",
+        "Resolves incoming paths in <code>router.py</code> and hands off directly to the channel dispatcher inside <code>fabric.py</code>.",
+    },
+    sim: {
+      path: ["router", "context", "sim_core"],
+      tag: "PATH 1 → 2 → 3 · router.py → context.py → sim_core.py",
+      lines: [
+        { text: "# [1] router.py -> [2] context.py -> [3] sim_core.py", hl: true },
+        { text: "ctx = context.search_symbols(repo, 'SIM')", hl: true },
+        { text: "handler = sim_core.handle_event(ctx)", hl: true },
+        { text: "return explain_trace(handler)", hl: true },
+      ],
+      answer:
+        "Queries repository symbols via <code>context.py</code> and pinpoints the SIM event handler entry point inside <code>sim_core.py</code>.",
     },
   };
 
-  const codePane = $("#code-pane");
-  const codeLinesEl = $("#code-lines");
-  const codeAnswerText = $("#code-answer-text");
-  const promptChips = $$("[data-code-q]");
-  const treeFiles = $$("[data-file]");
+  const codeState = {
+    activeKey: "auth",
+    beam: 0,
+    phase: 0,
+  };
 
   function selectCodeQuery(key) {
     const spec = codeQueries[key];
     if (!spec) return;
+    codeState.activeKey = key;
+    codeState.beam = 0;
 
     promptChips.forEach((chip) => {
       const active = chip.dataset.codeQ === key;
@@ -698,185 +1331,520 @@
       chip.setAttribute("aria-pressed", String(active));
     });
 
-    treeFiles.forEach((fileBtn) => {
-      fileBtn.classList.toggle("is-hit", fileBtn.dataset.file === spec.file);
-    });
-
     if (codeLinesEl) {
       const codeEl = document.createElement("code");
       spec.lines.forEach((line, idx) => {
         const span = document.createElement("span");
         span.className = line.hl ? "cl is-hl" : "cl";
-        span.dataset.line = String(idx + 1);
         span.textContent = line.text;
         codeEl.appendChild(span);
-        if (idx < spec.lines.length - 1) codeEl.appendChild(document.createTextNode("\n"));
+        if (idx < spec.lines.length - 1) {
+          codeEl.appendChild(document.createTextNode("\n"));
+        }
       });
       codeLinesEl.replaceChildren(codeEl);
     }
-
-    if (codeAnswerText) {
-      codeAnswerText.innerHTML = spec.answer;
-    }
+    if (codePathTag) codePathTag.textContent = spec.tag;
+    if (codeAnswerText) codeAnswerText.innerHTML = spec.answer;
 
     if (codePane && !reducedMotion) {
       codePane.classList.remove("is-scanning");
       void codePane.offsetWidth;
       codePane.classList.add("is-scanning");
     }
+    if (codeLoop && reducedMotion) codeLoop.drawOnce();
   }
 
   promptChips.forEach((chip) => {
     chip.addEventListener("click", () => selectCodeQuery(chip.dataset.codeQ));
   });
 
-  treeFiles.forEach((fileBtn) => {
-    fileBtn.addEventListener("click", () => {
-      const map = { router: "routing", auth: "auth", context: "context" };
-      selectCodeQuery(map[fileBtn.dataset.file] || "routing");
+  if (codeGraphCanvas) {
+    codeGraphCanvas.addEventListener("click", () => {
+      const keys = Object.keys(codeQueries);
+      const next = keys[(keys.indexOf(codeState.activeKey) + 1) % keys.length];
+      selectCodeQuery(next);
+    });
+  }
+
+  const codeLoop = registerCanvasLoop(codeGraphCanvas, (_now, dt, isStatic) => {
+    const { ctx, w, h } = syncCanvasSize(codeGraphCanvas, 156);
+    if (!ctx) return;
+
+    if (!isStatic) {
+      codeState.phase += dt * 1.6;
+      codeState.beam = Math.min(1.25, codeState.beam + dt * 1.15);
+    } else if (reducedMotion) {
+      codeState.beam = 1.25;
+    }
+
+    const compact = w < 380;
+    drawDarkGrid(ctx, w, h, 26);
+
+    const spec = codeQueries[codeState.activeKey];
+    const path = spec.path;
+    const nodeMap = {};
+    codeNodes.forEach((n) => {
+      nodeMap[n.id] = { ...n, x: n.nx * w, y: n.ny * h };
+    });
+
+    // Sweeping LLM Retrieval Beam
+    if (codeState.beam < 1.15) {
+      const bx = codeState.beam * w;
+      const g = ctx.createLinearGradient(bx - 48, 0, bx + 20, 0);
+      g.addColorStop(0, "rgba(0, 82, 255, 0)");
+      g.addColorStop(0.75, "rgba(59, 130, 246, 0.25)");
+      g.addColorStop(1, "rgba(96, 165, 250, 0.55)");
+      ctx.fillStyle = g;
+      ctx.fillRect(bx - 48, 0, 68, h);
+    }
+
+    // Draw base dependency edges
+    codeEdges.forEach(([aId, bId]) => {
+      const a = nodeMap[aId];
+      const b = nodeMap[bId];
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.22)";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    });
+
+    // Highlight active 1 -> 2 -> 3 execution edges + traveling tokens
+    for (let i = 0; i < path.length - 1; i++) {
+      const a = nodeMap[path[i]];
+      const b = nodeMap[path[i + 1]];
+      ctx.strokeStyle = "#3b82f6";
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+
+      const t = (codeState.phase * 0.65 + i * 0.35) % 1;
+      const px = a.x + (b.x - a.x) * t;
+      const py = a.y + (b.y - a.y) * t;
+      ctx.fillStyle = "#60a5fa";
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw labeled file/function AST nodes
+    const nw = compact ? 66 : 80;
+    const nh = 28;
+    codeNodes.forEach((n) => {
+      const p = nodeMap[n.id];
+      const stepIdx = path.indexOf(n.id);
+      const isHit = stepIdx >= 0;
+
+      drawRoundedRect(ctx, p.x - nw / 2, p.y - nh / 2, nw, nh, 7);
+      ctx.fillStyle = isHit ? "#102854" : "#152036";
+      ctx.fill();
+      ctx.strokeStyle = isHit ? "#3b82f6" : "rgba(148,163,184,0.28)";
+      ctx.lineWidth = isHit ? 1.9 : 1;
+      ctx.stroke();
+
+      ctx.fillStyle = isHit ? "#ffffff" : "#94a3b8";
+      ctx.font = `600 ${compact ? 8 : 9.2}px "JetBrains Mono", monospace`;
+      ctx.textAlign = "center";
+      ctx.fillText(n.label, p.x, p.y + 3);
+
+      // Step number badge (1, 2, 3)
+      if (isHit) {
+        const bx = p.x - nw / 2 + 2;
+        const by = p.y - nh / 2 - 2;
+        ctx.fillStyle = "#0052ff";
+        ctx.beginPath();
+        ctx.arc(bx, by, 8.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#93c5fd";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = '700 9px "JetBrains Mono", monospace';
+        ctx.fillText(String(stepIdx + 1), bx, by + 3);
+      }
     });
   });
 
   // --------------------------------------------------------------------------
-  // MINI-APP 4: Sonica — Playable NB-IoT RF Frequency Tuner
+  // MINI-APP 4: Sonica — NB-IoT SDR Waterfall Spectrogram & Subcarrier Lanes
   // --------------------------------------------------------------------------
   const sonicaCanvas = $("#sonica-canvas");
   const sonicaSlider = $("#sonica-slider");
   const sonicaMode = $("#sonica-mode");
   const sonicaFreq = $("#sonica-freq");
+  const sonicaDecode = $("#sonica-decode");
+  const sonicaBurstBtn = $("#sonica-burst-btn");
 
+  const wfCols = 72;
+  const wfRows = 24;
   const sonicaState = {
     pos: 50,
     phase: 0,
+    burstTimer: 0,
+    frameSeq: 1,
+    waterfall: Array.from({ length: wfRows }, () => new Float32Array(wfCols)),
+    wfAccum: 0,
   };
 
-  function updateSonicaLabels() {
+  function seedWaterfallRow(row, centerNorm, burstLevel) {
+    for (let i = 0; i < wfCols; i++) {
+      const u = i / (wfCols - 1);
+      const dSync = u - (centerNorm - 0.08);
+      const dCtrl = u - centerNorm;
+      const dUp = u - (centerNorm + 0.08);
+      const syncE = Math.exp(-(dSync * dSync) / 0.00055) * 0.72;
+      const ctrlE = Math.exp(-(dCtrl * dCtrl) / 0.00065) * 0.85;
+      const upE =
+        Math.exp(-(dUp * dUp) / 0.0007) * (0.45 + burstLevel * 0.95);
+      const floor = 0.08 + Math.abs(Math.sin(i * 1.7 + sonicaState.phase * 3)) * 0.09;
+      row[i] = Math.min(1.4, floor + syncE + ctrlE + upE);
+    }
+  }
+
+  // Pre-seed waterfall so first frame looks immediately authentic
+  for (let r = 0; r < wfRows; r++) {
+    seedWaterfallRow(sonicaState.waterfall[r], 0.5, r % 9 === 0 ? 0.8 : 0.1);
+  }
+
+  function updateSonicaLabels(decodedMsg) {
     const v = sonicaState.pos;
-    const band =
-      v < 35 ? "GUARD-BAND" : v > 65 ? "IN-BAND" : "STAND-ALONE";
-    if (sonicaMode) sonicaMode.textContent = `${band} · NARROWBAND LOCK`;
-    if (sonicaFreq) sonicaFreq.textContent = `CH ${v} · NB-IoT`;
+    const band = v < 36 ? "GUARD-BAND" : v > 64 ? "IN-BAND" : "STAND-ALONE";
+    if (sonicaMode) sonicaMode.textContent = `${band} · SYNC LOCKED`;
+    if (sonicaFreq) sonicaFreq.textContent = `CH ${v} · NB-IoT Carrier Tuner`;
+    if (decodedMsg && sonicaDecode) sonicaDecode.textContent = decodedMsg;
   }
 
   if (sonicaSlider) {
     sonicaSlider.addEventListener("input", () => {
       sonicaState.pos = Number(sonicaSlider.value);
-      updateSonicaLabels();
+      updateSonicaLabels(
+        `TUNED CH ${sonicaState.pos} · SHIFTED SUBCARRIER RESOURCE BLOCK`
+      );
+      if (sonicaLoop && reducedMotion) {
+        const nextRow = new Float32Array(wfCols);
+        seedWaterfallRow(nextRow, sonicaState.pos / 100, 0.3);
+        sonicaState.waterfall.pop();
+        sonicaState.waterfall.unshift(nextRow);
+        sonicaLoop.drawOnce();
+      }
+    });
+  }
+
+  if (sonicaBurstBtn) {
+    sonicaBurstBtn.addEventListener("click", () => {
+      sonicaState.burstTimer = 1.25;
+      sonicaState.frameSeq++;
+      updateSonicaLabels(
+        `DECODED SENSOR FRAME #${String(sonicaState.frameSeq).padStart(2, "0")} · UPLINK CRC OK`
+      );
+      const nextRow = new Float32Array(wfCols);
+      seedWaterfallRow(nextRow, sonicaState.pos / 100, 1.0);
+      sonicaState.waterfall.pop();
+      sonicaState.waterfall.unshift(nextRow);
       if (sonicaLoop && reducedMotion) sonicaLoop.drawOnce();
     });
   }
   updateSonicaLabels();
 
-  const sonicaLoop = registerCanvasLoop(sonicaCanvas, (_now, dt) => {
-    const { ctx, w, h } = syncCanvasSize(sonicaCanvas, 136);
+  const sonicaLoop = registerCanvasLoop(sonicaCanvas, (_now, dt, isStatic) => {
+    const { ctx, w, h } = syncCanvasSize(sonicaCanvas, 194);
     if (!ctx) return;
 
-    sonicaState.phase += dt * 4.5;
-    ctx.fillStyle = "#101829";
-    ctx.fillRect(0, 0, w, h);
-
-    // Spectrum grid
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.1)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let y = 28; y < h; y += 28) {
-      ctx.moveTo(0, y + 0.5);
-      ctx.lineTo(w, y + 0.5);
-    }
-    for (let x = 44; x < w; x += 44) {
-      ctx.moveTo(x + 0.5, 0);
-      ctx.lineTo(x + 0.5, h);
-    }
-    ctx.stroke();
-
     const centerNorm = sonicaState.pos / 100;
+    if (!isStatic) {
+      sonicaState.phase += dt * 4.0;
+      sonicaState.burstTimer = Math.max(0, sonicaState.burstTimer - dt);
+      sonicaState.wfAccum += dt;
+      if (sonicaState.wfAccum >= 0.08) {
+        sonicaState.wfAccum = 0;
+        const row = sonicaState.waterfall.pop();
+        seedWaterfallRow(row, centerNorm, sonicaState.burstTimer > 0 ? 1.0 : 0.05);
+        sonicaState.waterfall.unshift(row);
+      }
+    }
+
+    drawDarkGrid(ctx, w, h, 26);
+
+    const specBottom = 94;
+    const wfTop = 104;
+    const wfH = h - wfTop - 10;
     const centerX = centerNorm * w;
 
-    // Highlighted narrowband passband column
-    const grad = ctx.createLinearGradient(centerX - 38, 0, centerX + 38, 0);
-    grad.addColorStop(0, "rgba(0, 82, 255, 0)");
-    grad.addColorStop(0.5, "rgba(59, 130, 246, 0.22)");
-    grad.addColorStop(1, "rgba(0, 82, 255, 0)");
-    ctx.fillStyle = grad;
-    ctx.fillRect(centerX - 38, 0, 76, h);
+    // 3 discrete NB-IoT subcarrier lane highlights (Sync, Control, Uplink)
+    const laneOffset = Math.max(26, w * 0.08);
+    const lanes = [
+      { x: centerX - laneOffset, label: "SYNC", color: "#38bdf8" },
+      { x: centerX, label: "CTRL", color: "#3b82f6" },
+      {
+        x: centerX + laneOffset,
+        label: "UPLINK",
+        color: sonicaState.burstTimer > 0 ? "#10b981" : "#6ee7b7",
+      },
+    ];
 
-    // Subcarrier bars & narrowband RF envelope
-    const baseY = h - 20;
-    ctx.strokeStyle = "#3b82f6";
-    ctx.lineWidth = 2.2;
+    lanes.forEach((ln) => {
+      ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
+      ctx.fillRect(ln.x - 14, 18, 28, specBottom - 18);
+      ctx.fillStyle = ln.color;
+      ctx.font = '700 8.5px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText(ln.label, ln.x, 14);
+    });
+
+    // Live RF Narrowband Spectrum Trace
+    ctx.strokeStyle = "#60a5fa";
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    for (let x = 0; x <= w; x += 2) {
-      const dist = (x - centerX) / w;
-      const carrier = Math.exp(-(dist * dist) / 0.0028);
-      const sideband =
-        Math.exp(-((dist - 0.055) * (dist - 0.055)) / 0.0005) * 0.35 +
-        Math.exp(-((dist + 0.055) * (dist + 0.055)) / 0.0005) * 0.35;
-      const modulation =
-        0.78 + 0.22 * Math.sin(x * 0.24 - sonicaState.phase * 1.8);
-      const noise =
-        Math.sin(x * 0.19 + sonicaState.phase * 2.1) * 3.5 +
-        Math.cos(x * 0.43 - sonicaState.phase * 1.4) * 2.5;
-      const amp = (carrier + sideband) * 78 * modulation;
-      const y = Math.max(14, baseY - amp - Math.abs(noise));
-      if (x === 0) ctx.moveTo(x, y);
+    const topRow = sonicaState.waterfall[0];
+    for (let i = 0; i < wfCols; i++) {
+      const x = (i / (wfCols - 1)) * w;
+      const energy = topRow[i];
+      const ripple = Math.sin(i * 0.9 + sonicaState.phase * 2.2) * 2.5;
+      const y = Math.max(22, specBottom - energy * 52 + ripple);
+      if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
     ctx.stroke();
 
-    // Secondary emerald subcarrier ticks inside the narrowband channel
-    ctx.strokeStyle = "#10b981";
-    ctx.lineWidth = 2;
-    for (let k = -3; k <= 3; k++) {
-      const sx = centerX + k * 7;
-      const pulse = 0.55 + 0.45 * Math.sin(sonicaState.phase * 2.4 + k * 0.9);
-      const barH = (1 - Math.abs(k) * 0.14) * 46 * pulse;
+    // Scrolling Waterfall Spectrogram (bottom panel)
+    const cellW = w / wfCols;
+    const cellH = wfH / wfRows;
+    for (let r = 0; r < wfRows; r++) {
+      const row = sonicaState.waterfall[r];
+      const y = wfTop + r * cellH;
+      for (let c = 0; c < wfCols; c++) {
+        const val = row[c];
+        if (val < 0.16) continue;
+        const alpha = Math.min(0.95, val * 0.72);
+        if (val > 0.95) {
+          ctx.fillStyle = `rgba(16, 185, 129, ${alpha})`;
+        } else if (val > 0.52) {
+          ctx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
+        } else {
+          ctx.fillStyle = `rgba(56, 189, 248, ${alpha * 0.65})`;
+        }
+        ctx.fillRect(c * cellW, y, Math.ceil(cellW), Math.ceil(cellH));
+      }
+    }
+
+    // Divider + Waterfall label
+    ctx.strokeStyle = "rgba(148,163,184,0.25)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, wfTop - 2);
+    ctx.lineTo(w, wfTop - 2);
+    ctx.stroke();
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = '600 8px "JetBrains Mono", monospace';
+    ctx.textAlign = "left";
+    ctx.fillText("NB-IoT WATERFALL SPECTROGRAM", 8, wfTop + 11);
+  });
+
+  // --------------------------------------------------------------------------
+  // MINI-APP 5: Flora — 4-Layer Programmable Cellular Testbed
+  // --------------------------------------------------------------------------
+  const floraCanvas = $("#flora-canvas");
+  const floraHookBtns = $$("[data-flora-hook]");
+
+  const floraState = {
+    esim: true, // true = Private Testbed, false = Carrier A
+    ran: true, // true = Priority Slice, false = Shared Best-Effort
+    core: true, // true = Local Breakout, false = Central Cloud Detour
+    edge: true, // true = Edge GPU Offload, false = On-Device Only
+    phase: 0,
+  };
+
+  const floraLabels = {
+    esim: ["Carrier A", "Private Testbed"],
+    ran: ["Shared RAN", "Priority Slice"],
+    core: ["Central Core", "Local Breakout"],
+    edge: ["On-Device", "Edge GPU Active"],
+  };
+
+  floraHookBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.floraHook;
+      floraState[key] = !floraState[key];
+      const on = floraState[key];
+      btn.classList.toggle("is-on", on);
+      btn.setAttribute("aria-pressed", String(on));
+      const sub = $("[data-hook-state]", btn);
+      if (sub && floraLabels[key]) sub.textContent = floraLabels[key][on ? 1 : 0];
+      if (floraLoop && reducedMotion) floraLoop.drawOnce();
+    });
+  });
+
+  const floraLoop = registerCanvasLoop(floraCanvas, (_now, dt, isStatic) => {
+    const { ctx, w, h } = syncCanvasSize(floraCanvas, 196);
+    if (!ctx) return;
+
+    if (!isStatic) floraState.phase += dt * (floraState.ran ? 1.85 : 1.0);
+
+    const compact = w < 380;
+    drawDarkGrid(ctx, w, h, 26);
+
+    const pad = compact ? 10 : 18;
+    const cols = 4;
+    const gap = compact ? 14 : 26;
+    const cardW = (w - pad * 2 - gap * (cols - 1)) / cols;
+    const cardH = 74;
+    const cardY = 58;
+
+    const centers = [];
+    for (let i = 0; i < 4; i++) {
+      const x = pad + i * (cardW + gap);
+      centers.push({ x, cx: x + cardW / 2, cy: cardY + cardH / 2 });
+    }
+
+    // Draw connecting links across all 4 cellular stack layers
+    // 1) eSIM -> RAN (Radio wave arcs!)
+    const rMidX = (centers[0].x + cardW + centers[1].x) / 2;
+    const rMidY = centers[0].cy;
+    const arcCount = floraState.ran ? 3 : 2;
+    for (let a = 0; a < arcCount; a++) {
+      const rad = 6 + a * (floraState.ran ? 5 : 7);
+      ctx.strokeStyle = floraState.ran ? "#38bdf8" : "#94a3b8";
+      ctx.lineWidth = 1.6;
       ctx.beginPath();
-      ctx.moveTo(sx, baseY);
-      ctx.lineTo(sx, baseY - barH);
+      ctx.arc(rMidX - 4, rMidY, rad, -0.7, 0.7);
       ctx.stroke();
     }
 
-    // Center tuner crosshair
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
-    ctx.setLineDash([4, 4]);
-    ctx.lineWidth = 1;
+    // 2) RAN -> 5G Core (Direct or curved central core detour!)
+    const c1x = centers[1].x + cardW;
+    const c2x = centers[2].x;
+    ctx.strokeStyle = floraState.core ? "#3b82f6" : "#f59e0b";
+    ctx.lineWidth = 2.2;
     ctx.beginPath();
-    ctx.moveTo(centerX, 10);
-    ctx.lineTo(centerX, baseY);
+    ctx.moveTo(c1x, rMidY);
+    if (floraState.core) {
+      ctx.lineTo(c2x, rMidY);
+    } else {
+      ctx.quadraticCurveTo((c1x + c2x) / 2, cardY - 38, c2x, rMidY);
+    }
     ctx.stroke();
-    ctx.setLineDash([]);
-  });
 
-  // --------------------------------------------------------------------------
-  // MINI-APP 5: Flora — Playable 4-Layer 3D Stack Switcher
-  // --------------------------------------------------------------------------
-  const floraTabs = $$(".flora-tab");
-  const floraCards = $$("[data-layer-card]");
+    // 3) 5G Core -> Edge VR
+    const c3x = centers[2].x + cardW;
+    const c4x = centers[3].x;
+    ctx.strokeStyle = floraState.edge ? "#10b981" : "rgba(148,163,184,0.28)";
+    ctx.lineWidth = floraState.edge ? 2.4 : 1.5;
+    ctx.beginPath();
+    ctx.moveTo(c3x, rMidY);
+    ctx.lineTo(c4x, rMidY);
+    ctx.stroke();
 
-  function selectFloraLayer(index) {
-    const idx = Number(index);
-    floraTabs.forEach((tab) => {
-      const active = Number(tab.dataset.layer) === idx;
-      tab.classList.toggle("is-active", active);
-      tab.setAttribute("aria-selected", String(active));
+    // Central Core detour indicator above L3 when Local Breakout is OFF
+    if (!floraState.core) {
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = '700 8.5px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText("CENTRAL CORE DETOUR", centers[2].cx, 24);
+    } else {
+      ctx.fillStyle = "#93c5fd";
+      ctx.font = '700 8.5px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.fillText("LOCAL BREAKOUT ACTIVE", centers[2].cx, 24);
+    }
+
+    // Draw the 4 Labeled Cellular Stack Nodes
+    const layerDefs = [
+      {
+        title: "eSIM",
+        sub: floraState.esim ? "Private" : "Carrier A",
+        color: floraState.esim ? "#3b82f6" : "#f59e0b",
+      },
+      {
+        title: "RAN",
+        sub: floraState.ran ? "Slice" : "Shared",
+        color: floraState.ran ? "#38bdf8" : "#94a3b8",
+      },
+      {
+        title: "5G CORE",
+        sub: floraState.core ? "Local" : "Central",
+        color: floraState.core ? "#3b82f6" : "#f59e0b",
+      },
+      {
+        title: "EDGE VR",
+        sub: floraState.edge ? "Offload" : "Idle",
+        color: floraState.edge ? "#10b981" : "#64748b",
+      },
+    ];
+
+    layerDefs.forEach((def, i) => {
+      drawNodeBox(
+        ctx,
+        centers[i].x,
+        cardY,
+        cardW,
+        cardH,
+        def.title,
+        def.sub,
+        def.color
+      );
     });
-    floraCards.forEach((card) => {
-      const active = Number(card.dataset.layerCard) === idx;
-      card.classList.toggle("is-selected", active);
-    });
-  }
 
-  floraTabs.forEach((tab) => {
-    tab.addEventListener("click", () => selectFloraLayer(tab.dataset.layer));
-  });
-  floraCards.forEach((card) => {
-    card.addEventListener("click", () =>
-      selectFloraLayer(card.dataset.layerCard)
+    // Bidirectional Live End-to-End Packets (Uplink top rail, Downlink bottom rail)
+    const uY = cardY - 12;
+    const dY = cardY + cardH + 18;
+    const startX = centers[0].cx;
+    const endX = floraState.edge ? centers[3].cx : centers[2].cx;
+
+    // Uplink rail
+    ctx.strokeStyle = "rgba(59, 130, 246, 0.35)";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(startX, uY);
+    ctx.lineTo(endX, uY);
+    ctx.stroke();
+
+    const pktCount = floraState.ran ? 4 : 2;
+    for (let k = 0; k < pktCount; k++) {
+      const t = (floraState.phase * 0.45 + k / pktCount) % 1;
+      const px = startX + (endX - startX) * t;
+      ctx.fillStyle = floraState.esim ? "#60a5fa" : "#fbbf24";
+      ctx.beginPath();
+      ctx.arc(px, uY, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Downlink VR return rail (bright emerald when Edge Offload is ON)
+    ctx.strokeStyle = floraState.edge
+      ? "rgba(16, 185, 129, 0.42)"
+      : "rgba(148, 163, 184, 0.2)";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(startX, dY);
+    ctx.lineTo(endX, dY);
+    ctx.stroke();
+
+    for (let k = 0; k < pktCount; k++) {
+      const t = (floraState.phase * 0.45 + k / pktCount + 0.15) % 1;
+      const px = endX - (endX - startX) * t;
+      ctx.fillStyle = floraState.edge ? "#34d399" : "#94a3b8";
+      ctx.beginPath();
+      ctx.arc(px, dY, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = '600 8.5px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText(
+      floraState.edge
+        ? "BIDIRECTIONAL E2E FLOW · EDGE VR FRAMES RETURNING"
+        : "EDGE OFFLOAD OFF · CORE TERMINATED",
+      w / 2,
+      h - 12
     );
   });
 
   // --------------------------------------------------------------------------
-  // MINI-APP 6: Mobile VR Latency — Playable Head-Motion Lag Comparator
+  // MINI-APP 6: Mobile VR Latency — 6DoF Headset + Uplink Queue -> Edge GPU
   // --------------------------------------------------------------------------
   const vrStage = $(".vr-stage");
   const vrCanvas = $("#vr-canvas");
@@ -906,14 +1874,14 @@
     if (vrHudStatus) {
       vrHudStatus.textContent =
         vrState.mode === "proactive"
-          ? "PROACTIVE SCHEDULE · FRAME LOCKED TO MOTION"
-          : "STANDARD LTE · TRAILING RENDER FRAME LAG";
+          ? "PROACTIVE GRANT · UNQUEUED UPLINK · LOCKED"
+          : "REACTIVE LTE · UPLINK QUEUE BACKLOG · GHOST LAG";
     }
     if (vrStrategy) {
       vrStrategy.textContent =
         vrState.mode === "proactive"
-          ? "App-layer inference · DRX wake · Proactive uplink"
-          : "DRX doze wait · Reactive scheduling grant delay";
+          ? "App inference → DRX wake → Pre-scheduled grant"
+          : "DRX doze wait → Reactive grant backlog → Frame lag";
     }
     if (vrLoop && reducedMotion) vrLoop.drawOnce();
   }
@@ -930,64 +1898,77 @@
     });
   }
 
+  function setManualVRTarget(val) {
+    vrState.auto = false;
+    if (vrAutoBtn) {
+      vrAutoBtn.classList.remove("is-active");
+      vrAutoBtn.setAttribute("aria-pressed", "false");
+    }
+    vrState.target = Math.max(14, Math.min(86, val));
+    if (vrSlider) vrSlider.value = String(Math.round(vrState.target));
+    if (vrLoop && reducedMotion) {
+      vrState.ghost =
+        vrState.mode === "proactive"
+          ? vrState.target - 1.8
+          : Math.max(14, vrState.target - 20);
+      vrLoop.drawOnce();
+    }
+  }
+
   if (vrSlider) {
-    vrSlider.addEventListener("input", () => {
-      vrState.auto = false;
-      if (vrAutoBtn) {
-        vrAutoBtn.classList.remove("is-active");
-        vrAutoBtn.setAttribute("aria-pressed", "false");
-      }
-      vrState.target = Number(vrSlider.value);
-      if (vrLoop && reducedMotion) {
-        vrState.ghost =
-          vrState.mode === "proactive"
-            ? vrState.target - 2
-            : Math.max(12, vrState.target - 18);
-        vrLoop.drawOnce();
-      }
+    vrSlider.addEventListener("input", () =>
+      setManualVRTarget(Number(vrSlider.value))
+    );
+  }
+
+  if (vrCanvas) {
+    vrCanvas.addEventListener("pointermove", (ev) => {
+      if (ev.buttons === 0 && ev.pointerType === "touch") return;
+      const rect = vrCanvas.getBoundingClientRect();
+      const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+      setManualVRTarget(pct);
     });
   }
 
   const vrLoop = registerCanvasLoop(vrCanvas, (_now, dt, isStatic) => {
-    const { ctx, w, h } = syncCanvasSize(vrCanvas, 146);
+    const { ctx, w, h } = syncCanvasSize(vrCanvas, 200);
     if (!ctx) return;
 
     const isProactive = vrState.mode === "proactive";
     if (!isStatic) {
-      vrState.phase += dt * 2.25;
+      vrState.phase += dt * 2.2;
       if (vrState.auto) {
-        vrState.target = 50 + Math.sin(vrState.phase) * 34;
+        vrState.target = 50 + Math.sin(vrState.phase) * 32;
         if (vrSlider) vrSlider.value = String(Math.round(vrState.target));
       }
-      const followRate = isProactive ? 18 : 2.8;
+      const followRate = isProactive ? 19 : 2.6;
       vrState.ghost +=
         (vrState.target - vrState.ghost) * Math.min(1, dt * followRate);
     } else if (reducedMotion) {
-      vrState.target = 64;
-      vrState.ghost = isProactive ? 61.5 : 42;
+      vrState.target = 66;
+      vrState.ghost = isProactive ? 63.5 : 40;
     }
 
-    ctx.fillStyle = "#101829";
-    ctx.fillRect(0, 0, w, h);
+    const compact = w < 380;
+    drawDarkGrid(ctx, w, h, 26);
 
-    // Horizon grid
-    const trackY = h * 0.44;
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.14)";
+    // --- UPPER SECTION: 6DoF VR Headset Viewport Comparator ---
+    const trackY = 58;
+    ctx.strokeStyle = "rgba(148,163,184,0.16)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(20, trackY);
-    ctx.lineTo(w - 20, trackY);
+    ctx.moveTo(16, trackY);
+    ctx.lineTo(w - 16, trackY);
     ctx.stroke();
 
     const targetX = (vrState.target / 100) * w;
     const ghostX = (vrState.ghost / 100) * w;
     const lagPx = Math.abs(targetX - ghostX);
 
-    // Lag connector bridge
     if (lagPx > 3) {
       ctx.strokeStyle = isProactive
-        ? "rgba(16, 185, 129, 0.55)"
-        : "rgba(244, 63, 94, 0.72)";
+        ? "rgba(16,185,129,0.6)"
+        : "rgba(244,63,94,0.75)";
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(ghostX, trackY);
@@ -995,67 +1976,110 @@
       ctx.stroke();
     }
 
-    // Rendered Edge Frame (Ghost Frame)
-    const boxW = 68;
-    const boxH = 44;
+    // Rendered VR Display Frame (Ghost)
+    const boxW = 72;
+    const boxH = 40;
+    drawRoundedRect(ctx, ghostX - boxW / 2, trackY - boxH / 2, boxW, boxH, 9);
     ctx.fillStyle = isProactive
-      ? "rgba(16, 185, 129, 0.16)"
-      : "rgba(244, 63, 94, 0.16)";
+      ? "rgba(16,185,129,0.16)"
+      : "rgba(244,63,94,0.18)";
+    ctx.fill();
     ctx.strokeStyle = isProactive ? "#10b981" : "#f43f5e";
     ctx.lineWidth = 2;
-    drawRoundedRect(ctx, ghostX - boxW / 2, trackY - boxH / 2, boxW, boxH, 9);
-    ctx.fill();
     ctx.stroke();
 
-    // Target Head Pose Reticle (Klein Blue)
+    // 6DoF Headset Pose Reticle (Klein Blue)
     ctx.strokeStyle = "#60a5fa";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(targetX, trackY, 15, 0, Math.PI * 2);
+    ctx.arc(targetX, trackY, 13, 0, Math.PI * 2);
     ctx.stroke();
     ctx.fillStyle = "#3b82f6";
     ctx.beginPath();
-    ctx.arc(targetX, trackY, 4.5, 0, Math.PI * 2);
+    ctx.arc(targetX, trackY, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    // Labels
-    ctx.font = '600 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = "#93c5fd";
+    ctx.font = '700 8.8px "JetBrains Mono", monospace';
     ctx.textAlign = "center";
-    ctx.fillText("HEAD POSE", targetX, trackY - 28);
+    ctx.fillStyle = "#93c5fd";
+    ctx.fillText("6DoF HEAD POSE", targetX, 20);
     ctx.fillStyle = isProactive ? "#6ee7b7" : "#fda4af";
     ctx.fillText(
-      isProactive ? "EDGE FRAME (LOCKED)" : "EDGE FRAME (LAGGING)",
+      isProactive ? "VR DISPLAY (LOCKED)" : "VR DISPLAY (LAGGING)",
       ghostX,
-      trackY + 38
+      trackY + 34
     );
 
-    // Bottom uplink scheduling slots
-    const slotCount = 14;
-    const slotW = 18;
-    const totalW = slotCount * (slotW + 6);
-    const startX = (w - totalW) / 2;
-    const slotY = h - 22;
-    const activeSlot = Math.floor((vrState.phase * 3) % slotCount);
+    // --- LOWER SECTION: Wireless Uplink Queue -> Edge GPU -> Downlink Loop ---
+    const pipeY = 148;
+    const pad = compact ? 10 : 18;
+    const sW = compact ? 64 : 84;
+    const sH = 38;
+    const xs = [
+      pad,
+      pad + (w - pad * 2 - sW) * 0.34,
+      pad + (w - pad * 2 - sW) * 0.67,
+      w - pad - sW,
+    ];
 
-    for (let i = 0; i < slotCount; i++) {
-      const x = startX + i * (slotW + 6);
-      const isLit = isProactive
-        ? i === activeSlot || i === (activeSlot + 1) % slotCount
-        : i === activeSlot && i % 3 === 0;
-      ctx.fillStyle = isLit
-        ? isProactive
-          ? "#10b981"
-          : "#f43f5e"
-        : "rgba(148, 163, 184, 0.2)";
-      drawRoundedRect(ctx, x, slotY, slotW, 8, 3);
+    // Pipeline wire
+    ctx.strokeStyle = "rgba(148,163,184,0.28)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(xs[0] + sW / 2, pipeY);
+    ctx.lineTo(xs[3] + sW / 2, pipeY);
+    ctx.stroke();
+
+    // Traveling packets
+    const pCount = 3;
+    for (let k = 0; k < pCount; k++) {
+      const t = (vrState.phase * (isProactive ? 0.65 : 0.35) + k / pCount) % 1;
+      const px = xs[0] + sW / 2 + (xs[3] - xs[0]) * t;
+      ctx.fillStyle = isProactive ? "#34d399" : "#60a5fa";
+      ctx.beginPath();
+      ctx.arc(px, pipeY, 4, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.textAlign = "left";
+
+    drawNodeBox(ctx, xs[0], pipeY - sH / 2, sW, sH, "VR HMD", "Motion", "#3b82f6");
+
+    // Wireless Uplink Scheduler / Queue node (visibly shows queued coral bars in Standard mode!)
+    drawRoundedRect(ctx, xs[1], pipeY - sH / 2, sW, sH, 8);
+    ctx.fillStyle = isProactive ? "#0b2e26" : "#38121d";
+    ctx.fill();
+    ctx.strokeStyle = isProactive ? "#10b981" : "#f43f5e";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    ctx.fillStyle = isProactive ? "#6ee7b7" : "#fda4af";
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillText(isProactive ? "PRE-GRANT" : "UL QUEUE", xs[1] + sW / 2, pipeY - 4);
+    // Queue occupancy bars
+    const qBars = isProactive ? 1 : 5;
+    for (let q = 0; q < 5; q++) {
+      ctx.fillStyle =
+        q < qBars
+          ? isProactive
+            ? "#10b981"
+            : "#f43f5e"
+          : "rgba(148,163,184,0.18)";
+      ctx.fillRect(xs[1] + 10 + q * ((sW - 20) / 5), pipeY + 4, 8, 9);
+    }
+
+    drawNodeBox(ctx, xs[2], pipeY - sH / 2, sW, sH, "EDGE GPU", "Render", "#38bdf8");
+    drawNodeBox(
+      ctx,
+      xs[3],
+      pipeY - sH / 2,
+      sW,
+      sH,
+      "DISPLAY",
+      "Downlink",
+      isProactive ? "#10b981" : "#f43f5e"
+    );
   });
 
   // --------------------------------------------------------------------------
-  // MINI-APP 7: Acemap — On-Demand 2,208-Topic Searchable Knowledge Explorer
+  // MINI-APP 7: Acemap — 2,208 Topics + On-Canvas Cluster Labels + Neighbor Links
   // --------------------------------------------------------------------------
   const acemapFields = [
     "Psychology",
@@ -1143,14 +2167,15 @@
     loading: false,
     points: [],
     fieldCounts: new Array(acemapFields.length).fill(0),
+    centroids: [],
     activeField: "all",
     query: "",
     hovered: -1,
     selected: -1,
+    neighbors: [],
     bounds: { minX: 0, maxX: 1, minY: 0, maxY: 1 },
   };
 
-  // Populate discipline pills immediately (clicking any pill triggers on-demand load if needed)
   if (acemapDisciplines) {
     acemapFields.forEach((fieldName, idx) => {
       const btn = document.createElement("button");
@@ -1203,7 +2228,7 @@
 
   function drawAcemapPreview() {
     if (!acemapCanvas || acemapState.loaded) return;
-    const { ctx, w, h } = syncCanvasSize(acemapCanvas, 340);
+    const { ctx, w, h } = syncCanvasSize(acemapCanvas, 380);
     if (!ctx) return;
 
     ctx.clearRect(0, 0, w, h);
@@ -1222,13 +2247,12 @@
       ctx.stroke();
     }
 
-    // Deterministic preview clusters before CSV load
     let s = 42;
     const rand = () => {
       s = (s * 16807) % 2147483647;
       return (s - 1) / 2147483646;
     };
-    for (let i = 0; i < 160; i++) {
+    for (let i = 0; i < 180; i++) {
       const cluster = i % acemapDisplayColors.length;
       const angle = (cluster / acemapDisplayColors.length) * Math.PI * 2;
       const cx = w * 0.5 + Math.cos(angle) * (w * 0.28) + (rand() - 0.5) * 90;
@@ -1255,6 +2279,26 @@
     return true;
   }
 
+  function computeNearestNeighbors(idx, k = 6) {
+    if (idx < 0 || !acemapState.points[idx]) return [];
+    const src = acemapState.points[idx];
+    const best = [];
+    for (let i = 0; i < acemapState.points.length; i++) {
+      if (i === idx) continue;
+      const pt = acemapState.points[i];
+      if (!pt.matched) continue;
+      const dx = pt.x - src.x;
+      const dy = pt.y - src.y;
+      const d2 = dx * dx + dy * dy;
+      if (best.length < k || d2 < best[best.length - 1].d2) {
+        best.push({ idx: i, d2 });
+        best.sort((a, b) => a.d2 - b.d2);
+        if (best.length > k) best.pop();
+      }
+    }
+    return best.map((item) => item.idx);
+  }
+
   function updateInspector(idx) {
     if (idx < 0 || !acemapState.points[idx]) return;
     const pt = acemapState.points[idx];
@@ -1270,7 +2314,7 @@
 
   function renderAcemap() {
     if (!acemapCanvas || !acemapState.loaded) return;
-    const { ctx, w, h } = syncCanvasSize(acemapCanvas, 340);
+    const { ctx, w, h } = syncCanvasSize(acemapCanvas, 380);
     if (!ctx) return;
 
     ctx.clearRect(0, 0, w, h);
@@ -1292,7 +2336,7 @@
     }
 
     const { minX, maxX, minY, maxY } = acemapState.bounds;
-    const pad = 22;
+    const pad = 24;
     const scale = Math.min(
       (w - pad * 2) / (maxX - minX),
       (h - pad * 2) / (maxY - minY)
@@ -1303,7 +2347,7 @@
     let matchCount = 0;
     const topMatches = [];
 
-    // Pass 1: dim non-matching nodes
+    // Pass 1: project & draw dimmed non-matches
     for (let i = 0; i < acemapState.points.length; i++) {
       const pt = acemapState.points[i];
       pt.px = (pt.x - minX) * scale + ox;
@@ -1313,46 +2357,120 @@
         matchCount++;
         if (topMatches.length < 18) topMatches.push(i);
       } else {
-        ctx.fillStyle = "rgba(148, 163, 184, 0.16)";
+        ctx.fillStyle = "rgba(148, 163, 184, 0.14)";
         ctx.beginPath();
-        ctx.arc(pt.px, pt.py, 1.8, 0, Math.PI * 2);
+        ctx.arc(pt.px, pt.py, 1.7, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Pass 2: active matching nodes
+    // Pass 2: active nodes
     for (let i = 0; i < acemapState.points.length; i++) {
       const pt = acemapState.points[i];
       if (!pt.matched) continue;
       ctx.fillStyle = acemapDisplayColors[pt.field];
-      ctx.globalAlpha = acemapState.query ? 0.95 : 0.78;
+      ctx.globalAlpha = acemapState.query ? 0.94 : 0.72;
       const r = acemapState.query
-        ? Math.min(5.2, 2.8 + pt.size * 0.15)
-        : Math.min(4.2, 1.9 + pt.size * 0.14);
+        ? Math.min(5, 2.7 + pt.size * 0.14)
+        : Math.min(4, 1.85 + pt.size * 0.13);
       ctx.beginPath();
       ctx.arc(pt.px, pt.py, r, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    // Pass 3: hovered / selected ring highlight
-    [acemapState.hovered, acemapState.selected].forEach((idx, rank) => {
-      if (idx < 0 || !acemapState.points[idx]) return;
-      const pt = acemapState.points[idx];
-      const color = acemapDisplayColors[pt.field];
-      ctx.fillStyle = color;
+    // Pass 3: Direct On-Canvas Discipline Cluster Labels (collision-avoided!)
+    const placedBoxes = [];
+    ctx.font = '700 10px "Plus Jakarta Sans", sans-serif';
+    const orderedCentroids = [...acemapState.centroids].sort(
+      (a, b) => b.count - a.count
+    );
+    for (const c of orderedCentroids) {
+      if (
+        acemapState.activeField !== "all" &&
+        c.field !== Number(acemapState.activeField)
+      ) {
+        continue;
+      }
+      if (acemapState.query) continue; // Keep search view unobstructed
+      const lx = (c.x - minX) * scale + ox;
+      const ly = (c.y - minY) * scale + oy;
+      const label = acemapFields[c.field];
+      const textW = ctx.measureText(label).width;
+      const pillW = textW + 20;
+      const pillH = 20;
+      const bx = Math.max(8, Math.min(w - pillW - 8, lx - pillW / 2));
+      const by = Math.max(8, Math.min(h - pillH - 8, ly - pillH / 2));
+
+      const overlaps = placedBoxes.some(
+        (b) =>
+          bx < b.x + b.w + 6 &&
+          bx + pillW + 6 > b.x &&
+          by < b.y + b.h + 4 &&
+          by + pillH + 4 > b.y
+      );
+      if (overlaps && acemapState.activeField === "all") continue;
+      placedBoxes.push({ x: bx, y: by, w: pillW, h: pillH });
+
+      drawRoundedRect(ctx, bx, by, pillW, pillH, 10);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = acemapDisplayColors[c.field];
       ctx.beginPath();
-      ctx.arc(pt.px, pt.py, rank === 1 ? 6 : 5.2, 0, Math.PI * 2);
+      ctx.arc(bx + 8, by + pillH / 2, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#0f172a";
+      ctx.textAlign = "left";
+      ctx.fillText(label, bx + 15, by + 13.5);
+    }
+
+    // Pass 4: Scholarly Topic Neighborhood Link Lines for hovered or selected topic
+    const focusIdx =
+      acemapState.hovered >= 0 ? acemapState.hovered : acemapState.selected;
+    acemapState.neighbors =
+      focusIdx >= 0 && acemapState.points[focusIdx]?.matched
+        ? computeNearestNeighbors(focusIdx, 6)
+        : [];
+
+    if (focusIdx >= 0 && acemapState.neighbors.length) {
+      const src = acemapState.points[focusIdx];
+      acemapState.neighbors.forEach((nIdx) => {
+        const nb = acemapState.points[nIdx];
+        ctx.strokeStyle = "rgba(0, 82, 255, 0.52)";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(src.px, src.py);
+        ctx.lineTo(nb.px, nb.py);
+        ctx.stroke();
+
+        ctx.fillStyle = acemapDisplayColors[nb.field];
+        ctx.beginPath();
+        ctx.arc(nb.px, nb.py, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+
+      // Focus node halo
+      ctx.fillStyle = acemapDisplayColors[src.field];
+      ctx.beginPath();
+      ctx.arc(src.px, src.py, 6.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.strokeStyle = "#0052ff";
-      ctx.lineWidth = 1.6;
+      ctx.lineWidth = 1.8;
       ctx.beginPath();
-      ctx.arc(pt.px, pt.py, rank === 1 ? 10 : 8.5, 0, Math.PI * 2);
+      ctx.arc(src.px, src.py, 10.5, 0, Math.PI * 2);
       ctx.stroke();
-    });
+    }
 
     if (acemapStatus) {
       const fieldLabel =
@@ -1363,16 +2481,18 @@
       acemapStatus.textContent = `${fieldLabel}${qLabel} · ${matchCount.toLocaleString()} topics`;
     }
 
-    // Render clickable quick matches when searching or filtering
+    // Inspector list: search matches when searching/filtering, OR nearest scholarly neighbors!
     if (acemapMatches && acemapMatchList && acemapMatchesLabel) {
-      if (acemapState.query || acemapState.activeField !== "all") {
+      const useSearch = Boolean(acemapState.query || acemapState.activeField !== "all");
+      const listIndices = useSearch ? topMatches : acemapState.neighbors;
+
+      if (listIndices.length) {
         acemapMatches.hidden = false;
-        acemapMatchesLabel.textContent = `Showing ${Math.min(
-          topMatches.length,
-          matchCount
-        )} of ${matchCount.toLocaleString()} matches`;
+        acemapMatchesLabel.textContent = useSearch
+          ? `Showing ${Math.min(listIndices.length, matchCount)} of ${matchCount.toLocaleString()} matches`
+          : `Nearest scholarly neighbors (${listIndices.length})`;
         acemapMatchList.replaceChildren();
-        topMatches.forEach((idx) => {
+        listIndices.forEach((idx) => {
           const pt = acemapState.points[idx];
           const li = document.createElement("li");
           const btn = document.createElement("button");
@@ -1420,7 +2540,14 @@
         minY = Infinity,
         maxY = -Infinity;
 
+      const sums = acemapFields.map((_, field) => ({
+        field,
+        sx: 0,
+        sy: 0,
+        count: 0,
+      }));
       acemapState.fieldCounts.fill(0);
+
       for (const r of rows) {
         const x = Number(r[0]);
         const y = Number(r[1]);
@@ -1437,6 +2564,9 @@
         if (y < minY) minY = y;
         if (y > maxY) maxY = y;
         acemapState.fieldCounts[field]++;
+        sums[field].sx += x;
+        sums[field].sy += y;
+        sums[field].count++;
         pts.push({
           x,
           y,
@@ -1453,6 +2583,14 @@
       if (!pts.length) throw new Error("No valid topics found");
 
       acemapState.points = pts;
+      acemapState.centroids = sums
+        .filter((s) => s.count > 0)
+        .map((s) => ({
+          field: s.field,
+          x: s.sx / s.count,
+          y: s.sy / s.count,
+          count: s.count,
+        }));
       acemapState.bounds = { minX, maxX, minY, maxY };
       acemapState.loaded = true;
       acemapState.loading = false;
@@ -1460,7 +2598,6 @@
       if (acemapOverlay) acemapOverlay.hidden = true;
       if (acemapLoadBtn) acemapLoadBtn.hidden = true;
 
-      // Default inspect a prominent CS topic so inspector immediately feels alive
       const defaultIdx = pts.findIndex(
         (p) => p.field === 4 && p.name.toLowerCase().includes("security")
       );
@@ -1521,11 +2658,8 @@
         p.classList.toggle("is-active", active);
         p.setAttribute("aria-pressed", String(active));
       });
-      if (!acemapState.loaded) {
-        loadAcemapDataset();
-      } else {
-        renderAcemap();
-      }
+      if (!acemapState.loaded) loadAcemapDataset();
+      else renderAcemap();
     });
   }
 
@@ -1677,13 +2811,12 @@
   const cmdCloseBtn = $("#cmd-close-btn");
 
   const cmdEntries = [
-    // Sections
     {
       group: "Sections",
-      title: "Bare Metal Rack & CME Fabric Console",
-      sub: "Hero interactive hardware simulator",
+      title: "GCE Bare Metal & CME 4-Mode Rack",
+      sub: "Host & Fabric · Fleet Lifecycle · End-to-End · CME Fabric",
       tag: "Hero",
-      keywords: "hero rack bare metal cme oscilloscope",
+      keywords: "hero rack bare metal cme oscilloscope lifecycle",
       action: () => jumpTo("#rack"),
     },
     {
@@ -1696,10 +2829,10 @@
     },
     {
       group: "Sections",
-      title: "Playable Micro-App Playground",
-      sub: "7 interactive systems widgets",
+      title: "Playable Domain Playground (7 Labs)",
+      sub: "SEED, SecureSIM, GPT-Code-Learner, Sonica, Flora, VR, Acemap",
       tag: "Section",
-      keywords: "projects playground widgets apps",
+      keywords: "projects playground widgets labs apps",
       action: () => jumpTo("#projects"),
     },
     {
@@ -1718,25 +2851,34 @@
       keywords: "about bio ucla sjtu songwu lu google",
       action: () => jumpTo("#Bio"),
     },
-
-    // Quick Hardware Actions
     {
       group: "Quick Actions",
-      title: "Toggle Bare Metal Fabric Mode",
-      sub: "Switch hero rack between Standard Cloud and CME Dedicated Fabric",
+      title: "Switch Rack to CME Dedicated Fabric",
+      sub: "Show ultra-low-latency market-order pulses on bare metal",
       tag: "Action",
-      keywords: "toggle switch fabric cme standard rack",
+      keywords: "cme fabric rack switch trading",
       action: () => {
         jumpTo("#rack");
-        setFabricMode(rackState.fabric === "cme" ? "standard" : "cme");
+        setRackMode("cme");
       },
     },
     {
       group: "Quick Actions",
-      title: "Inject 5G Fault in SEED",
-      sub: "Trigger live 5G drop and watch the SIM applet recover",
+      title: "Switch Rack to Fleet Lifecycle",
+      sub: "Animate Provision → Verify → Active → Drain → Reclaim",
       tag: "Action",
-      keywords: "seed fault inject 5g sim recovery",
+      keywords: "fleet lifecycle provision drain reclaim rack",
+      action: () => {
+        jumpTo("#rack");
+        setRackMode("lifecycle");
+      },
+    },
+    {
+      group: "Quick Actions",
+      title: "Inject 5G Failure in SEED",
+      sub: "Fracture 5G bearer and watch SIM/SEED recover with 5G Core",
+      tag: "Action",
+      keywords: "seed fault failure inject 5g sim recovery",
       action: () => {
         jumpTo("#seed");
         triggerSeedFault();
@@ -1753,11 +2895,9 @@
         loadAcemapDataset();
       },
     },
-
-    // 7 Playable Mini-Apps
     {
       group: "Mini-Apps",
-      title: "SEED — 5G Fault Injector",
+      title: "SEED — 5G UE, SIM Chip & 5G Core Recovery",
       sub: "Diagnosing and recovering from 5G failures through the SIM",
       tag: "SIGCOMM ’22",
       keywords: "seed 5g sim failure sigcomm",
@@ -1765,7 +2905,7 @@
     },
     {
       group: "Mini-Apps",
-      title: "SecureSIM — Access Control Dial",
+      title: "SecureSIM — eSIM Policy Gate & Partitions",
       sub: "Authentication and fine-grained access control for SIM and eSIM",
       tag: "MobiCom ’21",
       keywords: "securesim sim esim auth cert security mobicom",
@@ -1773,47 +2913,46 @@
     },
     {
       group: "Mini-Apps",
-      title: "GPT-Code-Learner — Code Explorer",
+      title: "GPT-Code-Learner — AST Call-Graph Explorer",
       sub: "Explore a codebase through questions, context, and GPT",
       tag: "GitHub",
-      keywords: "gpt code learner llm codebase search github",
+      keywords: "gpt code learner llm codebase search ast graph github",
       action: () => jumpTo("#gptcodelearner"),
     },
     {
       group: "Mini-Apps",
-      title: "Sonica — NB-IoT RF Tuner",
+      title: "Sonica — NB-IoT SDR Waterfall Tuner",
       sub: "An open NB-IoT network for experiments with real devices",
       tag: "GitHub",
-      keywords: "sonica nbiot iot rf radio sdr",
+      keywords: "sonica nbiot iot rf radio sdr waterfall spectrogram",
       action: () => jumpTo("#sonica"),
     },
     {
       group: "Mini-Apps",
-      title: "Flora — 4-Layer Mobile Stack",
+      title: "Flora — 4-Layer Programmable Cellular Stack",
       sub: "Software-defined mobile network spanning eSIM, radio, core, and edge",
       tag: "Testbed",
-      keywords: "flora esim ran core edge vr lte",
+      keywords: "flora esim ran core edge vr lte slice",
       action: () => jumpTo("#flora"),
     },
     {
       group: "Mini-Apps",
-      title: "Mobile VR Latency — Lag Comparator",
+      title: "Mobile VR Latency — Motion-to-Photon Lab",
       sub: "Proactive LTE uplink scheduling for interactive mobile VR",
       tag: "NSDI ’21",
-      keywords: "vr latency lte uplink nsdi mobile",
+      keywords: "vr latency lte uplink nsdi mobile 6dof",
       action: () => jumpTo("#lrp"),
     },
     {
       group: "Mini-Apps",
       title: "Acemap — 2,208-Topic Knowledge Map",
-      sub: "Academic knowledge graph across 19 disciplines",
+      sub: "Academic knowledge graph across 19 labeled disciplines",
       tag: "SJTU",
       keywords: "acemap knowledge graph topics sjtu",
       action: () => jumpTo("#acemap"),
     },
   ];
 
-  // Dynamically index all 12 publications from semantic HTML
   pubRows.forEach((row) => {
     const link = $("h4 a", row);
     const venue = $(".venue-pill", row);
@@ -1841,7 +2980,6 @@
     });
   });
 
-  // External links & version switchers
   cmdEntries.push(
     {
       group: "Links",
@@ -2062,6 +3200,5 @@
     }
   });
 
-  // Initial layout sync for all spring-sliding segmented switches
   requestAnimationFrame(syncAllSegments);
 })();

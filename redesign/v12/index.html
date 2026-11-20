@@ -326,7 +326,7 @@
     </header>
 
     <main id="main">
-      <!-- HERO: Kinetic Typography + Playable Bare Metal Rack & CME Fabric Console -->
+      <!-- HERO: Kinetic Typography + 4-Mode Playable Bare Metal Rack & CME Workbench -->
       <section class="hero-workbench" id="rack" aria-labelledby="hero-title">
         <div class="shell hero-grid">
           <div class="hero-copy">
@@ -351,14 +351,15 @@
 
             <p class="hero-sub">
               Software Engineer on Google’s <strong>GCE Bare Metal</strong> team
-              and UCLA Ph.D. in Computer Science. Every module on this page is a
-              playable micro-instrument inspired by real systems work.
+              and UCLA Ph.D. in Computer Science. Every interactive unit below
+              is a domain-accurate micro-simulation of real infrastructure and
+              research work.
             </p>
 
             <div class="hero-cta-row">
               <a class="btn btn-primary" href="#projects">
                 <span>Launch Playground</span>
-                <span class="btn-badge">7 Apps</span>
+                <span class="btn-badge">7 Labs</span>
               </a>
               <button
                 type="button"
@@ -398,58 +399,65 @@
             </div>
           </div>
 
-          <!-- PLAYABLE HERO CONSOLE: Tactile Bare Metal Rack & CME Low-Latency Fabric -->
+          <!-- PLAYABLE HERO CONSOLE: 4-Mode GCE Bare Metal Rack & CME Fabric Workbench -->
           <div
             class="hardware-unit rack-console"
             id="rack-console"
-            data-fabric="cme"
+            data-rack-mode="host"
           >
             <div class="unit-bezel-top">
               <div class="unit-title-group">
                 <span class="led led-emerald" id="rack-led" aria-hidden="true"></span>
-                <span class="mono-label">GCE BARE METAL · RACK UNIT 01</span>
+                <span class="mono-label">GCE BARE METAL · WORKBENCH 01</span>
               </div>
-              <span class="sim-tag">Interactive simulation</span>
+              <span class="sim-tag">Illustrative simulation</span>
             </div>
 
-            <!-- Spring Toggle: Standard Cloud <-> CME Dedicated Fabric -->
+            <!-- 4-Mode Tactile Switch -->
             <div class="rack-control-strip">
               <div
-                class="spring-segment"
+                class="spring-segment spring-segment-4"
                 role="group"
-                aria-label="Fabric mode switch"
-                data-segment="fabric"
+                aria-label="Bare metal architecture mode"
+                data-segment="rack"
               >
                 <span class="seg-thumb" aria-hidden="true"></span>
                 <button
                   type="button"
-                  class="seg-btn"
-                  data-fabric-mode="standard"
-                  aria-pressed="false"
+                  class="seg-btn is-active"
+                  data-rack-select="host"
+                  aria-pressed="true"
                 >
-                  Standard Cloud
+                  Host &amp; Fabric
                 </button>
                 <button
                   type="button"
-                  class="seg-btn is-active"
-                  data-fabric-mode="cme"
-                  aria-pressed="true"
+                  class="seg-btn"
+                  data-rack-select="lifecycle"
+                  aria-pressed="false"
                 >
-                  CME Dedicated Fabric
+                  Fleet Lifecycle
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn"
+                  data-rack-select="e2e"
+                  aria-pressed="false"
+                >
+                  End-to-End
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn"
+                  data-rack-select="cme"
+                  aria-pressed="false"
+                >
+                  CME Fabric
                 </button>
               </div>
-              <button
-                type="button"
-                class="tactile-push"
-                id="rack-pulse-btn"
-                title="Send a fabric traffic burst across active blades"
-              >
-                <span class="push-dot" aria-hidden="true"></span>
-                Pulse Burst
-              </button>
             </div>
 
-            <!-- Interactive 4-Blade Chassis -->
+            <!-- Interactive 4-Blade Physical Chassis -->
             <div
               class="blade-chassis"
               role="group"
@@ -459,82 +467,92 @@
                 type="button"
                 class="blade is-active"
                 data-blade="0"
+                data-stage="2"
                 aria-pressed="true"
               >
                 <span class="blade-latch" aria-hidden="true"></span>
                 <span class="blade-led" aria-hidden="true"></span>
                 <span class="blade-id">BM-01</span>
-                <span class="blade-role">Dedicated Host Silicon</span>
+                <span class="blade-role">Physical CPU · Direct NIC</span>
                 <span class="blade-vents" aria-hidden="true"></span>
-                <span class="blade-state">ONLINE</span>
+                <span class="blade-state">ACTIVE</span>
               </button>
 
               <button
                 type="button"
                 class="blade is-active"
                 data-blade="1"
+                data-stage="1"
                 aria-pressed="true"
               >
                 <span class="blade-latch" aria-hidden="true"></span>
                 <span class="blade-led" aria-hidden="true"></span>
                 <span class="blade-id">BM-02</span>
-                <span class="blade-role">Deterministic Fabric NIC</span>
+                <span class="blade-role">Direct Fabric &amp; Storage I/O</span>
                 <span class="blade-vents" aria-hidden="true"></span>
-                <span class="blade-state">ONLINE</span>
+                <span class="blade-state">ACTIVE</span>
               </button>
 
               <button
                 type="button"
                 class="blade is-active"
                 data-blade="2"
+                data-stage="0"
                 aria-pressed="true"
               >
                 <span class="blade-latch" aria-hidden="true"></span>
                 <span class="blade-led" aria-hidden="true"></span>
                 <span class="blade-id">BM-03</span>
-                <span class="blade-role">Automated Fleet Control</span>
+                <span class="blade-role">Automated Fleet Controller</span>
                 <span class="blade-vents" aria-hidden="true"></span>
-                <span class="blade-state">ONLINE</span>
+                <span class="blade-state">ACTIVE</span>
               </button>
 
               <button
                 type="button"
                 class="blade is-active"
                 data-blade="3"
+                data-stage="3"
                 aria-pressed="true"
               >
                 <span class="blade-latch" aria-hidden="true"></span>
                 <span class="blade-led" aria-hidden="true"></span>
                 <span class="blade-id">BM-04</span>
-                <span class="blade-role">CME Low-Latency Node</span>
+                <span class="blade-role">CME Low-Latency Host</span>
                 <span class="blade-vents" aria-hidden="true"></span>
-                <span class="blade-state">ONLINE</span>
+                <span class="blade-state">ACTIVE</span>
               </button>
             </div>
 
-            <!-- Miniature Live Fabric Oscilloscope -->
+            <!-- Live Architecture & Signal Canvas -->
             <div class="scope-housing">
               <div class="scope-header">
-                <span class="scope-title">FABRIC SIGNAL OSCILLOSCOPE</span>
+                <span class="scope-title" id="rack-scope-title"
+                  >DIRECT BARE METAL · 0 HYPERVISOR</span
+                >
                 <span class="scope-readout" id="rack-readout" aria-live="polite"
-                  >DEDICATED PATH · 4/4 BLADES ACTIVE</span
+                  >4/4 BLADES ONLINE</span
                 >
               </div>
               <canvas
                 id="rack-scope"
                 class="scope-canvas"
-                width="520"
-                height="136"
-                aria-label="Live fabric traffic oscilloscope visualization"
+                width="540"
+                height="182"
+                aria-label="Live bare metal architecture and fabric visualization"
               ></canvas>
               <div class="scope-footer">
                 <span id="rack-detail"
-                  >Click any blade to toggle isolation, or switch fabric topology.</span
+                  >Direct CPU/NIC path to cloud storage &amp; fabric — zero
+                  hypervisor layer.</span
                 >
-                <span class="scope-legend">
-                  <span class="legend-chip legend-blue">Fabric</span>
-                  <span class="legend-chip legend-emerald">Lock</span>
-                </span>
+                <button
+                  type="button"
+                  class="scope-action-btn"
+                  id="rack-pulse-btn"
+                >
+                  Pulse Burst
+                </button>
               </div>
             </div>
           </div>
@@ -562,29 +580,57 @@
 
           <div class="focus-bento">
             <article class="pillar-card">
-              <span class="pillar-index">01</span>
+              <div class="pillar-top">
+                <span class="pillar-index">01</span>
+                <button
+                  type="button"
+                  class="inspect-pill"
+                  data-jump-rack="host"
+                >
+                  Inspect on Rack ↑
+                </button>
+              </div>
               <h3>Host &amp; fabric</h3>
               <p>
                 Dedicated silicon, high-speed networking, and storage I/O
-                boundaries engineered without virtualized compromise.
+                boundaries wired directly to cloud fabric—zero hypervisor layer.
               </p>
             </article>
 
             <article class="pillar-card">
-              <span class="pillar-index">02</span>
+              <div class="pillar-top">
+                <span class="pillar-index">02</span>
+                <button
+                  type="button"
+                  class="inspect-pill"
+                  data-jump-rack="lifecycle"
+                >
+                  Inspect on Rack ↑
+                </button>
+              </div>
               <h3>Fleet lifecycle</h3>
               <p>
-                Automated provisioning, orchestration, and safe control-plane
-                transitions across physical server fleets.
+                Automated provisioning, firmware/health verification, live
+                orchestration, safe draining, and reclaim across physical
+                fleets.
               </p>
             </article>
 
             <article class="pillar-card">
-              <span class="pillar-index">03</span>
+              <div class="pillar-top">
+                <span class="pillar-index">03</span>
+                <button
+                  type="button"
+                  class="inspect-pill"
+                  data-jump-rack="e2e"
+                >
+                  Inspect on Rack ↑
+                </button>
+              </div>
               <h3>End-to-end behavior</h3>
               <p>
-                Predictable latency, fault isolation, and operability at scale
-                from silicon up to cloud services.
+                Predictable low-jitter packet flows, fault isolation, and
+                operability at scale from host NIC through control plane.
               </p>
             </article>
 
@@ -601,6 +647,13 @@
                   <span class="meta-pill">Deterministic Networking</span>
                   <span class="meta-pill">Financial Markets</span>
                 </div>
+                <button
+                  type="button"
+                  class="btn btn-surface btn-sm cme-sim-btn"
+                  data-jump-rack="cme"
+                >
+                  View CME Dedicated Fabric on Rack ↑
+                </button>
               </div>
               <div class="cme-right">
                 <p>
@@ -638,12 +691,12 @@
         </div>
       </section>
 
-      <!-- SECTION 02: PLAYABLE TACTILE BENTO PLAYGROUND (7 MINI-APPS) -->
+      <!-- SECTION 02: PLAYABLE TACTILE BENTO PLAYGROUND (7 DOMAIN LABS) -->
       <section class="section" id="projects" aria-labelledby="projects-title">
         <div class="shell">
           <div class="section-head">
             <div>
-              <p class="kicker">02 / INTERACTIVE PLAYGROUND · 7 MICRO-APPS</p>
+              <p class="kicker">02 / INTERACTIVE PLAYGROUND · 7 DOMAIN MICRO-APPS</p>
               <h2 id="projects-title">
                 Systems &amp; explorations—<span class="text-blue"
                   >built to touch.</span
@@ -651,15 +704,17 @@
               </h2>
             </div>
             <p class="section-summary">
-              Zero passive diagrams. Flip switches, tune narrowband RF, trace
-              code context, compare VR frame lag, and search 2,208 real academic
-              topics live.
+              Every project card is a custom domain instrument: fracture a 5G
+              link for SEED, probe an eSIM policy barrier, trace an AST call
+              graph, decode NB-IoT waterfall bursts, reprogram Flora’s 4-layer
+              stack, test wireless VR motion-to-photon lag, and map 2,208
+              Acemap topics live.
             </p>
           </div>
 
           <div class="playground-bento">
-            <!-- MINI-APP 1: SEED (span 7) -->
-            <article class="app-card app-span-7" id="seed">
+            <!-- MINI-APP 1: SEED (span 6) -->
+            <article class="app-card app-span-6" id="seed">
               <div class="app-head">
                 <div>
                   <span class="app-badge">01 · 5G RESILIENCE · SIGCOMM ’22</span>
@@ -680,7 +735,7 @@
                   <div class="stage-status">
                     <span class="led led-emerald" id="seed-led" aria-hidden="true"></span>
                     <span class="mono-status" id="seed-status" aria-live="polite"
-                      >5G LINK NOMINAL · SIM MONITOR ARMED</span
+                      >5G BEARER HEALTHY · SIM ARMED</span
                     >
                   </div>
                   <button
@@ -693,7 +748,7 @@
                       <span class="rocker-knob"></span>
                     </span>
                     <span class="rocker-label" id="seed-btn-label"
-                      >Inject 5G Fault</span
+                      >Inject 5G Failure</span
                     >
                   </button>
                 </div>
@@ -703,31 +758,34 @@
                     id="seed-canvas"
                     class="mini-canvas"
                     width="540"
-                    height="128"
-                    aria-label="Live 5G control-plane signal waveform showing fault injection and SIM recovery"
+                    height="184"
+                    aria-label="Interactive 5G UE, SIM SEED chip, and 5G Core failure recovery console"
                   ></canvas>
                 </div>
 
-                <ol class="seed-pipeline" aria-label="SEED recovery phases">
+                <ol class="seed-pipeline" aria-label="SEED recovery choreography">
                   <li class="pipe-step" data-seed-step="1">
                     <span class="pipe-dot" aria-hidden="true"></span>
-                    <span>1. Device Fault Report</span>
+                    <span>1. 5G Drop → SIM</span>
                   </li>
                   <li class="pipe-step" data-seed-step="2">
                     <span class="pipe-dot" aria-hidden="true"></span>
-                    <span>2. SIM + 5G Core Diagnosis</span>
+                    <span>2. SIM + Core Infer</span>
                   </li>
                   <li class="pipe-step" data-seed-step="3">
                     <span class="pipe-dot" aria-hidden="true"></span>
-                    <span>3. Recovery Action Executed</span>
+                    <span>3. Recovery → Online</span>
                   </li>
                 </ol>
-                <span class="sim-footnote">Illustrative 5G failure-recovery simulation</span>
+                <span class="sim-footnote"
+                  >Click the SIM chip or rocker switch · Illustrative 5G
+                  recovery simulation</span
+                >
               </div>
             </article>
 
-            <!-- MINI-APP 2: SecureSIM (span 5) -->
-            <article class="app-card app-span-5" id="secureSIM">
+            <!-- MINI-APP 2: SecureSIM (span 6) -->
+            <article class="app-card app-span-6" id="secureSIM">
               <div class="app-head">
                 <div>
                   <span class="app-badge">02 · SIM/eSIM SECURITY · MOBICOM ’21</span>
@@ -745,63 +803,59 @@
               </div>
 
               <div class="app-stage securesim-stage" data-access="allowed">
-                <div class="dial-bay">
-                  <div class="crypto-dial" id="sim-dial" aria-hidden="true">
-                    <div class="dial-ring"></div>
-                    <div class="dial-needle"></div>
-                    <div class="dial-core">
-                      <span class="dial-icon" id="sim-dial-icon">✓</span>
-                    </div>
-                  </div>
-                  <div class="gate-readout">
-                    <span class="gate-kicker">SIM SERVICE GATE</span>
-                    <strong class="gate-verdict" id="sim-verdict" aria-live="polite"
-                      >ALLOWED</strong
-                    >
-                    <span class="gate-reason" id="sim-reason"
-                      >Certificate authenticated · permission scope valid</span
-                    >
-                  </div>
-                </div>
-
-                <div class="toggle-stack">
-                  <button
-                    type="button"
-                    class="hardware-toggle is-on"
-                    id="sim-cert-toggle"
-                    aria-pressed="true"
+                <div class="stage-bar">
+                  <div
+                    class="spring-segment spring-segment-sm"
+                    role="group"
+                    aria-label="Request authentication profile"
+                    data-segment="securesim"
                   >
-                    <span class="toggle-text">
-                      <strong>Mint Certificate</strong>
-                      <small id="sim-cert-sub">Valid signed identity</small>
-                    </span>
-                    <span class="pill-switch" aria-hidden="true"
-                      ><span class="pill-thumb"></span
-                    ></span>
-                  </button>
+                    <span class="seg-thumb" aria-hidden="true"></span>
+                    <button
+                      type="button"
+                      class="seg-btn is-active"
+                      data-sim-preset="valid"
+                      aria-pressed="true"
+                    >
+                      Valid Cert (Scoped)
+                    </button>
+                    <button
+                      type="button"
+                      class="seg-btn"
+                      data-sim-preset="unauthorized"
+                      aria-pressed="false"
+                    >
+                      Unsigned / Excess Scope
+                    </button>
+                  </div>
 
                   <button
                     type="button"
-                    class="hardware-toggle is-on"
-                    id="sim-perm-toggle"
-                    aria-pressed="true"
-                  >
-                    <span class="toggle-text">
-                      <strong>Grant Service Permission</strong>
-                      <small id="sim-perm-sub">Fine-grained policy active</small>
-                    </span>
-                    <span class="pill-switch" aria-hidden="true"
-                      ><span class="pill-thumb"></span
-                    ></span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="btn btn-surface btn-full"
+                    class="tactile-push tactile-push-sm"
                     id="sim-request-btn"
                   >
-                    Request SIM Service Access
+                    Send Request
                   </button>
+                </div>
+
+                <div class="scope-inset">
+                  <canvas
+                    id="sim-canvas"
+                    class="mini-canvas"
+                    width="540"
+                    height="184"
+                    aria-label="Interactive eSIM chip with cryptographic policy gate and isolated service partitions"
+                  ></canvas>
+                </div>
+
+                <div class="sim-verdict-strip">
+                  <span class="verdict-pill" id="sim-verdict" aria-live="polite"
+                    >ALLOWED</span
+                  >
+                  <span class="gate-reason" id="sim-reason"
+                    >Signed cert verified · routed strictly to scoped NET AUTH
+                    partition</span
+                  >
                 </div>
               </div>
             </article>
@@ -832,61 +886,61 @@
                   <button
                     type="button"
                     class="prompt-chip is-active"
-                    data-code-q="routing"
+                    data-code-q="auth"
                     aria-pressed="true"
                   >
-                    “How does routing work?”
+                    “Trace auth flow”
                   </button>
                   <button
                     type="button"
                     class="prompt-chip"
-                    data-code-q="auth"
+                    data-code-q="routing"
                     aria-pressed="false"
                   >
-                    “Trace auth”
+                    “Explain routing”
                   </button>
                   <button
                     type="button"
                     class="prompt-chip"
-                    data-code-q="context"
+                    data-code-q="sim"
                     aria-pressed="false"
                   >
-                    “Build repo context”
+                    “Find SIM handler”
                   </button>
                 </div>
 
-                <div class="mini-ide">
-                  <div class="ide-tree" aria-label="Repository files">
-                    <span class="tree-root">repo/</span>
-                    <button
-                      type="button"
-                      class="tree-file is-hit"
-                      data-file="router"
-                    >
-                      ├ src/router.py
-                    </button>
-                    <button type="button" class="tree-file" data-file="auth">
-                      ├ src/auth.py
-                    </button>
-                    <button type="button" class="tree-file" data-file="context">
-                      └ src/context.py
-                    </button>
-                  </div>
+                <div class="scope-inset">
+                  <canvas
+                    id="code-graph-canvas"
+                    class="mini-canvas"
+                    width="540"
+                    height="156"
+                    aria-label="Interactive repository AST and function call-graph traced by LLM retrieval beam"
+                  ></canvas>
+                </div>
+
+                <div class="mini-ide-compact">
                   <div class="ide-code" id="code-pane">
-                    <div class="ide-scanner" id="code-scanner" aria-hidden="true"></div>
-                    <pre class="code-lines" id="code-lines"><code><span class="cl is-hl" data-line="1">def dispatch(req, tree):</span>
-<span class="cl is-hl" data-line="2">  match = tree.resolve(req.path)</span>
-<span class="cl" data-line="3">  ctx = gather_context(match.file)</span>
-<span class="cl is-hl" data-line="4">  return match.handler(req, ctx)</span></code></pre>
+                    <div
+                      class="ide-scanner"
+                      id="code-scanner"
+                      aria-hidden="true"
+                    ></div>
+                    <pre class="code-lines" id="code-lines"><code><span class="cl is-hl" data-line="1"># [1] entry.py -> [2] auth.py -> [3] context.py</span>
+<span class="cl is-hl" data-line="2">token = parse_bearer(req.headers)</span>
+<span class="cl is-hl" data-line="3">claims = auth.verify(token)</span>
+<span class="cl" data-line="4">return context.bind(claims, req.repo)</span></code></pre>
                   </div>
                 </div>
 
                 <div class="gpt-answer" id="code-answer" aria-live="polite">
-                  <span class="answer-tag">GPT + CONTEXT</span>
+                  <span class="answer-tag" id="code-path-tag"
+                    >PATH 1 → 2 → 3 · GPT + CONTEXT</span
+                  >
                   <p id="code-answer-text">
-                    <code>dispatch()</code> resolves the request path against
-                    the route tree, pulls matching repository context, and
-                    invokes the bound handler.
+                    Starts at <code>entry.py</code>, verifies bearer credentials
+                    in <code>auth.py</code>, and binds the caller scope inside
+                    <code>context.py</code>.
                   </p>
                 </div>
               </div>
@@ -914,37 +968,44 @@
                   <div class="stage-status">
                     <span class="led led-blue" aria-hidden="true"></span>
                     <span class="mono-status" id="sonica-mode" aria-live="polite"
-                      >STAND-ALONE · NARROWBAND LOCK</span
+                      >STAND-ALONE · SYNC LOCKED</span
                     >
                   </div>
-                  <span class="freq-badge" id="sonica-freq">CH 50 · NB-IoT</span>
+                  <button
+                    type="button"
+                    class="tactile-push tactile-push-sm"
+                    id="sonica-burst-btn"
+                  >
+                    <span class="push-dot" aria-hidden="true"></span>
+                    Emit IoT Burst
+                  </button>
                 </div>
 
                 <div class="scope-inset">
                   <canvas
                     id="sonica-canvas"
                     class="mini-canvas"
-                    width="520"
-                    height="136"
-                    aria-label="Live NB-IoT narrowband RF frequency spectrum visualizer"
+                    width="540"
+                    height="194"
+                    aria-label="Live NB-IoT narrowband spectrum and scrolling waterfall spectrogram"
                   ></canvas>
                 </div>
 
                 <div class="tuner-control">
                   <label class="tuner-label" for="sonica-slider">
-                    <span>NB-IoT Carrier Tuner</span>
-                    <span class="mono-muted" id="sonica-chain"
-                      >COTS Device ↔ SDR eNodeB ↔ EPC + CIoT</span
+                    <span id="sonica-freq">CH 50 · NB-IoT Carrier Tuner</span>
+                    <span class="mono-muted" id="sonica-decode" aria-live="polite"
+                      >RX READY · COTS ↔ SDR eNodeB ↔ CIoT Core</span
                     >
                   </label>
                   <input
                     type="range"
                     id="sonica-slider"
                     class="tactile-slider"
-                    min="10"
-                    max="90"
+                    min="14"
+                    max="86"
                     value="50"
-                    aria-label="Tune NB-IoT narrowband carrier position"
+                    aria-label="Tune NB-IoT narrowband carrier resource block"
                   />
                   <div class="tuner-ticks" aria-hidden="true">
                     <span>Guard-band</span>
@@ -955,11 +1016,11 @@
               </div>
             </article>
 
-            <!-- MINI-APP 5: Flora (span 5) -->
-            <article class="app-card app-span-5" id="flora">
+            <!-- MINI-APP 5: Flora (span 6) -->
+            <article class="app-card app-span-6" id="flora">
               <div class="app-head">
                 <div>
-                  <span class="app-badge">05 · SOFTWARE-DEFINED LTE · TESTBED</span>
+                  <span class="app-badge">05 · SOFTWARE-DEFINED CELLULAR · TESTBED</span>
                   <h3>Flora</h3>
                   <p class="app-desc">
                     A software-defined mobile network spanning eSIM, radio,
@@ -972,107 +1033,73 @@
               </div>
 
               <div class="app-stage flora-stage">
+                <div class="scope-inset">
+                  <canvas
+                    id="flora-canvas"
+                    class="mini-canvas"
+                    width="540"
+                    height="196"
+                    aria-label="Live 4-layer Flora programmable cellular testbed showing eSIM, RAN, 5G Core, and Edge VR packet flows"
+                  ></canvas>
+                </div>
+
                 <div
-                  class="flora-tabs"
-                  role="tablist"
-                  aria-label="Flora 4-layer mobile stack"
+                  class="flora-hooks"
+                  role="group"
+                  aria-label="Programmable cellular stack layer hooks"
                 >
                   <button
                     type="button"
-                    class="flora-tab is-active"
-                    role="tab"
-                    aria-selected="true"
-                    data-layer="0"
+                    class="hook-toggle is-on"
+                    data-flora-hook="esim"
+                    aria-pressed="true"
                   >
-                    eSIM
+                    <span class="hook-layer">L1 · eSIM</span>
+                    <strong>Profile Swap</strong>
+                    <small data-hook-state>Private Testbed</small>
                   </button>
-                  <button
-                    type="button"
-                    class="flora-tab"
-                    role="tab"
-                    aria-selected="false"
-                    data-layer="1"
-                  >
-                    RAN
-                  </button>
-                  <button
-                    type="button"
-                    class="flora-tab"
-                    role="tab"
-                    aria-selected="false"
-                    data-layer="2"
-                  >
-                    Core
-                  </button>
-                  <button
-                    type="button"
-                    class="flora-tab"
-                    role="tab"
-                    aria-selected="false"
-                    data-layer="3"
-                  >
-                    Edge VR
-                  </button>
-                </div>
 
-                <div class="stack-3d" id="flora-stack">
                   <button
                     type="button"
-                    class="stack-card is-selected"
-                    data-layer-card="0"
+                    class="hook-toggle is-on"
+                    data-flora-hook="ran"
+                    aria-pressed="true"
                   >
-                    <span class="layer-num">L1 · IDENTITY</span>
-                    <strong>Configurable eSIM Profile</strong>
-                    <span class="layer-meta"
-                      >Programmable subscriber credentials &amp; network
-                      selection</span
-                    >
+                    <span class="hook-layer">L2 · RAN</span>
+                    <strong>RAN Slice</strong>
+                    <small data-hook-state>Priority Slice</small>
                   </button>
+
                   <button
                     type="button"
-                    class="stack-card"
-                    data-layer-card="1"
+                    class="hook-toggle is-on"
+                    data-flora-hook="core"
+                    aria-pressed="true"
                   >
-                    <span class="layer-num">L2 · RADIO ACCESS</span>
-                    <strong>Software-Defined LTE RAN</strong>
-                    <span class="layer-meta"
-                      >Open radio scheduling &amp; real-time over-the-air
-                      telemetry</span
-                    >
+                    <span class="hook-layer">L3 · 5G CORE</span>
+                    <strong>Core Route</strong>
+                    <small data-hook-state>Local Breakout</small>
                   </button>
+
                   <button
                     type="button"
-                    class="stack-card"
-                    data-layer-card="2"
+                    class="hook-toggle is-on"
+                    data-flora-hook="edge"
+                    aria-pressed="true"
                   >
-                    <span class="layer-num">L3 · NETWORK CORE</span>
-                    <strong>Software-Defined Mobile Core</strong>
-                    <span class="layer-meta"
-                      >End-to-end session control &amp; live network
-                      analytics</span
-                    >
-                  </button>
-                  <button
-                    type="button"
-                    class="stack-card"
-                    data-layer-card="3"
-                  >
-                    <span class="layer-num">L4 · APPLICATION</span>
-                    <strong>Edge VR &amp; Analytics</strong>
-                    <span class="layer-meta"
-                      >Interactive low-latency edge rendering with cross-layer
-                      visibility</span
-                    >
+                    <span class="hook-layer">L4 · EDGE VR</span>
+                    <strong>Edge Offload</strong>
+                    <small data-hook-state>Edge GPU Active</small>
                   </button>
                 </div>
               </div>
             </article>
 
-            <!-- MINI-APP 6: Mobile VR Latency (span 7) -->
-            <article class="app-card app-span-7" id="lrp">
+            <!-- MINI-APP 6: Mobile VR Latency (span 6) -->
+            <article class="app-card app-span-6" id="lrp">
               <div class="app-head">
                 <div>
-                  <span class="app-badge">06 · INTERACTIVE MOBILE VR · NSDI ’21</span>
+                  <span class="app-badge">06 · WIRELESS MOBILE VR · NSDI ’21</span>
                   <h3>Mobile VR Latency</h3>
                   <p class="app-desc">
                     Proactive LTE uplink scheduling for interactive mobile
@@ -1091,7 +1118,7 @@
                   <div
                     class="spring-segment spring-segment-sm"
                     role="group"
-                    aria-label="Scheduling mode comparison"
+                    aria-label="Wireless scheduling mode"
                     data-segment="vr"
                   >
                     <span class="seg-thumb" aria-hidden="true"></span>
@@ -1101,7 +1128,7 @@
                       data-vr-select="standard"
                       aria-pressed="false"
                     >
-                      Standard LTE
+                      Standard (Reactive)
                     </button>
                     <button
                       type="button"
@@ -1109,7 +1136,7 @@
                       data-vr-select="proactive"
                       aria-pressed="true"
                     >
-                      Proactive Uplink
+                      Proactive (Predicted)
                     </button>
                   </div>
 
@@ -1119,7 +1146,7 @@
                     id="vr-auto-btn"
                     aria-pressed="true"
                   >
-                    Auto-Motion
+                    Auto-6DoF
                   </button>
                 </div>
 
@@ -1127,13 +1154,13 @@
                   <canvas
                     id="vr-canvas"
                     class="mini-canvas"
-                    width="560"
-                    height="146"
-                    aria-label="Head-motion lag comparator showing target pose and rendered edge frame tracking"
+                    width="540"
+                    height="200"
+                    aria-label="Wireless VR motion-to-photon lab comparing reactive uplink queueing vs proactive pre-scheduled grants"
                   ></canvas>
                   <div class="vr-hud">
                     <span class="mono-status" id="vr-hud-status" aria-live="polite"
-                      >PROACTIVE SCHEDULE · FRAME LOCKED TO MOTION</span
+                      >PROACTIVE GRANT · UNQUEUED UPLINK · LOCKED</span
                     >
                     <span class="sim-tag-dark">Illustrative timing</span>
                   </div>
@@ -1141,19 +1168,19 @@
 
                 <div class="tuner-control">
                   <label class="tuner-label" for="vr-slider">
-                    <span>Drag Head Yaw Target</span>
+                    <span>Move Pointer on Scope or Drag 6DoF Head Yaw</span>
                     <span class="mono-muted" id="vr-strategy"
-                      >App-layer inference · DRX wake · Proactive uplink</span
+                      >App inference → DRX wake → Pre-scheduled grant</span
                     >
                   </label>
                   <input
                     type="range"
                     id="vr-slider"
                     class="tactile-slider"
-                    min="12"
-                    max="88"
+                    min="14"
+                    max="86"
                     value="50"
-                    aria-label="Adjust simulated VR head motion target"
+                    aria-label="Adjust simulated 6DoF VR headset yaw"
                   />
                 </div>
               </div>
@@ -1220,8 +1247,8 @@
                     <canvas
                       id="acemap-canvas"
                       width="840"
-                      height="360"
-                      aria-label="Interactive scatter map of 2,208 academic research topics across 19 disciplines"
+                      height="380"
+                      aria-label="Interactive scatter map of 2,208 academic research topics across 19 labeled discipline clusters"
                     ></canvas>
                     <div class="acemap-overlay" id="acemap-overlay">
                       <div class="overlay-card">
@@ -1229,7 +1256,8 @@
                         <h4>Explore the real 2,208-topic Acemap dataset</h4>
                         <p>
                           Loads directly from <code>data/data.csv</code> with
-                          instant search, 19 discipline clusters, and hover
+                          on-canvas discipline cluster labels, topic
+                          neighborhood links, instant search, and hover
                           inspection.
                         </p>
                         <button
@@ -1245,7 +1273,7 @@
 
                   <aside
                     class="acemap-inspector"
-                    aria-label="Selected topic details"
+                    aria-label="Selected topic and scholarly neighbors"
                   >
                     <span class="kicker">TOPIC INSPECTOR</span>
                     <div class="inspector-card" id="acemap-inspector-card">
@@ -1263,13 +1291,13 @@
                         Hover or search any topic
                       </h4>
                       <p class="inspector-meta" id="insp-meta">
-                        Load the map to inspect individual nodes, cluster
-                        neighborhoods, and Acemap topic IDs.
+                        Load the map to view labeled discipline centroids and
+                        scholarly neighborhood link lines on hover or click.
                       </p>
                     </div>
                     <div class="inspector-matches" id="acemap-matches" hidden>
                       <span class="matches-label" id="acemap-matches-label"
-                        >Top matches</span
+                        >Related / matching topics</span
                       >
                       <ul class="match-list" id="acemap-match-list"></ul>
                     </div>
@@ -1367,7 +1395,6 @@
               </div>
             </div>
 
-            <!-- Anchor helpers for #conf and #journal -->
             <div class="pub-list" id="pub-list">
               <div class="pub-group" data-kind="conference" id="conf">
                 <h3 class="pub-group-label">Conference publications · 9</h3>

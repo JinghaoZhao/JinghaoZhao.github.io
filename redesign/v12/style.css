@@ -599,6 +599,17 @@ a {
   font-size: 0.78rem;
 }
 
+.spring-segment-4 {
+  width: 100%;
+  grid-auto-columns: 1fr;
+}
+
+.spring-segment-4 .seg-btn {
+  justify-content: center;
+  padding: 7px 8px;
+  font-size: 0.76rem;
+}
+
 .tactile-push {
   display: inline-flex;
   align-items: center;
@@ -874,9 +885,33 @@ a {
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18), 0 0 8px rgba(5, 150, 105, 0.5);
 }
 
-.rack-console[data-fabric="standard"] .blade.is-active .blade-led {
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="0"] .blade-led,
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="1"] .blade-led {
   background: var(--blue);
   box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.16), 0 0 8px rgba(0, 82, 255, 0.45);
+}
+
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="3"] .blade-led {
+  background: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2), 0 0 8px rgba(217, 119, 6, 0.45);
+}
+
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="4"] .blade-led {
+  background: #94a3b8;
+  box-shadow: none;
+}
+
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="0"] .blade-state,
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="1"] .blade-state {
+  color: var(--blue);
+}
+
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="3"] .blade-state {
+  color: #b45309;
+}
+
+.rack-console[data-rack-mode="lifecycle"] .blade[data-stage="4"] .blade-state {
+  color: var(--ink-muted);
 }
 
 .blade.is-pulsing {
@@ -988,32 +1023,63 @@ a {
   color: #94a3b8;
 }
 
-.scope-legend {
-  display: inline-flex;
-  gap: 8px;
+.scope-action-btn {
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
   font-family: var(--font-mono);
   font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s var(--spring);
 }
 
-.legend-chip {
-  display: inline-flex;
+.scope-action-btn:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #60a5fa;
+  color: #ffffff;
+}
+
+.scope-action-btn:active {
+  transform: scale(0.95);
+}
+
+.pillar-top {
+  display: flex;
   align-items: center;
-  gap: 5px;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
-.legend-chip::before {
-  content: "";
-  width: 8px;
-  height: 3px;
-  border-radius: 2px;
+.pillar-top .pillar-index {
+  margin-bottom: 0;
 }
 
-.legend-blue::before {
-  background: #3b82f6;
+.inspect-pill {
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  transition: transform 0.22s var(--spring), background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.legend-emerald::before {
-  background: #10b981;
+.inspect-pill:hover {
+  transform: translateY(-1px);
+  background: #edf3ff;
+  border-color: var(--blue-ring);
+}
+
+.cme-sim-btn {
+  margin-top: 16px;
 }
 
 /* ==========================================================================
@@ -1933,15 +1999,159 @@ a {
   color: #94a3b8;
 }
 
-/* --- Mini-App 5: Flora 4-Layer 3D Stack Switcher --- */
-.flora-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  padding: 4px;
+/* --- Mini-App 2: SecureSIM Verdict Strip & Interactive Canvas --- */
+.sim-verdict-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
   border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 #ffffff;
+}
+
+.securesim-stage.is-shake .sim-verdict-strip {
+  animation: tactileShake 0.42s var(--ease-out);
+}
+
+.verdict-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: #ecfdf5;
+  color: var(--emerald-text);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+  flex: none;
+}
+
+.securesim-stage[data-access="denied"] .verdict-pill {
+  background: #fff1f2;
+  color: var(--coral-text);
+  border-color: rgba(225, 29, 72, 0.32);
+}
+
+#seed-canvas,
+#code-graph-canvas,
+#vr-canvas {
+  cursor: pointer;
+}
+
+.mini-ide-compact {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: var(--slate-screen);
+}
+
+/* --- Mini-App 5: Flora 4-Layer Programmable Hooks --- */
+.flora-hooks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hook-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  box-shadow: var(--shadow-button);
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform 0.25s var(--spring),
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.hook-toggle::after {
+  content: "OFF";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
   background: var(--well);
-  box-shadow: var(--shadow-well);
+  color: var(--ink-muted);
+}
+
+.hook-toggle:hover {
+  transform: translateY(-2px);
+  border-color: var(--blue-ring);
+}
+
+.hook-toggle:active {
+  transform: scale(0.98);
+}
+
+.hook-toggle.is-on {
+  border-color: rgba(0, 82, 255, 0.34);
+  background: linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 2px 6px rgba(0, 82, 255, 0.1);
+}
+
+.hook-toggle.is-on::after {
+  content: "ON";
+  background: #ecfdf5;
+  color: var(--emerald-text);
+  border: 1px solid rgba(5, 150, 105, 0.26);
+}
+
+.hook-layer {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--blue);
+}
+
+.hook-toggle strong {
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  color: var(--ink);
+}
+
+.hook-toggle small {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 540px) {
+  .spring-segment-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    gap: 4px;
+  }
+
+  .spring-segment-4 .seg-thumb {
+    display: none;
+  }
+
+  .spring-segment-4 .seg-btn.is-active {
+    background: #ffffff;
+    box-shadow: var(--shadow-button);
+    color: var(--blue);
+  }
+
+  .flora-hooks {
+    grid-template-columns: 1fr;
+  }
 }
 
 .flora-tab {
@@ -2957,10 +3167,28 @@ a {
     grid-auto-columns: 1fr;
   }
 
+  .spring-segment-sm {
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    gap: 4px;
+  }
+
+  .spring-segment-sm .seg-thumb {
+    display: none;
+  }
+
+  .spring-segment-sm .seg-btn.is-active {
+    background: #ffffff;
+    box-shadow: var(--shadow-button);
+    color: var(--blue);
+  }
+
   .seg-btn {
     padding: 7px 6px;
     font-size: 0.72rem;
     justify-content: center;
+    white-space: normal;
+    text-align: center;
   }
 
   .app-head {
