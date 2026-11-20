@@ -430,6 +430,11 @@
         </div>
 
         <div class="hero-stage" id="hero-stage">
+          <canvas
+            id="hero-bus-canvas"
+            class="hero-bus-canvas"
+            aria-hidden="true"
+          ></canvas>
           <h1 class="hero-display" id="hero-title">
             <span class="hero-band hero-band-left" id="hero-band-left">
               <span
@@ -755,6 +760,13 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
               <span class="cme-focus">ULTRA-LOW-LATENCY TRADING</span>
             </div>
 
+            <div class="cme-pulse-strip">
+              <canvas
+                id="cme-canvas"
+                aria-label="Conceptual visualization of ultra-low-latency market-order pulses traversing dedicated bare metal fabric between trading gateways and a matching engine"
+              ></canvas>
+            </div>
+
             <div class="cme-grid">
               <div class="cme-lockup">
                 <h3 id="cme-title">
@@ -859,6 +871,105 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
                   >
                     Inject 5G Fault <span aria-hidden="true">⚡</span>
                   </button>
+
+                  <!-- SecureSIM Valid vs Unauth -->
+                  <div class="ctx-controls" id="ctrl-securesim" hidden>
+                    <button
+                      type="button"
+                      class="stage-btn"
+                      data-securesim-mode="allow"
+                    >
+                      Valid Cert ✓
+                    </button>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-orange"
+                      data-securesim-mode="deny"
+                    >
+                      Unauth App ✕
+                    </button>
+                  </div>
+
+                  <!-- GPT-Code-Learner Query Selector -->
+                  <div class="ctx-controls" id="ctrl-gpt" hidden>
+                    <button
+                      type="button"
+                      class="stage-btn is-ctx-active"
+                      data-gpt-query="0"
+                      aria-pressed="true"
+                    >
+                      Trace Auth
+                    </button>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-secondary"
+                      data-gpt-query="1"
+                      aria-pressed="false"
+                    >
+                      Explain Routing
+                    </button>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-secondary"
+                      data-gpt-query="2"
+                      aria-pressed="false"
+                    >
+                      Find Entry Points
+                    </button>
+                  </div>
+
+                  <!-- Sonica Channel Tuning Slider -->
+                  <div class="ctx-controls" id="ctrl-sonica" hidden>
+                    <label class="sonica-tune" for="sonica-ch-slider">
+                      <span id="sonica-ch-label">TUNE CH-04</span>
+                      <input
+                        type="range"
+                        id="sonica-ch-slider"
+                        min="1"
+                        max="9"
+                        value="4"
+                        aria-label="NB-IoT narrowband channel"
+                      />
+                    </label>
+                  </div>
+
+                  <!-- Flora Programmable Layer Switches -->
+                  <div class="ctx-controls" id="ctrl-flora" hidden>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-secondary"
+                      data-flora-layer="0"
+                      aria-pressed="false"
+                    >
+                      eSIM: Prof-A
+                    </button>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-secondary"
+                      data-flora-layer="1"
+                      aria-pressed="false"
+                    >
+                      RAN: URLLC
+                    </button>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-secondary"
+                      data-flora-layer="2"
+                      aria-pressed="false"
+                    >
+                      Core: Fast
+                    </button>
+                    <button
+                      type="button"
+                      class="stage-btn stage-btn-secondary"
+                      data-flora-layer="3"
+                      aria-pressed="false"
+                    >
+                      Edge: Offload
+                    </button>
+                  </div>
+
+                  <!-- Mobile VR Mode Toggle -->
                   <button
                     type="button"
                     class="stage-btn stage-btn-secondary"
@@ -870,7 +981,7 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
                   </button>
                 </div>
                 <span class="stage-status" id="stage-status" role="status"
-                  >Harmonic lattice locked · Click canvas to disturb</span
+                  >5G UE ↔ SIM/SEED ↔ 5G Core active · Click to inject fault</span
                 >
               </div>
 
@@ -884,6 +995,15 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
                   >
                     Load 2,208 Topics Dataset <span aria-hidden="true">↗</span>
                   </button>
+                  <label class="acemap-field-wrap" id="acemap-search-wrap" hidden>
+                    <span>SEARCH TOPIC</span>
+                    <input
+                      type="search"
+                      id="acemap-search"
+                      placeholder="Filter e.g. network, 5G…"
+                      aria-label="Search research topics"
+                    />
+                  </label>
                   <label class="acemap-field-wrap" id="acemap-field-wrap" hidden>
                     <span>DISCIPLINE (19)</span>
                     <select id="acemap-field" aria-label="Research field">
