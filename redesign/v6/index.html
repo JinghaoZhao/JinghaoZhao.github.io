@@ -583,6 +583,17 @@
                 </button>
               </div>
 
+              <div class="bm-optical-frame">
+                <canvas
+                  id="bm-optical-canvas"
+                  class="bm-optical-canvas"
+                  aria-label="Live optical visualization of GCE Bare Metal architecture plane"
+                ></canvas>
+                <div class="bm-optical-readout" id="bm-optical-readout" role="status">
+                  HOST &amp; FABRIC · Dedicated physical CPU &amp; NIC directly on cloud fabric (zero hypervisor layer).
+                </div>
+              </div>
+
               <div class="crystal-planes-viewport" data-active-plane="0">
                 <div class="optical-axis" aria-hidden="true"></div>
 
@@ -657,6 +668,17 @@
                 Google Cloud <span class="cme-cross" aria-hidden="true">×</span><br />
                 CME Group
               </h3>
+
+              <div class="cme-optical-frame">
+                <canvas
+                  id="cme-optical-canvas"
+                  class="cme-optical-canvas"
+                  aria-label="Conceptual optical visualization of ultra-low-latency market order streams over dedicated bare metal fabric"
+                ></canvas>
+                <span class="cme-optical-tag">
+                  DEDICATED FABRIC · ORDER-MATCHING PULSE STREAM
+                </span>
+              </div>
 
               <div class="cme-body">
                 <p>
@@ -758,71 +780,140 @@
 
               <!-- Contextual Live Controls overlay (changes by active project) -->
               <div class="chamber-overlay-controls" id="chamber-controls">
-                <button
-                  type="button"
-                  class="hud-btn"
-                  id="seed-pulse-btn"
-                  data-for="seed"
-                >
-                  Trigger 5G Fault &amp; Heal
-                </button>
+                <div class="hud-group" data-for="seed">
+                  <button
+                    type="button"
+                    class="hud-btn hud-btn-primary"
+                    id="seed-pulse-btn"
+                  >
+                    Trigger 5G Failure ✦
+                  </button>
+                </div>
 
-                <button
-                  type="button"
-                  class="hud-btn"
-                  id="sim-auth-btn"
+                <div
+                  class="hud-segmented"
                   data-for="secureSIM"
                   hidden
+                  role="group"
+                  aria-label="SecureSIM access scenario"
                 >
-                  Cycle Iris Vault Lock
-                </button>
-
-                <button
-                  type="button"
-                  class="hud-btn"
-                  id="gpt-query-btn"
-                  data-for="gptcodelearner"
-                  hidden
-                >
-                  Pulse Semantic Query
-                </button>
-
-                <button
-                  type="button"
-                  class="hud-btn"
-                  id="sonica-burst-btn"
-                  data-for="sonica"
-                  hidden
-                >
-                  Emit NB-IoT Burst
-                </button>
-
-                <button
-                  type="button"
-                  class="hud-btn"
-                  id="flora-slice-btn"
-                  data-for="flora"
-                  hidden
-                >
-                  Cycle Active Layer
-                </button>
-
-                <div class="hud-segmented" data-for="lrp" hidden role="group" aria-label="VR latency comparison">
                   <button
                     type="button"
                     class="hud-seg-btn is-active"
-                    data-vr-mode="synced"
+                    data-sim-mode="valid"
                     aria-pressed="true"
                   >
-                    Proactive Synced
+                    Valid Cert
                   </button>
                   <button
                     type="button"
                     class="hud-seg-btn"
-                    data-vr-mode="lagged"
+                    data-sim-mode="unauth"
                     aria-pressed="false"
                   >
-                    Lagged Uplink
+                    Unauthorized App
+                  </button>
+                </div>
+
+                <div
+                  class="hud-segmented"
+                  data-for="gptcodelearner"
+                  hidden
+                  role="group"
+                  aria-label="GPT-Code-Learner query selector"
+                >
+                  <button
+                    type="button"
+                    class="hud-seg-btn is-active"
+                    data-gpt-query="auth"
+                    aria-pressed="true"
+                  >
+                    Trace auth flow
+                  </button>
+                  <button
+                    type="button"
+                    class="hud-seg-btn"
+                    data-gpt-query="routing"
+                    aria-pressed="false"
+                  >
+                    Explain routing
+                  </button>
+                  <button
+                    type="button"
+                    class="hud-seg-btn"
+                    data-gpt-query="entry"
+                    aria-pressed="false"
+                  >
+                    Find entry points
+                  </button>
+                </div>
+
+                <div class="hud-group" data-for="sonica" hidden>
+                  <label class="hud-tuner">
+                    <span>Channel</span>
+                    <input
+                      type="range"
+                      id="sonica-channel-slider"
+                      min="0"
+                      max="2"
+                      step="1"
+                      value="1"
+                      aria-label="Tune NB-IoT subcarrier channel"
+                    />
+                    <span id="sonica-channel-label">CH-2</span>
+                  </label>
+                  <button
+                    type="button"
+                    class="hud-btn hud-btn-primary"
+                    id="sonica-burst-btn"
+                  >
+                    Emit IoT Burst
+                  </button>
+                </div>
+
+                <div
+                  class="hud-group"
+                  data-for="flora"
+                  hidden
+                  role="group"
+                  aria-label="Flora programmable layer hooks"
+                >
+                  <button type="button" class="hud-btn is-hook-on" data-flora-hook="0" aria-pressed="true">
+                    eSIM Profile
+                  </button>
+                  <button type="button" class="hud-btn" data-flora-hook="1" aria-pressed="false">
+                    RAN Slice
+                  </button>
+                  <button type="button" class="hud-btn" data-flora-hook="2" aria-pressed="false">
+                    Core Route
+                  </button>
+                  <button type="button" class="hud-btn is-hook-on" data-flora-hook="3" aria-pressed="true">
+                    Edge Offload
+                  </button>
+                </div>
+
+                <div
+                  class="hud-segmented"
+                  data-for="lrp"
+                  hidden
+                  role="group"
+                  aria-label="Mobile VR uplink scheduling mode"
+                >
+                  <button
+                    type="button"
+                    class="hud-seg-btn is-active"
+                    data-vr-mode="proactive"
+                    aria-pressed="true"
+                  >
+                    Proactive (Predicted)
+                  </button>
+                  <button
+                    type="button"
+                    class="hud-seg-btn"
+                    data-vr-mode="standard"
+                    aria-pressed="false"
+                  >
+                    Standard (Reactive)
                   </button>
                 </div>
 
@@ -854,7 +945,7 @@
 
               <!-- Hover / Telemetry HUD Readout -->
               <div class="chamber-hud-status" id="chamber-status" role="status" aria-live="polite">
-                SEED · Harmonic carrier locked — click to inject a 5G failure and observe SIM-assisted healing.
+                SEED · 5G UE ↔ 5G Core active — trigger a 5G failure to watch SIM-based cause inference and recovery.
               </div>
             </div>
 
