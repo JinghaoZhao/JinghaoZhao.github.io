@@ -576,20 +576,20 @@
               <figure class="monolith-vitrine" aria-labelledby="monolith-caption">
                 <div class="vitrine-topline">
                   <span id="monolith-plate-code">STUDY I · HOST &amp; FABRIC</span>
-                  <span class="vitrine-hint">Move pointer to shift light angle</span>
+                  <span class="vitrine-hint" id="monolith-hint">Move pointer to shift light angle</span>
                 </div>
                 <canvas
                   id="monolith-canvas"
                   width="960"
                   height="600"
                   role="img"
-                  aria-label="Monochrome architectural light-sculpture depicting extruded bare metal monolith planes and directional silver light beams"
+                  aria-label="Monochrome architectural cutaway showing direct bare-metal silicon connected to cloud fabric without a hypervisor layer"
                 ></canvas>
                 <figcaption class="vitrine-caption" id="monolith-caption">
                   <span id="monolith-caption-text"
-                    >Physical silicon, fabric boundaries, and cloud control in equilibrium.</span
+                    >Dedicated physical silicon connected directly to cloud fabric—zero virtualization boundary.</span
                   >
-                  <span>Architectural Light Study</span>
+                  <span>Conceptual Architecture Study</span>
                 </figcaption>
               </figure>
             </div>
@@ -611,6 +611,24 @@
                 <span>CME Group</span>
               </h3>
             </div>
+
+            <figure class="cme-cinema-plate" aria-labelledby="cme-canvas-caption">
+              <div class="vitrine-topline">
+                <span>FABRIC STUDY · DEDICATED MARKET-ORDER RAIL</span>
+                <span>TRADING GATEWAY ⇄ BARE METAL ⇄ MATCHING ENGINE</span>
+              </div>
+              <canvas
+                id="cme-canvas"
+                width="1140"
+                height="260"
+                role="img"
+                aria-label="Monochrome cinema plate showing synchronized market-order light pulses traversing dedicated bare-metal fabric between trading gateways and the matching engine"
+              ></canvas>
+              <figcaption class="vitrine-caption" id="cme-canvas-caption">
+                <span>Deterministic market-order ingress and execution acknowledgement over dedicated bare-metal fabric.</span>
+                <span>Conceptual Visual</span>
+              </figcaption>
+            </figure>
 
             <div class="cme-body-grid">
               <p class="cme-lead">
@@ -982,7 +1000,7 @@
               <div class="kinetic-curtain" id="kinetic-curtain">
                 <div class="stage-bar">
                   <span id="stage-plate-num">PLATE 01 / 07</span>
-                  <span id="stage-plate-medium">CONCENTRIC HEALING SILK RINGS</span>
+                  <span id="stage-plate-medium">5G UE · SIM/SEED · 5G CORE</span>
                 </div>
                 <div class="stage-canvas-frame">
                   <canvas
@@ -990,9 +1008,238 @@
                     width="880"
                     height="680"
                     role="img"
-                    aria-label="Monochrome kinetic art installation for the selected project"
+                    aria-label="SEED: monochrome cinema plate depicting a 5G handset, SIM/SEED chip, and 5G Core diagnosing and recovering from 5G failures"
                   ></canvas>
                 </div>
+
+                <!-- Contextual Domain-Specific Interactive Control Dock -->
+                <div class="stage-controls" id="stage-controls">
+                  <!-- 01. SEED -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="seed">
+                    <div class="ctrl-row">
+                      <button
+                        type="button"
+                        class="hairline-button hairline-button-sm"
+                        id="seed-trigger-btn"
+                      >
+                        Trigger 5G Failure <span aria-hidden="true">⚡</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill is-active"
+                        id="seed-auto-btn"
+                        aria-pressed="true"
+                      >
+                        Auto Cycle
+                      </button>
+                    </div>
+                    <p class="ctrl-status" id="seed-status" role="status">
+                      5G Bearer Active · Click “Trigger 5G Failure” to observe SIM-assisted diagnosis &amp; recovery.
+                    </p>
+                  </div>
+
+                  <!-- 02. SecureSIM -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="secureSIM" hidden>
+                    <div class="ctrl-row" role="group" aria-label="SecureSIM request mode">
+                      <button
+                        type="button"
+                        class="ctrl-pill is-active"
+                        data-securesim-mode="valid"
+                        aria-pressed="true"
+                      >
+                        Valid Cert (Scoped)
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-securesim-mode="unauthorized"
+                        aria-pressed="false"
+                      >
+                        Unauthorized App
+                      </button>
+                    </div>
+                    <p class="ctrl-status" id="securesim-status" role="status">
+                      ALLOWED · Verified certificate aligns policy gate to unlock only its scoped SIM partition.
+                    </p>
+                  </div>
+
+                  <!-- 03. GPT-Code-Learner -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="gptcodelearner" hidden>
+                    <div class="ctrl-row" role="group" aria-label="Codebase query selector">
+                      <button
+                        type="button"
+                        class="ctrl-pill is-active"
+                        data-gpt-query="auth"
+                        aria-pressed="true"
+                      >
+                        “Trace auth flow”
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-gpt-query="routing"
+                        aria-pressed="false"
+                      >
+                        “Explain routing”
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-gpt-query="entry"
+                        aria-pressed="false"
+                      >
+                        “Find entry points”
+                      </button>
+                    </div>
+                    <p class="ctrl-status" id="gpt-status" role="status">
+                      Path I → II → III · entry/main.py → auth.verify() → sim_core.handle()
+                    </p>
+                  </div>
+
+                  <!-- 04. Sonica -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="sonica" hidden>
+                    <div class="ctrl-row" role="group" aria-label="NB-IoT frequency mode">
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-sonica-band="0"
+                        aria-pressed="false"
+                      >
+                        Guard-Band
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill is-active"
+                        data-sonica-band="1"
+                        aria-pressed="true"
+                      >
+                        Stand-Alone
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-sonica-band="2"
+                        aria-pressed="false"
+                      >
+                        In-Band
+                      </button>
+                      <button
+                        type="button"
+                        class="hairline-button hairline-button-sm"
+                        id="sonica-burst-btn"
+                      >
+                        Emit Sensor Burst
+                      </button>
+                    </div>
+                    <p class="ctrl-status" id="sonica-status" role="status">
+                      Stand-Alone NB-IoT channel · Sync Preamble, Control Ch &amp; Uplink Subcarriers active.
+                    </p>
+                  </div>
+
+                  <!-- 05. Flora -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="flora" hidden>
+                    <div class="ctrl-row" role="group" aria-label="Flora programmable layer hooks">
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-flora-hook="esim"
+                        aria-pressed="false"
+                      >
+                        eSIM Profile
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-flora-hook="ran"
+                        aria-pressed="false"
+                      >
+                        RAN Slice
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-flora-hook="core"
+                        aria-pressed="false"
+                      >
+                        Core Route
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill is-active"
+                        data-flora-hook="edge"
+                        aria-pressed="true"
+                      >
+                        Edge Offload
+                      </button>
+                    </div>
+                    <p class="ctrl-status" id="flora-status" role="status">
+                      Click any layer hook or stack plane to reprogram traffic across eSIM → RAN → 5G Core → Edge VR.
+                    </p>
+                  </div>
+
+                  <!-- 06. Mobile VR Latency -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="lrp" hidden>
+                    <div class="ctrl-row" role="group" aria-label="LTE uplink scheduling mode">
+                      <button
+                        type="button"
+                        class="ctrl-pill"
+                        data-vr-mode="standard"
+                        aria-pressed="false"
+                      >
+                        Standard LTE
+                      </button>
+                      <button
+                        type="button"
+                        class="ctrl-pill is-active"
+                        data-vr-mode="proactive"
+                        aria-pressed="true"
+                      >
+                        Proactive Uplink
+                      </button>
+                    </div>
+                    <p class="ctrl-status" id="vr-status" role="status">
+                      Proactive Uplink · Pre-allocated grants eliminate uplink queueing; move pointer over viewport to test lock.
+                    </p>
+                  </div>
+
+                  <!-- 07. Acemap -->
+                  <div class="plate-ctrl-panel" data-ctrl-for="acemap" hidden>
+                    <div class="acemap-bar">
+                      <button
+                        type="button"
+                        class="hairline-button hairline-button-sm"
+                        id="acemap-load-btn"
+                      >
+                        Load 2,208-Topic Silver Print <span aria-hidden="true">↗</span>
+                      </button>
+                      <label class="archival-select" id="acemap-field-wrap" hidden>
+                        <span>Discipline</span>
+                        <select id="acemap-field" aria-label="Research discipline">
+                          <option value="all">All 19 disciplines</option>
+                        </select>
+                      </label>
+                      <label class="archival-select" id="acemap-search-wrap" hidden>
+                        <span>Search Topic</span>
+                        <input
+                          type="search"
+                          id="acemap-search"
+                          placeholder="Filter 2,208 topics…"
+                          aria-label="Search research topic"
+                        />
+                      </label>
+                      <label class="archival-select" id="acemap-topic-wrap" hidden>
+                        <span>Topic</span>
+                        <select id="acemap-topic" aria-label="Research topic">
+                          <option value="">Choose a topic</option>
+                        </select>
+                      </label>
+                    </div>
+                    <p class="ctrl-status" id="acemap-status" role="status">
+                      On-demand archival dataset · 2,208 topics across 19 disciplines.
+                    </p>
+                  </div>
+                </div>
+
                 <div class="stage-footer">
                   <div class="stage-copy">
                     <h3 id="stage-title">SEED</h3>
@@ -1006,34 +1253,6 @@
                     href="../../docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
                     >Read the SIGCOMM ’22 paper <span aria-hidden="true">↗</span></a
                   >
-                </div>
-
-                <!-- Interactive Acemap Archival Controls (shown when Acemap plate is active) -->
-                <div class="acemap-controls" id="acemap-controls" hidden>
-                  <div class="acemap-bar">
-                    <button
-                      type="button"
-                      class="hairline-button hairline-button-sm"
-                      id="acemap-load-btn"
-                    >
-                      Load 2,208-Topic Silver Print <span aria-hidden="true">↗</span>
-                    </button>
-                    <label class="archival-select" id="acemap-field-wrap" hidden>
-                      <span>Discipline</span>
-                      <select id="acemap-field" aria-label="Research discipline">
-                        <option value="all">All 19 disciplines</option>
-                      </select>
-                    </label>
-                    <label class="archival-select" id="acemap-topic-wrap" hidden>
-                      <span>Topic</span>
-                      <select id="acemap-topic" aria-label="Research topic">
-                        <option value="">Choose a topic</option>
-                      </select>
-                    </label>
-                  </div>
-                  <p class="acemap-status" id="acemap-status" role="status">
-                    On-demand archival dataset · 2,208 topics across 19 disciplines.
-                  </p>
                 </div>
               </div>
             </div>

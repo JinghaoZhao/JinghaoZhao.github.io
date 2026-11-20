@@ -87,7 +87,8 @@ a {
 }
 
 button,
-select {
+select,
+input {
   font: inherit;
   color: inherit;
 }
@@ -849,8 +850,24 @@ select {
 }
 
 .cme-title-block {
-  padding: clamp(2.8rem, 6vw, 5.5rem) 0;
+  padding: clamp(2.8rem, 6vw, 5rem) 0;
   border-bottom: 1px solid var(--hairline-noir);
+}
+
+.cme-cinema-plate {
+  margin: clamp(2rem, 4vw, 3.2rem) 0 0;
+  border: 1px solid var(--hairline-noir);
+  background: #060608;
+  display: flex;
+  flex-direction: column;
+}
+
+#cme-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1140 / 260;
+  min-height: 150px;
+  background: #060608;
 }
 
 .cme-monument {
@@ -1295,11 +1312,55 @@ select {
   border-bottom-color: var(--ink-on-noir);
 }
 
-/* Acemap Archival Controls */
-.acemap-controls {
-  padding: 1.15rem 1.25rem 1.3rem;
+/* Contextual Monochrome Cinema Control Dock */
+.stage-controls {
+  padding: 1.05rem 1.25rem 1.15rem;
   border-top: 1px solid var(--hairline-noir);
   background: #0b0b0e;
+}
+
+.ctrl-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.ctrl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.52rem 0.92rem;
+  border: 1px solid var(--hairline-noir-strong);
+  background: transparent;
+  color: var(--ink-on-noir-2);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--ease-cinema),
+    color 0.25s var(--ease-cinema),
+    border-color 0.25s var(--ease-cinema);
+}
+
+.ctrl-pill:hover {
+  border-color: var(--ink-on-noir);
+  color: var(--ink-on-noir);
+}
+
+.ctrl-pill.is-active,
+.ctrl-pill[aria-pressed="true"] {
+  background: var(--pearl);
+  border-color: var(--pearl);
+  color: var(--noir);
+}
+
+.ctrl-status {
+  margin: 0.78rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-on-noir-2);
 }
 
 .acemap-bar {
@@ -1313,8 +1374,8 @@ select {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  min-width: 11rem;
-  flex: 1 1 11rem;
+  min-width: 9.5rem;
+  flex: 1 1 9.5rem;
 }
 
 .archival-select span {
@@ -1324,7 +1385,8 @@ select {
   color: var(--ink-on-noir-muted);
 }
 
-.archival-select select {
+.archival-select select,
+.archival-select input {
   width: 100%;
   padding: 0.52rem 0.7rem;
   background: var(--noir);
@@ -1334,10 +1396,8 @@ select {
   border-radius: 0;
 }
 
-.acemap-status {
-  margin: 0.85rem 0 0;
-  font-size: 0.82rem;
-  color: var(--ink-on-noir-2);
+.archival-select input::placeholder {
+  color: var(--ink-on-noir-muted);
 }
 
 .archival-spotlight {
