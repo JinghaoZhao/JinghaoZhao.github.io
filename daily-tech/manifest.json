@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-19",
+  "updated_at": "2026-11-20",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1921,6 +1921,27 @@
       ],
       "excerpt": "OpenAI 揭开 Codex 的本机沙箱架构：为什么不直接用 Docker，怎样用权限配置、网络代理和 Mac/Linux/Windows 原生内核能力保护 Agent 工具调用，以及 MCP 服务器可能遗漏的安全边界。",
       "reading_minutes": 17
+    },
+    {
+      "id": "2026-11-20-alphagenome-2-cell-context",
+      "sequence": 92,
+      "title": "同一段 DNA，为什么只在某种细胞里致病？AlphaGenome 2 把基因组预测推进到单细胞状态",
+      "source_title": "AlphaGenome 2: Deciphering how cells read DNA to better understand disease",
+      "source_author": "Adam Gayoso, Natasha Latysheva, Pushmeet Kohli, Žiga Avsec (Google DeepMind)",
+      "source_date": "2026-11-11",
+      "source_url": "https://deepmind.google/blog/alphagenome-2-deciphering-how-cells-read-dna-to-better-understand-disease/",
+      "delivery_date": "2026-11-20",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-20-alphagenome-2-cell-context.md",
+      "tags": [
+        "AI for Science",
+        "基因组学",
+        "单细胞生物学",
+        "生命科学工具"
+      ],
+      "excerpt": "Google DeepMind 将百万碱基序列预测改造成依赖细胞身份和状态的条件模型，以超过1.07亿份单细胞资料为基础，在免疫细胞变异识别评测中把30%与16%、43%与23%的差距变成可检验的科研线索。",
+      "reading_minutes": 19
     }
   ]
 }
