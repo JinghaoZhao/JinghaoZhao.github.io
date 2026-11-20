@@ -326,6 +326,138 @@ input {
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Silver-Hairline Collapsible 7-Day Edition Switcher */
+.edition-switcher {
+  position: relative;
+}
+
+.edition-trigger {
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  color: var(--ink-on-noir);
+  border-color: var(--hairline-noir-strong);
+}
+
+.edition-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pearl);
+}
+
+.edition-caret {
+  font-size: 0.72rem;
+  opacity: 0.75;
+  transition: transform 0.25s var(--ease-cinema);
+}
+
+.edition-trigger[aria-expanded="true"] .edition-caret {
+  transform: rotate(180deg);
+}
+
+.edition-menu {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  z-index: 100;
+  width: 16.5rem;
+  max-width: calc(100vw - 1.75rem);
+  padding: 0.85rem;
+  background: rgba(9, 9, 11, 0.96);
+  border: 1px solid var(--hairline-noir-strong);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+}
+
+.edition-menu-head {
+  margin: 0 0 0.65rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--hairline-noir);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-on-noir-muted);
+}
+
+.edition-days {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.edition-option {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid transparent;
+  font-size: 0.78rem;
+  color: var(--ink-on-noir-2);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.edition-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink-on-noir);
+}
+
+.edition-option.is-current {
+  background: var(--pearl);
+  color: var(--noir);
+  border-color: var(--pearl);
+}
+
+.ed-day {
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.edition-option.is-current .ed-day {
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+.ed-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.edition-menu-foot {
+  margin-top: 0.65rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--hairline-noir);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.edition-foot-link {
+  flex: 1;
+  text-align: center;
+  padding: 0.38rem 0.5rem;
+  border: 1px solid var(--hairline-noir);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-on-noir-2);
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.edition-foot-link:hover {
+  border-color: var(--hairline-noir-strong);
+  color: var(--ink-on-noir);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 /* Minimal Film-Slate Chapter Rail */
 .slate-rail {
   position: fixed;

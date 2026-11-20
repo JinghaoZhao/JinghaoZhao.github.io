@@ -17,6 +17,38 @@
   }
 
   /* -------------------------------------------------------------------------
+   * 7-Day Edition Switcher Popover (THU · V9)
+   * ---------------------------------------------------------------------- */
+  const editionSwitcher = $("#edition-switcher");
+  const editionToggle = $("#edition-toggle");
+  const editionMenu = $("#edition-menu");
+
+  if (editionSwitcher && editionToggle && editionMenu) {
+    const setEditionOpen = (open) => {
+      editionMenu.hidden = !open;
+      editionToggle.setAttribute("aria-expanded", String(open));
+    };
+
+    editionToggle.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      setEditionOpen(editionMenu.hidden);
+    });
+
+    document.addEventListener("click", (ev) => {
+      if (!editionMenu.hidden && !editionSwitcher.contains(ev.target)) {
+        setEditionOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && !editionMenu.hidden) {
+        setEditionOpen(false);
+        editionToggle.focus();
+      }
+    });
+  }
+
+  /* -------------------------------------------------------------------------
    * Motion Preference & Pauseable Canvas Registry
    * ---------------------------------------------------------------------- */
   const canvasControllers = [];

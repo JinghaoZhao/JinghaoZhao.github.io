@@ -3026,20 +3026,30 @@
     },
     {
       group: "Links",
-      title: "Redesign Gallery (All Versions)",
+      title: "7-Day Redesign Gallery",
       sub: "../",
       tag: "Switch",
-      keywords: "redesign versions gallery switcher",
+      keywords: "redesign versions gallery switcher 7 day",
       action: () => {
         window.location.href = "../";
       },
     },
     {
       group: "Links",
-      title: "Original Production Site",
+      title: "SUN · Classic Edition",
+      sub: "../../?edition=classic",
+      tag: "Switch",
+      keywords: "original classic sun edition live site",
+      action: () => {
+        window.location.href = "../../?edition=classic";
+      },
+    },
+    {
+      group: "Links",
+      title: "Auto (Today's Edition)",
       sub: "../../",
       tag: "Switch",
-      keywords: "original live site home",
+      keywords: "auto today daily rotation home",
       action: () => {
         window.location.href = "../../";
       },
@@ -3199,6 +3209,43 @@
       closeCmd();
     }
   });
+
+  // --------------------------------------------------------------------------
+  // Collapsible 7-Day Edition Switcher Popover (SAT · V12)
+  // --------------------------------------------------------------------------
+  const editionSwitcher = $("#edition-switcher");
+  const editionTrigger = $("#edition-trigger");
+  const editionMenu = $("#edition-menu");
+
+  function setEditionMenuOpen(open) {
+    if (!editionTrigger || !editionMenu) return;
+    editionMenu.hidden = !open;
+    editionTrigger.setAttribute("aria-expanded", String(open));
+  }
+
+  if (editionTrigger && editionMenu) {
+    editionTrigger.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      setEditionMenuOpen(editionMenu.hidden);
+    });
+
+    document.addEventListener("click", (ev) => {
+      if (
+        !editionMenu.hidden &&
+        editionSwitcher &&
+        !editionSwitcher.contains(ev.target)
+      ) {
+        setEditionMenuOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && !editionMenu.hidden) {
+        setEditionMenuOpen(false);
+        editionTrigger.focus({ preventScroll: true });
+      }
+    });
+  }
 
   requestAnimationFrame(syncAllSegments);
 })();

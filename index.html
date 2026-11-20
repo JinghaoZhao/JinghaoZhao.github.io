@@ -4,28 +4,101 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#07162b" />
-    <title>Jinghao Zhao — Engineer & Designer</title>
+    <title>
+      Jinghao Zhao — Engineer &amp; Designer | Google Cloud GCE Bare Metal, UCLA
+      CS Ph.D.
+    </title>
     <meta
       name="description"
-      content="Jinghao Zhao is a software engineer on Google’s GCE Bare Metal team, bringing an end-to-end systems perspective to cloud infrastructure. UCLA Ph.D., systems and networking researcher."
+      content="Jinghao Zhao is a software engineer on Google Cloud’s GCE Bare Metal team, contributing to dedicated physical cloud infrastructure and the Google Cloud × CME Group ultra-low-latency trading platform. UCLA Computer Science Ph.D. and SJTU B.S."
+    />
+    <meta name="author" content="Jinghao Zhao" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
     <link rel="canonical" href="https://zhaojinghao.com/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Jinghao Zhao — Engineer & Designer" />
+    <meta property="og:type" content="profile" />
+    <meta property="profile:first_name" content="Jinghao" />
+    <meta property="profile:last_name" content="Zhao" />
+    <meta
+      property="og:title"
+      content="Jinghao Zhao — Engineer &amp; Designer | Google Cloud GCE Bare Metal, UCLA CS Ph.D."
+    />
     <meta
       property="og:description"
-      content="Building at the intersection of cloud infrastructure, low-latency systems, and thoughtful design."
+      content="Software engineer on Google Cloud’s GCE Bare Metal team, architecting cloud and networked systems from bare metal up. UCLA Computer Science Ph.D. and systems researcher."
     />
     <meta property="og:url" content="https://zhaojinghao.com/" />
+    <meta property="og:site_name" content="Jinghao Zhao" />
     <meta
       property="og:image"
-      content="https://zhaojinghao.com/images/background.jpg"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
     <meta
       property="og:image:alt"
-      content="Blue geometric landscape from Jinghao Zhao’s personal website"
+      content="Portrait of Jinghao Zhao, Engineer and Designer"
     />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Jinghao Zhao — Engineer &amp; Designer | Google Cloud GCE Bare Metal, UCLA CS Ph.D."
+    />
+    <meta
+      name="twitter:description"
+      content="Software engineer on Google Cloud’s GCE Bare Metal team, UCLA Computer Science Ph.D., and systems &amp; networking researcher."
+    />
+    <meta
+      name="twitter:image"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Portrait of Jinghao Zhao, Engineer and Designer"
+    />
+    <!-- Synchronous 7-day weekday auto-router (runs before stylesheets/paint). -->
+    <script>
+      (function () {
+        try {
+          var routes = {
+            1: "redesign/v6/",
+            2: "redesign/v7/",
+            3: "redesign/v8/",
+            4: "redesign/v9/",
+            5: "redesign/v11/",
+            6: "redesign/v12/",
+          };
+          var editions = {
+            v6: "redesign/v6/",
+            v7: "redesign/v7/",
+            v8: "redesign/v8/",
+            v9: "redesign/v9/",
+            v11: "redesign/v11/",
+            v12: "redesign/v12/",
+          };
+          var params = new URLSearchParams(window.location.search);
+          var edition = (params.get("edition") || "").toLowerCase();
+          var day = params.get("day");
+          var stay = params.get("stay");
+          if (edition === "classic" || day === "0" || stay === "1") {
+            return;
+          }
+          var hash = window.location.hash || "";
+          if (day && routes[day]) {
+            window.location.replace(routes[day] + hash);
+            return;
+          }
+          if (edition && editions[edition]) {
+            window.location.replace(editions[edition] + hash);
+            return;
+          }
+          var d = new Date().getDay();
+          if (d !== 0 && routes[d]) {
+            window.location.replace(routes[d] + hash);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
     <link
       rel="preload"
@@ -41,7 +114,7 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="stylesheet" href="css/site.css?v=20261117-4" />
+    <link rel="stylesheet" href="css/site.css?v=20261120-1" />
     <link rel="stylesheet" href="css/project-studies.css?v=20261117-4" />
     <script src="js/site.js?v=20261117-4" defer></script>
     <script src="js/project-studies.js?v=20261117-4" defer></script>
@@ -64,6 +137,221 @@
         document.head.appendChild(analytics);
       }
     </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://zhaojinghao.com/#website",
+            "url": "https://zhaojinghao.com/",
+            "name": "Jinghao Zhao — Engineer & Designer",
+            "publisher": { "@id": "https://zhaojinghao.com/#person" }
+          },
+          {
+            "@type": "ProfilePage",
+            "@id": "https://zhaojinghao.com/#profilepage",
+            "url": "https://zhaojinghao.com/",
+            "name": "Jinghao Zhao — Engineer & Designer | Google Cloud GCE Bare Metal, UCLA CS Ph.D.",
+            "isPartOf": { "@id": "https://zhaojinghao.com/#website" },
+            "mainEntity": { "@id": "https://zhaojinghao.com/#person" },
+            "about": { "@id": "https://zhaojinghao.com/#person" }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://zhaojinghao.com/#person",
+            "name": "Jinghao Zhao",
+            "alternateName": "JH Zhao",
+            "url": "https://zhaojinghao.com/",
+            "image": "https://zhaojinghao.com/images/optimized/bio.webp",
+            "jobTitle": "Software Engineer, GCE Bare Metal",
+            "description": "Software engineer on Google's GCE Bare Metal team, bringing an end-to-end systems perspective to cloud infrastructure. UCLA Ph.D. in Computer Science, systems and networking researcher.",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "Google Cloud — GCE Bare Metal",
+              "url": "https://cloud.google.com/"
+            },
+            "alumniOf": [
+              {
+                "@type": "CollegeOrUniversity",
+                "name": "University of California, Los Angeles",
+                "url": "https://www.ucla.edu/"
+              },
+              {
+                "@type": "CollegeOrUniversity",
+                "name": "Shanghai Jiao Tong University",
+                "url": "https://en.sjtu.edu.cn/"
+              }
+            ],
+            "knowsAbout": [
+              "Bare Metal Cloud Infrastructure",
+              "Ultra-Low-Latency Networking",
+              "5G & Cellular Systems",
+              "SIM and eSIM Security",
+              "Mobile Edge Computing",
+              "Human-Computer Interaction"
+            ],
+            "sameAs": [
+              "https://github.com/JinghaoZhao",
+              "https://scholar.google.com/citations?user=0JvRKBUAAAAJ",
+              "https://www.linkedin.com/in/jinghaozhao/"
+            ]
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://zhaojinghao.com/#proj-gpt-code-learner",
+            "name": "GPT-Code-Learner",
+            "description": "Explore a codebase through questions, context, and GPT.",
+            "codeRepository": "https://github.com/JinghaoZhao/GPT-Code-Learner",
+            "url": "https://github.com/JinghaoZhao/GPT-Code-Learner",
+            "author": { "@id": "https://zhaojinghao.com/#person" }
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://zhaojinghao.com/#proj-sonica",
+            "name": "Sonica",
+            "description": "An open NB-IoT network for experiments with real devices.",
+            "codeRepository": "https://github.com/sonica-nbiot/sonica",
+            "url": "https://github.com/sonica-nbiot/sonica",
+            "author": { "@id": "https://zhaojinghao.com/#person" }
+          },
+          {
+            "@type": "CreativeWork",
+            "@id": "https://zhaojinghao.com/#proj-flora",
+            "name": "Flora",
+            "description": "A software-defined mobile network spanning eSIM, radio, core, and edge.",
+            "url": "https://project-flora.github.io/Flora/",
+            "author": { "@id": "https://zhaojinghao.com/#person" }
+          },
+          {
+            "@type": "Dataset",
+            "@id": "https://zhaojinghao.com/#proj-acemap",
+            "name": "Acemap",
+            "description": "An academic knowledge graph mapping connections across 2,208 research topics and 19 disciplines.",
+            "url": "https://acemap.sjtu.edu.cn/",
+            "creator": { "@id": "https://zhaojinghao.com/#person" },
+            "author": { "@id": "https://zhaojinghao.com/#person" }
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-sign-to-911",
+            "headline": "Sign-to-911: Enabling 911 Service for Sign Language Users on Assistive AR Glasses",
+            "datePublished": "2023",
+            "isPartOf": { "@type": "PublicationEvent", "name": "ACM MobiCom 2023" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1145/3570361.3613260",
+            "sameAs": "https://doi.org/10.1145/3570361.3613260"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-celldam",
+            "headline": "CellDAM: User-Space, Rootless Detection and Mitigation for 5G Data Plane",
+            "datePublished": "2023",
+            "isPartOf": { "@type": "PublicationEvent", "name": "USENIX NSDI 2023" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://www.usenix.org/system/files/nsdi23-tan.pdf"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-seed",
+            "headline": "SEED: A SIM-Based Solution to 5G Failures",
+            "datePublished": "2022",
+            "isPartOf": { "@type": "PublicationEvent", "name": "ACM SIGCOMM 2022" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://zhaojinghao.com/docs/SEED-A%20SIM-Based%20Solution%20to%205G%20Failures.pdf"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-5g-messaging",
+            "headline": "5G Messaging: System Insecurity and Defenses",
+            "datePublished": "2022",
+            "isPartOf": { "@type": "PublicationEvent", "name": "IEEE CNS 2022" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1109/CNS56114.2022.9947238",
+            "sameAs": "https://doi.org/10.1109/CNS56114.2022.9947238"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-securesim",
+            "headline": "SecureSIM: Rethinking Authentication and Access Control for SIM/eSIM",
+            "datePublished": "2021",
+            "isPartOf": { "@type": "PublicationEvent", "name": "ACM MobiCom 2021" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://dl.acm.org/doi/10.1145/3447993.3483254",
+            "sameAs": "https://dl.acm.org/doi/10.1145/3447993.3483254"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-ciot-mobicom",
+            "headline": "Data-Plane Signaling in Cellular IoT: Attacks and Defense",
+            "datePublished": "2021",
+            "isPartOf": { "@type": "PublicationEvent", "name": "ACM MobiCom 2021" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1145/3447993.3483255",
+            "sameAs": "https://doi.org/10.1145/3447993.3483255"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-mobileinsight",
+            "headline": "Experience: A Five-Year Retrospective of MobileInsight",
+            "datePublished": "2021",
+            "isPartOf": { "@type": "PublicationEvent", "name": "ACM MobiCom 2021" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1145/3447993.3448138",
+            "sameAs": "https://doi.org/10.1145/3447993.3448138"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-nsdi21",
+            "headline": "Device-Based LTE Latency Reduction at the Application Layer",
+            "datePublished": "2021",
+            "isPartOf": { "@type": "PublicationEvent", "name": "USENIX NSDI 2021" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://www.usenix.org/system/files/nsdi21-tan.pdf"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-ijcnn19",
+            "headline": "Skip The Question You Don't Know: An Embedding Space Approach",
+            "datePublished": "2019",
+            "isPartOf": { "@type": "PublicationEvent", "name": "IJCNN 2019" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1109/IJCNN.2019.8852003",
+            "sameAs": "https://doi.org/10.1109/IJCNN.2019.8852003"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-tmc23",
+            "headline": "LDRP: Device-Centric Latency Diagnostic and Reduction for Cellular Networks without Root",
+            "datePublished": "2023",
+            "isPartOf": { "@type": "Periodical", "name": "IEEE Transactions on Mobile Computing (TMC)" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1109/TMC.2023.3267805",
+            "sameAs": "https://doi.org/10.1109/TMC.2023.3267805"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-ton22",
+            "headline": "Movement-Based Reliable Mobility Management for Beyond 5G Cellular Networks",
+            "datePublished": "2022",
+            "isPartOf": { "@type": "Periodical", "name": "IEEE/ACM Transactions on Networking (TON)" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1109/TNET.2022.3190788",
+            "sameAs": "https://doi.org/10.1109/TNET.2022.3190788"
+          },
+          {
+            "@type": "ScholarlyArticle",
+            "@id": "https://zhaojinghao.com/#pub-tosn22",
+            "headline": "Breaking Cellular IoT with Forged Data-Plane Signaling: Attacks and Countermeasure",
+            "datePublished": "2022",
+            "isPartOf": { "@type": "Periodical", "name": "ACM Transactions on Sensor Networks (TOSN)" },
+            "author": { "@id": "https://zhaojinghao.com/#person" },
+            "url": "https://doi.org/10.1145/3534124",
+            "sameAs": "https://doi.org/10.1145/3534124"
+          }
+        ]
+      }
+    </script>
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -75,7 +363,10 @@
         <a href="#work">Work</a><a href="#Bio">About</a
         ><a href="#projects">Projects</a><a href="#publications">Research</a>
       </nav>
-      <a class="header-contact" href="https://www.linkedin.com/in/jinghaozhao/"
+      <a
+        class="header-contact"
+        href="https://www.linkedin.com/in/jinghaozhao/"
+        rel="me noopener noreferrer"
         >Connect <span aria-hidden="true">↗</span></a
       >
     </header>
@@ -109,14 +400,17 @@
           <div class="social-links">
             <a
               href="https://github.com/JinghaoZhao"
+              rel="me noopener noreferrer"
               aria-label="Jinghao Zhao on GitHub"
               >GitHub <span aria-hidden="true">↗</span></a
             ><a
               href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+              rel="me noopener noreferrer"
               aria-label="Jinghao Zhao on Google Scholar"
               >Scholar <span aria-hidden="true">↗</span></a
             ><a
               href="https://www.linkedin.com/in/jinghaozhao/"
+              rel="me noopener noreferrer"
               aria-label="Jinghao Zhao on LinkedIn"
               >LinkedIn <span aria-hidden="true">↗</span></a
             ><a
@@ -422,10 +716,12 @@
               ><a
                 class="text-link"
                 href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+                rel="me noopener noreferrer"
                 >Google Scholar <span aria-hidden="true">↗</span></a
               ><a
                 class="text-link"
                 href="https://www.linkedin.com/in/jinghaozhao/"
+                rel="me noopener noreferrer"
                 >Connect on LinkedIn <span aria-hidden="true">↗</span></a
               >
             </div>
@@ -1835,6 +2131,7 @@
               <a
                 class="text-link"
                 href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+                rel="me noopener noreferrer"
                 >Google Scholar <span aria-hidden="true">↗</span></a
               ><a
                 class="text-link"
@@ -2102,6 +2399,7 @@
             <a
               class="contact-arrow"
               href="https://www.linkedin.com/in/jinghaozhao/"
+              rel="me noopener noreferrer"
               aria-label="Connect with Jinghao Zhao on LinkedIn"
               ><span aria-hidden="true">↗</span></a
             >
@@ -2109,6 +2407,7 @@
           <a
             class="contact-link text-link"
             href="https://www.linkedin.com/in/jinghaozhao/"
+            rel="me noopener noreferrer"
             >Connect on LinkedIn <span aria-hidden="true">↗</span></a
           >
         </div>
@@ -2121,15 +2420,121 @@
         >
         <p>© 2016–<span id="year">2026</span> Jinghao Zhao</p>
         <div class="footer-links">
-          <a href="https://github.com/JinghaoZhao"
+          <a href="https://github.com/JinghaoZhao" rel="me noopener noreferrer"
             >GitHub <span aria-hidden="true">↗</span></a
-          ><a href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+          ><a
+            href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
+            rel="me noopener noreferrer"
             >Scholar <span aria-hidden="true">↗</span></a
-          ><a href="https://www.linkedin.com/in/jinghaozhao/"
+          ><a
+            href="https://www.linkedin.com/in/jinghaozhao/"
+            rel="me noopener noreferrer"
             >LinkedIn <span aria-hidden="true">↗</span></a
           ><a href="#top">Back to top <span aria-hidden="true">↑</span></a>
         </div>
       </div>
     </footer>
+    <aside
+      class="edition-switcher"
+      id="edition-switcher"
+      aria-label="7-Day Edition Switcher"
+    >
+      <div class="edition-menu" id="edition-menu" hidden>
+        <div class="edition-menu-head">
+          <span>7-Day Editions</span>
+          <span>Sun–Sat</span>
+        </div>
+        <ul class="edition-list">
+          <li>
+            <a
+              class="edition-item"
+              href="?edition=classic"
+              data-day="0"
+              aria-current="page"
+              ><span class="edition-day">SUN</span
+              ><span class="edition-name">Classic</span
+              ><span class="edition-badge">Active</span></a
+            >
+          </li>
+          <li>
+            <a class="edition-item" href="redesign/v6/" data-day="1"
+              ><span class="edition-day">MON</span
+              ><span class="edition-name">V6 Prism</span></a
+            >
+          </li>
+          <li>
+            <a class="edition-item" href="redesign/v7/" data-day="2"
+              ><span class="edition-day">TUE</span
+              ><span class="edition-name">V7 Monolith</span></a
+            >
+          </li>
+          <li>
+            <a class="edition-item" href="redesign/v8/" data-day="3"
+              ><span class="edition-day">WED</span
+              ><span class="edition-name">V8 Scope</span></a
+            >
+          </li>
+          <li>
+            <a class="edition-item" href="redesign/v9/" data-day="4"
+              ><span class="edition-day">THU</span
+              ><span class="edition-name">V9 Cinema</span></a
+            >
+          </li>
+          <li>
+            <a class="edition-item" href="redesign/v11/" data-day="5"
+              ><span class="edition-day">FRI</span
+              ><span class="edition-name">V11 Orbital</span></a
+            >
+          </li>
+          <li>
+            <a class="edition-item" href="redesign/v12/" data-day="6"
+              ><span class="edition-day">SAT</span
+              ><span class="edition-name">V12 Spatial OS</span></a
+            >
+          </li>
+        </ul>
+        <div class="edition-menu-foot">
+          <a class="edition-foot-link" href="redesign/">All 12 Gallery</a>
+          <a class="edition-foot-link" href="./">Auto (Today)</a>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="edition-trigger"
+        id="edition-trigger"
+        aria-expanded="false"
+        aria-controls="edition-menu"
+      >
+        <span class="edition-dot" aria-hidden="true"></span>
+        <span>Sun · Classic</span>
+        <span class="edition-caret" aria-hidden="true">▴</span>
+      </button>
+    </aside>
+    <script>
+      (function () {
+        var root = document.getElementById("edition-switcher");
+        var btn = document.getElementById("edition-trigger");
+        var menu = document.getElementById("edition-menu");
+        if (!root || !btn || !menu) return;
+        function setOpen(open) {
+          menu.hidden = !open;
+          btn.setAttribute("aria-expanded", String(open));
+        }
+        btn.addEventListener("click", function () {
+          setOpen(menu.hidden);
+        });
+        document.addEventListener("click", function (e) {
+          if (!menu.hidden && !root.contains(e.target)) {
+            setOpen(false);
+          }
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && !menu.hidden) {
+            setOpen(false);
+            btn.focus();
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

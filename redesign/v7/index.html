@@ -13,8 +13,10 @@
       content="Jinghao Zhao is an engineer and designer on Google Cloud's GCE Bare Metal team (including the Google Cloud × CME Group ultra-low-latency trading platform), UCLA Computer Science Ph.D., and networked systems researcher."
     />
     <meta name="author" content="Jinghao Zhao" />
-    <meta name="robots" content="noindex, follow" />
-    <!-- Preview-only: remove when promoted to root index.html -->
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <link rel="canonical" href="https://zhaojinghao.com/" />
     <meta property="og:type" content="profile" />
     <meta property="profile:first_name" content="Jinghao" />
@@ -30,11 +32,11 @@
     <meta property="og:url" content="https://zhaojinghao.com/" />
     <meta
       property="og:image"
-      content="https://zhaojinghao.com/images/background.jpg"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
     <meta
       property="og:image:alt"
-      content="Jinghao Zhao — Engineer and Designer personal website"
+      content="Jinghao Zhao — Engineer and Designer"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
@@ -47,7 +49,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://zhaojinghao.com/images/background.jpg"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
     <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -74,6 +76,7 @@
             "@id": "https://zhaojinghao.com/#person",
             "name": "Jinghao Zhao",
             "url": "https://zhaojinghao.com/",
+            "image": "https://zhaojinghao.com/images/optimized/bio.webp",
             "jobTitle": "Software Engineer — GCE Bare Metal",
             "description": "Engineer and designer on Google Cloud's GCE Bare Metal team, focusing on cloud infrastructure, dedicated physical compute, networked systems, and product interaction.",
             "worksFor": {
@@ -382,9 +385,68 @@
           <span class="mark-slash" aria-hidden="true">//</span>
           <span class="mark-edition">07</span>
         </a>
-        <div class="preview-pills" aria-label="Site edition switcher">
-          <a class="pill-link" href="../">Gallery <span aria-hidden="true">↗</span></a>
-          <a class="pill-link" href="../../">Original <span aria-hidden="true">↗</span></a>
+        <div class="edition-switcher" id="edition-switcher">
+          <button
+            type="button"
+            class="edition-trigger"
+            id="edition-trigger"
+            aria-expanded="false"
+            aria-controls="edition-menu"
+            aria-haspopup="true"
+          >
+            <span class="ed-day">TUE</span>
+            <span class="ed-sep" aria-hidden="true">·</span>
+            <span class="ed-ver">V7</span>
+            <span class="ed-caret" aria-hidden="true">▾</span>
+          </button>
+          <div
+            class="edition-menu"
+            id="edition-menu"
+            role="region"
+            aria-label="7-Day Edition Switcher"
+            hidden
+          >
+            <p class="edition-menu-head">7-DAY ROTATING EDITIONS</p>
+            <ul class="edition-list">
+              <li>
+                <a href="../../?edition=classic"
+                  ><span class="ed-k">SUN</span> Classic</a
+                >
+              </li>
+              <li>
+                <a href="../v6/"><span class="ed-k">MON</span> V6 · Prism</a>
+              </li>
+              <li>
+                <a
+                  href="../v7/"
+                  class="is-current"
+                  aria-current="page"
+                  ><span class="ed-k">TUE</span> V7 · Brutalist</a
+                >
+              </li>
+              <li>
+                <a href="../v8/"><span class="ed-k">WED</span> V8 · Scope</a>
+              </li>
+              <li>
+                <a href="../v9/"><span class="ed-k">THU</span> V9 · Cinema</a>
+              </li>
+              <li>
+                <a href="../v11/"><span class="ed-k">FRI</span> V11 · 3D Orbit</a>
+              </li>
+              <li>
+                <a href="../v12/"><span class="ed-k">SAT</span> V12 · Spatial OS</a>
+              </li>
+            </ul>
+            <div class="edition-menu-foot">
+              <a href="../">Gallery <span aria-hidden="true">↗</span></a>
+              <a href="../../">Auto (Today) <span aria-hidden="true">↻</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="preview-pills" aria-label="Quick edition links">
+          <a class="pill-link" href="../../?edition=classic"
+            >Classic <span aria-hidden="true">↗</span></a
+          >
         </div>
       </div>
 
@@ -402,7 +464,7 @@
         <a
           class="rail-cta"
           href="https://www.linkedin.com/in/jinghaozhao/"
-          rel="me"
+          rel="me noopener noreferrer"
           >Connect <span aria-hidden="true">↗</span></a
         >
       </div>
@@ -495,7 +557,7 @@
             <a
               class="matrix-link"
               href="https://github.com/JinghaoZhao"
-              rel="me"
+              rel="me noopener noreferrer"
             >
               <span class="ml-code">01 // CODE</span>
               <span class="ml-label">GitHub <span aria-hidden="true">↗</span></span>
@@ -503,7 +565,7 @@
             <a
               class="matrix-link"
               href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-              rel="me"
+              rel="me noopener noreferrer"
             >
               <span class="ml-code">02 // CITATIONS</span>
               <span class="ml-label"
@@ -513,7 +575,7 @@
             <a
               class="matrix-link"
               href="https://www.linkedin.com/in/jinghaozhao/"
-              rel="me"
+              rel="me noopener noreferrer"
             >
               <span class="ml-code">03 // NETWORK</span>
               <span class="ml-label"
@@ -1307,7 +1369,7 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
               <a
                 class="btn-slam btn-slam-dark"
                 href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-                rel="me"
+                rel="me noopener noreferrer"
                 >Google Scholar <span aria-hidden="true">↗</span></a
               >
               <a
@@ -1640,19 +1702,19 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
               <a
                 class="btn-slam btn-slam-outline-dark"
                 href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-                rel="me"
+                rel="me noopener noreferrer"
                 >Google Scholar <span aria-hidden="true">↗</span></a
               >
               <a
                 class="btn-slam btn-slam-outline-dark"
                 href="https://github.com/JinghaoZhao"
-                rel="me"
+                rel="me noopener noreferrer"
                 >GitHub <span aria-hidden="true">↗</span></a
               >
               <a
                 class="btn-slam btn-slam-outline-dark"
                 href="https://www.linkedin.com/in/jinghaozhao/"
-                rel="me"
+                rel="me noopener noreferrer"
                 >LinkedIn <span aria-hidden="true">↗</span></a
               >
             </div>
@@ -1709,7 +1771,7 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
           <a
             class="contact-slam-block"
             href="https://www.linkedin.com/in/jinghaozhao/"
-            rel="me"
+            rel="me noopener noreferrer"
             aria-label="Connect with Jinghao Zhao on LinkedIn"
           >
             <span class="csb-label">CONNECT ON LINKEDIN</span>
@@ -1731,15 +1793,15 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
         </div>
 
         <div class="footer-links" aria-label="Footer social links">
-          <a href="https://github.com/JinghaoZhao" rel="me"
+          <a href="https://github.com/JinghaoZhao" rel="me noopener noreferrer"
             >GitHub <span aria-hidden="true">↗</span></a
           >
           <a
             href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-            rel="me"
+            rel="me noopener noreferrer"
             >Scholar <span aria-hidden="true">↗</span></a
           >
-          <a href="https://www.linkedin.com/in/jinghaozhao/" rel="me"
+          <a href="https://www.linkedin.com/in/jinghaozhao/" rel="me noopener noreferrer"
             >LinkedIn <span aria-hidden="true">↗</span></a
           >
           <a
@@ -1748,9 +1810,12 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
           >
         </div>
 
-        <div class="footer-switchers" aria-label="Preview navigation">
-          <a href="../">Design Gallery <span aria-hidden="true">↗</span></a>
-          <a href="../../">Original Site <span aria-hidden="true">↗</span></a>
+        <div class="footer-switchers" aria-label="Edition navigation">
+          <a href="../">Gallery <span aria-hidden="true">↗</span></a>
+          <a href="../../?edition=classic"
+            >Classic <span aria-hidden="true">↗</span></a
+          >
+          <a href="../../">Auto (Today) <span aria-hidden="true">↻</span></a>
           <a href="#top">Top <span aria-hidden="true">↑</span></a>
         </div>
       </div>

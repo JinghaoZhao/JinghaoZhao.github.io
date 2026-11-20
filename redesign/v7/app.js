@@ -13,6 +13,37 @@
   const yearEl = $("#year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
+  /* ========================================================================
+     0. 7-DAY EDITION SWITCHER POPOVER
+     ======================================================================== */
+  const editionSwitcher = $("#edition-switcher");
+  const editionTrigger = $("#edition-trigger");
+  const editionMenu = $("#edition-menu");
+
+  function setEditionMenuOpen(open) {
+    if (!editionTrigger || !editionMenu) return;
+    editionTrigger.setAttribute("aria-expanded", String(open));
+    editionMenu.hidden = !open;
+  }
+
+  if (editionSwitcher && editionTrigger && editionMenu) {
+    editionTrigger.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      setEditionMenuOpen(editionMenu.hidden);
+    });
+    document.addEventListener("click", (ev) => {
+      if (!editionMenu.hidden && !editionSwitcher.contains(ev.target)) {
+        setEditionMenuOpen(false);
+      }
+    });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && !editionMenu.hidden) {
+        setEditionMenuOpen(false);
+        editionTrigger.focus();
+      }
+    });
+  }
+
   function resizeCanvasToDisplay(canvas) {
     if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();

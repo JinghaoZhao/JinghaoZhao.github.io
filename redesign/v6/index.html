@@ -13,11 +13,14 @@
     />
     <meta name="author" content="Jinghao Zhao" />
     <link rel="canonical" href="https://zhaojinghao.com/" />
-    <meta name="robots" content="noindex, follow" />
-    <!-- Preview-only: remove when promoted to root index.html -->
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
 
     <!-- Open Graph / Profile -->
     <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Jinghao Zhao" />
     <meta property="profile:first_name" content="Jinghao" />
     <meta property="profile:last_name" content="Zhao" />
     <meta
@@ -31,7 +34,7 @@
     <meta property="og:url" content="https://zhaojinghao.com/" />
     <meta
       property="og:image"
-      content="https://zhaojinghao.com/images/background.jpg"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
     <meta
       property="og:image:alt"
@@ -48,7 +51,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://zhaojinghao.com/images/background.jpg"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
 
     <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml" />
@@ -78,6 +81,7 @@
             "@id": "https://zhaojinghao.com/#person",
             "name": "Jinghao Zhao",
             "url": "https://zhaojinghao.com/",
+            "image": "https://zhaojinghao.com/images/optimized/bio.webp",
             "jobTitle": "Software Engineer, GCE Bare Metal",
             "description": "Engineer and designer on Google Cloud's GCE Bare Metal team. UCLA Ph.D. in Computer Science researching networked systems, 5G/cellular reliability, mobile security, and edge-cloud infrastructure.",
             "worksFor": {
@@ -388,12 +392,71 @@
           <span>jz<span class="wordmark-dot">.</span></span>
         </a>
 
-        <div class="header-switchers" aria-label="Preview navigation">
-          <a class="switcher-pill" href="../">
-            <span aria-hidden="true">◇</span> Gallery
-          </a>
-          <a class="switcher-pill" href="../../">
-            Live Site <span aria-hidden="true">↗</span>
+        <div class="header-switchers" aria-label="Edition and profile navigation">
+          <div class="edition-switcher" id="edition-switcher">
+            <button
+              type="button"
+              class="switcher-pill edition-trigger"
+              id="edition-toggle"
+              aria-expanded="false"
+              aria-controls="edition-menu"
+              aria-haspopup="true"
+            >
+              <span class="edition-dot" aria-hidden="true"></span>
+              <span>MON · V6</span>
+              <span class="edition-caret" aria-hidden="true">▾</span>
+            </button>
+            <div
+              class="edition-menu prism-glass"
+              id="edition-menu"
+              role="region"
+              aria-label="7-day rotating homepage editions"
+              hidden
+            >
+              <p class="edition-menu-title">7-DAY ROTATING EDITIONS</p>
+              <div class="edition-list">
+                <a class="edition-item" href="../../?edition=classic">
+                  <span class="edition-day">SUN</span>
+                  <span class="edition-name">Classic</span>
+                </a>
+                <a
+                  class="edition-item is-current"
+                  href="../v6/"
+                  aria-current="page"
+                >
+                  <span class="edition-day">MON</span>
+                  <span class="edition-name">V6 · Prism Atelier</span>
+                </a>
+                <a class="edition-item" href="../v7/">
+                  <span class="edition-day">TUE</span>
+                  <span class="edition-name">V7 · Kinetic Monolith</span>
+                </a>
+                <a class="edition-item" href="../v8/">
+                  <span class="edition-day">WED</span>
+                  <span class="edition-name">V8 · Phosphor Scope</span>
+                </a>
+                <a class="edition-item" href="../v9/">
+                  <span class="edition-day">THU</span>
+                  <span class="edition-name">V9 · Cinema Editorial</span>
+                </a>
+                <a class="edition-item" href="../v11/">
+                  <span class="edition-day">FRI</span>
+                  <span class="edition-name">V11 · Orbital Universe</span>
+                </a>
+                <a class="edition-item" href="../v12/">
+                  <span class="edition-day">SAT</span>
+                  <span class="edition-name">V12 · Spatial OS</span>
+                </a>
+              </div>
+              <div class="edition-menu-foot">
+                <a class="edition-foot-link" href="../">Gallery ◇</a>
+                <a class="edition-foot-link" href="../../">Auto (Today) ↻</a>
+              </div>
+            </div>
+          </div>
+
+          <a class="switcher-pill" href="../../?edition=classic">
+            Classic <span aria-hidden="true">↗</span>
           </a>
           <a
             class="switcher-pill switcher-accent"
@@ -1661,8 +1724,9 @@
           </p>
         </div>
         <div class="footer-links">
-          <a class="switcher-pill" href="../">Redesign Gallery</a>
-          <a class="switcher-pill" href="../../">Live Site ↗</a>
+          <a class="switcher-pill" href="../">Gallery</a>
+          <a class="switcher-pill" href="../../?edition=classic">Classic ↗</a>
+          <a class="switcher-pill" href="../../">Auto (Today)</a>
           <a class="switcher-pill" href="#top">Top ↑</a>
         </div>
       </div>

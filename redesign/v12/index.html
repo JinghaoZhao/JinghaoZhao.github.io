@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, follow" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <meta name="author" content="Jinghao Zhao" />
     <meta name="theme-color" content="#eef1f6" />
     <title>
@@ -16,8 +19,8 @@
     />
     <link rel="canonical" href="https://zhaojinghao.com/" />
     <meta property="og:type" content="profile" />
-    <meta property="og:first_name" content="Jinghao" />
-    <meta property="og:last_name" content="Zhao" />
+    <meta property="profile:first_name" content="Jinghao" />
+    <meta property="profile:last_name" content="Zhao" />
     <meta
       property="og:title"
       content="Jinghao Zhao — Engineer & Designer | Google Cloud GCE Bare Metal"
@@ -29,11 +32,11 @@
     <meta property="og:url" content="https://zhaojinghao.com/" />
     <meta
       property="og:image"
-      content="https://zhaojinghao.com/images/background.jpg"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
     <meta
       property="og:image:alt"
-      content="Jinghao Zhao — Engineer & Designer personal portfolio"
+      content="Jinghao Zhao — Engineer & Designer portrait"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
@@ -43,6 +46,10 @@
     <meta
       name="twitter:description"
       content="Software engineer on Google Cloud GCE Bare Metal, UCLA Ph.D. in Computer Science, systems and networking researcher."
+    />
+    <meta
+      name="twitter:image"
+      content="https://zhaojinghao.com/images/optimized/bio.webp"
     />
     <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml" />
     <link
@@ -85,6 +92,7 @@
             "@id": "https://zhaojinghao.com/#person",
             "name": "Jinghao Zhao",
             "url": "https://zhaojinghao.com/",
+            "image": "https://zhaojinghao.com/images/optimized/bio.webp",
             "jobTitle": "Software Engineer, GCE Bare Metal",
             "description": "Software engineer on Google's GCE Bare Metal team, bringing an end-to-end systems perspective to cloud infrastructure. UCLA Ph.D. in Computer Science, systems and networking researcher.",
             "worksFor": {
@@ -286,7 +294,7 @@
             <span class="os-brand-name">Jinghao Zhao</span>
             <span class="os-brand-status">
               <span class="led led-emerald" aria-hidden="true"></span>
-              V12 · Spatial Workbench
+              SAT · V12 Spatial OS
             </span>
           </span>
         </a>
@@ -313,13 +321,71 @@
             <kbd class="keycap">⌘K</kbd>
           </button>
 
-          <div class="switcher-pills" aria-label="Site version switcher">
-            <a class="switch-pill" href="../" title="View redesign gallery"
-              >Versions</a
+          <div class="edition-switcher" id="edition-switcher">
+            <button
+              type="button"
+              class="edition-trigger"
+              id="edition-trigger"
+              aria-expanded="false"
+              aria-controls="edition-menu"
+              aria-haspopup="true"
             >
-            <a class="switch-pill" href="../../" title="Return to live site"
-              >Live ↗</a
+              <span class="led led-blue" aria-hidden="true"></span>
+              <span class="edition-trigger-label">SAT · V12</span>
+              <span class="edition-caret" aria-hidden="true">▾</span>
+            </button>
+            <div
+              class="edition-menu"
+              id="edition-menu"
+              role="region"
+              aria-label="7-Day Edition Switcher"
+              hidden
             >
+              <div class="edition-menu-head">
+                <span class="mono-label">7-DAY EDITIONS</span>
+                <span class="edition-menu-sub">Daily Rotation</span>
+              </div>
+              <div class="edition-grid">
+                <a class="edition-link" href="../../?edition=classic">
+                  <span class="ed-day">SUN</span>
+                  <span class="ed-name">Classic</span>
+                </a>
+                <a class="edition-link" href="../v6/">
+                  <span class="ed-day">MON</span>
+                  <span class="ed-name">V6</span>
+                </a>
+                <a class="edition-link" href="../v7/">
+                  <span class="ed-day">TUE</span>
+                  <span class="ed-name">V7</span>
+                </a>
+                <a class="edition-link" href="../v8/">
+                  <span class="ed-day">WED</span>
+                  <span class="ed-name">V8</span>
+                </a>
+                <a class="edition-link" href="../v9/">
+                  <span class="ed-day">THU</span>
+                  <span class="ed-name">V9</span>
+                </a>
+                <a class="edition-link" href="../v11/">
+                  <span class="ed-day">FRI</span>
+                  <span class="ed-name">V11</span>
+                </a>
+                <a
+                  class="edition-link is-current"
+                  href="../v12/"
+                  aria-current="page"
+                >
+                  <span class="ed-day">SAT</span>
+                  <span class="ed-name">V12</span>
+                </a>
+              </div>
+              <div class="edition-menu-foot">
+                <a class="edition-foot-link" href="../">Gallery</a>
+                <a class="edition-foot-link edition-foot-auto" href="../../"
+                  >Auto (Today) ↗</a
+                >
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -376,19 +442,19 @@
               <a
                 class="dock-chip"
                 href="https://github.com/JinghaoZhao"
-                rel="me"
+                rel="me noopener noreferrer"
                 >GitHub <span aria-hidden="true">↗</span></a
               >
               <a
                 class="dock-chip"
                 href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-                rel="me"
+                rel="me noopener noreferrer"
                 >Google Scholar <span aria-hidden="true">↗</span></a
               >
               <a
                 class="dock-chip"
                 href="https://www.linkedin.com/in/jinghaozhao/"
-                rel="me"
+                rel="me noopener noreferrer"
                 >LinkedIn <span aria-hidden="true">↗</span></a
               >
               <a
@@ -1327,7 +1393,7 @@
               <a
                 class="btn btn-surface btn-sm"
                 href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-                rel="me"
+                rel="me noopener noreferrer"
                 >Google Scholar <span aria-hidden="true">↗</span></a
               >
               <a
@@ -1762,7 +1828,7 @@
                 <a
                   class="btn btn-primary btn-sm"
                   href="https://www.linkedin.com/in/jinghaozhao/"
-                  rel="me"
+                  rel="me noopener noreferrer"
                   >Connect on LinkedIn <span aria-hidden="true">↗</span></a
                 >
                 <a
@@ -1773,7 +1839,7 @@
                 <a
                   class="btn btn-surface btn-sm"
                   href="https://github.com/JinghaoZhao"
-                  rel="me"
+                  rel="me noopener noreferrer"
                   >GitHub <span aria-hidden="true">↗</span></a
                 >
               </div>
@@ -1798,7 +1864,7 @@
           <a
             class="btn btn-primary"
             href="https://www.linkedin.com/in/jinghaozhao/"
-            rel="me"
+            rel="me noopener noreferrer"
             >Connect on LinkedIn <span aria-hidden="true">↗</span></a
           >
         </div>
@@ -1812,17 +1878,18 @@
           </div>
 
           <div class="footer-links">
-            <a href="https://github.com/JinghaoZhao" rel="me">GitHub ↗</a>
+            <a href="https://github.com/JinghaoZhao" rel="me noopener noreferrer">GitHub ↗</a>
             <a
               href="https://scholar.google.com/citations?user=0JvRKBUAAAAJ"
-              rel="me"
+              rel="me noopener noreferrer"
               >Scholar ↗</a
             >
-            <a href="https://www.linkedin.com/in/jinghaozhao/" rel="me"
+            <a href="https://www.linkedin.com/in/jinghaozhao/" rel="me noopener noreferrer"
               >LinkedIn ↗</a
             >
-            <a href="../">Redesign Gallery</a>
-            <a href="../../">Original Site</a>
+            <a href="../">Gallery</a>
+            <a href="../../?edition=classic">SUN Classic</a>
+            <a href="../../">Auto (Today)</a>
             <a href="#top">Top ↑</a>
           </div>
         </div>

@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, follow" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <meta name="theme-color" content="#09090b" />
     <title>
       Jinghao Zhao — Engineer &amp; Designer | Google Cloud GCE Bare Metal, UCLA
@@ -403,11 +406,69 @@
           <a href="#publications"><span>IV</span> Archive</a>
         </nav>
         <div class="masthead-utilities">
-          <a class="edition-pill" href="../" title="View all redesign concepts"
-            >Concepts</a
-          >
-          <a class="edition-pill" href="../../" title="Return to live site"
-            >Live Site</a
+          <div class="edition-switcher" id="edition-switcher">
+            <button
+              type="button"
+              class="edition-pill edition-trigger"
+              id="edition-toggle"
+              aria-expanded="false"
+              aria-controls="edition-menu"
+              aria-haspopup="true"
+            >
+              <span class="edition-dot" aria-hidden="true"></span>
+              <span>THU · V9</span>
+              <span class="edition-caret" aria-hidden="true">▾</span>
+            </button>
+            <div
+              class="edition-menu"
+              id="edition-menu"
+              role="region"
+              aria-label="7-Day Edition Switcher"
+              hidden
+            >
+              <p class="edition-menu-head">7-DAY EDITION SCHEDULE</p>
+              <div class="edition-days">
+                <a class="edition-option" href="../../?edition=classic">
+                  <span class="ed-day">SUN</span>
+                  <span class="ed-name">Classic</span>
+                </a>
+                <a class="edition-option" href="../v6/">
+                  <span class="ed-day">MON</span>
+                  <span class="ed-name">V6 · Liquid Glass</span>
+                </a>
+                <a class="edition-option" href="../v7/">
+                  <span class="ed-day">TUE</span>
+                  <span class="ed-name">V7 · Kinetic Monolith</span>
+                </a>
+                <a class="edition-option" href="../v8/">
+                  <span class="ed-day">WED</span>
+                  <span class="ed-name">V8 · Phosphor Scope</span>
+                </a>
+                <a
+                  class="edition-option is-current"
+                  href="../v9/"
+                  aria-current="page"
+                >
+                  <span class="ed-day">THU</span>
+                  <span class="ed-name">V9 · Monochrome Cinema</span>
+                </a>
+                <a class="edition-option" href="../v11/">
+                  <span class="ed-day">FRI</span>
+                  <span class="ed-name">V11 · Orbital Universe</span>
+                </a>
+                <a class="edition-option" href="../v12/">
+                  <span class="ed-day">SAT</span>
+                  <span class="ed-name">V12 · Tactile Spatial</span>
+                </a>
+              </div>
+              <div class="edition-menu-foot">
+                <a class="edition-foot-link" href="../">Gallery</a>
+                <a class="edition-foot-link" href="../../">Auto (Today)</a>
+              </div>
+            </div>
+          </div>
+          <a class="edition-pill" href="../../?edition=classic" title="View Classic edition"
+            >Classic</a
           >
         </div>
       </div>
@@ -1680,8 +1741,9 @@
             target="_blank"
             >LinkedIn</a
           >
-          <a class="edition-pill" href="../">All Concepts</a>
-          <a class="edition-pill" href="../../">Live Site</a>
+          <a class="edition-pill" href="../">Gallery</a>
+          <a class="edition-pill" href="../../?edition=classic">Classic</a>
+          <a class="edition-pill" href="../../">Auto (Today)</a>
           <a href="#top">Top ↑</a>
         </div>
       </div>

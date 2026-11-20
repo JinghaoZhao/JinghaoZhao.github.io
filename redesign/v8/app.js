@@ -10,6 +10,37 @@
   const yearEl = $("#year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
+  // Collapsible 7-Day Edition Switcher
+  (function initEditionSwitcher() {
+    const root = $("#edition-switcher");
+    const trigger = $("#edition-trigger");
+    const menu = $("#edition-menu");
+    if (!root || !trigger || !menu) return;
+
+    function setOpen(open) {
+      trigger.setAttribute("aria-expanded", String(open));
+      menu.hidden = !open;
+    }
+
+    trigger.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      setOpen(menu.hidden);
+    });
+
+    document.addEventListener("click", (ev) => {
+      if (!menu.hidden && !root.contains(ev.target)) {
+        setOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && !menu.hidden) {
+        setOpen(false);
+        trigger.focus();
+      }
+    });
+  })();
+
   // Motion & pointer preferences
   const reduceMotionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
   const finePointerMQ = window.matchMedia("(hover: hover) and (pointer: fine)");

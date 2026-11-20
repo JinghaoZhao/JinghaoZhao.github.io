@@ -24,6 +24,43 @@
   }
 
   /* ========================================================================
+     0. 7-DAY ROTATING EDITION SWITCHER POPOVER
+     ======================================================================== */
+  const editionSwitcher = $("#edition-switcher");
+  const editionToggle = $("#edition-toggle");
+  const editionMenu = $("#edition-menu");
+
+  function setEditionMenuOpen(open) {
+    if (!editionToggle || !editionMenu) return;
+    editionMenu.hidden = !open;
+    editionToggle.setAttribute("aria-expanded", String(open));
+  }
+
+  if (editionToggle && editionMenu) {
+    editionToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setEditionMenuOpen(editionMenu.hidden);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (
+        !editionMenu.hidden &&
+        editionSwitcher &&
+        !editionSwitcher.contains(e.target)
+      ) {
+        setEditionMenuOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !editionMenu.hidden) {
+        setEditionMenuOpen(false);
+        editionToggle.focus();
+      }
+    });
+  }
+
+  /* ========================================================================
      SHARED CANVAS OPTICAL DRAWING PRIMITIVES (FROSTED GLASS & PRISM OPTICS)
      ======================================================================== */
   function roundBox(ctx, x, y, w, h, r) {

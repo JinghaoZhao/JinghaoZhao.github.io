@@ -3239,8 +3239,45 @@
   }
 
   /* =========================================================
+     7-DAY EDITION SWITCHER POPOVER
+     ========================================================= */
+  function initEditionSwitcher() {
+    const toggle = $("#edition-toggle");
+    const popover = $("#edition-popover");
+    if (!toggle || !popover) return;
+
+    function setOpen(open) {
+      popover.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+    }
+
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setOpen(popover.hidden);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!popover.hidden && !popover.contains(e.target) && e.target !== toggle) {
+        setOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !popover.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+
+  /* =========================================================
      BOOT ALL 3D SPATIAL ENGINES SAFELY
      ========================================================= */
+  try {
+    initEditionSwitcher();
+  } catch (e) {
+    /* Graceful fallback */
+  }
   try {
     initHeroGlobe();
   } catch (e) {

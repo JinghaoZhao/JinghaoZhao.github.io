@@ -427,29 +427,163 @@ a {
   color: var(--blue);
 }
 
-.switcher-pills {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px;
-  border-radius: 999px;
-  background: var(--well);
-  box-shadow: var(--shadow-well);
+/* Tactile Porcelain Collapsible 7-Day Edition Switcher */
+.edition-switcher {
+  position: relative;
 }
 
-.switch-pill {
-  padding: 5px 10px;
+.edition-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
   border-radius: 999px;
+  border: 1px solid rgba(0, 82, 255, 0.22);
+  background: linear-gradient(180deg, #ffffff 0%, #eff5ff 100%);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
   font-family: var(--font-mono);
   font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--blue);
+  white-space: nowrap;
+  transition: transform 0.25s var(--spring), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.edition-trigger:hover {
+  transform: translateY(-1px);
+  border-color: var(--blue);
+}
+
+.edition-trigger:active {
+  transform: scale(0.96);
+}
+
+.edition-caret {
+  font-size: 0.72rem;
+  transition: transform 0.28s var(--spring);
+}
+
+.edition-trigger[aria-expanded="true"] .edition-caret {
+  transform: rotate(180deg);
+}
+
+.edition-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 120;
+  width: min(296px, calc(100vw - 24px));
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 18px 40px -14px rgba(15, 23, 42, 0.24),
+    0 4px 12px -4px rgba(15, 23, 42, 0.1);
+  animation: cmdPop 0.24s var(--spring);
+}
+
+.edition-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.edition-menu-sub {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--ink-muted);
+}
+
+.edition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.edition-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  text-decoration: none;
+  transition: transform 0.22s var(--spring), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.edition-link:hover {
+  transform: translateY(-1px);
+  border-color: var(--blue-ring);
+  background: #ffffff;
+}
+
+.edition-link.is-current {
+  grid-column: 1 / -1;
+  background: linear-gradient(180deg, #1b65ff 0%, var(--blue) 100%);
+  border-color: #0043d6;
+  color: #ffffff;
+  box-shadow: var(--shadow-primary);
+}
+
+.ed-day {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+
+.ed-name {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.edition-link.is-current .ed-day,
+.edition-link.is-current .ed-name {
+  color: #ffffff;
+}
+
+.edition-menu-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border);
+}
+
+.edition-foot-link {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--well);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--ink-2);
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.switch-pill:hover {
-  background: #ffffff;
+.edition-foot-link:hover {
+  background: #e3ecff;
+  color: var(--blue);
+}
+
+.edition-foot-auto {
   color: var(--blue);
 }
 
@@ -3158,6 +3292,20 @@ a {
 }
 
 @media (max-width: 420px) {
+  .os-brand-name {
+    font-size: 0.82rem;
+  }
+
+  .os-actions {
+    gap: 6px;
+  }
+
+  .edition-trigger {
+    padding: 5px 8px;
+    gap: 5px;
+    font-size: 0.68rem;
+  }
+
   .hardware-unit {
     padding: 14px;
   }

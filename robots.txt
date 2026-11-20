@@ -1,0 +1,37 @@
+# robots.txt for https://zhaojinghao.com/
+# Welcome search engines and AI/LLM crawlers.
+# Authoritative plain-Markdown profile: https://zhaojinghao.com/llms.txt
+
+User-agent: *
+Allow: /
+
+# Major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# AI & GEO search / answer crawlers
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://zhaojinghao.com/sitemap.xml

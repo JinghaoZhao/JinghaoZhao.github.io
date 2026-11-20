@@ -4,12 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#07162b" />
-    <title>Jinghao Zhao — Homepage Redesign Concepts</title>
-      <meta
+    <title>Jinghao Zhao — 7-Day Rotating Editions &amp; Design Gallery</title>
+    <meta
       name="description"
-      content="Twelve distinct visual design concepts for Jinghao Zhao's personal homepage—preserving the same bare-metal systems focus, project studies, and publications."
+      content="Explore Jinghao Zhao's 7-day rotating homepage editions (Classic Sunday through V6–V12 Monday–Saturday) and full archive of 12 design monographs."
     />
-    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="Jinghao Zhao" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://zhaojinghao.com/redesign/" />
     <link rel="icon" href="../images/favicon.svg" type="image/svg+xml" />
     <link
       rel="preload"
@@ -30,7 +32,7 @@
         font-family: Raleway;
         src: url("../fonts/raleway.ttf") format("truetype");
         font-style: normal;
-        font-weight: 100 900;
+        font-weight: 100;
         font-display: swap;
       }
       @font-face {
@@ -47,12 +49,17 @@
         --muted: #4b5e74;
         --line: #d6dfe9;
         --accent: #1d5ca8;
+        --accent-deep: #14437d;
+        --live: #0f6e4e;
         --ease: cubic-bezier(0.22, 1, 0.36, 1);
       }
       *,
       *::before,
       *::after {
         box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
       }
       html {
         color-scheme: light;
@@ -79,20 +86,25 @@
         border-radius: 4px;
       }
       .container {
-        width: min(1140px, calc(100% - 48px));
+        width: min(1160px, calc(100% - 48px));
         margin-inline: auto;
       }
       .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
         border-bottom: 1px solid var(--line);
-        background: rgba(246, 248, 251, 0.9);
+        background: rgba(246, 248, 251, 0.92);
         backdrop-filter: blur(12px);
       }
       .topbar-inner {
-        height: 76px;
+        min-height: 74px;
+        padding: 10px 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
+        gap: 14px;
+        flex-wrap: wrap;
       }
       .wordmark {
         font-size: 30px;
@@ -106,8 +118,9 @@
       .topbar-actions {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 10px;
         font-size: 13px;
+        flex-wrap: wrap;
       }
       .status-pill {
         display: inline-flex;
@@ -119,18 +132,18 @@
         background: var(--surface);
         color: var(--muted);
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 550;
       }
       .status-dot {
-        width: 6px;
-        height: 6px;
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
-        background: #1d7a59;
+        background: var(--live);
       }
-      .back-link {
+      .nav-btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 7px;
         font-weight: 550;
         padding: 7px 14px;
         border: 1px solid var(--line);
@@ -138,45 +151,88 @@
         background: var(--surface);
         transition:
           border-color 0.2s var(--ease),
-          color 0.2s var(--ease);
+          color 0.2s var(--ease),
+          background 0.2s var(--ease);
       }
-      .back-link:hover {
+      .nav-btn:hover {
         border-color: var(--accent);
         color: var(--accent);
       }
+      .nav-btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+      }
+      .nav-btn-primary:hover {
+        background: var(--accent-deep);
+        border-color: var(--accent-deep);
+        color: #ffffff;
+      }
       main {
         flex: 1;
-        padding: 64px 0 84px;
+        padding: 56px 0 84px;
       }
       .intro {
-        max-width: 720px;
+        max-width: 780px;
         margin-bottom: 48px;
       }
       .eyebrow {
         margin: 0 0 14px;
         font-size: 11px;
-        font-weight: 600;
+        font-weight: 650;
         letter-spacing: 2.2px;
         color: var(--accent);
       }
       h1 {
-        margin: 0 0 18px;
-        font-family: Raleway, "DM Sans", sans-serif;
-        font-weight: 400;
-        font-size: clamp(34px, 4.8vw, 56px);
+        margin: 0 0 16px;
+        font-family: "DM Sans", sans-serif;
+        font-weight: 500;
+        font-size: clamp(32px, 4.6vw, 52px);
         line-height: 1.12;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.025em;
       }
       .subtitle {
-        margin: 0;
+        margin: 0 0 24px;
         font-size: 16px;
         color: var(--muted);
-        max-width: 600px;
+        max-width: 660px;
       }
-      .gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
-        gap: 24px;
+      .hero-cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+      .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        transition:
+          transform 0.25s var(--ease),
+          border-color 0.2s var(--ease),
+          background 0.2s var(--ease);
+      }
+      .cta-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-1px);
+      }
+      .cta-btn-primary {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #ffffff;
+      }
+      .cta-btn-primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
       }
       .wave-section + .wave-section {
         margin-top: 56px;
@@ -185,22 +241,28 @@
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        gap: 16px;
-        margin: 0 0 20px;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+        margin: 0 0 22px;
         padding-bottom: 12px;
         border-bottom: 1px solid var(--line);
       }
       .wave-title {
         margin: 0;
         font-size: 11.5px;
-        font-weight: 650;
+        font-weight: 700;
         letter-spacing: 2px;
         text-transform: uppercase;
         color: var(--ink);
       }
       .wave-meta {
-        font-size: 12.5px;
+        font-size: 13px;
         color: var(--muted);
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+        gap: 22px;
       }
       .concept-card {
         display: flex;
@@ -208,7 +270,7 @@
         background: var(--surface);
         border: 1px solid var(--line);
         border-radius: 10px;
-        padding: 26px;
+        padding: 24px;
         transition:
           transform 0.3s var(--ease),
           border-color 0.25s var(--ease),
@@ -219,39 +281,64 @@
         border-color: #9cb3cc;
         box-shadow: 0 14px 32px rgba(19, 34, 56, 0.06);
       }
+      .concept-card.is-today {
+        border-color: var(--accent);
+        box-shadow:
+          0 0 0 1px var(--accent),
+          0 16px 36px rgba(29, 92, 168, 0.1);
+      }
       .card-top {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .edition-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
       }
       .edition {
         font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 1.8px;
+        font-weight: 650;
+        letter-spacing: 1.7px;
         color: var(--muted);
+      }
+      .today-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
       }
       .swatches {
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        flex-shrink: 0;
       }
       .swatch {
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        border: 1px solid rgba(19, 34, 56, 0.16);
+        border: 1px solid rgba(19, 34, 56, 0.18);
       }
       .concept-card h2 {
         margin: 0 0 10px;
-        font-size: 24px;
-        font-weight: 550;
+        font-size: 22px;
+        font-weight: 600;
         letter-spacing: -0.015em;
         line-height: 1.25;
       }
       .concept-tagline {
-        margin: 0 0 22px;
+        margin: 0 0 20px;
         font-size: 14.5px;
         color: var(--muted);
         line-height: 1.65;
@@ -261,7 +348,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-top: 16px;
+        padding-top: 15px;
         border-top: 1px solid #e7edf3;
         font-size: 13.5px;
         font-weight: 600;
@@ -287,6 +374,12 @@
         justify-content: space-between;
         gap: 12px 24px;
       }
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+      }
       .footer-link {
         font-weight: 550;
         color: var(--ink);
@@ -299,22 +392,24 @@
           width: calc(100% - 32px);
         }
         main {
-          padding: 44px 0 64px;
+          padding: 40px 0 64px;
         }
         .status-pill {
           display: none;
         }
         .concept-card {
-          padding: 22px;
+          padding: 20px;
         }
       }
       @media (prefers-reduced-motion: reduce) {
         .concept-card,
         .card-arrow,
-        .back-link {
+        .nav-btn,
+        .cta-btn {
           transition: none;
         }
-        .concept-card:hover {
+        .concept-card:hover,
+        .cta-btn:hover {
           transform: none;
         }
       }
@@ -323,15 +418,22 @@
   <body>
     <header class="topbar">
       <div class="container topbar-inner">
-        <a class="wordmark" href="../" aria-label="Jinghao Zhao, current homepage"
+        <a
+          class="wordmark"
+          href="../?edition=classic"
+          aria-label="Jinghao Zhao, Classic edition"
           >jz<span class="wordmark-dot" aria-hidden="true">.</span></a
         >
         <div class="topbar-actions">
-          <span class="status-pill"
-            ><span class="status-dot" aria-hidden="true"></span>12 of 12 concepts live</span
+          <span class="status-pill" id="today-pill"
+            ><span class="status-dot" aria-hidden="true"></span
+            ><span id="today-pill-text">7-Day Rotation Live</span></span
           >
-          <a class="back-link" href="../"
-            ><span aria-hidden="true">←</span> Current Site</a
+          <a class="nav-btn" href="../?edition=classic"
+            ><span aria-hidden="true">←</span> Classic Site</a
+          >
+          <a class="nav-btn nav-btn-primary" href="../"
+            >Today’s Auto-Route <span aria-hidden="true">↗</span></a
           >
         </div>
       </div>
@@ -340,23 +442,75 @@
     <main>
       <div class="container">
         <div class="intro">
-          <p class="eyebrow">HOMEPAGE EXPLORATIONS · 2026</p>
-          <h1>Twelve design monographs for Jinghao Zhao.</h1>
+          <p class="eyebrow">7-DAY ROTATING HOMEPAGE · 2026</p>
+          <h1>Seven daily editions, twelve design monographs.</h1>
           <p class="subtitle">
-            Alternative editorial, architectural, and interactive expressions of the
-            same GCE Bare Metal work, 7 systems studies, and 12-paper archive.
+            Every weekday at <code>zhaojinghao.com</code> opens a distinct
+            interactive edition of Jinghao Zhao’s GCE Bare Metal work, 7
+            systems projects, and 12-paper archive—plus 5 additional design
+            monographs below.
           </p>
+          <div class="hero-cta-row">
+            <a class="cta-btn cta-btn-primary" href="../" id="auto-route-cta"
+              >Open Today’s Auto-Route <span aria-hidden="true">↗</span></a
+            >
+            <a class="cta-btn" href="../?edition=classic"
+              >Open Classic Edition (Sun)</a
+            >
+          </div>
         </div>
 
-        <section class="wave-section" aria-label="Flagship wave concepts v6 to v12">
+        <section
+          class="wave-section"
+          aria-label="Live 7-Day Weekday Rotation Schedule"
+        >
           <div class="wave-header">
-            <h2 class="wave-title">Flagship Wave · V6–V12</h2>
-            <span class="wave-meta">From-scratch interactive architectures &amp; zero legacy diagrams</span>
+            <h2 class="wave-title">Live 7-Day Weekday Rotation · Sun–Sat</h2>
+            <span class="wave-meta"
+              >Automatically routed at zhaojinghao.com by local weekday</span
+            >
           </div>
           <div class="gallery">
-            <a class="concept-card" href="./v6/">
+            <a
+              class="concept-card"
+              href="../?edition=classic"
+              data-weekday="0"
+              data-edition-label="Sun · Classic"
+            >
               <div class="card-top">
-                <span class="edition">CONCEPT 06</span>
+                <div class="edition-wrap">
+                  <span class="edition">SUNDAY · CLASSIC</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #07162b"></span>
+                  <span class="swatch" style="background: #286cb2"></span>
+                  <span class="swatch" style="background: #f7f9fb"></span>
+                </span>
+              </div>
+              <h2>Classic Blue Geometric</h2>
+              <p class="concept-tagline">
+                Original navy and paper editorial homepage with 30fps geometric
+                hero mesh, layered Bare Metal compute figure, 7 inline SVG
+                project walkthroughs, and Acemap explorer.
+              </p>
+              <div class="card-footer">
+                <span>Open Sunday (Classic)</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a
+              class="concept-card"
+              href="./v6/"
+              data-weekday="1"
+              data-edition-label="Mon · V6 Prism"
+            >
+              <div class="card-top">
+                <div class="edition-wrap">
+                  <span class="edition">MONDAY · V6</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
                 <span class="swatches" aria-hidden="true">
                   <span class="swatch" style="background: #070910"></span>
                   <span class="swatch" style="background: #7be8ff"></span>
@@ -370,14 +524,22 @@
                 scenes, and labeled 2,208-star spectral Acemap.
               </p>
               <div class="card-footer">
-                <span>Explore v6</span>
+                <span>Open Monday (v6)</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
-            <a class="concept-card" href="./v7/">
+            <a
+              class="concept-card"
+              href="./v7/"
+              data-weekday="2"
+              data-edition-label="Tue · V7 Monolith"
+            >
               <div class="card-top">
-                <span class="edition">CONCEPT 07</span>
+                <div class="edition-wrap">
+                  <span class="edition">TUESDAY · V7</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
                 <span class="swatches" aria-hidden="true">
                   <span class="swatch" style="background: #eae8e1"></span>
                   <span class="swatch" style="background: #0b0b0c"></span>
@@ -391,14 +553,22 @@
                 system studies, and cluster-labeled 2,208-topic Acemap.
               </p>
               <div class="card-footer">
-                <span>Explore v7</span>
+                <span>Open Tuesday (v7)</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
-            <a class="concept-card" href="./v8/">
+            <a
+              class="concept-card"
+              href="./v8/"
+              data-weekday="3"
+              data-edition-label="Wed · V8 Scope"
+            >
               <div class="card-top">
-                <span class="edition">CONCEPT 08</span>
+                <div class="edition-wrap">
+                  <span class="edition">WEDNESDAY · V8</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
                 <span class="swatches" aria-hidden="true">
                   <span class="swatch" style="background: #040907"></span>
                   <span class="swatch" style="background: #3dff9a"></span>
@@ -412,14 +582,22 @@
                 patch-bay domain simulations, and labeled 2,208-topic radar.
               </p>
               <div class="card-footer">
-                <span>Explore v8</span>
+                <span>Open Wednesday (v8)</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
 
-            <a class="concept-card" href="./v9/">
+            <a
+              class="concept-card"
+              href="./v9/"
+              data-weekday="4"
+              data-edition-label="Thu · V9 Cinema"
+            >
               <div class="card-top">
-                <span class="edition">CONCEPT 09</span>
+                <div class="edition-wrap">
+                  <span class="edition">THURSDAY · V9</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
                 <span class="swatches" aria-hidden="true">
                   <span class="swatch" style="background: #09090b"></span>
                   <span class="swatch" style="background: #9a9890"></span>
@@ -433,7 +611,184 @@
                 domain-true system canvases, and labeled silver-print Acemap.
               </p>
               <div class="card-footer">
-                <span>Explore v9</span>
+                <span>Open Thursday (v9)</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a
+              class="concept-card"
+              href="./v11/"
+              data-weekday="5"
+              data-edition-label="Fri · V11 Orbital"
+            >
+              <div class="card-top">
+                <div class="edition-wrap">
+                  <span class="edition">FRIDAY · V11</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #04060e"></span>
+                  <span class="swatch" style="background: #38bdf8"></span>
+                  <span class="swatch" style="background: #fbbf24"></span>
+                </span>
+              </div>
+              <h2>3D Orbital Particle Universe</h2>
+              <p class="concept-tagline">
+                Cosmic obsidian 3D observatory with Bare Metal fabric globe, 4
+                interactive 3D Bare Metal &amp; CME scenes, 7 unobstructed 3D
+                domain project stations, and cluster-labeled 2,208-star Acemap.
+              </p>
+              <div class="card-footer">
+                <span>Open Friday (v11)</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a
+              class="concept-card"
+              href="./v12/"
+              data-weekday="6"
+              data-edition-label="Sat · V12 Spatial OS"
+            >
+              <div class="card-top">
+                <div class="edition-wrap">
+                  <span class="edition">SATURDAY · V12</span>
+                  <span class="today-badge" hidden>TODAY</span>
+                </div>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #eef1f6"></span>
+                  <span class="swatch" style="background: #0052ff"></span>
+                  <span class="swatch" style="background: #059669"></span>
+                </span>
+              </div>
+              <h2>Tactile Spatial OS Playground</h2>
+              <p class="concept-tagline">
+                Daylight porcelain workbench with 4-mode Bare Metal &amp; CME
+                oscilloscope, Cmd-K Spotlight, 7 authentic domain-simulated
+                project instruments, and neighbor-linked 2,208-topic Acemap.
+              </p>
+              <div class="card-footer">
+                <span>Open Saturday (v12)</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <section
+          class="wave-section"
+          aria-label="Additional Archive Monographs v1 to v5 and v10"
+        >
+          <div class="wave-header">
+            <h2 class="wave-title">Archive Monographs · V1–V5 &amp; V10</h2>
+            <span class="wave-meta"
+              >Six standalone editorial &amp; experimental studies</span
+            >
+          </div>
+          <div class="gallery">
+            <a class="concept-card" href="./v1/">
+              <div class="card-top">
+                <span class="edition">CONCEPT 01</span>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #f5f4ef"></span>
+                  <span class="swatch" style="background: #111317"></span>
+                  <span class="swatch" style="background: #d9381e"></span>
+                </span>
+              </div>
+              <h2>Swiss Editorial</h2>
+              <p class="concept-tagline">
+                Kinetic Swiss specimen machine with cursor-tracking column
+                crosshair, velocity ticker, scroll vernier scale, interactive
+                2-pane poster board, and particle-flight 2,208-topic Acemap.
+              </p>
+              <div class="card-footer">
+                <span>Explore v1</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a class="concept-card" href="./v2/">
+              <div class="card-top">
+                <span class="edition">CONCEPT 02</span>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #05080f"></span>
+                  <span class="swatch" style="background: #3b82f6"></span>
+                  <span class="swatch" style="background: #63d8ff"></span>
+                </span>
+              </div>
+              <h2>Precision Silicon Atelier</h2>
+              <p class="concept-tagline">
+                Apple Pro Silicon dark atelier with 3D wafer packet-beam canvas,
+                scroll-choreographed 3D exploded Bare Metal stack, glare bento
+                schematics, and warp-speed 2,208-topic starfield.
+              </p>
+              <div class="card-footer">
+                <span>Explore v2</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a class="concept-card" href="./v3/">
+              <div class="card-top">
+                <span class="edition">CONCEPT 03</span>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #f2ede4"></span>
+                  <span class="swatch" style="background: #1f5452"></span>
+                  <span class="swatch" style="background: #9c5a3c"></span>
+                </span>
+              </div>
+              <h2>Architectural Gallery</h2>
+              <p class="concept-tagline">
+                Rebuilt 7-room kinetic exhibition with masked portrait reveal,
+                magnetic lens cursor, bespoke canvas installations (5G healing,
+                astrolabe vault, 2.5D code graph, RF waves, 3D Flora, VR sync),
+                and Ink-Bloom Acemap.
+              </p>
+              <div class="card-footer">
+                <span>Explore v3</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a class="concept-card" href="./v4/">
+              <div class="card-top">
+                <span class="edition">CONCEPT 04</span>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #082144"></span>
+                  <span class="swatch" style="background: #70ccff"></span>
+                  <span class="swatch" style="background: #f5b963"></span>
+                </span>
+              </div>
+              <h2>Cyanotype Systems Blueprint</h2>
+              <p class="concept-tagline">
+                Live cyanotype CAD drafting canvas with Bare Metal telemetry
+                simulator, continuous-flow blueprint schematics, and a
+                2,208-topic sonar radar coordinate plot.
+              </p>
+              <div class="card-footer">
+                <span>Explore v4</span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </div>
+            </a>
+
+            <a class="concept-card" href="./v5/">
+              <div class="card-top">
+                <span class="edition">CONCEPT 05</span>
+                <span class="swatches" aria-hidden="true">
+                  <span class="swatch" style="background: #fbfcfe"></span>
+                  <span class="swatch" style="background: #1d63ff"></span>
+                  <span class="swatch" style="background: #6366f1"></span>
+                </span>
+              </div>
+              <h2>Kinetic Spatial Studio</h2>
+              <p class="concept-tagline">
+                Liquid chromatic aurora studio with 4-chapter atmosphere
+                morphing, spring-sliding pill dock, 3D split-stage SVG
+                walkthroughs, and a spring-physics 2,208-topic Acemap field.
+              </p>
+              <div class="card-footer">
+                <span>Explore v5</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
@@ -450,170 +805,14 @@
               <h2>Japanese Zen Ink-Wash Studio</h2>
               <p class="concept-tagline">
                 Warm kozo washi and Sumi-e fluid ink hero with sliding cedar
-                Shoji Bare Metal doors, unfolding 7-leaf Byōbu canvas screen, and
-                an Indigo-on-Washi 2,208-topic Acemap scroll.
+                Shoji Bare Metal doors, unfolding 7-leaf Byōbu canvas screen,
+                and an Indigo-on-Washi 2,208-topic Acemap scroll.
               </p>
               <div class="card-footer">
                 <span>Explore v10</span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </div>
             </a>
-
-            <a class="concept-card" href="./v11/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 11</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #04060e"></span>
-                  <span class="swatch" style="background: #38bdf8"></span>
-                  <span class="swatch" style="background: #fbbf24"></span>
-                </span>
-              </div>
-              <h2>3D Orbital Particle Universe</h2>
-              <p class="concept-tagline">
-                Cosmic obsidian 3D observatory with Bare Metal fabric globe, 4
-                interactive 3D Bare Metal &amp; CME scenes, 7 unobstructed 3D
-                domain project stations, and cluster-labeled 2,208-star Acemap.
-              </p>
-              <div class="card-footer">
-                <span>Explore v11</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-
-            <a class="concept-card" href="./v12/">
-              <div class="card-top">
-                <span class="edition">CONCEPT 12</span>
-                <span class="swatches" aria-hidden="true">
-                  <span class="swatch" style="background: #eef1f6"></span>
-                  <span class="swatch" style="background: #0052ff"></span>
-                  <span class="swatch" style="background: #059669"></span>
-                </span>
-              </div>
-              <h2>Tactile Spatial OS Playground</h2>
-              <p class="concept-tagline">
-                Daylight porcelain workbench with 4-mode Bare Metal &amp; CME
-                oscilloscope, Cmd-K Spotlight, 7 authentic domain-simulated
-                project instruments, and neighbor-linked 2,208-topic Acemap.
-              </p>
-              <div class="card-footer">
-                <span>Explore v12</span>
-                <span class="card-arrow" aria-hidden="true">↗</span>
-              </div>
-            </a>
-          </div>
-        </section>
-
-        <section class="wave-section" aria-label="First wave concepts v1 to v5">
-          <div class="wave-header">
-            <h2 class="wave-title">First Wave · V1–V5</h2>
-            <span class="wave-meta">Original five editorial &amp; kinetic monographs</span>
-          </div>
-          <div class="gallery">
-          <a class="concept-card" href="./v1/">
-            <div class="card-top">
-              <span class="edition">CONCEPT 01</span>
-              <span class="swatches" aria-hidden="true">
-                <span class="swatch" style="background: #f5f4ef"></span>
-                <span class="swatch" style="background: #111317"></span>
-                <span class="swatch" style="background: #d9381e"></span>
-              </span>
-            </div>
-            <h2>Swiss Editorial</h2>
-            <p class="concept-tagline">
-              Kinetic Swiss specimen machine with cursor-tracking column
-              crosshair, velocity ticker, scroll vernier scale, interactive
-              2-pane poster board, and particle-flight 2,208-topic Acemap.
-            </p>
-            <div class="card-footer">
-              <span>Explore v1</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-          </a>
-
-          <a class="concept-card" href="./v2/">
-            <div class="card-top">
-              <span class="edition">CONCEPT 02</span>
-              <span class="swatches" aria-hidden="true">
-                <span class="swatch" style="background: #05080f"></span>
-                <span class="swatch" style="background: #3b82f6"></span>
-                <span class="swatch" style="background: #63d8ff"></span>
-              </span>
-            </div>
-            <h2>Precision Silicon Atelier</h2>
-            <p class="concept-tagline">
-              Apple Pro Silicon dark atelier with 3D wafer packet-beam canvas,
-              scroll-choreographed 3D exploded Bare Metal stack, glare bento
-              schematics, and warp-speed 2,208-topic starfield.
-            </p>
-            <div class="card-footer">
-              <span>Explore v2</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-          </a>
-
-          <a class="concept-card" href="./v3/">
-            <div class="card-top">
-              <span class="edition">CONCEPT 03</span>
-              <span class="swatches" aria-hidden="true">
-                <span class="swatch" style="background: #f2ede4"></span>
-                <span class="swatch" style="background: #1f5452"></span>
-                <span class="swatch" style="background: #9c5a3c"></span>
-              </span>
-            </div>
-            <h2>Architectural Gallery</h2>
-            <p class="concept-tagline">
-              Rebuilt 7-room kinetic exhibition with masked portrait reveal,
-              magnetic lens cursor, bespoke canvas installations (5G healing,
-              astrolabe vault, 2.5D code graph, RF waves, 3D Flora, VR sync),
-              and Ink-Bloom Acemap.
-            </p>
-            <div class="card-footer">
-              <span>Explore v3</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-          </a>
-
-          <a class="concept-card" href="./v4/">
-            <div class="card-top">
-              <span class="edition">CONCEPT 04</span>
-              <span class="swatches" aria-hidden="true">
-                <span class="swatch" style="background: #082144"></span>
-                <span class="swatch" style="background: #70ccff"></span>
-                <span class="swatch" style="background: #f5b963"></span>
-              </span>
-            </div>
-            <h2>Cyanotype Systems Blueprint</h2>
-            <p class="concept-tagline">
-              Live cyanotype CAD drafting canvas with Bare Metal telemetry
-              simulator, continuous-flow blueprint schematics, and a 2,208-topic
-              sonar radar coordinate plot.
-            </p>
-            <div class="card-footer">
-              <span>Explore v4</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-          </a>
-
-          <a class="concept-card" href="./v5/">
-            <div class="card-top">
-              <span class="edition">CONCEPT 05</span>
-              <span class="swatches" aria-hidden="true">
-                <span class="swatch" style="background: #fbfcfe"></span>
-                <span class="swatch" style="background: #1d63ff"></span>
-                <span class="swatch" style="background: #6366f1"></span>
-              </span>
-            </div>
-            <h2>Kinetic Spatial Studio</h2>
-            <p class="concept-tagline">
-              Liquid chromatic aurora studio with 4-chapter atmosphere morphing,
-              spring-sliding pill dock, 3D split-stage SVG walkthroughs, and a
-              spring-physics 2,208-topic Acemap field.
-            </p>
-            <div class="card-footer">
-              <span>Explore v5</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-          </a>
           </div>
         </section>
       </div>
@@ -622,10 +821,44 @@
     <footer class="site-footer">
       <div class="container footer-inner">
         <span>© 2016–2026 Jinghao Zhao · Engineer &amp; Designer</span>
-        <a class="footer-link" href="../"
-          >Return to current site <span aria-hidden="true">↗</span></a
-        >
+        <div class="footer-links">
+          <a class="footer-link" href="../?edition=classic"
+            >Classic edition (Sun)</a
+          >
+          <a class="footer-link" href="../"
+            >Today’s auto-route <span aria-hidden="true">↗</span></a
+          >
+        </div>
       </div>
     </footer>
+
+    <script>
+      (function () {
+        try {
+          var day = String(new Date().getDay());
+          var cards = document.querySelectorAll("[data-weekday]");
+          var pillText = document.getElementById("today-pill-text");
+          var cta = document.getElementById("auto-route-cta");
+          for (var i = 0; i < cards.length; i++) {
+            var card = cards[i];
+            if (card.getAttribute("data-weekday") === day) {
+              card.classList.add("is-today");
+              var badge = card.querySelector(".today-badge");
+              if (badge) badge.hidden = false;
+              var label = card.getAttribute("data-edition-label");
+              if (label && pillText) {
+                pillText.textContent = "Today: " + label;
+              }
+              if (label && cta) {
+                cta.innerHTML =
+                  "Open Today (" +
+                  label +
+                  ') <span aria-hidden="true">↗</span>';
+              }
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>
