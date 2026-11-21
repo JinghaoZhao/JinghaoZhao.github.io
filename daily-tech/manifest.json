@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-20",
+  "updated_at": "2026-11-21",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1942,6 +1942,28 @@
       ],
       "excerpt": "Google DeepMind 将百万碱基序列预测改造成依赖细胞身份和状态的条件模型，以超过1.07亿份单细胞资料为基础，在免疫细胞变异识别评测中把30%与16%、43%与23%的差距变成可检验的科研线索。",
       "reading_minutes": 19
+    },
+    {
+      "id": "2026-11-21-frostbite-ai-cpu-interaction-nets",
+      "sequence": 93,
+      "title": "AI 没有只是优化 CPU，它重新发明了计算的组织方式：Frostbite 的 4.59 倍能效意味着什么？",
+      "source_title": "Introducing Frostbite: A new CPU architecture discovered, designed, and verified end-to-end by AI",
+      "source_author": "Architect Labs 研究团队",
+      "source_date": "2026-11-18",
+      "source_url": "https://architectlabs.com/blog/frostbite",
+      "delivery_date": "2026-11-21",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-21-frostbite-ai-cpu-interaction-nets.md",
+      "tags": [
+        "AI Infra",
+        "半导体",
+        "AI Agent",
+        "芯片架构",
+        "软件工程"
+      ],
+      "excerpt": "AI 从编程语言、交互网指令集到物理版图协同设计新型 CPU；在 25 项任务上报告 4.59 倍每瓦性能，但结果仍来自未流片、对照组不具名的评估。",
+      "reading_minutes": 22
     }
   ]
 }
