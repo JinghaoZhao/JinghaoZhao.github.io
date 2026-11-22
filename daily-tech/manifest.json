@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-21",
+  "updated_at": "2026-11-22",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -1964,6 +1964,28 @@
       ],
       "excerpt": "AI 从编程语言、交互网指令集到物理版图协同设计新型 CPU；在 25 项任务上报告 4.59 倍每瓦性能，但结果仍来自未流片、对照组不具名的评估。",
       "reading_minutes": 22
+    },
+    {
+      "id": "2026-11-22-openai-research-acceleration-jagged-frontier",
+      "sequence": 94,
+      "title": "当研究员开始同时指挥十几个 AI：OpenAI 的最新实测揭示科研自动化的真正瓶颈",
+      "source_title": "Research acceleration: The jagged frontier",
+      "source_author": "OpenAI",
+      "source_date": "2026-11-18",
+      "source_url": "https://openai.com/index/research-acceleration-jagged-frontier/",
+      "delivery_date": "2026-11-22",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-22-openai-research-acceleration-jagged-frontier.md",
+      "tags": [
+        "AI Agent",
+        "AI 研发",
+        "科研自动化",
+        "AI 安全",
+        "科技经济"
+      ],
+      "excerpt": "从每日 5.7 个 Agent 工作日、46% 的中等时长任务自主成功率，到仅 25% 的推理服务代码任务成功率，解读 AI 研究组织为何在自动化扩张时更加依赖人类判断与安全验证。",
+      "reading_minutes": 21
     }
   ]
 }
