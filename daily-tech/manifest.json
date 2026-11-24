@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-23",
+  "updated_at": "2026-11-24",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -2008,6 +2008,27 @@
       ],
       "excerpt": "Meta 工程团队实测：Agent 已承担超过六成广告模型技术推广工作，单人工程产能约提高三倍；共享模型模板、历史实验和分阶段验证，如何把一次算法创新快速推向大规模生产。",
       "reading_minutes": 19
+    },
+    {
+      "id": "2026-11-24-agentic-inference-capacity-growth",
+      "title": "全球 AI Agent 推理容量一年扩大至 4.6 倍：为什么芯片算力只增长到 2.6 倍？",
+      "source_title": "Agentic inference capacity grew 4.6× in a year, versus 2.6× for compute capacity",
+      "source_author": "Jason Li（Epoch AI）",
+      "source_date": "2026-11-18",
+      "source_url": "https://epoch.ai/data-insights/agentic-inference-capacity-growth",
+      "delivery_date": "2026-11-24",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-24-agentic-inference-capacity-growth.md",
+      "tags": [
+        "AI Infra",
+        "半导体",
+        "推理",
+        "AI Agent"
+      ],
+      "excerpt": "Epoch AI 的累计销量与 IPI 模型显示，智能体推理容量同比扩大至4.6倍，峰值8位算力仅增至2.6倍；Blackwell贡献约74%的新增推理容量。解读软硬件协同、增长基数与估算边界。",
+      "reading_minutes": 11,
+      "sequence": 96
     }
   ]
 }
