@@ -1,0 +1,368 @@
+/* ==========================================================================
+ * Game 01b: Count the Rectangles (数矩形 / 사각형 세기)
+ * Luminous amber-gold digital matrix · Monopoly 5/1/1 vs Devotion 1/3/3
+ * ========================================================================== */
+
+.ctr-layout {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.38fr) minmax(300px, 0.92fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.ctr-matrix-panel {
+  border-radius: var(--dp-radius-lg);
+  border: 1px solid var(--dp-border-strong);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 15%, rgba(245, 158, 11, 0.14), transparent 65%),
+    linear-gradient(180deg, rgba(16, 20, 32, 0.94), rgba(8, 10, 16, 0.98));
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.ctr-matrix-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--dp-border-subtle);
+  background: rgba(10, 12, 20, 0.78);
+  flex-wrap: wrap;
+}
+
+.ctr-target-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  background: rgba(245, 158, 11, 0.14);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.22);
+}
+
+.ctr-target-num {
+  font-family: var(--dp-font-mono);
+  font-size: 26px;
+  font-weight: 800;
+  color: #fde68a;
+  text-shadow: 0 0 14px rgba(245, 158, 11, 0.65);
+  line-height: 1;
+}
+
+.ctr-grid-stage {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.ctr-grid-frame {
+  position: relative;
+  width: min(100%, 490px);
+  aspect-ratio: 1 / 1;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: #070910;
+  box-shadow: inset 0 0 36px rgba(245, 158, 11, 0.08), 0 14px 36px rgba(0, 0, 0, 0.6);
+  touch-action: none;
+  user-select: none;
+}
+
+.ctr-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 8px;
+}
+
+.ctr-cell {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 106, 0.22);
+  background: linear-gradient(155deg, rgba(28, 34, 52, 0.9), rgba(14, 17, 28, 0.96));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dp-font-mono);
+  font-size: clamp(20px, 3.2vw, 30px);
+  font-weight: 700;
+  color: #f8ecd1;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+  transition: transform 0.14s var(--dp-ease), background 0.16s, border-color 0.16s, box-shadow 0.16s;
+  cursor: crosshair;
+}
+
+.ctr-cell:hover {
+  border-color: rgba(245, 158, 11, 0.55);
+}
+
+.ctr-cell.is-drag {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.85);
+  color: #fff;
+  box-shadow: inset 0 0 16px rgba(56, 189, 248, 0.35);
+}
+
+.ctr-cell.is-sol {
+  background: linear-gradient(145deg, rgba(245, 158, 11, 0.34), rgba(212, 175, 106, 0.2));
+  border-color: #fde68a;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), inset 0 0 14px rgba(253, 230, 138, 0.3);
+  transform: scale(1.03);
+  z-index: 2;
+}
+
+.ctr-rect-laser {
+  position: absolute;
+  pointer-events: none;
+  border: 3px solid #fde68a;
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.85), inset 0 0 18px rgba(245, 158, 11, 0.28);
+  z-index: 4;
+  transition: all 0.28s var(--dp-ease);
+}
+
+.ctr-rect-laser.is-drag-box {
+  border: 2px dashed #38bdf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.55);
+  transition: none;
+}
+
+/* Verification Playback Bar */
+.ctr-verify-box {
+  width: 100%;
+  max-width: 520px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  border: 1px solid var(--dp-border-strong);
+  background: rgba(12, 15, 24, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ctr-eq-line {
+  font-family: var(--dp-font-mono);
+  font-size: 13.5px;
+  color: #fde68a;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.ctr-sol-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 84px;
+  overflow-y: auto;
+}
+
+.ctr-sol-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  border: 1px solid var(--dp-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--dp-ink-muted);
+}
+
+.ctr-sol-pill.is-active {
+  border-color: #fde68a;
+  background: rgba(245, 158, 11, 0.24);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Team / Alliance Setup Screen */
+.ctr-alliance-wrap {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ctr-alliance-hero {
+  border-radius: var(--dp-radius-lg);
+  border: 1px solid var(--dp-border-strong);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(14, 17, 28, 0.94));
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ctr-contract-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ctr-contract-card {
+  border-radius: var(--dp-radius-md);
+  border: 1px solid var(--dp-border);
+  background: rgba(16, 20, 32, 0.9);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.16s var(--dp-ease), border-color 0.16s, box-shadow 0.16s;
+}
+
+.ctr-contract-card:hover {
+  border-color: var(--dp-border-strong);
+  transform: translateY(-2px);
+}
+
+.ctr-contract-card.is-selected {
+  border-color: var(--dp-brass-bright);
+  background: rgba(212, 175, 106, 0.12);
+  box-shadow: 0 0 24px rgba(212, 175, 106, 0.22);
+}
+
+.ctr-split-visual {
+  display: flex;
+  gap: 6px;
+  font-family: var(--dp-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ctr-split-chip {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+
+.ctr-squad-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.ctr-squad-card {
+  border-radius: 12px;
+  border: 1px solid var(--dp-border);
+  background: rgba(14, 17, 26, 0.88);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ctr-squad-card.is-mine {
+  border-color: var(--dp-brass-bright);
+  background: rgba(212, 175, 106, 0.1);
+}
+
+/* Terminal & Lockout (reuse studio obsidian terminal feel) */
+.ctr-side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ctr-terminal {
+  position: relative;
+  border-radius: var(--dp-radius-lg);
+  border: 1px solid var(--dp-border-strong);
+  background: linear-gradient(180deg, rgba(20, 24, 38, 0.95), rgba(10, 12, 20, 0.98));
+  padding: 18px;
+  box-shadow: var(--dp-shadow-card);
+  overflow: hidden;
+}
+
+.ctr-display {
+  height: 62px;
+  border-radius: 12px;
+  border: 1px solid var(--dp-border-strong);
+  background: #06080f;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  margin-bottom: 12px;
+}
+
+.ctr-display-num {
+  font-family: var(--dp-font-mono);
+  font-size: 32px;
+  font-weight: 800;
+  color: #fde68a;
+}
+
+.ctr-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ctr-key {
+  min-height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--dp-border);
+  background: rgba(26, 31, 48, 0.88);
+  font-family: var(--dp-font-mono);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--dp-ink);
+  transition: transform 0.12s, background 0.15s, border-color 0.15s;
+}
+
+.ctr-key:hover:not(:disabled) {
+  border-color: #fde68a;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.ctr-lockout {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: radial-gradient(circle at 50% 45%, rgba(168, 20, 36, 0.93), rgba(26, 5, 10, 0.97));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px;
+}
+
+.ctr-scratch-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: min(100%, 490px);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--dp-border-subtle);
+  font-size: 12px;
+  color: var(--dp-ink-muted);
+}
+
+@media (max-width: 900px) {
+  .ctr-layout {
+    grid-template-columns: 1fr;
+  }
+  .ctr-contract-grid {
+    grid-template-columns: 1fr;
+  }
+}

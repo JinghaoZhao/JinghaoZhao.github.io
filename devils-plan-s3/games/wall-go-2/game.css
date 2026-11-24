@@ -1,0 +1,310 @@
+/* ==========================================================================
+ * Prison Match 4: Wall Go II — Magnetic Slate & Laser-Wall Architectural Board
+ * ========================================================================== */
+
+.wg-arena {
+  display: grid;
+  grid-template-columns: minmax(0, 1.32fr) minmax(295px, 0.88fr);
+  gap: 18px;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.wg-banner {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--dp-radius-md);
+  background: linear-gradient(135deg, rgba(16, 19, 30, 0.94), rgba(14, 22, 32, 0.9));
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.wg-banner.is-break-active {
+  border-color: rgba(245, 158, 11, 0.75);
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.25);
+}
+
+/* Main Slate Board Frame */
+.wg-board-stage {
+  position: relative;
+  border-radius: var(--dp-radius-lg);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(212, 175, 106, 0.1) 0%, rgba(12, 15, 23, 0.97) 64%, rgba(5, 6, 10, 0.99) 100%);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card), inset 0 0 70px rgba(0, 0, 0, 0.72);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.wg-svg-wrap {
+  width: min(540px, 100%);
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+
+.wg-board-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Cells & Legal Highlights */
+.wg-cell {
+  transition: fill 0.18s, stroke 0.18s;
+}
+
+.wg-cell.is-clickable {
+  cursor: pointer;
+}
+
+.wg-cell.is-clickable:hover {
+  stroke: rgba(242, 213, 145, 0.85);
+  stroke-width: 2;
+}
+
+.wg-cell.is-legal-dest {
+  cursor: pointer;
+}
+
+.wg-cell.is-legal-dest:hover {
+  filter: brightness(1.32);
+}
+
+.wg-dest-pulse {
+  animation: wgDestPulse 1.3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes wgDestPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* Hoverable Brass Wall Slots */
+.wg-wall-slot {
+  cursor: pointer;
+}
+
+.wg-wall-slot .wg-wall-preview {
+  fill: rgba(242, 213, 145, 0.24);
+  stroke: rgba(242, 213, 145, 0.72);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 3;
+  transition: fill 0.16s, stroke 0.16s, filter 0.16s;
+  animation: wgWallSlotGlow 1.15s ease-in-out infinite;
+}
+
+.wg-wall-slot:hover .wg-wall-preview {
+  fill: #f2d591;
+  stroke: #ffffff;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 10px rgba(242, 213, 145, 0.9));
+}
+
+@keyframes wgWallSlotGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Placed Laser Walls */
+.wg-wall-placed {
+  animation: wgWallSnap 0.24s cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+
+@keyframes wgWallSnap {
+  0% { opacity: 0.2; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Wall Break Shockwave */
+.wg-shatter-ring {
+  fill: none;
+  stroke: #f59e0b;
+  stroke-width: 4;
+  animation: wgShatterBurst 0.75s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes wgShatterBurst {
+  0% { r: 6; opacity: 1; stroke-width: 6; }
+  100% { r: 44; opacity: 0; stroke-width: 1; }
+}
+
+/* Pieces */
+.wg-piece-group {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wg-piece-group.is-selectable {
+  cursor: pointer;
+}
+
+.wg-piece-group.is-selectable:hover {
+  filter: drop-shadow(0 0 12px rgba(242, 213, 145, 0.75));
+}
+
+.wg-piece-selected-halo {
+  animation: wgHaloSpin 6s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes wgHaloSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Right Telemetry & Tactical Controls */
+.wg-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wg-card {
+  border-radius: var(--dp-radius-md);
+  background: var(--dp-glass);
+  border: 1px solid var(--dp-border);
+  padding: 15px;
+  box-shadow: var(--dp-shadow-card);
+  backdrop-filter: blur(10px);
+}
+
+.wg-card-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dp-brass);
+  margin: 0 0 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wg-faction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wg-faction-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(10, 13, 22, 0.85);
+  border: 1px solid var(--dp-border-subtle);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.wg-faction-row.is-turn {
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 18px rgba(212, 175, 106, 0.2);
+}
+
+.wg-faction-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.wg-break-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 11px;
+  border: 1.5px solid rgba(245, 158, 11, 0.55);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(120, 53, 15, 0.24));
+  color: #fef3c7;
+  font-weight: 700;
+  font-size: 13.5px;
+  transition: all 0.18s;
+}
+
+.wg-break-btn:hover:not(:disabled) {
+  border-color: #fbbf24;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+}
+
+.wg-break-btn.is-armed {
+  background: linear-gradient(135deg, #f59e0b, #b45309);
+  color: #0b0d14;
+  border-color: #fef08a;
+  box-shadow: 0 0 26px rgba(245, 158, 11, 0.58);
+}
+
+.wg-legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.wg-legend-item {
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: rgba(8, 10, 16, 0.76);
+  border: 1px solid var(--dp-border-subtle);
+  font-size: 12px;
+}
+
+.wg-legend-item strong {
+  display: block;
+  color: var(--dp-ink);
+  margin-bottom: 2px;
+}
+
+.wg-legend-item span {
+  color: var(--dp-ink-muted);
+  font-size: 11.5px;
+}
+
+.wg-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 165px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+
+.wg-log-row {
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: rgba(8, 10, 16, 0.72);
+  border-left: 2px solid var(--dp-border-strong);
+  color: var(--dp-ink-muted);
+}
+
+.wg-log-row.is-break {
+  border-left-color: var(--dp-amber);
+  background: rgba(245, 158, 11, 0.1);
+  color: #fef3c7;
+}
+
+@media (max-width: 960px) {
+  .wg-arena {
+    grid-template-columns: 1fr;
+  }
+  .wg-board-stage {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,358 @@
+/* ==========================================================================
+ * Game 01c: Memory Poker (记忆扑克 / 기억 포커)
+ * Velvet-and-obsidian studio table · 16 3D-flipping gold-foil rank cards
+ * ========================================================================== */
+
+.mp-arena {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.38fr) minmax(300px, 0.92fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.mp-table {
+  position: relative;
+  border-radius: 24px;
+  border: 1px solid var(--dp-border-strong);
+  background:
+    radial-gradient(ellipse 68% 42% at 50% 14%, rgba(212, 175, 106, 0.16), transparent 64%),
+    radial-gradient(ellipse 80% 65% at 50% 62%, rgba(92, 18, 30, 0.44), rgba(11, 13, 20, 0.96) 76%),
+    #0a0c14;
+  box-shadow:
+    0 26px 64px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 8px rgba(10, 12, 18, 0.6),
+    inset 0 0 0 9px rgba(212, 175, 106, 0.2);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mp-table.is-darkened {
+  background:
+    radial-gradient(ellipse 52% 28% at 50% 12%, rgba(242, 213, 145, 0.25), transparent 62%),
+    radial-gradient(ellipse 75% 65% at 50% 65%, rgba(44, 10, 18, 0.42), rgba(6, 7, 12, 0.98) 74%),
+    #06070c;
+}
+
+.mp-phase-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mp-phase-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--dp-border-strong);
+  background: rgba(212, 175, 106, 0.14);
+  color: var(--dp-brass-bright);
+}
+
+.mp-phase-pill.is-urgent {
+  border-color: rgba(220, 53, 69, 0.65);
+  background: rgba(220, 53, 69, 0.18);
+  color: #ff98a3;
+}
+
+.mp-mem-bar-wrap {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.mp-mem-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dc3545, #f59e0b, #f2d591);
+  transition: width 0.25s linear;
+}
+
+/* Community Cards Spotlight */
+.mp-community-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 175, 106, 0.28);
+  background: rgba(8, 10, 18, 0.64);
+  box-shadow: inset 0 0 28px rgba(212, 175, 106, 0.07);
+}
+
+.mp-community-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dp-brass);
+  font-weight: 700;
+}
+
+.mp-community-row {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* 4x4 Memory Card Grid */
+.mp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 490px);
+  margin: 0 auto;
+}
+
+/* 3D Luxury Playing Card */
+.mp-card-slot {
+  perspective: 950px;
+  aspect-ratio: 3 / 4;
+  position: relative;
+}
+
+.mp-card-slot.is-community {
+  width: 82px;
+  height: 112px;
+  aspect-ratio: auto;
+}
+
+.mp-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 12px;
+  cursor: default;
+}
+
+.mp-card.is-clickable {
+  cursor: pointer;
+}
+
+.mp-card.is-clickable:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.mp-card.is-facedown {
+  transform: rotateY(180deg);
+}
+
+.mp-card.is-facedown.is-clickable:hover {
+  transform: rotateY(180deg) translateY(-4px) scale(1.03);
+}
+
+.mp-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Front (Rank Visible) */
+.mp-card-front {
+  background:
+    radial-gradient(circle at 50% 25%, rgba(242, 213, 145, 0.16), transparent 62%),
+    linear-gradient(155deg, #1d2233 0%, #0e111a 60%, #15121d 100%);
+  border: 1.5px solid rgba(212, 175, 106, 0.58);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(212, 175, 106, 0.1);
+}
+
+.mp-card-front.is-community-face {
+  border-color: #f2d591;
+  box-shadow: 0 0 26px rgba(212, 175, 106, 0.42), inset 0 0 14px rgba(242, 213, 145, 0.16);
+}
+
+.mp-card-coord {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-family: var(--dp-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(212, 175, 106, 0.72);
+}
+
+.mp-card-rank {
+  font-family: var(--dp-font-display);
+  font-size: clamp(24px, 4vw, 38px);
+  font-weight: 800;
+  color: #f7e4b4;
+  text-shadow: 0 2px 14px rgba(212, 175, 106, 0.45);
+  line-height: 1;
+}
+
+.mp-card-front.is-high-rank .mp-card-rank {
+  color: #ffd778;
+}
+
+.mp-card-emblem {
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(212, 175, 106, 0.55);
+  letter-spacing: 0.18em;
+}
+
+/* Back (Obsidian Gold Filigree) */
+.mp-card-back {
+  transform: rotateY(180deg);
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(212, 175, 106, 0.06) 0px,
+      rgba(212, 175, 106, 0.06) 2px,
+      transparent 2px,
+      transparent 10px
+    ),
+    radial-gradient(circle at 50% 50%, #241926 0%, #0e1018 72%);
+  border: 1.5px solid rgba(212, 175, 106, 0.38);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.52), inset 0 0 0 4px rgba(10, 12, 18, 0.7), inset 0 0 0 5px rgba(212, 175, 106, 0.22);
+}
+
+.mp-back-num {
+  font-family: var(--dp-font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--dp-brass);
+  padding: 4px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 106, 0.32);
+  background: rgba(8, 10, 16, 0.75);
+}
+
+/* Selection & Showdown Highlights */
+.mp-card-slot.is-selected .mp-card-back,
+.mp-card-slot.is-selected .mp-card-front {
+  border: 2.5px solid #f2d591;
+  box-shadow: 0 0 28px rgba(242, 213, 145, 0.65), inset 0 0 18px rgba(242, 213, 145, 0.22);
+}
+
+.mp-card-slot.is-optimal .mp-card-front {
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.65);
+  border-color: #38bdf8;
+}
+
+.mp-pick-tag {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 800;
+  background: var(--dp-brass-bright);
+  color: #090b10;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Right Side Panel */
+.mp-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mp-panel {
+  border-radius: var(--dp-radius-lg);
+  border: 1px solid var(--dp-border-strong);
+  background: rgba(14, 17, 26, 0.9);
+  padding: 16px;
+  box-shadow: var(--dp-shadow-card);
+}
+
+.mp-hand-ladder {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 10px;
+  font-size: 11.5px;
+  color: var(--dp-ink-muted);
+  margin-top: 8px;
+}
+
+.mp-showdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.mp-showdown-row {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--dp-border-subtle);
+  background: rgba(255, 255, 255, 0.025);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mp-showdown-row.is-winner {
+  border-color: var(--dp-brass-bright);
+  background: rgba(212, 175, 106, 0.12);
+  box-shadow: 0 0 20px rgba(212, 175, 106, 0.16);
+}
+
+.mp-showdown-row.is-me {
+  border-left: 3px solid var(--dp-cyan);
+}
+
+.mp-mini-cards {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.mp-mini-card {
+  width: 30px;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid var(--dp-border-strong);
+  background: linear-gradient(155deg, #21273b, #111521);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dp-font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--dp-brass-bright);
+}
+
+.mp-mini-card.is-picked {
+  border-color: #38bdf8;
+  background: linear-gradient(155deg, #1b3146, #0f1b29);
+  color: #bae6fd;
+}
+
+@media (max-width: 900px) {
+  .mp-arena {
+    grid-template-columns: 1fr;
+  }
+  .mp-card-slot.is-community {
+    width: 68px;
+    height: 94px;
+  }
+  .mp-grid {
+    gap: 8px;
+  }
+}

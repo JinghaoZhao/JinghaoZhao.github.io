@@ -1,0 +1,487 @@
+/* ==========================================================================
+ * Collection Hub — The Devil's Plan Season 3: Dead Again
+ * Space-coded cinema-grade broadcast gallery
+ * ========================================================================== */
+
+.hub-body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+#hub-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hub-lightshaft {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    conic-gradient(
+      from 165deg at 50% -15%,
+      transparent 0deg,
+      rgba(212, 175, 106, 0.09) 18deg,
+      transparent 40deg,
+      rgba(220, 53, 69, 0.08) 62deg,
+      transparent 90deg
+    ),
+    radial-gradient(ellipse 60% 35% at 50% 102%, rgba(167, 139, 250, 0.08), transparent 70%);
+  filter: blur(22px);
+}
+
+.hub-container {
+  position: relative;
+  z-index: 2;
+  width: min(1220px, calc(100% - 36px));
+  margin-inline: auto;
+}
+
+/* Topbar */
+.hub-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(8, 10, 16, 0.86);
+  border-bottom: 1px solid var(--dp-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.hub-topbar-inner {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hub-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hub-home-link {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--dp-ink);
+  transition: color 0.16s;
+}
+
+.hub-home-link:hover {
+  color: var(--dp-brass-bright);
+}
+
+.hub-divider {
+  color: var(--dp-ink-faint);
+}
+
+.hub-brand-title {
+  font-family: var(--dp-font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--dp-ink-muted);
+}
+
+.hub-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hero Stage */
+.hub-main {
+  flex: 1;
+}
+
+.hub-hero {
+  padding: clamp(38px, 6.5vh, 72px) 0 32px;
+  text-align: center;
+}
+
+.hub-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--dp-border-strong);
+  background: rgba(212, 175, 106, 0.09);
+  color: var(--dp-brass-bright);
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  margin-bottom: 18px;
+}
+
+.hub-title {
+  margin: 0;
+  font-family: var(--dp-font-display);
+  line-height: 1.04;
+}
+
+.hub-title-main {
+  display: block;
+  font-size: clamp(34px, 6.2vw, 74px);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  background: linear-gradient(180deg, #fff8e7 0%, #e5c47c 56%, #9b7739 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 12px 32px rgba(212, 175, 106, 0.24));
+}
+
+.hub-title-sub {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(18px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  color: var(--dp-crimson-bright);
+  text-shadow: 0 0 28px var(--dp-crimson-glow);
+}
+
+.hub-lead {
+  max-width: 670px;
+  margin: 18px auto 0;
+  font-size: 15.5px;
+  color: var(--dp-ink-muted);
+  line-height: 1.7;
+}
+
+.hub-pillars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 22px auto 0;
+}
+
+.hub-pillar {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(20, 24, 36, 0.78);
+  border: 1px solid var(--dp-border-subtle);
+  font-size: 12.5px;
+  color: var(--dp-ink);
+}
+
+.hub-pillar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dp-brass);
+  box-shadow: 0 0 8px var(--dp-brass);
+}
+
+/* Quick Join Bar */
+.hub-quickjoin {
+  max-width: 820px;
+  margin: 26px auto 0;
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.hub-qj-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dp-brass);
+  margin-bottom: 10px;
+}
+
+.hub-qj-controls {
+  display: grid;
+  grid-template-columns: 1.35fr 1.25fr auto;
+  gap: 10px;
+}
+
+/* Catalog Section */
+.hub-catalog {
+  padding: 20px 0 78px;
+}
+
+.hub-catalog-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--dp-border);
+}
+
+.hub-section-title {
+  margin: 0;
+  font-family: var(--dp-font-display);
+  font-size: 24px;
+  letter-spacing: 0.06em;
+}
+
+.hub-section-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--dp-ink-muted);
+}
+
+.hub-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hub-filter-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--dp-border-subtle);
+  background: rgba(20, 24, 36, 0.72);
+  color: var(--dp-ink-muted);
+  transition: all 0.18s var(--dp-ease);
+}
+
+.hub-filter-btn:hover {
+  color: var(--dp-ink);
+  border-color: var(--dp-border-strong);
+}
+
+.hub-filter-btn.is-active {
+  background: rgba(212, 175, 106, 0.18);
+  border-color: var(--dp-brass);
+  color: var(--dp-brass-bright);
+  box-shadow: 0 0 18px rgba(212, 175, 106, 0.16);
+}
+
+/* Game Card Grid */
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(336px, 1fr));
+  gap: 18px;
+}
+
+.hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 18px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(circle at 92% 10%, var(--card-glow, rgba(212, 175, 106, 0.14)), transparent 52%),
+    linear-gradient(165deg, rgba(24, 29, 44, 0.9) 0%, rgba(11, 13, 21, 0.96) 100%);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
+  overflow: hidden;
+  transition: transform 0.25s var(--dp-ease), border-color 0.25s var(--dp-ease),
+    box-shadow 0.25s var(--dp-ease);
+}
+
+.hub-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--card-accent, var(--dp-brass)), transparent);
+  opacity: 0.85;
+}
+
+.hub-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--card-accent, var(--dp-brass));
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.72), 0 0 32px var(--card-glow, rgba(212, 175, 106, 0.18));
+}
+
+.hub-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.hub-card-ep {
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-ink-faint);
+  letter-spacing: 0.08em;
+}
+
+.hub-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.hub-card-emblem {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 10, 16, 0.72);
+  border: 1px solid color-mix(in srgb, var(--card-accent, #d4af6a) 42%, transparent);
+  color: var(--card-accent, var(--dp-brass));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 20px var(--card-glow, rgba(212, 175, 106, 0.14));
+}
+
+.hub-card-emblem svg {
+  width: 26px;
+  height: 26px;
+}
+
+.hub-card-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--dp-ink);
+  line-height: 1.25;
+}
+
+.hub-card-subtitle {
+  font-size: 12px;
+  color: var(--card-accent, var(--dp-brass));
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+  opacity: 0.92;
+}
+
+.hub-card-tagline {
+  margin: 12px 0 16px;
+  font-size: 13.5px;
+  color: var(--dp-ink-muted);
+  line-height: 1.62;
+  flex: 1;
+}
+
+.hub-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 16px;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-ink-muted);
+}
+
+.hub-meta-pill {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--dp-border-subtle);
+}
+
+.hub-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Space Badges */
+.dp-badge-amber {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fcd34d;
+}
+
+.dp-badge-violet {
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.46);
+  color: #ddd6fe;
+}
+
+/* TBA Finale Teaser Card */
+.hub-card-tba {
+  border-style: dashed;
+  border-color: rgba(212, 175, 106, 0.32);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(220, 53, 69, 0.12), transparent 60%),
+    linear-gradient(165deg, rgba(16, 18, 28, 0.72), rgba(8, 10, 16, 0.88));
+  cursor: default;
+}
+
+.hub-card-tba:hover {
+  transform: none;
+  border-color: rgba(212, 175, 106, 0.42);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.hub-tba-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
+  border-radius: var(--dp-radius-sm);
+  border: 1px dashed rgba(212, 175, 106, 0.34);
+  background: rgba(212, 175, 106, 0.06);
+  color: var(--dp-ink-muted);
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.hub-empty {
+  grid-column: 1 / -1;
+  padding: 46px 24px;
+  text-align: center;
+  border-radius: var(--dp-radius-md);
+  border: 1px dashed var(--dp-border-strong);
+  background: rgba(16, 19, 30, 0.52);
+}
+
+/* Footer */
+.hub-footer {
+  border-top: 1px solid var(--dp-border);
+  background: rgba(8, 10, 16, 0.85);
+  padding: 18px 0;
+  font-size: 12.5px;
+  color: var(--dp-ink-faint);
+}
+
+.hub-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hub-footer-link:hover {
+  color: var(--dp-brass-bright);
+}
+
+@media (max-width: 720px) {
+  .hub-qj-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .hub-grid {
+    grid-template-columns: 1fr;
+  }
+}

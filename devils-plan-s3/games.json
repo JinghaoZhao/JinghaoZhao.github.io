@@ -1,0 +1,312 @@
+{
+  "season": "The Devil's Plan Season 3: Dead Again",
+  "seasonZh": "魔鬼的计谋 第三季：死亡重启",
+  "seasonKo": "데블스 플랜: 데드 어게인",
+  "updatedAt": "2026-11-24",
+  "games": [
+    {
+      "slug": "either-or",
+      "episode": "EP 1–2 · DAY 1",
+      "category": "MAIN MATCH",
+      "space": "studio",
+      "title": { "zh": "二选一", "en": "Either/Or", "ko": "양자택일" },
+      "tagline": {
+        "zh": "10轮秘密二选一政治博弈（公共利益 vs 个人私利），穿插4场脑力小游戏争夺生活馆席位与联盟徽章。",
+        "en": "10 secret binary dilemmas pitting public prize pool against personal survival, interlaced with 4 high-stakes mini-games."
+      },
+      "players": { "min": 4, "max": 16, "recommended": 8 },
+      "duration": "20–30 min",
+      "accent": "#d4af6a",
+      "icon": "scale",
+      "status": "playable"
+    },
+    {
+      "slug": "count-the-cubes",
+      "episode": "EP 1 · MM1 MINI",
+      "category": "MINI-GAME",
+      "space": "mini",
+      "title": { "zh": "数方块", "en": "Count the Cubes", "ko": "큐브 세기" },
+      "tagline": {
+        "zh": "3D 等轴测立体堆叠空间速算，精准推导被遮挡隐藏方块总数，答错将触发 20 秒锁定惩罚。",
+        "en": "Isometric 3D stacked-cube speed counting with occluded hidden blocks — wrong guesses trigger a 20-second lockout."
+      },
+      "players": { "min": 1, "max": 16, "recommended": 4 },
+      "duration": "3–6 min",
+      "accent": "#38bdf8",
+      "icon": "cubes",
+      "status": "playable"
+    },
+    {
+      "slug": "count-the-rectangles",
+      "episode": "EP 1 · MM1 MINI",
+      "category": "MINI-GAME",
+      "space": "mini",
+      "title": { "zh": "数矩形", "en": "Count the Rectangles", "ko": "사각형 세기" },
+      "tagline": {
+        "zh": "在数字网格中找出所有格内之和等于目标值的矩形；支持单打独赢 7 分，或 ≤3 人组队进行独食 (5/1/1) 与奉献 (1/3/3) 博弈。",
+        "en": "Count every sub-rectangle matching the target sum; go solo for 7 pts or form a 3-player team with Monopoly (5/1/1) vs Devotion (1/3/3) splits."
+      },
+      "players": { "min": 1, "max": 16, "recommended": 6 },
+      "duration": "5–10 min",
+      "accent": "#38bdf8",
+      "icon": "grid",
+      "status": "playable"
+    },
+    {
+      "slug": "memory-poker",
+      "episode": "EP 1 · MM1 MINI",
+      "category": "MINI-GAME",
+      "space": "mini",
+      "title": { "zh": "记忆扑克", "en": "Memory Poker", "ko": "기억 포커" },
+      "tagline": {
+        "zh": "16 张扑克牌限时 20 秒记忆后全数翻面，结合 3 张公共牌盲选 2 张暗牌组成最强 5 张德州牌型。",
+        "en": "Memorize 16 cards in 20 seconds before they flip face-down; pick 2 hidden cards to forge the strongest 5-card hand with 3 community cards."
+      },
+      "players": { "min": 2, "max": 16, "recommended": 6 },
+      "duration": "5–8 min",
+      "accent": "#38bdf8",
+      "icon": "cards",
+      "status": "playable"
+    },
+    {
+      "slug": "lay-the-grass",
+      "episode": "EP 2 · MM1 MINI",
+      "category": "MINI-GAME",
+      "space": "mini",
+      "title": { "zh": "铺草坪", "en": "Lay the Grass", "ko": "잔디 깔기" },
+      "tagline": {
+        "zh": "114 格公园棋盘，低分优先挑选 7 种尺寸多联骨牌 {3,4,6,7,9,11,13}，按从小到大轮流放置（仅旋转、禁翻转）卡位封杀。",
+        "en": "114-cell park grid: lowest scorer drafts first from 7 polyomino sizes {3–13}, placing smallest-to-largest (rotate only) to out-block rivals."
+      },
+      "players": { "min": 2, "max": 16, "recommended": 6 },
+      "duration": "8–15 min",
+      "accent": "#38bdf8",
+      "icon": "grass",
+      "status": "playable"
+    },
+    {
+      "slug": "mystery-stock-market",
+      "episode": "EP 3–4 · DAY 2",
+      "category": "MAIN MATCH",
+      "space": "studio",
+      "title": { "zh": "神秘交易所", "en": "Mystery Stock Market", "ko": "미스터리 거래소" },
+      "tagline": {
+        "zh": "24 轮 7 只神秘股票暗箱操盘！10万起始资金，R5/10/15/20 逐步解密涨跌公式，支持 Secret 隐匿下单与 1000 万奖金徽章冲刺。",
+        "en": "24 rounds across 7 enigmatic stocks with hidden price formulas revealed at R5/10/15/20. Use Secret orders, Piece intel, and race for 10M KRW."
+      },
+      "players": { "min": 2, "max": 12, "recommended": 6 },
+      "duration": "20–30 min",
+      "accent": "#d4af6a",
+      "icon": "chart",
+      "status": "playable"
+    },
+    {
+      "slug": "gem-black-market",
+      "episode": "EP 6–7 · DAY 3",
+      "category": "MAIN MATCH",
+      "space": "studio",
+      "title": { "zh": "宝石黑市", "en": "Gem Black Market", "ko": "보석 암시장" },
+      "tagline": {
+        "zh": "3 轮 13 张牌（11宝石 + 2炸弹 -6/-4）正逆序强制暗换；终局得分 = 己分 × 秘密伙伴(Manito)分，负负得正惊天逆转！",
+        "en": "3 rounds of forward & reverse card swaps among 11 Gems and 2 Bombs (-6/-4). Final score = Own × Secret Manito — negative × negative wins!"
+      },
+      "players": { "min": 4, "max": 9, "recommended": 6 },
+      "duration": "15–22 min",
+      "accent": "#d4af6a",
+      "icon": "gem",
+      "status": "playable"
+    },
+    {
+      "slug": "auction-bingo",
+      "episode": "EP 9–10 · DAY 4",
+      "category": "MAIN MATCH",
+      "space": "studio",
+      "title": { "zh": "拍卖宾果", "en": "Auction Bingo", "ko": "경매 빙고" },
+      "tagline": {
+        "zh": "7 轮同款 3×3 ○△☆ 宾果盘，7 张名牌 + 10 枚不可拆全付硬币暗拍！得标量等于同选该图形人数，且胜者全程保密。",
+        "en": "7 rounds on identical 3×3 ○△☆ boards with 7 Name Tickets & 10 non-splittable all-pay coins. Blind auction winners claim tiles equal to selector count."
+      },
+      "players": { "min": 4, "max": 8, "recommended": 6 },
+      "duration": "15–25 min",
+      "accent": "#d4af6a",
+      "icon": "gavel",
+      "status": "playable"
+    },
+    {
+      "slug": "heavy-13",
+      "episode": "EP 2–3 · DAY 1",
+      "category": "PRISON MATCH",
+      "space": "prison",
+      "title": { "zh": "沉重13", "en": "Heavy 13", "ko": "무거운 13" },
+      "tagline": {
+        "zh": "14 轮两循环暗出 0–6 岩石卡与红/绿/蓝/彩虹筹码，三座底座任一凑满 ≥13 即爆仓吞下整座岩石总罚分。",
+        "en": "14 rounds of simultaneous 0–6 rock cards and color/rainbow chips. Push any stand to ≥13 and bust, absorbing every rock on that stand."
+      },
+      "players": { "min": 3, "max": 8, "recommended": 6 },
+      "duration": "12–18 min",
+      "accent": "#dc3545",
+      "icon": "weights",
+      "status": "playable"
+    },
+    {
+      "slug": "russian-roulette",
+      "episode": "EP 4–5 · DAY 2",
+      "category": "PRISON MATCH",
+      "space": "prison",
+      "title": { "zh": "俄罗斯轮盘", "en": "Russian Roulette", "ko": "러시안 룰렛" },
+      "tagline": {
+        "zh": "6 弹仓 2 实弹，每人 16 枚秘密点数！公开/私密查验、拨转弹仓或 6 点暗拍众筹交换相邻弹仓，3 人归零瞬间顺时针连发。",
+        "en": "6 chambers, 2 live bullets, 16 secret credits. Peek, spin, or secretly crowd-fund 6 credits to swap chambers before 3 empty players trigger fire."
+      },
+      "players": { "min": 3, "max": 6, "recommended": 6 },
+      "duration": "12–20 min",
+      "accent": "#dc3545",
+      "icon": "revolver",
+      "status": "playable"
+    },
+    {
+      "slug": "piggy-bank",
+      "episode": "EP 7–8 · DAY 3",
+      "category": "PRISON MATCH",
+      "space": "prison",
+      "title": { "zh": "存钱罐", "en": "Piggy Bank", "ko": "돼지 저금통" },
+      "tagline": {
+        "zh": "5 只存钱罐初始各 1 黑 1 白币，投 1–5 币传递；接罐者 20 秒报黑白交替累计数，10 秒抢铃质疑 (+1/-1)，先到 5 分胜出。",
+        "en": "5 piggy banks start with 1B+1W coin. Drop 1–5 coins & pass; receiver has 20s to call alternating B/W totals under a 10s Doubt buzzer (+1/-1) to 5 pts."
+      },
+      "players": { "min": 3, "max": 4, "recommended": 4 },
+      "duration": "10–15 min",
+      "accent": "#dc3545",
+      "icon": "piggy",
+      "status": "playable"
+    },
+    {
+      "slug": "wall-go-2",
+      "episode": "EP 10 · DAY 4",
+      "category": "PRISON MATCH",
+      "space": "prison",
+      "title": { "zh": "墙壁围棋Ⅱ", "en": "Wall Go II", "ko": "벽바둑 Ⅱ" },
+      "tagline": {
+        "zh": "7×7 棋盘，方棋（直线 1–2 格）与圆棋（1 格或 90° L 拐）分兵作战，禁原地不动、每步必落一墙，R1 三人还握有唯一破墙杀招！",
+        "en": "7×7 territory duel: Square pieces move straight 1–2, Circle pieces step 1 or L-turn 90°. Mandatory movement + 1 wall per turn, plus R1 Wall Break."
+      },
+      "players": { "min": 2, "max": 3, "recommended": 3 },
+      "duration": "12–20 min",
+      "accent": "#dc3545",
+      "icon": "walls",
+      "status": "playable"
+    },
+    {
+      "slug": "piece-puzzle",
+      "episode": "EP 4–5 · EXILE 1",
+      "category": "EXILE MATCH",
+      "space": "exile",
+      "title": { "zh": "碎片拼图", "en": "Piece Puzzle", "ko": "피스 퍼즐" },
+      "tagline": {
+        "zh": "流放地首战：精密观察 8 枚立体凹槽魔鬼碎片的齿槽方向与深度，旋转互锁拼成严丝合缝的石阵网格。",
+        "en": "Exile Trial 1: Inspect groove depths and notches across 8 Devil's Pieces to interlock them into a seamless stone grid before rivals."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 4 },
+      "duration": "5–10 min",
+      "accent": "#f59e0b",
+      "icon": "piece",
+      "status": "playable"
+    },
+    {
+      "slug": "spot-the-difference",
+      "episode": "EP 6 · EXILE 2",
+      "category": "EXILE MATCH",
+      "space": "exile",
+      "title": { "zh": "找不同", "en": "Spot the Difference", "ko": "달라진 그림 찾기" },
+      "tagline": {
+        "zh": "限时死记流放地神殿原始壁画，随后在改版壁画中高速精准点出全部 5 处细微篡改，末位即刻永久淘汰。",
+        "en": "Memorize the original ancient temple mural under the clock, then race to pinpoint all 5 subtle alterations on the mutated fresco."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 4 },
+      "duration": "4–8 min",
+      "accent": "#f59e0b",
+      "icon": "eye",
+      "status": "playable"
+    },
+    {
+      "slug": "secret-code",
+      "episode": "EP 7 · EXILE 3",
+      "category": "EXILE MATCH",
+      "space": "exile",
+      "title": { "zh": "秘密密码", "en": "Secret Code", "ko": "비밀 코드" },
+      "tagline": {
+        "zh": "26 张 A–Z 字母卡各带唯一「数字 + 颜色 + 图形」三重属性，依据逻辑线索交叉排除，抢铃锁定唯一 4 字母密码。",
+        "en": "26 A–Z cards each carry a unique Number, Color & Shape signature. Cross-deduce layered logic clues and buzz in the sole 4-letter code."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 4 },
+      "duration": "6–12 min",
+      "accent": "#f59e0b",
+      "icon": "cipher",
+      "status": "playable"
+    },
+    {
+      "slug": "loop-fence-puzzle",
+      "episode": "EP 8 · EXILE 4",
+      "category": "EXILE MATCH",
+      "space": "exile",
+      "title": { "zh": "围栏环路", "en": "Loop Fence Puzzle", "ko": "울타리 치기" },
+      "tagline": {
+        "zh": "高难度数回 (Slitherlink) 逻辑竞速：按格子数字 0–3 沿点阵架设围栏，连成唯一无交叉、无分叉的闭合单环。",
+        "en": "High-tension Slitherlink race: connect dot-grid edges matching every 0–3 clue into one continuous, non-branching closed loop."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 4 },
+      "duration": "5–12 min",
+      "accent": "#f59e0b",
+      "icon": "loop",
+      "status": "playable"
+    },
+    {
+      "slug": "symmetrical-puzzle",
+      "episode": "EP 10 · EXILE 5",
+      "category": "EXILE MATCH",
+      "space": "exile",
+      "title": { "zh": "对称拼图", "en": "Symmetrical Puzzle", "ko": "대칭 퍼즐" },
+      "tagline": {
+        "zh": "将蓝、红、绿三组多联几何模块分别拼成 3 个完美轴对称图形，前两名死里逃生、末位彻底告别流放地。",
+        "en": "Assemble Blue, Red, and Green polyomino sets into 3 exact mirror-symmetrical silhouettes — top two survive Exile, last falls forever."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 3 },
+      "duration": "6–12 min",
+      "accent": "#f59e0b",
+      "icon": "symmetry",
+      "status": "playable"
+    },
+    {
+      "slug": "gods-test",
+      "episode": "EP 7–10 · EXILE REVIVAL",
+      "category": "HIDDEN STAGE",
+      "space": "hidden",
+      "title": { "zh": "神之考验：49魔方阵", "en": "God's Test (7×7 Magic Square)", "ko": "신의 시험 (7×7 마방진)" },
+      "tagline": {
+        "zh": "穿行红蓝选择之房与 15 区象形古语壁画！限时 1 小时，首行正中锁定 1，将 1–49 填入 7×7 玄武岩石碑使行列对角线皆等于 175。",
+        "en": "Enter the Red/Blue Choice Room & decode the 15-zone Exile Cipher. Lock 1 at top-center and fill 1–49 into a 7×7 tablet summing to 175 on every line."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 1 },
+      "duration": "15–60 min",
+      "accent": "#a78bfa",
+      "icon": "temple",
+      "status": "playable"
+    },
+    {
+      "slug": "secret-safe",
+      "episode": "EP 3–8 · LIVING QUARTERS",
+      "category": "HIDDEN STAGE",
+      "space": "hidden",
+      "title": { "zh": "生活馆秘密金库", "en": "Living Quarters Secret Safe", "ko": "생활동 비밀 금고" },
+      "tagline": {
+        "zh": "沉浸式四幕密室机关：撬开假插座插入 1 碎片→紫外显影 `?`→12 枚碎片齿轮互锁开密梯→直面「诅咒结界」与 2 亿奖金徽章的终极抉择！",
+        "en": "4-act interactive suite escape room: pry the fake outlet, reveal the UV `?`, interlock 12 Devil's Pieces to open the hidden elevator & face the Curse Barrier."
+      },
+      "players": { "min": 1, "max": 4, "recommended": 1 },
+      "duration": "8–15 min",
+      "accent": "#a78bfa",
+      "icon": "vault",
+      "status": "playable"
+    }
+  ]
+}

@@ -1,0 +1,780 @@
+/* ==========================================================================
+ * 沉重13 (Heavy 13) — Prison Dungeon Stone Pedestal Design System
+ * Cold Concrete & Iron Shadows · 3D Stone Pedestals · Stress Cracks & Bust FX
+ * ========================================================================== */
+
+.h13-body {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.24) 0px,
+      rgba(0, 0, 0, 0.24) 14px,
+      transparent 14px,
+      transparent 92px
+    ),
+    radial-gradient(ellipse 72% 42% at 50% -4%, rgba(186, 210, 230, 0.13), transparent 62%),
+    radial-gradient(ellipse 46% 36% at 50% 92%, rgba(220, 53, 69, 0.14), transparent 65%),
+    #080a0e;
+}
+
+.h13-stage {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-bottom: 24px;
+}
+
+.h13-stage.is-bust-shake {
+  animation: h13ScreenShake 0.56s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes h13ScreenShake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  12% { transform: translate3d(-8px, 3px, 0); }
+  24% { transform: translate3d(8px, -4px, 0); }
+  36% { transform: translate3d(-7px, -2px, 0); }
+  48% { transform: translate3d(6px, 4px, 0); }
+  64% { transform: translate3d(-4px, 2px, 0); }
+  80% { transform: translate3d(3px, -1px, 0); }
+}
+
+/* ---------- Prison Telemetry Header ---------- */
+.h13-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: var(--dp-radius-md);
+  background: linear-gradient(180deg, rgba(24, 28, 36, 0.94), rgba(12, 14, 19, 0.96));
+  border: 1px solid rgba(160, 178, 198, 0.22);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.h13-round-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.h13-round-badge {
+  font-family: var(--dp-font-mono);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(220, 53, 69, 0.16);
+  border: 1px solid rgba(220, 53, 69, 0.48);
+  color: #ffb4bd;
+}
+
+.h13-cycle-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #cbd5e1;
+}
+
+.h13-first-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(212, 175, 106, 0.12);
+  border: 1px solid rgba(212, 175, 106, 0.42);
+  color: var(--dp-brass-bright);
+}
+
+/* ---------- Color Accent Variables ---------- */
+.h13-c-red {
+  --ped-color: #f43f5e;
+  --ped-deep: #7f1d1d;
+  --ped-glow: rgba(244, 63, 94, 0.42);
+  --ped-surface: rgba(244, 63, 94, 0.12);
+}
+.h13-c-green {
+  --ped-color: #10b981;
+  --ped-deep: #064e3b;
+  --ped-glow: rgba(16, 185, 129, 0.40);
+  --ped-surface: rgba(16, 185, 129, 0.12);
+}
+.h13-c-blue {
+  --ped-color: #3b82f6;
+  --ped-deep: #1e3a8a;
+  --ped-glow: rgba(59, 130, 246, 0.42);
+  --ped-surface: rgba(59, 130, 246, 0.12);
+}
+
+/* ---------- Three Sculptural 3D Stone Pedestals ---------- */
+.h13-pedestals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.h13-pedestal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 288px;
+  padding: 14px 14px 16px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(ellipse 85% 48% at 50% 0%, var(--ped-surface), transparent 70%),
+    linear-gradient(180deg, #1a1f29 0%, #11141b 65%, #0b0d12 100%);
+  border: 1.5px solid color-mix(in srgb, var(--ped-color) 38%, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -10px 24px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  transition: transform 0.22s var(--dp-ease), border-color 0.22s var(--dp-ease), box-shadow 0.22s var(--dp-ease);
+}
+
+.h13-pedestal.is-warn {
+  border-color: rgba(245, 158, 11, 0.72);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 22px rgba(245, 158, 11, 0.22);
+}
+
+.h13-pedestal.is-critical {
+  border-color: #ff4757;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.7), 0 0 32px rgba(255, 71, 87, 0.42);
+  animation: h13PedestalTremble 1.6s ease-in-out infinite;
+}
+
+.h13-pedestal.is-rainbow-target {
+  cursor: pointer;
+  border-color: var(--ped-color);
+  box-shadow: 0 0 0 1px var(--ped-color), 0 0 28px var(--ped-glow);
+}
+
+.h13-pedestal.is-rainbow-target:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 2px #fff, 0 0 36px var(--ped-glow);
+}
+
+.h13-pedestal.is-just-busted {
+  animation: h13BustFlash 0.85s var(--dp-ease);
+}
+
+@keyframes h13PedestalTremble {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-1.5px); }
+  40% { transform: translateX(1.5px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+@keyframes h13BustFlash {
+  0% {
+    box-shadow: 0 0 65px rgba(255, 71, 87, 0.95), inset 0 0 48px rgba(255, 71, 87, 0.75);
+    border-color: #fff;
+  }
+  100% {
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.62);
+  }
+}
+
+/* Stress Cracks SVG Overlay */
+.h13-cracks-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+.h13-pedestal.is-warn .h13-cracks-svg {
+  opacity: 0.45;
+}
+
+.h13-pedestal.is-critical .h13-cracks-svg {
+  opacity: 0.95;
+  filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.9));
+}
+
+.h13-ped-head {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.h13-ped-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--dp-font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--dp-ink);
+}
+
+.h13-ped-gem {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  transform: rotate(45deg);
+  background: var(--ped-color);
+  box-shadow: 0 0 12px var(--ped-glow);
+}
+
+.h13-ped-weight-led {
+  font-family: var(--dp-font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--ped-color);
+  letter-spacing: 0.04em;
+}
+
+.h13-pedestal.is-critical .h13-ped-weight-led {
+  color: #ff6b7a;
+  border-color: rgba(255, 71, 87, 0.7);
+  text-shadow: 0 0 10px rgba(255, 71, 87, 0.85);
+}
+
+/* Pressure Gauge Bar (0 -> 13) */
+.h13-pressure-wrap {
+  position: relative;
+  z-index: 3;
+  margin-top: 8px;
+}
+
+.h13-pressure-track {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 2px;
+  height: 10px;
+  padding: 2px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.h13-pressure-seg {
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: background 0.25s, box-shadow 0.25s;
+}
+
+.h13-pressure-seg.is-on {
+  background: var(--ped-color);
+  box-shadow: 0 0 6px var(--ped-glow);
+}
+
+.h13-pressure-seg.is-on.is-hot {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.75);
+}
+
+.h13-pressure-seg.is-on.is-danger {
+  background: #ff4757;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.9);
+}
+
+.h13-pressure-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--dp-font-mono);
+  font-size: 10.5px;
+  color: var(--dp-ink-muted);
+  margin-top: 4px;
+}
+
+/* Physical Stacked Stone Rocks on Pedestal Slab */
+.h13-rock-stack-arena {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 4px 6px;
+  min-height: 146px;
+}
+
+.h13-rock-pile {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: center;
+  align-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.h13-stone-block {
+  position: relative;
+  min-width: 52px;
+  padding: 6px 8px 5px;
+  border-radius: 7px;
+  background:
+    linear-gradient(160deg, #3c4352 0%, #242934 55%, #151820 100%);
+  border: 1.5px solid rgba(203, 213, 225, 0.26);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.16),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.65),
+    0 5px 12px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  animation: h13RockDrop 0.32s var(--dp-ease);
+}
+
+.h13-stone-block.is-zero {
+  border-color: rgba(168, 85, 247, 0.72);
+  background: linear-gradient(160deg, #2e2042 0%, #1c1528 65%, #120d1b 100%);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.h13-stone-block.is-rainbow {
+  border-color: #f4d08c;
+  box-shadow: 0 0 12px rgba(244, 208, 140, 0.42), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.h13-stone-val {
+  display: block;
+  font-family: var(--dp-font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.05;
+}
+
+.h13-stone-block.is-zero .h13-stone-val {
+  color: #d8b4fe;
+}
+
+.h13-stone-owner {
+  display: block;
+  font-size: 9.5px;
+  color: var(--dp-ink-muted);
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes h13RockDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-22px) scale(1.08);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(2px) scale(0.98);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.h13-pedestal-slab {
+  width: 100%;
+  height: 16px;
+  border-radius: 5px 5px 8px 8px;
+  background: linear-gradient(180deg, #3b4252 0%, #1f2430 60%, #11131a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 2px solid color-mix(in srgb, var(--ped-color) 65%, #94a3b8);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+}
+
+.h13-rainbow-proj {
+  position: relative;
+  z-index: 3;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #86efac;
+}
+
+.h13-rainbow-proj.is-bust {
+  background: rgba(244, 63, 94, 0.18);
+  border-color: rgba(244, 63, 94, 0.65);
+  color: #fda4af;
+}
+
+/* ---------- Shattering Bust Alert Banner ---------- */
+.h13-bust-banner {
+  position: relative;
+  padding: 14px 18px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(220, 53, 69, 0.28), rgba(20, 10, 14, 0.96));
+  border: 1.5px solid #ff4757;
+  box-shadow: 0 0 36px rgba(220, 53, 69, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: h13BustBannerIn 0.4s var(--dp-ease);
+}
+
+@keyframes h13BustBannerIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Interactive Decision Banner (Rainbow / Strategic Pass) ---------- */
+.h13-decision-bar {
+  padding: 15px 18px;
+  border-radius: var(--dp-radius-md);
+  background: linear-gradient(135deg, rgba(30, 26, 18, 0.94), rgba(14, 17, 26, 0.96));
+  border: 1.5px solid var(--dp-brass-bright);
+  box-shadow: 0 0 28px rgba(212, 175, 106, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ---------- Player Hand Console (3D Rock Cards + Color & Prismatic Chips) ---------- */
+.h13-hand-panel {
+  padding: 16px 18px;
+  border-radius: var(--dp-radius-md);
+  background: linear-gradient(180deg, rgba(20, 24, 33, 0.92), rgba(11, 13, 19, 0.96));
+  border: 1px solid rgba(160, 178, 198, 0.2);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.h13-hand-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.h13-sublabel {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--dp-ink-muted);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.h13-rock-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.h13-rock-card {
+  position: relative;
+  width: 62px;
+  height: 84px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.14), transparent 55%),
+    linear-gradient(165deg, #343b4a 0%, #1d222c 62%, #12151c 100%);
+  border: 1.5px solid rgba(203, 213, 225, 0.25);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.16),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.7),
+    0 8px 18px rgba(0, 0, 0, 0.55);
+  transition: transform 0.18s var(--dp-ease), border-color 0.18s, box-shadow 0.18s, opacity 0.18s;
+  user-select: none;
+}
+
+.h13-rock-card:hover:not(:disabled) {
+  transform: translateY(-6px);
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.65), 0 0 18px rgba(212, 175, 106, 0.32);
+}
+
+.h13-rock-card.is-selected {
+  transform: translateY(-8px) scale(1.04);
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 0 2px rgba(242, 213, 145, 0.55), 0 14px 28px rgba(0, 0, 0, 0.7), 0 0 26px rgba(212, 175, 106, 0.45);
+}
+
+.h13-rock-card.is-used {
+  opacity: 0.22;
+  filter: grayscale(1);
+  transform: none;
+  box-shadow: none;
+}
+
+.h13-rock-card-num {
+  font-family: var(--dp-font-mono);
+  font-size: 28px;
+  font-weight: 800;
+  color: #f1f5f9;
+  line-height: 1;
+}
+
+.h13-rock-card[data-rock="0"] .h13-rock-card-num {
+  color: #d8b4fe;
+}
+
+.h13-rock-card-tag {
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--dp-ink-muted);
+  text-transform: uppercase;
+}
+
+/* Color Chips + Glowing Prismatic Rainbow Chip */
+.h13-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.h13-chip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(15, 19, 28, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.18s var(--dp-ease), border-color 0.18s, box-shadow 0.18s, opacity 0.18s;
+}
+
+.h13-chip-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--ped-color, #fff);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.h13-chip-btn.is-selected {
+  transform: translateY(-3px);
+  border-color: var(--ped-color, #fff);
+  box-shadow: 0 0 0 1px var(--ped-color, #fff), 0 0 22px var(--ped-glow, rgba(255, 255, 255, 0.4));
+  background: color-mix(in srgb, var(--ped-color, #d4af6a) 16%, rgba(15, 19, 28, 0.95));
+}
+
+.h13-chip-btn.is-rainbow {
+  --ped-color: #f4d08c;
+  --ped-glow: rgba(192, 132, 252, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(244, 63, 94, 0.16) 0%,
+    rgba(245, 158, 11, 0.16) 28%,
+    rgba(16, 185, 129, 0.16) 58%,
+    rgba(59, 130, 246, 0.18) 100%
+  );
+  border-color: rgba(244, 208, 140, 0.45);
+}
+
+.h13-chip-disc {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 32% 28%, #fff 0%, var(--ped-color) 42%, var(--ped-deep, #111) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px var(--ped-glow);
+}
+
+.h13-chip-btn.is-rainbow .h13-chip-disc {
+  background: conic-gradient(from 0deg, #f43f5e, #f59e0b, #10b981, #3b82f6, #a855f7, #f43f5e);
+  animation: h13PrismSpin 5s linear infinite;
+}
+
+@keyframes h13PrismSpin {
+  to { transform: rotate(360deg); }
+}
+
+.h13-chip-btn.is-used {
+  opacity: 0.25;
+  filter: grayscale(0.95);
+}
+
+/* ---------- Queue & Standings Strip ---------- */
+.h13-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.h13-box-panel {
+  padding: 14px 16px;
+  border-radius: var(--dp-radius-md);
+  background: rgba(15, 18, 26, 0.9);
+  border: 1px solid rgba(160, 178, 198, 0.18);
+}
+
+.h13-standings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+.h13-pcard {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.h13-pcard.is-me {
+  border-color: var(--dp-border-strong);
+  background: rgba(212, 175, 106, 0.08);
+}
+
+.h13-pcard.is-first {
+  box-shadow: inset 0 0 0 1px rgba(242, 213, 145, 0.35);
+}
+
+.h13-pcard.is-active {
+  border-color: #ff4757;
+  box-shadow: 0 0 16px rgba(255, 71, 87, 0.28);
+}
+
+.h13-penalty-num {
+  font-family: var(--dp-font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: #fca5a5;
+}
+
+.h13-penalty-num.is-clean {
+  color: #86efac;
+}
+
+.h13-used-dots {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.h13-used-dot {
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-family: var(--dp-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--dp-ink-muted);
+}
+
+.h13-used-dot.is-spent {
+  background: rgba(220, 53, 69, 0.16);
+  color: rgba(255, 255, 255, 0.25);
+  text-decoration: line-through;
+}
+
+.h13-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.h13-queue-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 12px;
+}
+
+.h13-queue-item.is-bust {
+  background: rgba(220, 53, 69, 0.15);
+  border-color: rgba(244, 63, 94, 0.45);
+  color: #fecdd3;
+}
+
+.h13-queue-item.is-pass {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+}
+
+.h13-queue-item.is-next {
+  border-color: var(--dp-brass-bright);
+  background: rgba(212, 175, 106, 0.11);
+}
+
+/* ---------- Mobile Responsive ---------- */
+@media (max-width: 920px) {
+  .h13-pedestals-grid {
+    grid-template-columns: 1fr;
+  }
+  .h13-pedestal {
+    min-height: 215px;
+  }
+  .h13-hand-row,
+  .h13-lower-grid {
+    grid-template-columns: 1fr;
+  }
+  .h13-rock-card {
+    width: 52px;
+    height: 72px;
+  }
+  .h13-rock-card-num {
+    font-size: 23px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .h13-stage.is-bust-shake,
+  .h13-pedestal.is-critical,
+  .h13-pedestal.is-just-busted,
+  .h13-stone-block,
+  .h13-chip-btn.is-rainbow .h13-chip-disc {
+    animation: none;
+  }
+}

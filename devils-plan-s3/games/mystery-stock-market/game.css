@@ -1,0 +1,870 @@
+/* ==========================================================================
+ * Mystery Stock Market (神秘交易所) — Wall-Street-Meets-Devil's-Plan Terminal
+ * ========================================================================== */
+
+.msm-body {
+  background:
+    radial-gradient(ellipse 80% 42% at 50% -10%, rgba(16, 185, 129, 0.10), transparent 62%),
+    radial-gradient(ellipse 60% 38% at 85% 90%, rgba(236, 72, 153, 0.09), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 15% 80%, rgba(212, 175, 106, 0.08), transparent 60%),
+    var(--dp-bg-void);
+}
+
+.msm-terminal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 1420px;
+  margin: 0 auto;
+  padding-bottom: 18px;
+}
+
+/* ---------- Live Ticker Tape Marquee ---------- */
+.msm-ticker-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 106, 0.24);
+  background: linear-gradient(90deg, rgba(8, 11, 18, 0.96), rgba(14, 18, 28, 0.92), rgba(8, 11, 18, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.45);
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.msm-ticker-wrap::before,
+.msm-ticker-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  z-index: 2;
+  pointer-events: none;
+}
+.msm-ticker-wrap::before {
+  left: 0;
+  background: linear-gradient(90deg, #080b12, transparent);
+}
+.msm-ticker-wrap::after {
+  right: 0;
+  background: linear-gradient(270deg, #080b12, transparent);
+}
+
+.msm-ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  white-space: nowrap;
+  will-change: transform;
+  animation: msmMarquee 36s linear infinite;
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+  padding-left: 16px;
+}
+
+.msm-ticker-wrap:hover .msm-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes msmMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.msm-tick-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.msm-tick-code {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.msm-tick-up { color: #10b981; }
+.msm-tick-down { color: #f43f5e; }
+.msm-tick-flat { color: var(--dp-ink-muted); }
+.msm-tick-prize {
+  color: var(--dp-brass-bright);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(212, 175, 106, 0.14);
+  border: 1px solid rgba(212, 175, 106, 0.4);
+}
+
+/* ---------- Top Telemetry KPI Strip ---------- */
+.msm-kpi-strip {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr 1.25fr 1.15fr;
+  gap: 10px;
+}
+
+.msm-kpi-card {
+  position: relative;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(20, 25, 38, 0.86), rgba(11, 14, 22, 0.92));
+  border: 1px solid var(--dp-border);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.msm-kpi-card.is-prize-hit {
+  border-color: #10b981;
+  box-shadow: 0 0 28px rgba(16, 185, 129, 0.3);
+}
+
+.msm-kpi-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dp-ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.msm-kpi-val {
+  font-family: var(--dp-font-mono);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--dp-ink);
+  letter-spacing: -0.02em;
+}
+
+.msm-kpi-val.is-gold { color: var(--dp-brass-bright); }
+.msm-kpi-val.is-emerald { color: #34d399; }
+
+.msm-kpi-sub {
+  font-size: 11px;
+  color: var(--dp-ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.msm-milestone-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-top: 2px;
+}
+.msm-milestone-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #d4af6a, #10b981);
+  transition: width 0.6s var(--dp-ease);
+}
+
+.msm-tier-pills {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+.msm-tier-pill {
+  font-family: var(--dp-font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--dp-ink-faint);
+  background: rgba(255, 255, 255, 0.03);
+}
+.msm-tier-pill.is-unlocked {
+  border-color: rgba(212, 175, 106, 0.55);
+  color: var(--dp-brass-bright);
+  background: rgba(212, 175, 106, 0.16);
+}
+
+/* ---------- Market Bell Shockwave Banner ---------- */
+.msm-bell-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.13), rgba(14, 18, 28, 0.92), rgba(212, 175, 106, 0.12));
+  border: 1px solid rgba(212, 175, 106, 0.36);
+  animation: msmBannerFlash 0.6s var(--dp-ease);
+}
+
+.msm-bell-banner.is-crash {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.16), rgba(14, 18, 28, 0.92), rgba(212, 175, 106, 0.10));
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+@keyframes msmBannerFlash {
+  0% { transform: translateY(-6px); opacity: 0.35; box-shadow: 0 0 36px rgba(16, 185, 129, 0.45); }
+  100% { transform: translateY(0); opacity: 1; box-shadow: none; }
+}
+
+.msm-bell-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.msm-bell-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+}
+
+/* ---------- Main Grid: Left Chart + Trading Floor, Right Formula Dossier + Order Slip ---------- */
+.msm-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.msm-col-left,
+.msm-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* ---------- Hero Multi-Stock Canvas Chart ---------- */
+.msm-chart-panel {
+  padding: 14px 16px 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(14, 18, 28, 0.94), rgba(8, 10, 16, 0.96));
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.msm-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.msm-chart-title {
+  font-family: var(--dp-font-display);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--dp-brass-bright);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.msm-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.msm-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--dp-ink-muted);
+  transition: all 0.16s var(--dp-ease);
+}
+
+.msm-legend-pill:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--dp-ink);
+}
+
+.msm-legend-pill.is-active {
+  background: rgba(212, 175, 106, 0.16);
+  border-color: var(--dp-brass-bright);
+  color: var(--dp-ink);
+  box-shadow: 0 0 12px rgba(212, 175, 106, 0.25);
+}
+
+.msm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.msm-canvas-box {
+  position: relative;
+  width: 100%;
+  height: 252px;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05), transparent 65%),
+    #07090f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.msm-canvas-box canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.msm-chart-tooltip {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  pointer-events: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(7, 9, 15, 0.92);
+  border: 1px solid rgba(212, 175, 106, 0.35);
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-ink);
+  display: none;
+  z-index: 4;
+  min-width: 155px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+}
+
+.msm-chart-tooltip.is-visible {
+  display: block;
+}
+
+/* ---------- 7-Stock Trading Board ---------- */
+.msm-board-panel {
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(16, 20, 31, 0.9), rgba(10, 12, 20, 0.95));
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.msm-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.msm-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dp-brass);
+}
+
+.msm-stock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msm-stock-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(112px, 1.15fr) 56px minmax(92px, 0.85fr) minmax(70px, 0.65fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 11px;
+  background: rgba(18, 23, 36, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  transition: border-color 0.18s var(--dp-ease), background 0.18s var(--dp-ease), box-shadow 0.18s var(--dp-ease);
+}
+
+.msm-stock-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--stock-color, var(--dp-brass));
+}
+
+.msm-stock-row:hover {
+  border-color: rgba(212, 175, 106, 0.35);
+  background: rgba(24, 30, 46, 0.88);
+}
+
+.msm-stock-row.is-selected {
+  border-color: var(--stock-color, var(--dp-brass-bright));
+  background: rgba(26, 33, 52, 0.95);
+  box-shadow: 0 0 0 1px rgba(212, 175, 106, 0.25), 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.msm-stock-row.is-surge {
+  animation: msmSurgeGlow 0.9s var(--dp-ease);
+}
+.msm-stock-row.is-crash {
+  animation: msmCrashGlow 0.9s var(--dp-ease);
+}
+
+@keyframes msmSurgeGlow {
+  0% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.8), inset 0 0 28px rgba(16, 185, 129, 0.28); }
+  100% { box-shadow: none; }
+}
+@keyframes msmCrashGlow {
+  0% { box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.85), inset 0 0 28px rgba(244, 63, 94, 0.3); }
+  100% { box-shadow: none; }
+}
+
+.msm-stock-id {
+  cursor: pointer;
+  min-width: 0;
+}
+
+.msm-stock-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.msm-ticker-tag {
+  font-family: var(--dp-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--stock-color, var(--dp-brass-bright));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.msm-stock-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--dp-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msm-stock-meta {
+  font-size: 11px;
+  color: var(--dp-ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.msm-sparkline {
+  width: 56px;
+  height: 26px;
+  display: block;
+}
+
+.msm-price-cell {
+  font-family: var(--dp-font-mono);
+  text-align: right;
+  min-width: 0;
+}
+
+.msm-price-now {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--dp-ink);
+}
+
+.msm-price-delta {
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.msm-price-delta.is-up { color: #34d399; }
+.msm-price-delta.is-down { color: #fb7185; }
+.msm-price-delta.is-flat { color: var(--dp-ink-faint); }
+
+.msm-pos-cell {
+  font-family: var(--dp-font-mono);
+  font-size: 11.5px;
+  text-align: right;
+  color: var(--dp-ink-muted);
+}
+.msm-pos-owned {
+  color: var(--dp-ink);
+  font-weight: 600;
+}
+.msm-pos-delta {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.msm-pos-delta.is-buy {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+.msm-pos-delta.is-sell {
+  background: rgba(244, 63, 94, 0.22);
+  color: #fda4af;
+}
+
+.msm-mkt-badge {
+  font-size: 10px;
+  color: var(--dp-ink-faint);
+  margin-top: 2px;
+}
+.msm-mkt-badge.is-secret {
+  color: #f472b6;
+}
+
+.msm-trade-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.msm-qty-btn {
+  min-width: 26px;
+  height: 28px;
+  padding: 0 5px;
+  border-radius: 6px;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 15, 24, 0.85);
+  color: var(--dp-ink);
+  transition: all 0.14s var(--dp-ease);
+}
+
+.msm-qty-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--dp-brass);
+}
+
+.msm-qty-btn.is-buy:hover:not(:disabled) {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+}
+.msm-qty-btn.is-sell:hover:not(:disabled) {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.18);
+  color: #fda4af;
+}
+
+.msm-secret-btn {
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-family: var(--dp-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  background: rgba(236, 72, 153, 0.06);
+  color: var(--dp-ink-muted);
+  transition: all 0.16s var(--dp-ease);
+  margin-left: 1px;
+}
+
+.msm-secret-btn:hover:not(:disabled) {
+  border-color: #ec4899;
+  color: #f9a8d4;
+}
+
+.msm-secret-btn.is-armed {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.36), rgba(168, 85, 247, 0.28));
+  border-color: #f472b6;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.45);
+}
+
+/* ---------- Right Column: Order Slip & Classified Formula Dossier ---------- */
+.msm-slip-panel,
+.msm-dossier-panel,
+.msm-tape-panel {
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(16, 20, 32, 0.92), rgba(9, 12, 20, 0.96));
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.msm-slip-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.msm-slip-stat {
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(8, 10, 16, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--dp-font-mono);
+}
+.msm-slip-stat span {
+  display: block;
+  font-size: 10px;
+  color: var(--dp-ink-faint);
+  text-transform: uppercase;
+}
+.msm-slip-stat strong {
+  font-size: 13.5px;
+  color: var(--dp-ink);
+}
+
+.msm-slip-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+}
+
+.msm-slip-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.msm-slip-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.msm-lock-btn {
+  flex: 1;
+  min-height: 44px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.msm-traders-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.msm-trader-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--dp-ink-muted);
+}
+.msm-trader-chip.is-done {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+}
+
+/* ---------- Classified Formula Dossier with Redacted Tape ---------- */
+.msm-clue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.msm-clue-card {
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(10, 13, 22, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.2s var(--dp-ease);
+  cursor: pointer;
+}
+
+.msm-clue-card.is-selected {
+  border-color: var(--stock-color, var(--dp-brass));
+  background: rgba(18, 23, 38, 0.92);
+}
+
+.msm-clue-card.is-unlocked {
+  border-color: rgba(212, 175, 106, 0.32);
+}
+
+.msm-clue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.msm-clue-body {
+  font-size: 12.2px;
+  line-height: 1.65;
+  color: var(--dp-ink);
+  word-break: break-word;
+}
+
+.msm-redact {
+  display: inline-block;
+  vertical-align: baseline;
+  height: 1.05em;
+  border-radius: 3px;
+  margin: 0 2px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #1c2233,
+    #1c2233 4px,
+    #0e111b 4px,
+    #0e111b 8px
+  );
+  border: 1px solid rgba(212, 175, 106, 0.22);
+  color: transparent;
+  user-select: none;
+  transform: translateY(2px);
+}
+
+.msm-intel-btn {
+  padding: 2px 8px;
+  min-height: 24px;
+  font-size: 10.5px;
+  border-radius: 6px;
+  border: 1px solid rgba(212, 175, 106, 0.45);
+  background: rgba(212, 175, 106, 0.12);
+  color: var(--dp-brass-bright);
+  font-weight: 600;
+}
+.msm-intel-btn:hover:not(:disabled) {
+  background: rgba(212, 175, 106, 0.26);
+}
+
+/* ---------- Public Trade Tape ---------- */
+.msm-tape-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-height: 112px;
+  overflow-y: auto;
+}
+
+.msm-tape-pill {
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--dp-ink-muted);
+}
+.msm-tape-pill.is-buy { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.28); }
+.msm-tape-pill.is-sell { color: #fda4af; border-color: rgba(244, 63, 94, 0.28); }
+.msm-tape-pill.is-secret {
+  color: #f9a8d4;
+  border-color: rgba(236, 72, 153, 0.45);
+  background: rgba(236, 72, 153, 0.12);
+}
+
+/* ---------- Closing Bell Final Leaderboard ---------- */
+.msm-closing-panel {
+  padding: 18px 20px;
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(212, 175, 106, 0.16), transparent 65%),
+    linear-gradient(180deg, rgba(16, 20, 32, 0.96), rgba(8, 10, 17, 0.98));
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+}
+
+.msm-closing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+
+.msm-rank-card {
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: rgba(12, 15, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.msm-rank-card.is-winner {
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 24px rgba(212, 175, 106, 0.22);
+}
+.msm-rank-card.is-eliminated {
+  border-color: rgba(244, 63, 94, 0.5);
+  background: rgba(45, 12, 20, 0.42);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1320px) {
+  .msm-stock-row {
+    grid-template-columns: minmax(112px, 1.2fr) minmax(88px, 0.85fr) minmax(68px, 0.65fr) auto;
+  }
+  .msm-sparkline {
+    display: none;
+  }
+}
+
+@media (max-width: 1160px) {
+  .msm-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .msm-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .msm-kpi-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+  .msm-stock-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "id price"
+      "pos ctrls";
+    gap: 8px;
+  }
+  .msm-stock-id { grid-area: id; }
+  .msm-sparkline { display: none; }
+  .msm-price-cell { grid-area: price; }
+  .msm-pos-cell { grid-area: pos; text-align: left; }
+  .msm-trade-ctrls { grid-area: ctrls; flex-wrap: wrap; }
+  .msm-canvas-box { height: 210px; }
+}

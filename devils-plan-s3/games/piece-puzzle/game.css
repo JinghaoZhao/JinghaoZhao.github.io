@@ -1,0 +1,529 @@
+/* ==========================================================================
+ * Exile Match 1: Piece Puzzle (碎片拼图 / 피스 퍼즐)
+ * Ancient Temple Sandstone & Dark Basalt + Flickering Torchlight Aesthetic
+ * ========================================================================== */
+
+body.exile-temple-body {
+  background:
+    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(245, 158, 11, 0.16), transparent 65%),
+    radial-gradient(ellipse 45% 45% at 10% 85%, rgba(217, 119, 6, 0.12), transparent 60%),
+    radial-gradient(ellipse 45% 45% at 90% 85%, rgba(220, 53, 69, 0.12), transparent 60%),
+    #0a0807;
+}
+
+.pp-root {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Ancient Temple Header & Race Progress Strip */
+.pp-temple-banner {
+  position: relative;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(35, 25, 16, 0.92), rgba(16, 13, 11, 0.95));
+  border: 1px solid rgba(212, 175, 106, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 219, 148, 0.12),
+    0 12px 30px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.pp-temple-banner::before {
+  content: "☥  ◈  ⟐  ✦  ⬡  ☥  ◈  ⟐  ✦  ⬡  ☥  ◈  ⟐  ✦  ⬡";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  color: rgba(212, 175, 106, 0.16);
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.pp-race-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-top: 6px;
+  flex-wrap: wrap;
+}
+
+.pp-race-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--dp-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--dp-brass-bright);
+  text-transform: uppercase;
+}
+
+.pp-torch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.6);
+  animation: pp-torch-flicker 2.2s ease-in-out infinite;
+}
+
+@keyframes pp-torch-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  35% { opacity: 0.72; transform: scale(0.9); }
+  65% { opacity: 0.95; transform: scale(1.1); }
+}
+
+.pp-survival-note {
+  font-size: 12px;
+  color: var(--dp-ink-muted);
+}
+
+.pp-race-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.pp-racer-card {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(12, 10, 9, 0.72);
+  border: 1px solid rgba(212, 175, 106, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.pp-racer-card.is-me {
+  border-color: rgba(245, 185, 86, 0.55);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.14);
+}
+
+.pp-racer-card.is-survived {
+  border-color: rgba(34, 197, 94, 0.55);
+  background: rgba(16, 36, 24, 0.45);
+}
+
+.pp-racer-card.is-eliminated {
+  border-color: rgba(220, 53, 69, 0.55);
+  background: rgba(42, 14, 18, 0.45);
+}
+
+.pp-racer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.pp-racer-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pp-racer-stat {
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-brass-bright);
+  flex-shrink: 0;
+}
+
+.pp-bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.pp-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b45309, #f59e0b, #fde68a);
+  transition: width 0.35s var(--dp-ease);
+}
+
+.pp-racer-card.is-survived .pp-bar-fill {
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+
+/* Main Workspace */
+.pp-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.85fr);
+  gap: 16px;
+  align-items: start;
+}
+
+/* Recessed Temple Stone Board */
+.pp-stone-chamber {
+  position: relative;
+  padding: 18px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.09), transparent 65%),
+    linear-gradient(160deg, #1e1813 0%, #120f0d 100%);
+  border: 2px solid rgba(196, 154, 78, 0.36);
+  box-shadow:
+    inset 0 0 36px rgba(0, 0, 0, 0.72),
+    0 18px 40px rgba(0, 0, 0, 0.65);
+}
+
+.pp-chamber-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.pp-seam-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(12, 10, 8, 0.8);
+  border: 1px solid rgba(212, 175, 106, 0.32);
+  font-family: var(--dp-font-mono);
+  font-size: 12.5px;
+  color: var(--dp-brass-bright);
+}
+
+.pp-seam-meter.is-complete {
+  border-color: rgba(34, 197, 94, 0.65);
+  color: #86efac;
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.25);
+}
+
+.pp-board-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 14px;
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(45deg, rgba(212, 175, 106, 0.025) 0 4px, transparent 4px 12px),
+    linear-gradient(180deg, #0d0b09, #15110d);
+  border: 2px solid rgba(168, 129, 62, 0.45);
+  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.88);
+}
+
+.pp-board-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.pp-slot {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 106, 0.05), rgba(7, 6, 5, 0.88));
+  border: 1.5px dashed rgba(196, 154, 78, 0.26);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s, background 0.18s;
+  user-select: none;
+  padding: 2px;
+}
+
+.pp-slot:hover {
+  border-color: rgba(245, 185, 86, 0.65);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.pp-slot.is-drop-target {
+  border-style: solid;
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.35), inset 0 0 14px rgba(245, 158, 11, 0.2);
+}
+
+.pp-slot.has-piece {
+  border-style: solid;
+  border-color: rgba(212, 175, 106, 0.28);
+  background: rgba(15, 12, 9, 0.92);
+}
+
+.pp-slot.is-selected {
+  border-color: #fde68a;
+  box-shadow: 0 0 0 2px rgba(253, 230, 138, 0.5), 0 0 24px rgba(245, 158, 11, 0.45);
+  z-index: 3;
+}
+
+.pp-slot.is-all-matched {
+  border-color: rgba(250, 204, 21, 0.72);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.28);
+}
+
+.pp-slot.has-mismatch {
+  border-color: rgba(239, 68, 68, 0.72);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.28);
+}
+
+.pp-slot-index {
+  position: absolute;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: rgba(212, 175, 106, 0.26);
+  pointer-events: none;
+}
+
+/* Seam glow badges on slot edges */
+.pp-seam-glow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 4;
+  border-radius: 999px;
+}
+
+.pp-seam-glow.is-right {
+  right: -5px;
+  top: 22%;
+  bottom: 22%;
+  width: 4px;
+}
+
+.pp-seam-glow.is-bottom {
+  bottom: -5px;
+  left: 22%;
+  right: 22%;
+  height: 4px;
+}
+
+.pp-seam-glow.is-ok {
+  background: linear-gradient(180deg, #fef08a, #f59e0b, #fef08a);
+  box-shadow: 0 0 10px #f59e0b, 0 0 18px rgba(250, 204, 21, 0.7);
+  animation: pp-seam-pulse 1.6s ease-in-out infinite;
+}
+
+.pp-seam-glow.is-bad {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+}
+
+@keyframes pp-seam-pulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+/* Piece SVG Wrapper */
+.pp-piece-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.65));
+  transition: transform 0.22s var(--dp-ease);
+}
+
+.pp-slot.is-selected .pp-piece-svg,
+.pp-tray-card.is-selected .pp-piece-svg {
+  filter: drop-shadow(0 0 12px rgba(245, 185, 86, 0.7));
+}
+
+/* Controls Row */
+.pp-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.pp-control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Right Column: Piece Tray & Legend */
+.pp-tray-panel {
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(28, 22, 16, 0.92), rgba(14, 11, 9, 0.96));
+  border: 1px solid rgba(212, 175, 106, 0.3);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pp-tray-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--dp-brass-bright);
+  text-transform: uppercase;
+}
+
+.pp-tray-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.pp-tray-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  background: rgba(11, 9, 8, 0.85);
+  border: 1.5px solid rgba(212, 175, 106, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  cursor: pointer;
+  transition: transform 0.16s var(--dp-ease), border-color 0.16s, box-shadow 0.16s;
+}
+
+.pp-tray-card:hover:not(.is-placed) {
+  transform: translateY(-2px);
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.pp-tray-card.is-selected {
+  border-color: #fde68a;
+  box-shadow: 0 0 0 2px rgba(253, 230, 138, 0.45), 0 0 20px rgba(245, 158, 11, 0.35);
+}
+
+.pp-tray-card.is-placed {
+  opacity: 0.22;
+  border-style: dashed;
+  cursor: default;
+}
+
+.pp-legend {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(8, 7, 6, 0.72);
+  border: 1px solid rgba(212, 175, 106, 0.16);
+  font-size: 12px;
+  color: var(--dp-ink-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pp-legend-title {
+  font-weight: 700;
+  color: var(--dp-brass);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pp-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.pp-legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-ink);
+}
+
+/* Lockout / Solved Overlay Banner inside Chamber */
+.pp-lockout-mask {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: rgba(28, 6, 9, 0.84);
+  backdrop-filter: blur(5px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 20px;
+  border: 2px solid rgba(239, 68, 68, 0.75);
+}
+
+.pp-lockout-mask strong {
+  font-family: var(--dp-font-display);
+  font-size: 22px;
+  color: #fca5a5;
+  letter-spacing: 0.06em;
+}
+
+.pp-lockout-timer {
+  font-family: var(--dp-font-mono);
+  font-size: 32px;
+  font-weight: 800;
+  color: #ff5868;
+}
+
+.pp-solved-banner {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(20, 52, 32, 0.85), rgba(14, 28, 19, 0.92));
+  border: 1.5px solid rgba(74, 222, 128, 0.6);
+  color: #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pp-frame-hint {
+  text-align: center;
+  font-size: 11.5px;
+  color: rgba(212, 175, 106, 0.72);
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .pp-main {
+    grid-template-columns: 1fr;
+  }
+  .pp-tray-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .pp-stone-chamber {
+    padding: 12px;
+  }
+  .pp-board-wrap {
+    padding: 8px;
+  }
+  .pp-board-grid {
+    gap: 4px;
+  }
+}

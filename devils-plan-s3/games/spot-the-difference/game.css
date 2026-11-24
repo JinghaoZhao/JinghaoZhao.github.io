@@ -1,0 +1,388 @@
+/* ==========================================================================
+ * Exile Match 2: Spot the Difference (找不同 / 달라진 그림 찾기)
+ * Ancient Temple Murals · Memorize Original -> Alteration Hunt
+ * ========================================================================== */
+
+body.exile-temple-body {
+  background:
+    radial-gradient(ellipse 65% 42% at 50% 0%, rgba(245, 158, 11, 0.16), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 12% 90%, rgba(217, 119, 6, 0.11), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 88% 90%, rgba(220, 53, 69, 0.12), transparent 60%),
+    #0a0807;
+}
+
+.sd-root {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.sd-temple-banner {
+  position: relative;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(35, 25, 16, 0.92), rgba(16, 13, 11, 0.95));
+  border: 1px solid rgba(212, 175, 106, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 219, 148, 0.12), 0 12px 30px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.sd-temple-banner::before {
+  content: "☥  ◈  ⟐  ✦  ⬡  ☥  ◈  ⟐  ✦  ⬡  ☥  ◈  ⟐  ✦  ⬡";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  color: rgba(212, 175, 106, 0.16);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.sd-race-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-top: 6px;
+  flex-wrap: wrap;
+}
+
+.sd-race-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--dp-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--dp-brass-bright);
+  text-transform: uppercase;
+}
+
+.sd-torch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.6);
+  animation: sd-flicker 2.1s ease-in-out infinite;
+}
+
+@keyframes sd-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  45% { opacity: 0.7; transform: scale(0.9); }
+  75% { opacity: 0.95; transform: scale(1.12); }
+}
+
+.sd-race-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 8px;
+}
+
+.sd-racer-card {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(12, 10, 9, 0.72);
+  border: 1px solid rgba(212, 175, 106, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sd-racer-card.is-me {
+  border-color: rgba(245, 185, 86, 0.55);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.14);
+}
+
+.sd-racer-card.is-survived {
+  border-color: rgba(34, 197, 94, 0.55);
+  background: rgba(16, 36, 24, 0.45);
+}
+
+.sd-racer-card.is-eliminated {
+  border-color: rgba(220, 53, 69, 0.55);
+  background: rgba(42, 14, 18, 0.45);
+}
+
+.sd-racer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.sd-racer-stat {
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-brass-bright);
+  flex-shrink: 0;
+}
+
+.sd-bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.sd-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b45309, #f59e0b, #fde68a);
+  transition: width 0.35s var(--dp-ease);
+}
+
+.sd-racer-card.is-survived .sd-bar-fill {
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+
+/* Phase Strip */
+.sd-phase-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(24, 18, 13, 0.9);
+  border: 1px solid rgba(212, 175, 106, 0.32);
+  flex-wrap: wrap;
+}
+
+.sd-phase-bar.is-memorize {
+  border-color: rgba(245, 158, 11, 0.65);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.16);
+}
+
+.sd-phase-bar.is-hunt {
+  border-color: rgba(220, 53, 69, 0.55);
+}
+
+.sd-phase-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sd-phase-headline {
+  font-family: var(--dp-font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dp-brass-bright);
+}
+
+.sd-phase-sub {
+  font-size: 12.5px;
+  color: var(--dp-ink-muted);
+}
+
+.sd-pip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sd-pip {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 106, 0.4);
+  background: rgba(12, 10, 8, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dp-ink-faint);
+  transition: all 0.25s;
+}
+
+.sd-pip.is-found {
+  border-color: #fde68a;
+  background: radial-gradient(circle, #f59e0b, #92400e);
+  color: #140c03;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.65);
+}
+
+/* Mural Frame */
+.sd-stage-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.sd-stage-grid.is-side-by-side {
+  grid-template-columns: 1fr 1fr;
+}
+
+.sd-mural-frame {
+  position: relative;
+  border-radius: 16px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.1), transparent 65%),
+    linear-gradient(160deg, #211912, #110d0a);
+  border: 2px solid rgba(196, 154, 78, 0.42);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.72), 0 18px 40px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.sd-mural-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--dp-brass);
+  text-transform: uppercase;
+}
+
+.sd-svg-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 800 / 500;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(212, 175, 106, 0.34);
+  background: #14100d;
+  user-select: none;
+}
+
+.sd-svg-box.is-interactive {
+  cursor: crosshair;
+}
+
+.sd-svg-box svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Hit ripple & Miss burst animations inside SVG */
+@keyframes sd-ripple {
+  0% { r: 8; opacity: 1; stroke-width: 5; }
+  100% { r: 44; opacity: 0; stroke-width: 1; }
+}
+
+.sd-hit-ripple {
+  fill: none;
+  stroke: #fde68a;
+  animation: sd-ripple 1s ease-out forwards;
+}
+
+@keyframes sd-miss-pop {
+  0% { opacity: 1; transform: scale(0.7); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+.sd-miss-mark {
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sd-miss-pop 0.9s ease-out forwards;
+}
+
+/* Lockout Overlay */
+.sd-lockout-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 6, 9, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgba(239, 68, 68, 0.72);
+}
+
+.sd-lockout-mask strong {
+  font-family: var(--dp-font-display);
+  font-size: 20px;
+  color: #fca5a5;
+}
+
+.sd-lockout-sec {
+  font-family: var(--dp-font-mono);
+  font-size: 32px;
+  font-weight: 800;
+  color: #ff5868;
+}
+
+/* Memorize Torchlight Vignette */
+.sd-memorize-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 68% 68% at 50% 50%, transparent 55%, rgba(12, 7, 3, 0.52) 100%);
+  box-shadow: inset 0 0 36px rgba(245, 158, 11, 0.16);
+}
+
+/* Post-round Diff Log */
+.sd-diff-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.sd-diff-chip {
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(18, 14, 11, 0.88);
+  border: 1px solid rgba(212, 175, 106, 0.3);
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sd-diff-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #b45309);
+  color: #140c03;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sd-solved-banner {
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(20, 52, 32, 0.85), rgba(14, 28, 19, 0.92));
+  border: 1.5px solid rgba(74, 222, 128, 0.6);
+  color: #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .sd-stage-grid.is-side-by-side {
+    grid-template-columns: 1fr;
+  }
+}

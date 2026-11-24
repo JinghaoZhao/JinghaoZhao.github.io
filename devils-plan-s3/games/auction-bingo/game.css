@@ -1,0 +1,865 @@
+/* ==========================================================================
+ * 拍卖宾果 (Auction Bingo) — Broadcast Auction House Design System
+ * Obsidian Velvet · Brushed Brass Coins · Luminous Neon Geometric Boxes
+ * ========================================================================== */
+
+.ab-body {
+  background:
+    radial-gradient(ellipse 68% 42% at 50% 0%, rgba(212, 175, 106, 0.16), transparent 64%),
+    radial-gradient(ellipse 52% 45% at 15% 88%, rgba(56, 189, 248, 0.10), transparent 62%),
+    radial-gradient(ellipse 52% 45% at 88% 86%, rgba(220, 53, 69, 0.13), transparent 62%),
+    var(--dp-bg-void);
+}
+
+.ab-stage {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+/* ---------- Broadcast Header Strip ---------- */
+.ab-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: var(--dp-radius-md);
+  background: linear-gradient(135deg, rgba(20, 24, 38, 0.92), rgba(11, 13, 21, 0.94));
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(242, 213, 145, 0.14);
+}
+
+.ab-round-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ab-round-pill {
+  font-family: var(--dp-font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--dp-brass-bright);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(212, 175, 106, 0.14);
+  border: 1px solid rgba(212, 175, 106, 0.45);
+}
+
+.ab-phase-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--dp-ink-faint);
+}
+
+.ab-phase-step {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  transition: all 0.25s var(--dp-ease);
+}
+
+.ab-phase-step.is-active {
+  color: var(--dp-ink);
+  font-weight: 700;
+  background: rgba(212, 175, 106, 0.18);
+  border-color: var(--dp-border-strong);
+  box-shadow: 0 0 14px rgba(212, 175, 106, 0.22);
+}
+
+.ab-mode-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ab-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--dp-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--dp-ink-muted);
+}
+
+.ab-tag.is-blind {
+  border-color: rgba(220, 53, 69, 0.45);
+  background: rgba(220, 53, 69, 0.12);
+  color: #ff9aa5;
+}
+
+.ab-tag.is-orbit {
+  border-color: rgba(167, 139, 250, 0.5);
+  background: rgba(167, 139, 250, 0.14);
+  color: #d4c4ff;
+}
+
+/* ---------- Main Two-Column Arena ---------- */
+.ab-arena {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(290px, 0.95fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.ab-panel {
+  border-radius: var(--dp-radius-md);
+  background: linear-gradient(180deg, rgba(19, 23, 35, 0.88), rgba(11, 13, 21, 0.94));
+  border: 1px solid var(--dp-border);
+  padding: 16px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+
+.ab-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ab-panel-title {
+  font-family: var(--dp-font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dp-brass-bright);
+  margin: 0;
+}
+
+.ab-panel-sub {
+  font-size: 12px;
+  color: var(--dp-ink-muted);
+}
+
+/* ---------- Shape Colors ---------- */
+.ab-shape-O {
+  --shape-color: #f2d591;
+  --shape-glow: rgba(242, 213, 145, 0.36);
+  --shape-bg: rgba(242, 213, 145, 0.10);
+}
+.ab-shape-T {
+  --shape-color: #38bdf8;
+  --shape-glow: rgba(56, 189, 248, 0.36);
+  --shape-bg: rgba(56, 189, 248, 0.10);
+}
+.ab-shape-S {
+  --shape-color: #ff5868;
+  --shape-glow: rgba(255, 88, 104, 0.38);
+  --shape-bg: rgba(255, 88, 104, 0.11);
+}
+
+/* ---------- Three Luminous Auction Boxes ---------- */
+.ab-boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ab-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px 14px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(circle at 50% 24%, var(--shape-bg), transparent 72%),
+    rgba(13, 16, 26, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.22s var(--dp-ease), border-color 0.22s var(--dp-ease), box-shadow 0.22s var(--dp-ease);
+  text-align: center;
+  overflow: hidden;
+}
+
+.ab-box.is-selectable {
+  cursor: pointer;
+}
+
+.ab-box.is-selectable:hover {
+  transform: translateY(-4px);
+  border-color: var(--shape-color);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 24px var(--shape-glow);
+}
+
+.ab-box.is-my-box {
+  border-color: var(--shape-color);
+  box-shadow: 0 0 0 1px var(--shape-color), 0 0 28px var(--shape-glow);
+}
+
+.ab-box.is-dimmed {
+  opacity: 0.56;
+}
+
+.ab-box-glyph {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--shape-color);
+  background: radial-gradient(circle, var(--shape-bg), rgba(0, 0, 0, 0.45));
+  border: 1.5px solid color-mix(in srgb, var(--shape-color) 55%, transparent);
+  text-shadow: 0 0 16px var(--shape-glow);
+  box-shadow: inset 0 0 16px var(--shape-bg), 0 0 18px rgba(0, 0, 0, 0.4);
+}
+
+.ab-box-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dp-ink);
+  letter-spacing: 0.04em;
+}
+
+.ab-box-qty {
+  font-family: var(--dp-font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--shape-color);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid color-mix(in srgb, var(--shape-color) 45%, transparent);
+}
+
+.ab-box-entrants {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 2px;
+  min-height: 24px;
+}
+
+.ab-entrant-chip {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--dp-ink-muted);
+  white-space: nowrap;
+}
+
+.ab-entrant-chip.is-me {
+  color: var(--dp-brass-bright);
+  border-color: var(--dp-border-strong);
+  background: rgba(212, 175, 106, 0.16);
+  font-weight: 700;
+}
+
+.ab-entrant-chip.is-guest {
+  color: #d4c4ff;
+  border-color: rgba(167, 139, 250, 0.5);
+  background: rgba(167, 139, 250, 0.16);
+}
+
+.ab-entrant-chip.is-sealed {
+  border-color: rgba(34, 197, 94, 0.5);
+  color: #86efac;
+}
+
+/* ---------- Sealed Bid Console & Embossed Coins ---------- */
+.ab-bid-console {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212, 175, 106, 0.11), transparent 70%),
+    rgba(9, 11, 18, 0.92);
+  border: 1px solid var(--dp-border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ab-envelope-zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--dp-radius-sm);
+  border: 1.5px dashed rgba(212, 175, 106, 0.42);
+  background: linear-gradient(135deg, rgba(28, 22, 14, 0.65), rgba(14, 16, 26, 0.85));
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.ab-envelope-zone.is-drag-over {
+  border-style: solid;
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 28px rgba(242, 213, 145, 0.32);
+  background: linear-gradient(135deg, rgba(46, 35, 16, 0.82), rgba(20, 24, 38, 0.9));
+}
+
+.ab-envelope-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ab-envelope-label {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dp-brass);
+  font-weight: 700;
+}
+
+.ab-envelope-total {
+  font-family: var(--dp-font-mono);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--dp-brass-bright);
+  line-height: 1.1;
+  text-shadow: 0 0 18px rgba(242, 213, 145, 0.35);
+}
+
+.ab-envelope-coins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 36px;
+}
+
+.ab-coin-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Tactile Embossed Brass Coin */
+.ab-coin {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dp-font-mono);
+  font-weight: 800;
+  font-size: 17px;
+  color: #1f1606;
+  background:
+    radial-gradient(circle at 30% 26%, #fff3c7 0%, #e5be69 38%, #a67c2e 78%, #6c4d17 100%);
+  border: 2px solid #f7df9d;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(68, 43, 6, 0.7),
+    0 5px 14px rgba(0, 0, 0, 0.55);
+  transition: transform 0.18s var(--dp-ease), box-shadow 0.18s var(--dp-ease), opacity 0.18s;
+  user-select: none;
+  cursor: pointer;
+}
+
+.ab-coin::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px dashed rgba(94, 61, 12, 0.55);
+  pointer-events: none;
+}
+
+.ab-coin[data-val="5"] {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+  background: radial-gradient(circle at 30% 26%, #fff7d6 0%, #f5c961 36%, #b8821d 80%, #6f480a 100%);
+}
+
+.ab-coin[data-val="10"] {
+  width: 62px;
+  height: 62px;
+  font-size: 20px;
+  color: #210c04;
+  background: radial-gradient(circle at 30% 24%, #ffffff 0%, #ffdf7e 28%, #df9d28 68%, #854e0b 100%);
+  border-color: #fff2b8;
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, 0.75),
+    inset 0 -4px 8px rgba(80, 42, 5, 0.8),
+    0 0 18px rgba(242, 213, 145, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.65);
+}
+
+.ab-coin:hover:not(:disabled):not(.is-spent) {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow:
+    inset 0 2px 5px rgba(255, 255, 255, 0.75),
+    0 0 22px rgba(242, 213, 145, 0.55),
+    0 10px 20px rgba(0, 0, 0, 0.6);
+}
+
+.ab-coin.is-selected {
+  transform: translateY(-6px) scale(1.08);
+  outline: 2.5px solid #fff3c7;
+  outline-offset: 2px;
+  box-shadow: 0 0 26px rgba(242, 213, 145, 0.75), 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.ab-coin.is-spent {
+  opacity: 0.24;
+  filter: grayscale(0.9);
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.ab-coin-round {
+  position: absolute;
+  bottom: -6px;
+  right: -4px;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(10, 12, 20, 0.92);
+  color: var(--dp-ink-muted);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.ab-coin-mini {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.ab-piece-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--dp-radius-sm);
+  border: 1.5px solid rgba(212, 175, 106, 0.38);
+  background: rgba(212, 175, 106, 0.08);
+  color: var(--dp-brass-bright);
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s var(--dp-ease);
+}
+
+.ab-piece-toggle.is-active {
+  background: rgba(212, 175, 106, 0.26);
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 18px rgba(242, 213, 145, 0.35);
+}
+
+/* ---------- 3×3 Neon-Brass Bingo Matrix ---------- */
+.ab-board-wrap {
+  position: relative;
+  width: min(100%, 310px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  padding: 12px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 106, 0.09), rgba(8, 10, 16, 0.96));
+  border: 1.5px solid var(--dp-border-strong);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.65), 0 0 24px rgba(212, 175, 106, 0.12);
+}
+
+.ab-board-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 9px;
+  width: 100%;
+  height: 100%;
+}
+
+.ab-cell {
+  position: relative;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 22, 34, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  color: color-mix(in srgb, var(--shape-color) 65%, transparent);
+  font-size: 34px;
+  line-height: 1;
+  transition: all 0.22s var(--dp-ease);
+  user-select: none;
+}
+
+.ab-cell.is-clickable {
+  cursor: pointer;
+}
+
+.ab-cell.is-clickable:hover {
+  border-color: var(--shape-color);
+  transform: scale(1.04);
+  box-shadow: 0 0 16px var(--shape-glow);
+}
+
+.ab-cell.is-filled {
+  color: var(--shape-color);
+  background:
+    radial-gradient(circle at 50% 45%, var(--shape-bg), rgba(16, 20, 32, 0.92));
+  border-color: var(--shape-color);
+  text-shadow: 0 0 16px var(--shape-glow);
+  box-shadow:
+    inset 0 0 16px var(--shape-bg),
+    0 0 18px var(--shape-glow);
+  animation: abTileClaim 0.36s var(--dp-ease);
+}
+
+.ab-cell.is-bingo-cell {
+  border-color: #fff3c7;
+  box-shadow:
+    inset 0 0 22px rgba(242, 213, 145, 0.36),
+    0 0 24px rgba(242, 213, 145, 0.55);
+}
+
+.ab-cell-check {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  font-size: 11px;
+  color: var(--dp-brass-bright);
+  font-weight: 800;
+}
+
+/* SVG Animated Laser Bingo-Line Sweeps */
+.ab-laser-svg {
+  position: absolute;
+  inset: 12px;
+  width: calc(100% - 24px);
+  height: calc(100% - 24px);
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible;
+}
+
+.ab-laser-line {
+  stroke: #ffe599;
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 8px rgba(242, 213, 145, 0.95)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.85));
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: abLaserSweep 0.65s var(--dp-ease) forwards;
+}
+
+@keyframes abLaserSweep {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes abTileClaim {
+  0% {
+    transform: scale(0.84);
+    filter: brightness(1.6);
+  }
+  65% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* ---------- Gavel Drop / Round Summary Banner ---------- */
+.ab-gavel-card {
+  padding: 18px;
+  border-radius: var(--dp-radius-md);
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 0%, rgba(212, 175, 106, 0.2), transparent 72%),
+    rgba(14, 16, 26, 0.96);
+  border: 1.5px solid var(--dp-brass);
+  text-align: center;
+  animation: abGavelPop 0.42s var(--dp-ease);
+}
+
+@keyframes abGavelPop {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 48px rgba(242, 213, 145, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+  }
+}
+
+.ab-gavel-title {
+  font-family: var(--dp-font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--dp-brass-bright);
+  letter-spacing: 0.08em;
+  margin: 4px 0 6px;
+}
+
+.ab-outcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  margin: 8px 0 12px;
+}
+
+.ab-outcome-badge.is-win {
+  background: rgba(34, 197, 94, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.55);
+  color: #86efac;
+}
+
+.ab-outcome-badge.is-loss {
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  color: #fca5a5;
+}
+
+.ab-outcome-badge.is-sealed {
+  background: rgba(212, 175, 106, 0.14);
+  border: 1px solid var(--dp-border-strong);
+  color: var(--dp-brass-bright);
+}
+
+/* ---------- Tile Inventory Pills ---------- */
+.ab-inv-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ab-inv-pill {
+  padding: 8px;
+  border-radius: 10px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ab-inv-pill strong {
+  display: block;
+  font-family: var(--dp-font-mono);
+  font-size: 16px;
+  color: var(--shape-color);
+}
+
+.ab-inv-pill span {
+  font-size: 11px;
+  color: var(--dp-ink-muted);
+}
+
+/* ---------- Contestant Status Strip ---------- */
+.ab-players-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.ab-pcard {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.ab-pcard.is-me {
+  border-color: var(--dp-border-strong);
+  background: rgba(212, 175, 106, 0.08);
+}
+
+.ab-pcard.is-guest {
+  border-color: rgba(167, 139, 250, 0.45);
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.ab-pcard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.ab-pcard-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--dp-ink-muted);
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+}
+
+/* ---------- Grand Reveal Vault Audit & Mini Boards ---------- */
+.ab-audit-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--dp-border);
+}
+
+.ab-audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.ab-audit-table th,
+.ab-audit-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ab-audit-table th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dp-brass);
+  background: rgba(212, 175, 106, 0.08);
+}
+
+.ab-mini-boards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 12px;
+}
+
+.ab-mini-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(14, 17, 27, 0.9);
+  border: 1px solid var(--dp-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ab-mini-card.is-winner {
+  border-color: var(--dp-brass-bright);
+  box-shadow: 0 0 22px rgba(242, 213, 145, 0.22);
+}
+
+.ab-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+
+.ab-mini-cell {
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.ab-mini-cell.is-filled {
+  color: var(--shape-color);
+  border-color: var(--shape-color);
+  background: var(--shape-bg);
+}
+
+.ab-mini-cell.is-bingo-cell {
+  border-color: #ffe599;
+  box-shadow: inset 0 0 8px rgba(242, 213, 145, 0.45);
+}
+
+/* ---------- History Timeline Chips ---------- */
+.ab-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 210px;
+  overflow-y: auto;
+}
+
+.ab-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+}
+
+/* ---------- Responsive Mobile ---------- */
+@media (max-width: 920px) {
+  .ab-arena {
+    grid-template-columns: 1fr;
+  }
+  .ab-boxes-grid {
+    gap: 8px;
+  }
+  .ab-box {
+    padding: 12px 8px;
+  }
+  .ab-box-glyph {
+    width: 48px;
+    height: 48px;
+    font-size: 26px;
+  }
+  .ab-coin {
+    width: 46px;
+    height: 46px;
+    font-size: 15px;
+  }
+  .ab-coin[data-val="5"] {
+    width: 50px;
+    height: 50px;
+  }
+  .ab-coin[data-val="10"] {
+    width: 54px;
+    height: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-laser-line,
+  .ab-cell.is-filled,
+  .ab-gavel-card {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
