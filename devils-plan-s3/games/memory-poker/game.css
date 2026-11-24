@@ -1,6 +1,6 @@
 /* ==========================================================================
  * Game 01c: Memory Poker (记忆扑克 / 기억 포커)
- * Velvet-and-obsidian studio table · 16 3D-flipping gold-foil rank cards
+ * Velvet-and-obsidian studio table · Museum-grade ivory Red/Black 52-card UI
  * ========================================================================== */
 
 .mp-arena {
@@ -113,20 +113,20 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  width: min(100%, 490px);
+  width: min(100%, 500px);
   margin: 0 auto;
 }
 
 /* 3D Luxury Playing Card */
 .mp-card-slot {
   perspective: 950px;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 5 / 7;
   position: relative;
 }
 
 .mp-card-slot.is-community {
-  width: 82px;
-  height: 112px;
+  width: 88px;
+  height: 124px;
   aspect-ratio: auto;
 }
 
@@ -136,7 +136,7 @@
   height: 100%;
   transform-style: preserve-3d;
   transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
-  border-radius: 12px;
+  border-radius: 11px;
   cursor: default;
 }
 
@@ -159,7 +159,7 @@
 .mp-card-face {
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 11px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   display: flex;
@@ -169,48 +169,170 @@
   overflow: hidden;
 }
 
-/* Front (Rank Visible) */
+/* Luxury Ivory / Alabaster Playing Card Front */
 .mp-card-front {
   background:
-    radial-gradient(circle at 50% 25%, rgba(242, 213, 145, 0.16), transparent 62%),
-    linear-gradient(155deg, #1d2233 0%, #0e111a 60%, #15121d 100%);
-  border: 1.5px solid rgba(212, 175, 106, 0.58);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(212, 175, 106, 0.1);
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.85), transparent 55%),
+    linear-gradient(155deg, #fbf8f1 0%, #f4eee1 56%, #eae0cb 100%);
+  border: 1.5px solid #d7be84;
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.56),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 0 0 4px rgba(250, 245, 234, 0.9),
+    inset 0 0 0 5px rgba(188, 148, 72, 0.34);
+  color: #14171f;
+}
+
+.mp-card-front.is-suit-red {
+  color: #c81e32;
+}
+
+.mp-card-front.is-suit-black {
+  color: #14171f;
 }
 
 .mp-card-front.is-community-face {
-  border-color: #f2d591;
-  box-shadow: 0 0 26px rgba(212, 175, 106, 0.42), inset 0 0 14px rgba(242, 213, 145, 0.16);
+  border-color: #f0cf80;
+  box-shadow:
+    0 0 28px rgba(212, 175, 106, 0.5),
+    0 12px 26px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 4px rgba(251, 247, 238, 0.92),
+    inset 0 0 0 5px rgba(202, 158, 70, 0.52);
 }
 
+/* Corner Indices (Top-Left + Inverted Bottom-Right) */
+.mp-corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.95;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.mp-corner-tl {
+  top: 6px;
+  left: 7px;
+}
+
+.mp-corner-br {
+  bottom: 6px;
+  right: 7px;
+  transform: rotate(180deg);
+}
+
+.mp-corner-rank {
+  font-family: "Space Grotesk", "Cinzel", Georgia, serif;
+  font-size: clamp(13px, 1.8vw, 17px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.mp-card-slot.is-community .mp-corner-rank {
+  font-size: 15px;
+}
+
+.mp-corner-pip {
+  width: 11px;
+  height: 11px;
+  display: block;
+}
+
+/* Subtle Top-Right Grid Coordinate Tag */
 .mp-card-coord {
   position: absolute;
   top: 6px;
-  left: 8px;
+  right: 6px;
+  padding: 1px 4px;
+  border-radius: 4px;
   font-family: var(--dp-font-mono);
-  font-size: 10px;
+  font-size: 8.5px;
   font-weight: 700;
-  color: rgba(212, 175, 106, 0.72);
+  color: #8b6c30;
+  background: rgba(188, 148, 72, 0.14);
+  border: 1px solid rgba(188, 148, 72, 0.28);
+  line-height: 1.25;
 }
 
-.mp-card-rank {
+.mp-card-back .mp-card-coord {
+  top: 7px;
+  left: 8px;
+  right: auto;
+  color: rgba(242, 213, 145, 0.78);
+  background: rgba(8, 10, 16, 0.55);
+  border-color: rgba(212, 175, 106, 0.28);
+}
+
+/* Center Luxury Emblem */
+.mp-center-art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 58%;
+  height: 54%;
+  pointer-events: none;
+}
+
+.mp-center-pip {
+  width: clamp(28px, 4.2vw, 42px);
+  height: clamp(28px, 4.2vw, 42px);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.14));
+}
+
+.mp-card-slot.is-community .mp-center-pip {
+  width: 34px;
+  height: 34px;
+}
+
+.mp-ace-halo {
+  position: relative;
+  width: clamp(44px, 5.5vw, 56px);
+  height: clamp(44px, 5.5vw, 56px);
+  border-radius: 50%;
+  border: 1.5px solid rgba(188, 148, 72, 0.55);
+  background: radial-gradient(circle, rgba(212, 175, 106, 0.16), transparent 72%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 3px rgba(255, 252, 245, 0.65);
+}
+
+.mp-court-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  border: 1px solid rgba(188, 148, 72, 0.55);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(212, 175, 106, 0.2), transparent 68%),
+    linear-gradient(180deg, rgba(188, 148, 72, 0.08), rgba(188, 148, 72, 0.16));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.mp-court-crown {
+  width: 18px;
+  height: 12px;
+  color: #b88b35;
+}
+
+.mp-court-letter {
   font-family: var(--dp-font-display);
-  font-size: clamp(24px, 4vw, 38px);
+  font-size: clamp(18px, 2.5vw, 24px);
   font-weight: 800;
-  color: #f7e4b4;
-  text-shadow: 0 2px 14px rgba(212, 175, 106, 0.45);
   line-height: 1;
 }
 
-.mp-card-front.is-high-rank .mp-card-rank {
-  color: #ffd778;
-}
-
-.mp-card-emblem {
-  margin-top: 4px;
-  font-size: 11px;
-  color: rgba(212, 175, 106, 0.55);
-  letter-spacing: 0.18em;
+.mp-court-suit {
+  width: 14px;
+  height: 14px;
 }
 
 /* Back (Obsidian Gold Filigree) */
@@ -219,49 +341,50 @@
   background:
     repeating-linear-gradient(
       45deg,
-      rgba(212, 175, 106, 0.06) 0px,
-      rgba(212, 175, 106, 0.06) 2px,
+      rgba(212, 175, 106, 0.07) 0px,
+      rgba(212, 175, 106, 0.07) 2px,
       transparent 2px,
       transparent 10px
     ),
     radial-gradient(circle at 50% 50%, #241926 0%, #0e1018 72%);
-  border: 1.5px solid rgba(212, 175, 106, 0.38);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.52), inset 0 0 0 4px rgba(10, 12, 18, 0.7), inset 0 0 0 5px rgba(212, 175, 106, 0.22);
+  border: 1.5px solid rgba(212, 175, 106, 0.42);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.52), inset 0 0 0 4px rgba(10, 12, 18, 0.72), inset 0 0 0 5px rgba(212, 175, 106, 0.26);
 }
 
 .mp-back-num {
   font-family: var(--dp-font-mono);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--dp-brass);
   padding: 4px 9px;
   border-radius: 8px;
-  border: 1px solid rgba(212, 175, 106, 0.32);
-  background: rgba(8, 10, 16, 0.75);
+  border: 1px solid rgba(212, 175, 106, 0.34);
+  background: rgba(8, 10, 16, 0.78);
 }
 
 /* Selection & Showdown Highlights */
 .mp-card-slot.is-selected .mp-card-back,
 .mp-card-slot.is-selected .mp-card-front {
   border: 2.5px solid #f2d591;
-  box-shadow: 0 0 28px rgba(242, 213, 145, 0.65), inset 0 0 18px rgba(242, 213, 145, 0.22);
+  box-shadow: 0 0 28px rgba(242, 213, 145, 0.72), inset 0 0 14px rgba(242, 213, 145, 0.22);
 }
 
 .mp-card-slot.is-optimal .mp-card-front {
-  box-shadow: 0 0 24px rgba(56, 189, 248, 0.65);
-  border-color: #38bdf8;
+  box-shadow: 0 0 26px rgba(56, 189, 248, 0.75);
+  border: 2.5px solid #38bdf8;
 }
 
 .mp-pick-tag {
   position: absolute;
   bottom: 5px;
-  right: 5px;
+  left: 5px;
   padding: 2px 6px;
   border-radius: 999px;
   font-size: 9.5px;
   font-weight: 800;
   background: var(--dp-brass-bright);
   color: #090b10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
   z-index: 4;
   pointer-events: none;
 }
@@ -317,6 +440,7 @@
   border-left: 3px solid var(--dp-cyan);
 }
 
+/* Ivory Red/Black Showdown Mini-Cards */
 .mp-mini-cards {
   display: flex;
   gap: 5px;
@@ -324,24 +448,40 @@
 }
 
 .mp-mini-card {
-  width: 30px;
-  height: 38px;
+  min-width: 34px;
+  height: 44px;
+  padding: 0 3px;
   border-radius: 6px;
-  border: 1px solid var(--dp-border-strong);
-  background: linear-gradient(155deg, #21273b, #111521);
+  border: 1.2px solid #d4b678;
+  background: linear-gradient(155deg, #fbf8f1, #ede3cf);
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: var(--dp-font-mono);
-  font-size: 13px;
+  font-family: "Space Grotesk", var(--dp-font-mono);
+  font-size: 12px;
   font-weight: 800;
-  color: var(--dp-brass-bright);
+  line-height: 1.05;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.mp-mini-card.is-suit-red {
+  color: #c81e32;
+}
+
+.mp-mini-card.is-suit-black {
+  color: #14171f;
 }
 
 .mp-mini-card.is-picked {
-  border-color: #38bdf8;
-  background: linear-gradient(155deg, #1b3146, #0f1b29);
-  color: #bae6fd;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.45);
+}
+
+.mp-mini-suit {
+  width: 10px;
+  height: 10px;
+  display: block;
 }
 
 @media (max-width: 900px) {
@@ -349,10 +489,27 @@
     grid-template-columns: 1fr;
   }
   .mp-card-slot.is-community {
-    width: 68px;
-    height: 94px;
+    width: 74px;
+    height: 104px;
   }
   .mp-grid {
     gap: 8px;
+  }
+  .mp-corner-tl {
+    top: 4px;
+    left: 5px;
+  }
+  .mp-corner-br {
+    bottom: 4px;
+    right: 5px;
+  }
+  .mp-corner-pip {
+    width: 9px;
+    height: 9px;
+  }
+  .mp-card-coord {
+    font-size: 7.5px;
+    top: 4px;
+    right: 4px;
   }
 }

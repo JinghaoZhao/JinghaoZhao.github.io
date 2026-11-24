@@ -1,5 +1,5 @@
 import { mountGame, SFX, UI } from '../../shared/sdk.js';
-import { GameRules, RANK_LABELS } from './rules.js';
+import { GameRules, RANK_LABELS, SUIT_META } from './rules.js';
 
 const ui = {
   selected: [],
@@ -9,8 +9,85 @@ const ui = {
   lastCtx: null,
 };
 
-function rankStr(r) {
-  return r == null ? '?' : (RANK_LABELS[r] || String(r));
+function suitSvg(suit, className = '') {
+  const paths = {
+    S: '<path d="M12 2C9.5 6.4 4 10.1 4 14.3c0 2.5 1.9 4.2 4.1 4.2 1.4 0 2.6-.7 3.2-1.7-.1 1.7-.7 3.1-2.1 4.2h5.6c-1.4-1.1-2-2.5-2.1-4.2.6 1 1.8 1.7 3.2 1.7 2.2 0 4.1-1.7 4.1-4.2C20 10.1 14.5 6.4 12 2z"/>',
+    H: '<path d="M12 21.2C11.5 20.8 3.5 14.9 3.5 8.8 3.5 5.6 5.9 3.2 8.7 3.2c1.6 0 2.8.8 3.3 2 .5-1.2 1.7-2 3.3-2 2.8 0 5.2 2.4 5.2 5.6 0 6.1-8 12-8.5 12.4z"/>',
+    D: '<path d="M12 2L20.5 12 12 22 3.5 12 12 2z"/>',
+    C: '<path d="M12 3a3.7 3.7 0 0 0-3.2 5.5 3.8 3.8 0 1 0-1.1 7.4c1.5 0 2.8-.8 3.5-2-.1 2-.7 3.8-2.2 5.1h6c-1.5-1.3-2.1-3.1-2.2-5.1.7 1.2 2 2 3.5 2a3.8 3.8 0 1 0-1.1-7.4A3.7 3.7 0 0 0 12 3z"/>',
+  };
+  return `<svg class="${className}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${paths[suit] || paths.S}</svg>`;
+}
+
+const CROWN_SVG =
+  '<svg class="mp-court-crown" viewBox="0 0 24 16" fill="currentColor" aria-hidden="true"><path d="M2 13L4 4l5 4 3-6 3 6 5-4 2 9H2zm1 2h18v1H3v-1z"/></svg>';
+
+function cardText(card) {
+  if (!card) return '?';
+  const r = RANK_LABELS[card.rank] || String(card.rank);
+  const sym = SUIT_META[card.suit]?.symbol || '';
+  return `${r}${sym}`;
+}
+
+function renderCardFrontHtml(card, coordLabel, isCommunity = false) {
+  if (!card) {
+    return `<div class="mp-card-face mp-card-front ${isCommunity ? 'is-community-face' : ''}"></div>`;
+  }
+  const meta = SUIT_META[card.suit] || SUIT_META.S;
+  const suitCls = meta.color === 'red' ? 'is-suit-red' : 'is-suit-black';
+  const rLabel = RANK_LABELS[card.rank] || String(card.rank);
+
+  let centerHtml = '';
+  if (card.rank === 14) {
+    centerHtml = `
+      <div class="mp-center-art">
+        <div class="mp-ace-halo">${suitSvg(card.suit, 'mp-center-pip')}</div>
+      </div>
+    `;
+  } else if (card.rank >= 11) {
+    centerHtml = `
+      <div class="mp-center-art">
+        <div class="mp-court-frame">
+          ${CROWN_SVG}
+          <span class="mp-court-letter">${rLabel}</span>
+          ${suitSvg(card.suit, 'mp-court-suit')}
+        </div>
+      </div>
+    `;
+  } else {
+    centerHtml = `
+      <div class="mp-center-art">
+        ${suitSvg(card.suit, 'mp-center-pip')}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="mp-card-face mp-card-front ${suitCls} ${isCommunity ? 'is-community-face' : ''}">
+      <span class="mp-corner mp-corner-tl">
+        <span class="mp-corner-rank">${rLabel}</span>
+        ${suitSvg(card.suit, 'mp-corner-pip')}
+      </span>
+      ${coordLabel ? `<span class="mp-card-coord">${coordLabel}</span>` : ''}
+      ${centerHtml}
+      <span class="mp-corner mp-corner-br">
+        <span class="mp-corner-rank">${rLabel}</span>
+        ${suitSvg(card.suit, 'mp-corner-pip')}
+      </span>
+    </div>
+  `;
+}
+
+function renderMiniCardHtml(card, isPicked = false) {
+  const meta = SUIT_META[card.suit] || SUIT_META.S;
+  const suitCls = meta.color === 'red' ? 'is-suit-red' : 'is-suit-black';
+  const rLabel = RANK_LABELS[card.rank] || String(card.rank);
+  return `
+    <span class="mp-mini-card ${suitCls} ${isPicked ? 'is-picked' : ''}" title="${cardText(card)}">
+      <span>${rLabel}</span>
+      ${suitSvg(card.suit, 'mp-mini-suit')}
+    </span>
+  `;
 }
 
 mountGame({
@@ -45,22 +122,31 @@ mountGame({
           { value: '30', label: { zh: '30 秒 (充裕)', en: '30s (Relaxed)' } },
         ],
       },
+      {
+        key: 'includeFlushes',
+        label: { zh: '启用同花 / 同花顺牌型 (完整 9 级德州)', en: 'Enable Flush & Straight Flush (Full 9-Tier)' },
+        type: 'boolean',
+        default: false,
+      },
     ],
     rulesSummary: {
       zh: `### 游戏流程
-1. **20 秒极限记忆**：牌桌中央 ` + '`4×4`' + ` 共 16 张黑曜石金箔数字牌全部正面展示 **20 秒**，牢记每个坐标的点数。
-2. **翻面与公共牌揭晓**：倒计时结束，16 张牌齐齐翻面扣下，桌面正上方亮出 **3 张公共牌**。
-3. **盲选 2 张**：每位选手凭记忆秘密选定 2 个不同位置（不同玩家可重复选同一张牌），与 3 张公共牌组成 5 张扑克牌型。
-4. **亮牌比大小（无同花，7 级牌型）**：
-   - **四条 > 葫芦 > 顺子 > 三条 > 两对 > 一对 > 高牌**
-   - 顺子最小为 ` + '`A-2-3-4-5`' + `，最大为 ` + '`10-J-Q-K-A`' + `。
-   - 按每局牌型排名发放胜点（前 25% +5 分、前 50% +3 分、其余 +1 分）。`,
+1. **标准 52 张传统红黑扑克（♠ ♥ ♣ ♦）**：每局从完整 52 张牌库中不重复发出 **16 张网格牌（4×4）+ 3 张公共牌**。
+2. **20 秒极限记忆**：牌桌中央 16 张传统红黑扑克牌正面展示 **20 秒**，牢记每个坐标的点数与花色。
+3. **翻面与公共牌揭晓**：倒计时结束，16 张牌齐齐翻面扣下，桌面正上方亮出 **3 张公共牌**。
+4. **盲选 2 张**：每位选手凭记忆秘密选定 2 个不同位置（不同玩家可重复选同一张牌），与 3 张公共牌组成 5 张扑克牌型。
+5. **牌型大小**：
+   - **默认 S3 剧集 7 级规则**（花色用于唯一辨识 52 张牌，计分不含同花）：**四条 > 葫芦 > 顺子 > 三条 > 两对 > 一对 > 高牌**。
+   - 亦可在房间选项中开启 **「启用同花 / 同花顺」** 升级为完整 9 级德州扑克（皇家同花顺 / 同花顺 > 四条 > 葫芦 > 同花 > 顺子 > 三条 > 两对 > 一对 > 高牌）。
+   - 按每局排名发放胜点（前 25% +5 分、前 50% +3 分、其余 +1 分）。`,
       en: `### Round Flow
-1. **20-Second Memory Flash**: All 16 obsidian-gold rank cards (` + '`4×4`' + `) face up for **20 seconds**. Memorize every slot!
-2. **Flip & Community Reveal**: All 16 cards flip face-down in unison while **3 glowing Community Cards** reveal overhead.
-3. **Blind 2-Card Selection**: Secretly pick **2 distinct slots** (players may pick overlapping slots) to combine with the 3 community cards.
-4. **Showdown (7-Tier Rank-Only Poker — No Flushes)**:
-   - **Four of a Kind > Full House > Straight > Three of a Kind > Two Pair > One Pair > High Card**
+1. **Standard 52-Card Red/Black Deck (♠ ♥ ♣ ♦)**: Every round deals **16 unique grid cards (4×4) + 3 unique Community Cards** with zero duplicates.
+2. **20-Second Memory Flash**: All 16 traditional red/black playing cards face up for **20 seconds**. Memorize every slot!
+3. **Flip & Community Reveal**: All 16 cards flip face-down in unison while **3 spotlighted Community Cards** reveal overhead.
+4. **Blind 2-Card Selection**: Secretly pick **2 distinct slots** (players may pick overlapping slots) to combine with the 3 community cards.
+5. **Hand Rankings**:
+   - **Show Default (7-Tier S3 Rules)**: Traditional suits identify every card in the 52-card deck while S3 scoring ignores flushes (**Four of a Kind > Full House > Straight > Three of a Kind > Two Pair > One Pair > High Card**).
+   - Toggle **Enable Flush & Straight Flush** in lobby options for full **9-Tier Texas Hold'em** (adds Royal/Straight Flush & Flush).
    - Scored each round: Top 25% **+5 pts**, Top 50% **+3 pts**, others **+1 pt**.`,
     },
   },
@@ -90,10 +176,11 @@ mountGame({
     const isSelect = state.phase === 'select';
     const isShowdown = state.phase === 'showdown' || state.phase === 'finished';
     const activePick = myLockedPick || ui.selected;
+    const includeFlushes = Boolean(state.options?.includeFlushes);
 
     const pickedCount = state.seats.filter((s) => Boolean(state.picks[s.seatId])).length;
     const phaseTitle = isMemorize
-      ? (lang === 'zh' ? '记忆阶段 · 死记 16 张牌面！' : 'MEMORIZE · STUDY ALL 16 CARDS!')
+      ? (lang === 'zh' ? '记忆阶段 · 死记 16 张扑克！' : 'MEMORIZE · STUDY ALL 16 CARDS!')
       : isSelect
       ? (lang === 'zh' ? '盲选阶段 · 结合 3 张公共牌盲选 2 张！' : 'BLIND PICK · SELECT 2 HIDDEN SLOTS')
       : (lang === 'zh' ? '亮牌决胜 · SHOWDOWN' : 'SHOWDOWN REVEAL');
@@ -135,16 +222,12 @@ mountGame({
             </div>
             <div class="mp-community-row">
               ${state.community
-                .map((r, i) => {
-                  const facedown = r == null;
+                .map((card, i) => {
+                  const facedown = card == null;
                   return `
                     <div class="mp-card-slot is-community">
                       <div class="mp-card ${facedown ? 'is-facedown' : ''}">
-                        <div class="mp-card-face mp-card-front is-community-face ${r >= 11 ? 'is-high-rank' : ''}">
-                          <span class="mp-card-coord">C${i + 1}</span>
-                          <span class="mp-card-rank">${rankStr(r)}</span>
-                          <span class="mp-card-emblem">◆ ◆</span>
-                        </div>
+                        ${renderCardFrontHtml(card, `C${i + 1}`, true)}
                         <div class="mp-card-face mp-card-back">
                           <span class="mp-back-num">?</span>
                         </div>
@@ -158,7 +241,7 @@ mountGame({
 
           <div class="mp-grid">
             ${state.grid
-              .map((r, idx) => {
+              .map((card, idx) => {
                 const facedown = isSelect;
                 const isSel = activePick.includes(idx);
                 const isOpt = isShowdown && optPair.includes(idx);
@@ -166,11 +249,7 @@ mountGame({
                 return `
                   <div class="mp-card-slot ${isSel ? 'is-selected' : ''} ${isOpt ? 'is-optimal' : ''}">
                     <div class="mp-card ${facedown ? 'is-facedown' : ''} ${canClick ? 'is-clickable' : ''}" data-slot="${idx}">
-                      <div class="mp-card-face mp-card-front ${r >= 11 ? 'is-high-rank' : ''}">
-                        <span class="mp-card-coord">${state.coords[idx]}</span>
-                        <span class="mp-card-rank">${rankStr(r)}</span>
-                        <span class="mp-card-emblem">#${idx + 1}</span>
-                      </div>
+                      ${renderCardFrontHtml(card, state.coords[idx], false)}
                       <div class="mp-card-face mp-card-back">
                         <span class="mp-card-coord">${state.coords[idx]}</span>
                         <span class="mp-back-num">#${idx + 1}</span>
@@ -190,8 +269,8 @@ mountGame({
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:6px;border-top:1px solid var(--dp-border-subtle);">
                   <span style="font-size:13px;color:var(--dp-ink-muted);">
                     ${lang === 'zh'
-                      ? `已选位置 (${ui.selected.length}/2)：<strong style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || '请点击 2 张暗牌'}</strong>`
-                      : `Selected (${ui.selected.length}/2): <strong style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || 'Click 2 hidden cards'}</strong>`}
+                      ? `已选位置 (${ui.selected.length}/2)：<strong id="mp-sel-readout" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || '请点击 2 张暗牌'}</strong>`
+                      : `Selected (${ui.selected.length}/2): <strong id="mp-sel-readout" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || 'Click 2 hidden cards'}</strong>`}
                   </span>
                   <button type="button" class="dp-btn dp-btn-primary" id="mp-confirm-pick" ${ui.selected.length !== 2 ? 'disabled' : ''}>
                     ${lang === 'zh' ? '锁定 2 张暗牌 →' : 'Lock 2 Cards →'}
@@ -213,7 +292,7 @@ mountGame({
             <div style="font-size:11.5px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
               ${isShowdown
                 ? (lang === 'zh' ? '本局亮牌结算' : 'ROUND SHOWDOWN')
-                : (lang === 'zh' ? '参赛者积分与牌型表' : 'STANDINGS & HAND LADDER')}
+                : (lang === 'zh' ? '参赛者积分与状态' : 'STANDINGS & STATUS')}
             </div>
 
             ${
@@ -224,7 +303,7 @@ mountGame({
                       ? `<div style="margin-top:10px;padding:9px 11px;border-radius:10px;border:1px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.09);font-size:12px;">
                           <strong style="color:#7dd3fc;">✦ ${lang === 'zh' ? '牌桌理论最强解' : 'THEORETICAL BEST HAND'}:</strong>
                           ${UI.escapeHtml(state.optimal.eval.name[lang] || state.optimal.eval.name.en)}
-                          (${state.optimal.pair.map((i) => `${state.coords[i]}[${rankStr(state.grid[i])}]`).join(' + ')})
+                          (${state.optimal.pair.map((i) => `${state.coords[i]}[${cardText(state.grid[i])}]`).join(' + ')})
                          </div>`
                       : ''
                   }
@@ -245,8 +324,8 @@ mountGame({
                             </div>
                             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                               <div class="mp-mini-cards">
-                                ${state.community.map((r) => `<span class="mp-mini-card">${rankStr(r)}</span>`).join('')}
-                                ${entry.pickedRanks.map((r) => `<span class="mp-mini-card is-picked">${rankStr(r)}</span>`).join('')}
+                                ${state.community.map((c) => renderMiniCardHtml(c, false)).join('')}
+                                ${entry.pickedCards.map((c) => renderMiniCardHtml(c, true)).join('')}
                               </div>
                               <span style="font-size:12px;font-weight:700;color:var(--dp-brass-bright);white-space:nowrap;">
                                 ${UI.escapeHtml(entry.eval.name[lang] || entry.eval.name.en)}
@@ -290,17 +369,37 @@ mountGame({
           </div>
 
           <div class="mp-panel">
-            <div style="font-size:11px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
-              ${lang === 'zh' ? '7 级牌型大小（无同花）' : '7-TIER HAND RANKING (NO FLUSH)'}
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+              <span style="font-size:11px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
+                ${includeFlushes
+                  ? (lang === 'zh' ? '9 级完整扑克牌型 (含同花)' : '9-TIER POKER RANKING (FLUSHES ON)')
+                  : (lang === 'zh' ? 'S3 剧集 7 级牌型 (不含同花)' : 'S3 7-TIER RANKING (NO FLUSH)')}
+              </span>
             </div>
             <div class="mp-hand-ladder">
-              <span>1. ${lang === 'zh' ? '四条 (AAAA+X)' : 'Four of a Kind'}</span>
-              <span>2. ${lang === 'zh' ? '葫芦 (AAA+BB)' : 'Full House'}</span>
-              <span>3. ${lang === 'zh' ? '顺子 (5连张)' : 'Straight'}</span>
-              <span>4. ${lang === 'zh' ? '三条 (AAA)' : 'Three of a Kind'}</span>
-              <span>5. ${lang === 'zh' ? '两对 (AA+BB)' : 'Two Pair'}</span>
-              <span>6. ${lang === 'zh' ? '一对 (AA)' : 'One Pair'}</span>
-              <span>7. ${lang === 'zh' ? '高牌 (最大单张)' : 'High Card'}</span>
+              ${
+                includeFlushes
+                  ? `
+                    <span>1. ${lang === 'zh' ? '同花顺 (含皇家)' : 'Straight Flush'}</span>
+                    <span>2. ${lang === 'zh' ? '四条 (AAAA+X)' : 'Four of a Kind'}</span>
+                    <span>3. ${lang === 'zh' ? '葫芦 (AAA+BB)' : 'Full House'}</span>
+                    <span>4. ${lang === 'zh' ? '同花 (5张同花色)' : 'Flush'}</span>
+                    <span>5. ${lang === 'zh' ? '顺子 (5连张)' : 'Straight'}</span>
+                    <span>6. ${lang === 'zh' ? '三条 (AAA)' : 'Three of a Kind'}</span>
+                    <span>7. ${lang === 'zh' ? '两对 (AA+BB)' : 'Two Pair'}</span>
+                    <span>8. ${lang === 'zh' ? '一对 (AA)' : 'One Pair'}</span>
+                    <span>9. ${lang === 'zh' ? '高牌 (最大单张)' : 'High Card'}</span>
+                  `
+                  : `
+                    <span>1. ${lang === 'zh' ? '四条 (AAAA+X)' : 'Four of a Kind'}</span>
+                    <span>2. ${lang === 'zh' ? '葫芦 (AAA+BB)' : 'Full House'}</span>
+                    <span>3. ${lang === 'zh' ? '顺子 (5连张)' : 'Straight'}</span>
+                    <span>4. ${lang === 'zh' ? '三条 (AAA)' : 'Three of a Kind'}</span>
+                    <span>5. ${lang === 'zh' ? '两对 (AA+BB)' : 'Two Pair'}</span>
+                    <span>6. ${lang === 'zh' ? '一对 (AA)' : 'One Pair'}</span>
+                    <span>7. ${lang === 'zh' ? '高牌 (最大单张)' : 'High Card'}</span>
+                  `
+              }
             </div>
           </div>
         </aside>
@@ -326,7 +425,6 @@ mountGame({
           ui.selected.push(idx);
         }
         sfx.play('click');
-        // Fast DOM highlight sync without losing flip state
         container.querySelectorAll('.mp-card-slot').forEach((slotEl) => {
           const inner = slotEl.querySelector('[data-slot]');
           if (!inner) return;
@@ -345,9 +443,9 @@ mountGame({
         });
         const btn = container.querySelector('#mp-confirm-pick');
         if (btn) btn.disabled = ui.selected.length !== 2;
-        const strong = container.querySelector('.mp-table strong');
-        if (strong) {
-          strong.textContent =
+        const readout = container.querySelector('#mp-sel-readout');
+        if (readout) {
+          readout.textContent =
             ui.selected.map((i) => state.coords[i]).join(' + ') ||
             (lang === 'zh' ? '请点击 2 张暗牌' : 'Click 2 hidden cards');
         }
@@ -367,7 +465,6 @@ mountGame({
       dispatch({ type: 'NEXT_ROUND' });
     });
 
-    // Smooth memory progress bar animation
     clearInterval(ui.barTimer);
     if (isMemorize) {
       ui.barTimer = setInterval(() => {

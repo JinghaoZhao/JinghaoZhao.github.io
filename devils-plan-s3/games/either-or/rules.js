@@ -23,6 +23,13 @@ export const GRASS_COLORS = [
   '#38bdf8', '#a3e635', '#047857', '#15803d',
 ];
 export const RANK_LABELS = { 2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A' };
+export const SUITS = ['S', 'H', 'C', 'D'];
+export const SUIT_META = {
+  S: { symbol: '♠', color: 'black' },
+  H: { symbol: '♥', color: 'red' },
+  C: { symbol: '♣', color: 'black' },
+  D: { symbol: '♦', color: 'red' },
+};
 
 function clone(o) {
   return JSON.parse(JSON.stringify(o));
@@ -417,34 +424,41 @@ function genMiniRects(rng) {
   return { size: 5, target: 10, grid: Array.from({ length: 5 }, () => [2, 3, 2, 3, 5]), total: 10 };
 }
 
-function evalMiniPoker(ranks5) {
-  const sorted = [...ranks5].sort((a, b) => b - a);
+function evalMiniPoker(cards5, includeFlushes = false) {
+  const norm = cards5.map((c) => (typeof c === 'number' ? { rank: c, suit: 'S' } : { rank: Number(c.rank), suit: c.suit }));
+  const sorted = norm.map((c) => c.rank).sort((a, b) => b - a);
   const cnt = new Map();
   for (const r of sorted) cnt.set(r, (cnt.get(r) || 0) + 1);
   const g = [...cnt.entries()].sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : b[0] - a[0]));
+  const isFlush = includeFlushes && norm.every((c) => c.suit === norm[0].suit);
   let straightHigh = 0;
   if (g.length === 5) {
     if (sorted[0] - sorted[4] === 4) straightHigh = sorted[0];
     else if (sorted[0] === 14 && sorted[1] === 5 && sorted[4] === 2) straightHigh = 5;
   }
-  const names = [
-    { zh: '高牌', en: 'High Card' },
-    { zh: '一对', en: 'One Pair' },
-    { zh: '两对', en: 'Two Pair' },
-    { zh: '三条', en: 'Three of a Kind' },
-    { zh: '顺子', en: 'Straight' },
-    { zh: '葫芦', en: 'Full House' },
-    { zh: '四条', en: 'Four of a Kind' },
-  ];
+  const names = {
+    8: { zh: '同花顺', en: 'Straight Flush' },
+    7: { zh: '四条', en: 'Four of a Kind' },
+    6: { zh: '葫芦', en: 'Full House' },
+    5: { zh: '同花', en: 'Flush' },
+    4: { zh: '顺子', en: 'Straight' },
+    3: { zh: '三条', en: 'Three of a Kind' },
+    2: { zh: '两对', en: 'Two Pair' },
+    1: { zh: '一对', en: 'One Pair' },
+    0: { zh: '高牌', en: 'High Card' },
+  };
   let cat = 0;
   let tb = sorted;
-  if (g[0][1] === 4) { cat = 6; tb = [g[0][0], g[1][0]]; }
-  else if (g[0][1] === 3 && g[1][1] === 2) { cat = 5; tb = [g[0][0], g[1][0]]; }
+  if (isFlush && straightHigh) { cat = 8; tb = [straightHigh]; }
+  else if (g[0][1] === 4) { cat = 7; tb = [g[0][0], g[1][0]]; }
+  else if (g[0][1] === 3 && g[1][1] === 2) { cat = 6; tb = [g[0][0], g[1][0]]; }
+  else if (isFlush) { cat = 5; tb = sorted; }
   else if (straightHigh) { cat = 4; tb = [straightHigh]; }
   else if (g[0][1] === 3) { cat = 3; tb = [g[0][0], g[1][0], g[2][0]]; }
   else if (g[0][1] === 2 && g[1][1] === 2) { cat = 2; tb = [g[0][0], g[1][0], g[2][0]]; }
   else if (g[0][1] === 2) { cat = 1; tb = [g[0][0], g[1][0], g[2][0], g[3][0]]; }
-  return { category: cat, tiebreak: tb, name: names[cat] };
+  const name = cat === 8 && straightHigh === 14 ? { zh: '皇家同花顺', en: 'Royal Flush' } : names[cat];
+  return { category: cat, tiebreak: tb, name };
 }
 
 function cmpPoker(a, b) {
@@ -586,7 +600,7 @@ function startStage(state, stageIdx, now, rng) {
     state.pendingSeatIds = state.seats.filter((s) => !s.isBot).map((s) => s.seatId);
   } else if (item.miniType === 'poker') {
     const deck = [];
-    for (let r = 2; r <= 14; r++) for (let c = 0; c < 4; c++) deck.push(r);
+    for (const suit of SUITS) for (let rank = 2; rank <= 14; rank++) deck.push({ rank, suit });
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(rng() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -597,7 +611,7 @@ function startStage(state, stageIdx, now, rng) {
     for (const s of state.seats) {
       if (!s.isBot) continue;
       const mem = {};
-      for (let i = 0; i < 16; i++) if (rng() < 0.78) mem[i] = grid[i];
+      for (let i = 0; i < 16; i++) if (rng() < 0.78) mem[i] = { ...grid[i] };
       botMemory[s.seatId] = mem;
     }
     state.mini = {
@@ -685,8 +699,9 @@ function finalizePokerMini(state) {
   }
   const entries = state.seats.map((s) => {
     const pair = m.picks[s.seatId];
-    const ev = evalMiniPoker([...m.community, m.grid[pair[0]], m.grid[pair[1]]]);
-    return { seatId: s.seatId, pair, pickedRanks: [m.grid[pair[0]], m.grid[pair[1]]], eval: ev, rank: 1, pts: 1 };
+    const pickedCards = [m.grid[pair[0]], m.grid[pair[1]]];
+    const ev = evalMiniPoker([...m.community, ...pickedCards]);
+    return { seatId: s.seatId, pair, pickedCards, eval: ev, rank: 1, pts: 1 };
   });
   entries.sort((a, b) => cmpPoker(b.eval, a.eval));
   entries.forEach((e, i) => {

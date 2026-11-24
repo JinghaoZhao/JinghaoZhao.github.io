@@ -5,9 +5,41 @@ import {
   GRASS_COLS,
   GRASS_TILE_IDS,
   RANK_LABELS,
+  SUIT_META,
   rotateGrassCells,
   canPlaceGrass,
 } from './rules.js';
+
+function eoSuitSvg(suit, cls = '') {
+  const paths = {
+    S: '<path d="M12 2C9.5 6.4 4 10.1 4 14.3c0 2.5 1.9 4.2 4.1 4.2 1.4 0 2.6-.7 3.2-1.7-.1 1.7-.7 3.1-2.1 4.2h5.6c-1.4-1.1-2-2.5-2.1-4.2.6 1 1.8 1.7 3.2 1.7 2.2 0 4.1-1.7 4.1-4.2C20 10.1 14.5 6.4 12 2z"/>',
+    H: '<path d="M12 21.2C11.5 20.8 3.5 14.9 3.5 8.8 3.5 5.6 5.9 3.2 8.7 3.2c1.6 0 2.8.8 3.3 2 .5-1.2 1.7-2 3.3-2 2.8 0 5.2 2.4 5.2 5.6 0 6.1-8 12-8.5 12.4z"/>',
+    D: '<path d="M12 2L20.5 12 12 22 3.5 12 12 2z"/>',
+    C: '<path d="M12 3a3.7 3.7 0 0 0-3.2 5.5 3.8 3.8 0 1 0-1.1 7.4c1.5 0 2.8-.8 3.5-2-.1 2-.7 3.8-2.2 5.1h6c-1.5-1.3-2.1-3.1-2.2-5.1.7 1.2 2 2 3.5 2a3.8 3.8 0 1 0-1.1-7.4A3.7 3.7 0 0 0 12 3z"/>',
+  };
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${paths[suit] || paths.S}</svg>`;
+}
+
+function renderEoPlayingCardInner(card) {
+  const r = RANK_LABELS[card.rank] || String(card.rank);
+  return `
+    <span class="eo-pc-corner eo-pc-tl">
+      <span class="eo-pc-rank">${r}</span>
+      ${eoSuitSvg(card.suit, 'eo-pc-pip')}
+    </span>
+    ${eoSuitSvg(card.suit, 'eo-pc-center')}
+    <span class="eo-pc-corner eo-pc-br">
+      <span class="eo-pc-rank">${r}</span>
+      ${eoSuitSvg(card.suit, 'eo-pc-pip')}
+    </span>
+  `;
+}
+
+function renderEoCardChip(card, picked = false) {
+  const meta = SUIT_META[card.suit] || SUIT_META.S;
+  const cls = meta.color === 'red' ? 'is-suit-red' : 'is-suit-black';
+  return `<span class="eo-mini-chip ${cls} ${picked ? 'is-picked' : ''}">${RANK_LABELS[card.rank] || card.rank}${meta.symbol}</span>`;
+}
 
 const ui = {
   miniInput: '',
@@ -372,19 +404,24 @@ mountGame({
           </div>
 
           <div class="eo-mini-stage">
-            <div style="display:flex;justify-content:center;gap:10px;align-items:center;">
+            <div class="eo-mini-poker-comm">
               <span style="font-size:11px;color:var(--dp-brass);letter-spacing:0.1em;font-weight:700;">COMMUNITY:</span>
               ${m.community
-                .map((r) => `<span style="width:46px;height:60px;border-radius:8px;border:1.5px solid #f2d591;background:#1b2032;display:inline-flex;align-items:center;justify-content:center;font-family:var(--dp-font-display);font-size:22px;font-weight:800;color:#f5d88e;">${r ? RANK_LABELS[r] : '?'}</span>`)
+                .map((card) => {
+                  if (!card) return `<span class="eo-mini-comm-card is-hidden">?</span>`;
+                  const suitCls = (SUIT_META[card.suit]?.color === 'red') ? 'is-suit-red' : 'is-suit-black';
+                  return `<span class="eo-mini-comm-card ${suitCls}">${renderEoPlayingCardInner(card)}</span>`;
+                })
                 .join('')}
             </div>
 
             <div class="eo-mini-poker-grid">
               ${m.grid
-                .map((r, idx) => {
+                .map((card, idx) => {
                   const sel = activePick.includes(idx);
-                  return `<button type="button" class="eo-mini-pcard ${isSel ? 'is-hidden' : ''} ${sel ? 'is-sel' : ''}" data-pcard="${idx}" ${isSel && mySeatId && !myPick ? '' : 'disabled'}>
-                    ${isSel ? `#${idx + 1}` : (RANK_LABELS[r] || '?')}
+                  const suitCls = card && !isSel ? (SUIT_META[card.suit]?.color === 'red' ? 'is-suit-red' : 'is-suit-black') : '';
+                  return `<button type="button" class="eo-mini-pcard ${isSel ? 'is-hidden' : suitCls} ${sel ? 'is-sel' : ''}" data-pcard="${idx}" ${isSel && mySeatId && !myPick ? '' : 'disabled'}>
+                    ${isSel || !card ? `#${idx + 1}` : renderEoPlayingCardInner(card)}
                   </button>`;
                 })
                 .join('')}
@@ -399,8 +436,11 @@ mountGame({
                 ? `
                   <div style="display:flex;flex-direction:column;gap:6px;">
                     ${(m.results || []).slice(0, 6).map((e) => `
-                      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.03);">
-                        <span><strong>#${e.rank}</strong> ${UI.escapeHtml(nameOf(e.seatId))} · ${UI.escapeHtml(e.eval.name[lang] || e.eval.name.en)}</span>
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.03);">
+                        <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                          <strong>#${e.rank}</strong> ${UI.escapeHtml(nameOf(e.seatId))} · ${UI.escapeHtml(e.eval.name[lang] || e.eval.name.en)}
+                          ${(e.pickedCards || []).map((c) => renderEoCardChip(c, true)).join('')}
+                        </span>
                         <strong style="color:#86efac;font-family:var(--dp-font-mono);">+${e.pts}pt</strong>
                       </div>
                     `).join('')}

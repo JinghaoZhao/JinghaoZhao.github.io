@@ -1,6 +1,8 @@
 /**
  * Game 01c: Memory Poker (记忆扑克 / 기억 포커)
- * Pure rank-based 7-tier Devil's Plan S3 Poker Evaluator + 20s memory flash + blind 2-card selection.
+ * Standard 52-card deck with traditional 4 suits (♠ ♥ ♣ ♦) + 20s memory flash + blind 2-card selection.
+ * Supports Devil's Plan S3 default 7-tier ranking (suits identify unique cards; flushes off)
+ * AND optional full 9-tier Texas Hold'em ranking (with Flush & Straight Flush) via `includeFlushes`.
  */
 
 export const RANK_LABELS = {
@@ -8,9 +10,20 @@ export const RANK_LABELS = {
   11: 'J', 12: 'Q', 13: 'K', 14: 'A',
 };
 
+export const SUITS = ['S', 'H', 'C', 'D'];
+
+export const SUIT_META = {
+  S: { symbol: '♠', color: 'black', name: { zh: '黑桃', en: 'Spades' } },
+  H: { symbol: '♥', color: 'red',   name: { zh: '红桃', en: 'Hearts' } },
+  C: { symbol: '♣', color: 'black', name: { zh: '梅花', en: 'Clubs' } },
+  D: { symbol: '♦', color: 'red',   name: { zh: '方块', en: 'Diamonds' } },
+};
+
 export const HAND_NAMES = {
-  6: { zh: '四条', en: 'Four of a Kind' },
-  5: { zh: '葫芦', en: 'Full House' },
+  8: { zh: '同花顺', en: 'Straight Flush' },
+  7: { zh: '四条', en: 'Four of a Kind' },
+  6: { zh: '葫芦', en: 'Full House' },
+  5: { zh: '同花', en: 'Flush' },
   4: { zh: '顺子', en: 'Straight' },
   3: { zh: '三条', en: 'Three of a Kind' },
   2: { zh: '两对', en: 'Two Pair' },
@@ -29,13 +42,20 @@ function clone(o) {
   return JSON.parse(JSON.stringify(o));
 }
 
+function normalizeCard(c) {
+  if (typeof c === 'number') return { rank: c, suit: 'S' };
+  return { rank: Number(c.rank), suit: c.suit };
+}
+
 /**
- * Exact Devil's Plan S3 7-tier rank-only 5-card Poker evaluator (NO flushes).
- * Input: array of 5 integer ranks in [2..14] (14 = Ace).
- * Returns { category: 0..6, tiebreak: number[], name: { zh, en } }
+ * Exact 5-card Poker evaluator.
+ * - `cards5`: array of 5 `{ rank: 2..14, suit: 'S'|'H'|'C'|'D' }` objects (or rank numbers).
+ * - `includeFlushes = false` (S3 default): 7 tiers (Quads=7, Full House=6, Straight=4, Trips=3, Two Pair=2, One Pair=1, High Card=0).
+ * - `includeFlushes = true` (Full 9-tier): adds Straight Flush=8 (Royal Flush when high=14) & Flush=5.
  */
-export function evaluateHand(ranks5) {
-  const sorted = [...ranks5].sort((a, b) => b - a);
+export function evaluateHand(cards5, includeFlushes = false) {
+  const norm = cards5.map(normalizeCard);
+  const sorted = norm.map((c) => c.rank).sort((a, b) => b - a);
   const counts = new Map();
   for (const r of sorted) counts.set(r, (counts.get(r) || 0) + 1);
 
@@ -44,7 +64,9 @@ export function evaluateHand(ranks5) {
     return b[0] - a[0];
   });
 
-  // Check Straight (all 5 unique)
+  const isFlush = includeFlushes && norm.every((c) => c.suit === norm[0].suit);
+
+  // Check Straight (all 5 unique ranks)
   let straightHigh = 0;
   if (groups.length === 5) {
     if (sorted[0] - sorted[4] === 4) {
@@ -57,12 +79,18 @@ export function evaluateHand(ranks5) {
   let category = 0;
   let tiebreak = sorted;
 
-  if (groups[0][1] === 4) {
-    category = 6; // Four of a Kind
+  if (isFlush && straightHigh > 0) {
+    category = 8; // Straight Flush / Royal Flush
+    tiebreak = [straightHigh];
+  } else if (groups[0][1] === 4) {
+    category = 7; // Four of a Kind
     tiebreak = [groups[0][0], groups[1][0]];
   } else if (groups[0][1] === 3 && groups[1][1] === 2) {
-    category = 5; // Full House
+    category = 6; // Full House
     tiebreak = [groups[0][0], groups[1][0]];
+  } else if (isFlush) {
+    category = 5; // Flush
+    tiebreak = sorted;
   } else if (straightHigh > 0) {
     category = 4; // Straight
     tiebreak = [straightHigh];
@@ -80,11 +108,12 @@ export function evaluateHand(ranks5) {
     tiebreak = sorted;
   }
 
-  return {
-    category,
-    tiebreak,
-    name: HAND_NAMES[category],
-  };
+  const name =
+    category === 8 && straightHigh === 14
+      ? { zh: '皇家同花顺', en: 'Royal Flush' }
+      : HAND_NAMES[category];
+
+  return { category, tiebreak, name };
 }
 
 export function compareEvaluations(a, b) {
@@ -97,12 +126,12 @@ export function compareEvaluations(a, b) {
   return 0;
 }
 
-function findBestPossiblePick(gridCards, communityCards) {
+function findBestPossiblePick(gridCards, communityCards, includeFlushes) {
   let bestPair = [0, 1];
   let bestEval = null;
   for (let i = 0; i < 16; i++) {
     for (let j = i + 1; j < 16; j++) {
-      const ev = evaluateHand([...communityCards, gridCards[i], gridCards[j]]);
+      const ev = evaluateHand([...communityCards, gridCards[i], gridCards[j]], includeFlushes);
       if (!bestEval || compareEvaluations(ev, bestEval) > 0) {
         bestEval = ev;
         bestPair = [i, j];
@@ -112,27 +141,31 @@ function findBestPossiblePick(gridCards, communityCards) {
   return { pair: bestPair, eval: bestEval };
 }
 
-function dealRoundDeck(rng) {
-  // Build a 4-of-each-rank deck (52 cards, ranks 2..14) and ensure interesting combos
+export function createStandardDeck() {
   const deck = [];
-  for (let r = 2; r <= 14; r++) {
-    for (let c = 0; c < 4; c++) deck.push(r);
+  for (const suit of SUITS) {
+    for (let rank = 2; rank <= 14; rank++) {
+      deck.push({ rank, suit });
+    }
   }
-  // Fisher-Yates shuffle
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
-  // Deal 3 community + 16 grid cards; verify at least Straight or Full House / Trips is achievable
-  let community = deck.slice(0, 3);
-  let grid = deck.slice(3, 19);
-  const opt = findBestPossiblePick(grid, community);
-  if (opt.eval.category < 3) {
-    // Re-roll once to guarantee juicy strategic poker targets (Trips/Straight/Full House/Quads)
+  return deck;
+}
+
+function dealRoundDeck(rng, includeFlushes) {
+  const deck = createStandardDeck();
+  const shuffle = () => {
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(rng() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
+  };
+  shuffle();
+  let community = deck.slice(0, 3);
+  let grid = deck.slice(3, 19);
+  const opt = findBestPossiblePick(grid, community, includeFlushes);
+  if (opt.eval.category < 3) {
+    // Re-roll once to encourage juicy Trips/Straight/Flush/Full House/Quads lines
+    shuffle();
     community = deck.slice(0, 3);
     grid = deck.slice(3, 19);
   }
@@ -140,8 +173,9 @@ function dealRoundDeck(rng) {
 }
 
 function initRound(state, roundIndex, now, rng) {
-  const { community, grid } = dealRoundDeck(rng);
-  const optimal = findBestPossiblePick(grid, community);
+  const includeFlushes = Boolean(state.options.includeFlushes);
+  const { community, grid } = dealRoundDeck(rng, includeFlushes);
+  const optimal = findBestPossiblePick(grid, community, includeFlushes);
 
   state.round = roundIndex + 1;
   state.phase = 'memorize'; // 'memorize' -> 'select' -> 'showdown' -> 'finished'
@@ -154,14 +188,14 @@ function initRound(state, roundIndex, now, rng) {
   state.roundResults = null;
   state.pendingSeatIds = state.seats.filter((s) => !s.isBot).map((s) => s.seatId);
 
-  // Build realistic bot memory maps (each bot remembers 10..15 of the 16 cards accurately)
+  // Realistic bot memory maps (each bot remembers ~64–92% of the 16 suited cards)
   state.botMemory = {};
   for (const s of state.seats) {
     if (!s.isBot) continue;
     const accuracy = 0.64 + rng() * 0.28;
     const mem = {};
     for (let idx = 0; idx < 16; idx++) {
-      if (rng() < accuracy) mem[idx] = grid[idx];
+      if (rng() < accuracy) mem[idx] = { ...grid[idx] };
     }
     state.botMemory[s.seatId] = mem;
   }
@@ -175,7 +209,7 @@ function enterSelectPhase(state, now) {
 }
 
 function resolveShowdown(state) {
-  // Fill any unpicked seats with fallback [0, 1]
+  const includeFlushes = Boolean(state.options.includeFlushes);
   for (const s of state.seats) {
     if (!state.picks[s.seatId]) {
       state.picks[s.seatId] = [0, 1];
@@ -184,12 +218,13 @@ function resolveShowdown(state) {
 
   const entries = state.seats.map((s) => {
     const pair = state.picks[s.seatId];
-    const cards5 = [...state.community, state.grid[pair[0]], state.grid[pair[1]]];
-    const ev = evaluateHand(cards5);
+    const pickedCards = [state.grid[pair[0]], state.grid[pair[1]]];
+    const cards5 = [...state.community, ...pickedCards];
+    const ev = evaluateHand(cards5, includeFlushes);
     return {
       seatId: s.seatId,
       pair,
-      pickedRanks: [state.grid[pair[0]], state.grid[pair[1]]],
+      pickedCards,
       eval: ev,
       rank: 1,
       pointsEarned: 0,
@@ -198,7 +233,6 @@ function resolveShowdown(state) {
 
   entries.sort((a, b) => compareEvaluations(b.eval, a.eval));
 
-  // Assign competition ranks (ties share same rank)
   for (let i = 0; i < entries.length; i++) {
     if (i > 0 && compareEvaluations(entries[i].eval, entries[i - 1].eval) === 0) {
       entries[i].rank = entries[i - 1].rank;
@@ -207,7 +241,6 @@ function resolveShowdown(state) {
     }
   }
 
-  // Award points by tier (top 25% +5, top 50% +3, rest +1)
   const n = entries.length;
   for (const e of entries) {
     const pct = e.rank / n;
@@ -234,10 +267,15 @@ export const GameRules = {
     const opts = ctx.options || {};
     const totalRounds = Number(opts.rounds) || 3;
     const memoryMs = (Number(opts.memorySec) || 20) * 1000;
+    const includeFlushes = Boolean(opts.includeFlushes);
     const now = Date.now();
     const state = {
       seats: seats.map((s) => ({ seatId: s.seatId, name: s.name, avatar: s.avatar, isBot: s.isBot })),
-      options: { rounds: totalRounds, memorySec: Number(opts.memorySec) || 20 },
+      options: {
+        rounds: totalRounds,
+        memorySec: Number(opts.memorySec) || 20,
+        includeFlushes,
+      },
       totalRounds,
       memoryMs,
       selectMs: 40000,
@@ -340,7 +378,6 @@ export const GameRules = {
       return { state, events: [{ type: 'FLIP_CARDS', round: state.round }] };
     }
     if (state.phase === 'select') {
-      // Assign random pair to any seat that timed out
       for (const s of state.seats) {
         if (!state.picks[s.seatId]) {
           const a = Math.floor(ctx.rng() * 16);
@@ -382,6 +419,7 @@ export const GameRules = {
       round: fullState.round,
       totalRounds: fullState.totalRounds,
       phase: fullState.phase,
+      options: fullState.options,
       phaseStartedAt: fullState.phaseStartedAt,
       memoryMs: fullState.memoryMs,
       selectMs: fullState.selectMs,
@@ -403,18 +441,18 @@ export const GameRules = {
     if (fullState.phase !== 'select') return null;
     if (fullState.picks[botSeatId]) return null;
 
+    const includeFlushes = Boolean(fullState.options?.includeFlushes);
     const mem = fullState.botMemory?.[botSeatId] || {};
     const knownIndices = Object.keys(mem).map(Number);
 
     let bestPair = null;
     let bestEval = null;
 
-    // Evaluate all known pairs against the 3 community cards
     for (let i = 0; i < knownIndices.length; i++) {
       for (let j = i + 1; j < knownIndices.length; j++) {
         const a = knownIndices[i];
         const b = knownIndices[j];
-        const ev = evaluateHand([...fullState.community, mem[a], mem[b]]);
+        const ev = evaluateHand([...fullState.community, mem[a], mem[b]], includeFlushes);
         if (!bestEval || compareEvaluations(ev, bestEval) > 0) {
           bestEval = ev;
           bestPair = [Math.min(a, b), Math.max(a, b)];
@@ -422,7 +460,6 @@ export const GameRules = {
       }
     }
 
-    // Small realistic slip chance (10%) picking an adjacent forgotten card
     if (!bestPair || (ctx.rng() < 0.1 && knownIndices.length < 16)) {
       const a = Math.floor(ctx.rng() * 16);
       const b = (a + 1 + Math.floor(ctx.rng() * 15)) % 16;

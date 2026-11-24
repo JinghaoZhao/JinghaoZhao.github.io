@@ -383,41 +383,152 @@
   color: #fde68a;
 }
 
+.eo-mini-poker-comm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.eo-mini-comm-card {
+  position: relative;
+  width: 64px;
+  height: 90px;
+  border-radius: 9px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.85), transparent 55%),
+    linear-gradient(155deg, #fbf8f1 0%, #f4eee1 56%, #eae0cb 100%);
+  border: 1.5px solid #f0cf80;
+  box-shadow: 0 0 20px rgba(212, 175, 106, 0.42), inset 0 0 0 3px rgba(251, 247, 238, 0.9), inset 0 0 0 4px rgba(188, 148, 72, 0.4);
+}
+
+.eo-mini-comm-card.is-hidden {
+  background:
+    repeating-linear-gradient(45deg, rgba(212, 175, 106, 0.07) 0 2px, transparent 2px 9px),
+    radial-gradient(circle at 50% 50%, #241926, #0e1018 72%);
+  border-color: rgba(212, 175, 106, 0.42);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+  color: var(--dp-brass);
+  font-family: var(--dp-font-mono);
+  font-size: 16px;
+  font-weight: 700;
+}
+
 .eo-mini-poker-grid {
-  width: min(100%, 380px);
+  width: min(100%, 410px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 9px;
 }
 
 .eo-mini-pcard {
-  aspect-ratio: 3 / 4;
+  position: relative;
+  aspect-ratio: 5 / 7;
   border-radius: 10px;
-  border: 1.5px solid var(--dp-border-strong);
-  background: linear-gradient(155deg, #1d2233, #0e111a);
+  border: 1.5px solid #d7be84;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.85), transparent 55%),
+    linear-gradient(155deg, #fbf8f1 0%, #f4eee1 56%, #eae0cb 100%);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.48), inset 0 0 0 3px rgba(250, 245, 234, 0.88), inset 0 0 0 4px rgba(188, 148, 72, 0.32);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: var(--dp-font-display);
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--dp-brass-bright);
+  padding: 0;
+  overflow: hidden;
   transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
 }
 
+.eo-mini-pcard:disabled {
+  opacity: 1;
+}
+
+.eo-mini-pcard.is-suit-red,
+.eo-mini-comm-card.is-suit-red,
+.eo-mini-chip.is-suit-red {
+  color: #c81e32;
+}
+
+.eo-mini-pcard.is-suit-black,
+.eo-mini-comm-card.is-suit-black,
+.eo-mini-chip.is-suit-black {
+  color: #14171f;
+}
+
 .eo-mini-pcard.is-hidden {
-  background: linear-gradient(155deg, #241926, #0e1018);
+  background:
+    repeating-linear-gradient(45deg, rgba(212, 175, 106, 0.07) 0 2px, transparent 2px 9px),
+    radial-gradient(circle at 50% 50%, #241926, #0e1018 72%);
+  border-color: rgba(212, 175, 106, 0.42);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5), inset 0 0 0 3px rgba(10, 12, 18, 0.72), inset 0 0 0 4px rgba(212, 175, 106, 0.24);
   color: var(--dp-brass);
   font-family: var(--dp-font-mono);
   font-size: 14px;
+  font-weight: 700;
 }
 
 .eo-mini-pcard.is-sel {
-  border-color: #38bdf8;
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
+  border: 2.5px solid #38bdf8;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
   transform: translateY(-2px);
+}
+
+.eo-pc-corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.95;
+  gap: 1px;
+  pointer-events: none;
+}
+
+.eo-pc-tl { top: 4px; left: 5px; }
+.eo-pc-br { bottom: 4px; right: 5px; transform: rotate(180deg); }
+
+.eo-pc-rank {
+  font-family: "Space Grotesk", "Cinzel", Georgia, serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.eo-pc-pip {
+  width: 9px;
+  height: 9px;
+  display: block;
+}
+
+.eo-pc-center {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.14));
+}
+
+.eo-mini-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid #d4b678;
+  background: linear-gradient(155deg, #fbf8f1, #ede3cf);
+  font-family: "Space Grotesk", var(--dp-font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.eo-mini-chip.is-picked {
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
 }
 
 .eo-mini-grass-board {
