@@ -1,40 +1,41 @@
 /* ==========================================================================
  * Game 01c: Memory Poker (记忆扑克 / 기억 포커)
- * Velvet-and-obsidian studio table · Museum-grade ivory Red/Black 52-card UI
+ * Netflix / WSOP TV-Broadcast Jumbo-Index Porcelain Playing Cards
+ * Fits all 3 Community Cards + all 16 (4x4) Grid Cards above the 1440x900 fold
  * ========================================================================== */
 
 .mp-arena {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1180px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.38fr) minmax(300px, 0.92fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(250px, 0.72fr);
+  gap: 16px;
   align-items: start;
 }
 
 .mp-table {
   position: relative;
-  border-radius: 24px;
+  border-radius: 22px;
   border: 1px solid var(--dp-border-strong);
   background:
-    radial-gradient(ellipse 68% 42% at 50% 14%, rgba(212, 175, 106, 0.16), transparent 64%),
-    radial-gradient(ellipse 80% 65% at 50% 62%, rgba(92, 18, 30, 0.44), rgba(11, 13, 20, 0.96) 76%),
+    radial-gradient(ellipse 68% 40% at 50% 10%, rgba(212, 175, 106, 0.16), transparent 62%),
+    radial-gradient(ellipse 84% 68% at 50% 60%, rgba(84, 16, 28, 0.42), rgba(10, 12, 19, 0.97) 75%),
     #0a0c14;
   box-shadow:
-    0 26px 64px rgba(0, 0, 0, 0.72),
-    inset 0 0 0 8px rgba(10, 12, 18, 0.6),
-    inset 0 0 0 9px rgba(212, 175, 106, 0.2);
-  padding: 20px;
+    0 24px 60px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 6px rgba(10, 12, 18, 0.62),
+    inset 0 0 0 7px rgba(212, 175, 106, 0.22);
+  padding: 14px 18px 16px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 11px;
 }
 
 .mp-table.is-darkened {
   background:
-    radial-gradient(ellipse 52% 28% at 50% 12%, rgba(242, 213, 145, 0.25), transparent 62%),
-    radial-gradient(ellipse 75% 65% at 50% 65%, rgba(44, 10, 18, 0.42), rgba(6, 7, 12, 0.98) 74%),
+    radial-gradient(ellipse 58% 30% at 50% 12%, rgba(242, 213, 145, 0.24), transparent 60%),
+    radial-gradient(ellipse 78% 66% at 50% 64%, rgba(40, 9, 17, 0.44), rgba(6, 7, 12, 0.98) 74%),
     #06070c;
 }
 
@@ -42,19 +43,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .mp-phase-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
+  gap: 7px;
+  padding: 4px 13px;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   border: 1px solid var(--dp-border-strong);
   background: rgba(212, 175, 106, 0.14);
@@ -69,7 +70,7 @@
 
 .mp-mem-bar-wrap {
   width: 100%;
-  height: 6px;
+  height: 5px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -81,52 +82,66 @@
   transition: width 0.25s linear;
 }
 
-/* Community Cards Spotlight */
+/* Sleek Horizontal Community Spotlight Strip */
 .mp-community-zone {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(212, 175, 106, 0.28);
-  background: rgba(8, 10, 18, 0.64);
-  box-shadow: inset 0 0 28px rgba(212, 175, 106, 0.07);
+  justify-content: center;
+  gap: 18px;
+  padding: 10px 16px;
+  border-radius: 15px;
+  border: 1px solid rgba(212, 175, 106, 0.34);
+  background:
+    radial-gradient(ellipse 65% 85% at 50% 50%, rgba(212, 175, 106, 0.1), rgba(8, 10, 17, 0.74));
+  box-shadow: inset 0 0 24px rgba(212, 175, 106, 0.08);
+  flex-wrap: wrap;
+}
+
+.mp-community-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .mp-community-label {
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dp-brass);
-  font-weight: 700;
+  color: var(--dp-brass-bright);
+  font-weight: 800;
+}
+
+.mp-community-sub {
+  font-size: 11px;
+  color: var(--dp-ink-muted);
 }
 
 .mp-community-row {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-/* 4x4 Memory Card Grid */
+/* Compact Above-the-Fold 4x4 Broadcast Card Grid */
 .mp-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  width: min(100%, 500px);
+  gap: 10px;
+  width: min(100%, 488px);
   margin: 0 auto;
 }
 
-/* 3D Luxury Playing Card */
+/* 3D Playing Card Container */
 .mp-card-slot {
   perspective: 950px;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: 4 / 4.75;
   position: relative;
 }
 
 .mp-card-slot.is-community {
-  width: 88px;
-  height: 124px;
+  width: 84px;
+  height: 106px;
   aspect-ratio: auto;
 }
 
@@ -135,8 +150,8 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
-  border-radius: 11px;
+  transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 12px;
   cursor: default;
 }
 
@@ -145,7 +160,7 @@
 }
 
 .mp-card.is-clickable:hover {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-3px) scale(1.02);
 }
 
 .mp-card.is-facedown {
@@ -159,248 +174,251 @@
 .mp-card-face {
   position: absolute;
   inset: 0;
-  border-radius: 11px;
+  border-radius: 12px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
 }
 
-/* Luxury Ivory / Alabaster Playing Card Front */
+/* Pure Porcelain-White Broadcast Jumbo-Index Card Front */
 .mp-card-front {
   background:
-    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.85), transparent 55%),
-    linear-gradient(155deg, #fbf8f1 0%, #f4eee1 56%, #eae0cb 100%);
-  border: 1.5px solid #d7be84;
+    linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
+  border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 12px 26px rgba(0, 0, 0, 0.56),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    inset 0 0 0 4px rgba(250, 245, 234, 0.9),
-    inset 0 0 0 5px rgba(188, 148, 72, 0.34);
-  color: #14171f;
+    0 8px 22px rgba(0, 0, 0, 0.48),
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  color: #12151c;
+}
+
+/* Subtle glossy top sheen */
+.mp-card-front::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 38%);
+  pointer-events: none;
+}
+
+/* Razor-thin suit-tinted inner hairline frame */
+.mp-card-front::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(18, 21, 28, 0.1);
+  pointer-events: none;
 }
 
 .mp-card-front.is-suit-red {
-  color: #c81e32;
+  color: #d91e36;
+}
+
+.mp-card-front.is-suit-red::after {
+  border-color: rgba(217, 30, 54, 0.16);
 }
 
 .mp-card-front.is-suit-black {
-  color: #14171f;
+  color: #12151c;
 }
 
 .mp-card-front.is-community-face {
-  border-color: #f0cf80;
+  border: 1.5px solid #f4d78d;
   box-shadow:
-    0 0 28px rgba(212, 175, 106, 0.5),
-    0 12px 26px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 0 0 4px rgba(251, 247, 238, 0.92),
-    inset 0 0 0 5px rgba(202, 158, 70, 0.52);
+    0 0 26px rgba(242, 213, 145, 0.52),
+    0 10px 24px rgba(0, 0, 0, 0.56),
+    inset 0 1px 0 #ffffff;
 }
 
-/* Corner Indices (Top-Left + Inverted Bottom-Right) */
-.mp-corner {
+/* Giant Top-Left Jumbo Rank + Crisp Suit Pip */
+.mp-jumbo-index {
   position: absolute;
+  top: 7px;
+  left: 9px;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 0.95;
   gap: 2px;
   pointer-events: none;
 }
 
-.mp-corner-tl {
-  top: 6px;
-  left: 7px;
+.mp-jumbo-rank {
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(1.72rem, 2.35vw, 2.25rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.mp-corner-br {
-  bottom: 6px;
-  right: 7px;
-  transform: rotate(180deg);
+.mp-card-slot.is-community .mp-jumbo-rank {
+  font-size: 1.9rem;
 }
 
-.mp-corner-rank {
-  font-family: "Space Grotesk", "Cinzel", Georgia, serif;
-  font-size: clamp(13px, 1.8vw, 17px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.mp-card-slot.is-community .mp-corner-rank {
-  font-size: 15px;
-}
-
-.mp-corner-pip {
-  width: 11px;
-  height: 11px;
+.mp-jumbo-pip {
+  width: 17px;
+  height: 17px;
   display: block;
 }
 
-/* Subtle Top-Right Grid Coordinate Tag */
-.mp-card-coord {
+.mp-card-slot.is-community .mp-jumbo-pip {
+  width: 15px;
+  height: 15px;
+}
+
+/* Hero Glossy Lower-Center / Right Suit Emblem */
+.mp-hero-suit-wrap {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  padding: 1px 4px;
-  border-radius: 4px;
-  font-family: var(--dp-font-mono);
-  font-size: 8.5px;
-  font-weight: 700;
-  color: #8b6c30;
-  background: rgba(188, 148, 72, 0.14);
-  border: 1px solid rgba(188, 148, 72, 0.28);
-  line-height: 1.25;
-}
-
-.mp-card-back .mp-card-coord {
-  top: 7px;
-  left: 8px;
-  right: auto;
-  color: rgba(242, 213, 145, 0.78);
-  background: rgba(8, 10, 16, 0.55);
-  border-color: rgba(212, 175, 106, 0.28);
-}
-
-/* Center Luxury Emblem */
-.mp-center-art {
-  position: relative;
+  right: 10px;
+  bottom: 14px;
+  z-index: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 58%;
-  height: 54%;
   pointer-events: none;
 }
 
-.mp-center-pip {
-  width: clamp(28px, 4.2vw, 42px);
-  height: clamp(28px, 4.2vw, 42px);
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.14));
+.mp-hero-suit {
+  width: clamp(40px, 3.6vw, 52px);
+  height: clamp(40px, 3.6vw, 52px);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.16));
 }
 
-.mp-card-slot.is-community .mp-center-pip {
-  width: 34px;
-  height: 34px;
+.mp-card-slot.is-community .mp-hero-suit-wrap {
+  right: 8px;
+  bottom: 10px;
 }
 
-.mp-ace-halo {
-  position: relative;
-  width: clamp(44px, 5.5vw, 56px);
-  height: clamp(44px, 5.5vw, 56px);
-  border-radius: 50%;
-  border: 1.5px solid rgba(188, 148, 72, 0.55);
-  background: radial-gradient(circle, rgba(212, 175, 106, 0.16), transparent 72%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 0 0 3px rgba(255, 252, 245, 0.65);
+.mp-card-slot.is-community .mp-hero-suit {
+  width: 38px;
+  height: 38px;
 }
 
-.mp-court-frame {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 7px;
-  border: 1px solid rgba(188, 148, 72, 0.55);
-  background:
-    radial-gradient(circle at 50% 35%, rgba(212, 175, 106, 0.2), transparent 68%),
-    linear-gradient(180deg, rgba(188, 148, 72, 0.08), rgba(188, 148, 72, 0.16));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
+/* Ultra-subtle translucent metallic gold filigree watermark for A/K/Q/J only */
+.mp-royal-watermark {
+  position: absolute;
+  right: 5px;
+  bottom: 8px;
+  width: 62px;
+  height: 62px;
+  color: #c5983e;
+  opacity: 0.18;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.mp-court-crown {
-  width: 18px;
-  height: 12px;
-  color: #b88b35;
-}
-
-.mp-court-letter {
-  font-family: var(--dp-font-display);
-  font-size: clamp(18px, 2.5vw, 24px);
-  font-weight: 800;
+/* Subtle Clean Bottom-Right Coordinate Label */
+.mp-card-coord {
+  position: absolute;
+  bottom: 4px;
+  right: 7px;
+  z-index: 4;
+  font-family: var(--dp-font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #8b93a6;
   line-height: 1;
+  letter-spacing: 0.02em;
+  pointer-events: none;
 }
 
-.mp-court-suit {
-  width: 14px;
-  height: 14px;
-}
-
-/* Back (Obsidian Gold Filigree) */
+/* Luxury Obsidian & Brushed-Gold Geometric SVG Card Back */
 .mp-card-back {
   transform: rotateY(180deg);
-  background:
-    repeating-linear-gradient(
-      45deg,
-      rgba(212, 175, 106, 0.07) 0px,
-      rgba(212, 175, 106, 0.07) 2px,
-      transparent 2px,
-      transparent 10px
-    ),
-    radial-gradient(circle at 50% 50%, #241926 0%, #0e1018 72%);
-  border: 1.5px solid rgba(212, 175, 106, 0.42);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.52), inset 0 0 0 4px rgba(10, 12, 18, 0.72), inset 0 0 0 5px rgba(212, 175, 106, 0.26);
+  background: radial-gradient(circle at 50% 42%, #1d2133 0%, #0d1019 62%, #07090f 100%);
+  border: 1.5px solid rgba(212, 175, 106, 0.56);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(242, 213, 145, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.mp-back-num {
+.mp-back-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mp-back-crest {
+  position: relative;
+  z-index: 2;
+  min-width: 44px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(242, 213, 145, 0.65);
+  background: linear-gradient(160deg, rgba(22, 26, 40, 0.94), rgba(10, 12, 19, 0.96));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(212, 175, 106, 0.16);
   font-family: var(--dp-font-mono);
   font-size: 16px;
-  font-weight: 700;
-  color: var(--dp-brass);
-  padding: 4px 9px;
-  border-radius: 8px;
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  background: rgba(8, 10, 16, 0.78);
+  font-weight: 800;
+  color: #f4d78d;
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(242, 213, 145, 0.45);
+}
+
+.mp-card-slot.is-community .mp-back-crest {
+  min-width: 34px;
+  padding: 4px 8px;
+  font-size: 15px;
 }
 
 /* Selection & Showdown Highlights */
 .mp-card-slot.is-selected .mp-card-back,
 .mp-card-slot.is-selected .mp-card-front {
-  border: 2.5px solid #f2d591;
-  box-shadow: 0 0 28px rgba(242, 213, 145, 0.72), inset 0 0 14px rgba(242, 213, 145, 0.22);
+  border: 2.5px solid #f4d78d;
+  box-shadow: 0 0 26px rgba(242, 213, 145, 0.8), 0 8px 22px rgba(0, 0, 0, 0.5);
 }
 
 .mp-card-slot.is-optimal .mp-card-front {
-  box-shadow: 0 0 26px rgba(56, 189, 248, 0.75);
   border: 2.5px solid #38bdf8;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.8), 0 8px 22px rgba(0, 0, 0, 0.5);
 }
 
 .mp-pick-tag {
   position: absolute;
-  bottom: 5px;
-  left: 5px;
+  top: 5px;
+  right: 5px;
   padding: 2px 6px;
   border-radius: 999px;
   font-size: 9.5px;
   font-weight: 800;
   background: var(--dp-brass-bright);
   color: #090b10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-  z-index: 4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 5;
   pointer-events: none;
+}
+
+/* Selection Footer Bar */
+.mp-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--dp-border-subtle);
 }
 
 /* Right Side Panel */
 .mp-side {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .mp-panel {
   border-radius: var(--dp-radius-lg);
   border: 1px solid var(--dp-border-strong);
   background: rgba(14, 17, 26, 0.9);
-  padding: 16px;
+  padding: 14px 15px;
   box-shadow: var(--dp-shadow-card);
 }
 
@@ -416,12 +434,12 @@
 .mp-showdown-list {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 8px;
   margin-top: 10px;
 }
 
 .mp-showdown-row {
-  padding: 10px 12px;
+  padding: 9px 11px;
   border-radius: 12px;
   border: 1px solid var(--dp-border-subtle);
   background: rgba(255, 255, 255, 0.025);
@@ -433,14 +451,14 @@
 .mp-showdown-row.is-winner {
   border-color: var(--dp-brass-bright);
   background: rgba(212, 175, 106, 0.12);
-  box-shadow: 0 0 20px rgba(212, 175, 106, 0.16);
+  box-shadow: 0 0 18px rgba(212, 175, 106, 0.16);
 }
 
 .mp-showdown-row.is-me {
   border-left: 3px solid var(--dp-cyan);
 }
 
-/* Ivory Red/Black Showdown Mini-Cards */
+/* Crisp Pure-White Porcelain Red/Black Showdown Mini-Cards */
 .mp-mini-cards {
   display: flex;
   gap: 5px;
@@ -448,68 +466,94 @@
 }
 
 .mp-mini-card {
-  min-width: 34px;
-  height: 44px;
-  padding: 0 3px;
+  min-width: 36px;
+  height: 46px;
+  padding: 2px 3px;
   border-radius: 6px;
-  border: 1.2px solid #d4b678;
-  background: linear-gradient(155deg, #fbf8f1, #ede3cf);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(155deg, #ffffff, #eef1f6);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: "Space Grotesk", var(--dp-font-mono);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.05;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  gap: 1px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.44);
 }
 
 .mp-mini-card.is-suit-red {
-  color: #c81e32;
+  color: #d91e36;
 }
 
 .mp-mini-card.is-suit-black {
-  color: #14171f;
+  color: #12151c;
 }
 
 .mp-mini-card.is-picked {
   border: 2px solid #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
 }
 
 .mp-mini-suit {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   display: block;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .mp-arena {
     grid-template-columns: 1fr;
   }
+  .mp-table {
+    padding: 12px;
+    gap: 10px;
+  }
+  .mp-community-zone {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .mp-community-meta {
+    align-items: center;
+  }
   .mp-card-slot.is-community {
-    width: 74px;
-    height: 104px;
+    width: 72px;
+    height: 92px;
   }
   .mp-grid {
-    gap: 8px;
+    gap: 7px;
   }
-  .mp-corner-tl {
+  .mp-jumbo-index {
     top: 4px;
-    left: 5px;
+    left: 6px;
   }
-  .mp-corner-br {
-    bottom: 4px;
-    right: 5px;
+  .mp-jumbo-rank {
+    font-size: 1.45rem;
   }
-  .mp-corner-pip {
-    width: 9px;
-    height: 9px;
+  .mp-jumbo-pip {
+    width: 13px;
+    height: 13px;
+  }
+  .mp-hero-suit-wrap {
+    right: 6px;
+    bottom: 12px;
+  }
+  .mp-hero-suit {
+    width: 30px;
+    height: 30px;
   }
   .mp-card-coord {
-    font-size: 7.5px;
-    top: 4px;
-    right: 4px;
+    font-size: 9px;
+    bottom: 3px;
+    right: 5px;
+  }
+  .mp-back-crest {
+    min-width: 34px;
+    padding: 3px 7px;
+    font-size: 13px;
   }
 }

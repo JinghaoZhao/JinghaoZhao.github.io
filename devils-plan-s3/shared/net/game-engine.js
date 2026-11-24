@@ -16,11 +16,46 @@ import {
   MSG,
   generateRoomCode,
   normalizeRoomCode,
+  sanitizePlayerName,
   getClientId,
   randomActionId,
   createSeededRng,
 } from './protocol.js';
 import { RoomClient } from './room-client.js';
+
+/**
+ * Recursively syncs any cached seat `.name` inside `fullState` (e.g. `state.players[seatId].name`,
+ * `state.seats[i].name`, or nested mini-game state) so all 19 games reflect live renames immediately.
+ */
+function syncSeatNameInState(node, seatId, newName, depth = 0) {
+  if (!node || typeof node !== 'object' || depth > 4) return;
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      if (item && typeof item === 'object') {
+        if (item.seatId === seatId && typeof item.name === 'string') {
+          item.name = newName;
+        } else if (depth < 4) {
+          syncSeatNameInState(item, seatId, newName, depth + 1);
+        }
+      }
+    }
+    return;
+  }
+  if (node.seatId === seatId && typeof node.name === 'string') {
+    node.name = newName;
+  }
+  const direct = node[seatId];
+  if (direct && typeof direct === 'object' && !Array.isArray(direct) && typeof direct.name === 'string') {
+    direct.name = newName;
+  }
+  for (const key of Object.keys(node)) {
+    if (key === seatId) continue;
+    const val = node[key];
+    if (val && typeof val === 'object') {
+      syncSeatNameInState(val, seatId, newName, depth + 1);
+    }
+  }
+}
 
 const BOT_NAMES_ZH = [
   'AI·河锡辰', 'AI·轨道', 'AI·金东载', 'AI·徐东珠', 'AI·郑贤奎',
@@ -345,6 +380,56 @@ export class GameEngine {
     } else {
       this.room.sendToHost({ t: MSG.READY, clientId: this.clientId, ready: Boolean(ready) });
     }
+  }
+
+  /**
+   * Live rename for the local player (works in Lobby OR Mid-Match, Solo, Hotseat, and Online).
+   */
+  renameSelf(rawName) {
+    const clean = sanitizePlayerName(rawName, '');
+    if (!clean) return { ok: false, reason: 'Name cannot be empty' };
+
+    if (this.isHost) {
+      const targetSeat =
+        this.mode === 'hotseat'
+          ? this.lobby.seats.find((s) => s.seatId === (this.hotseatActiveSeatId || this.mySeatId))
+          : this.lobby.seats.find((s) => s.clientId === this.clientId);
+      if (targetSeat) {
+        this._hostApplyRename(targetSeat, clean);
+        return { ok: true, name: clean };
+      }
+      const spec = this.lobby.spectators.find((sp) => sp.clientId === this.clientId);
+      if (spec) {
+        spec.name = clean;
+        this._broadcastLobby();
+        this._saveHostCheckpoint();
+        this._emit();
+        return { ok: true, name: clean };
+      }
+      return { ok: false, reason: 'Seat not found' };
+    }
+
+    // Guest: send live RENAME to Host
+    this.room.sendToHost({
+      t: MSG.RENAME,
+      clientId: this.clientId,
+      name: clean,
+    });
+    return { ok: true, name: clean };
+  }
+
+  _hostApplyRename(seat, cleanName) {
+    seat.name = cleanName;
+    if (this.fullState) {
+      syncSeatNameInState(this.fullState, seat.seatId, cleanName);
+      this.seq += 1;
+      this._broadcastLobby();
+      this._pushStateToAll();
+    } else {
+      this._broadcastLobby();
+      this._emit();
+    }
+    this._saveHostCheckpoint();
   }
 
   setOption(key, value) {
@@ -833,6 +918,24 @@ export class GameEngine {
       if (seat && this.lobby.phase === 'lobby') {
         seat.ready = Boolean(msg.ready);
         this._broadcastLobby();
+        this._emit();
+      }
+      return;
+    }
+
+    if (msg.t === MSG.RENAME) {
+      const clean = sanitizePlayerName(msg.name, '');
+      if (!clean) return;
+      const seat = this.lobby.seats.find((s) => s.clientId === cid);
+      if (seat) {
+        this._hostApplyRename(seat, clean);
+        return;
+      }
+      const spec = this.lobby.spectators.find((sp) => sp.clientId === cid);
+      if (spec) {
+        spec.name = clean;
+        this._broadcastLobby();
+        this._saveHostCheckpoint();
         this._emit();
       }
       return;

@@ -7,7 +7,24 @@
  * - Ep 11–14 Finale TBA teaser card
  */
 
-import { I18n, SFX, UI, normalizeRoomCode } from './shared/sdk.js';
+import { I18n, SFX, UI, normalizeRoomCode, sanitizePlayerName } from './shared/sdk.js';
+
+const NAME_STORAGE_KEY = 'dp3_player_name';
+
+function getSavedPlayerName() {
+  try {
+    return sanitizePlayerName(localStorage.getItem(NAME_STORAGE_KEY) || '', '');
+  } catch (_) {
+    return '';
+  }
+}
+
+function setSavedPlayerName(name) {
+  try {
+    const clean = sanitizePlayerName(name, '');
+    if (clean) localStorage.setItem(NAME_STORAGE_KEY, clean);
+  } catch (_) {}
+}
 
 const CATEGORIES = [
   { key: 'ALL', label: { zh: '全部游戏', en: 'All' } },
@@ -68,7 +85,93 @@ const el = {
   langBtn: document.getElementById('hub-lang-btn'),
   muteBtn: document.getElementById('hub-mute-btn'),
   ambBtn: document.getElementById('hub-amb-btn'),
+  profileBtn: document.getElementById('hub-profile-btn'),
+  profileName: document.getElementById('hub-profile-name'),
 };
+
+function syncProfileUI() {
+  const lang = I18n.getLang();
+  const saved = getSavedPlayerName();
+  if (el.profileName) {
+    el.profileName.textContent = saved || (lang === 'zh' ? '参赛者' : 'Player');
+  }
+  if (el.profileBtn) {
+    el.profileBtn.title = lang === 'zh' ? '修改参赛代号' : 'Edit Player Name';
+  }
+}
+
+function openHubRenameModal() {
+  document.getElementById('hub-rename-modal')?.remove();
+  const lang = I18n.getLang();
+  const current = getSavedPlayerName() || (lang === 'zh' ? '参赛者' : 'Player');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'dp-modal-backdrop';
+  backdrop.id = 'hub-rename-modal';
+  backdrop.style.zIndex = '105';
+  backdrop.innerHTML = `
+    <div class="dp-modal" style="width:min(420px,100%);" role="dialog" aria-modal="true">
+      <div class="dp-modal-header" style="margin-bottom:12px;">
+        <div>
+          <span class="dp-badge">${lang === 'zh' ? '参赛身份' : 'PLAYER IDENTITY'}</span>
+          <h3 class="dp-modal-title" style="font-size:19px;">${lang === 'zh' ? '设置参赛代号' : 'Set Player Name'}</h3>
+        </div>
+        <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="hub-rename-close" aria-label="Close">✕</button>
+      </div>
+      <form id="hub-rename-form">
+        <input class="dp-input" id="hub-rename-input" type="text" maxlength="20" value="${UI.escapeHtml(current)}" placeholder="${lang === 'zh' ? '输入你的代号（最多 20 字）' : 'Enter your name (max 20 chars)'}" autocomplete="nickname" />
+        <p style="font-size:12px;color:var(--dp-ink-muted);margin:8px 0 16px;">
+          ${
+            lang === 'zh'
+              ? '保存后进入任意 19 款第三季游戏时将自动使用该代号，联机时亦可随时修改。'
+              : 'Automatically applied across all 19 Season 3 games and editable anytime mid-match.'
+          }
+        </p>
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+          <button type="button" class="dp-btn dp-btn-ghost" id="hub-rename-cancel">${lang === 'zh' ? '取消' : 'Cancel'}</button>
+          <button type="submit" class="dp-btn dp-btn-primary">${lang === 'zh' ? '保存代号' : 'Save Name'}</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+
+  const input = backdrop.querySelector('#hub-rename-input');
+  const close = () => {
+    backdrop.remove();
+    document.removeEventListener('keydown', onKey);
+  };
+  const onKey = (e) => {
+    if (e.key === 'Escape') close();
+  };
+  document.addEventListener('keydown', onKey);
+  backdrop.querySelector('#hub-rename-close')?.addEventListener('click', close);
+  backdrop.querySelector('#hub-rename-cancel')?.addEventListener('click', close);
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  backdrop.querySelector('#hub-rename-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const next = sanitizePlayerName(input.value, '');
+    if (!next) {
+      SFX.play('error');
+      UI.toast(lang === 'zh' ? '代号不能为空' : 'Name cannot be empty', 'error');
+      input.focus();
+      return;
+    }
+    SFX.play('click');
+    setSavedPlayerName(next);
+    syncProfileUI();
+    close();
+    UI.toast(
+      lang === 'zh' ? `已保存参赛代号：${next}` : `Player name saved: ${next}`,
+      'success'
+    );
+  });
+
+  input?.focus();
+  input?.select();
+}
 
 function matchesCategory(game, filterKey) {
   if (filterKey === 'ALL') return true;
@@ -277,9 +380,15 @@ function renderHub() {
   const showTba = activeCategory === 'ALL' || activeCategory === 'MAIN';
   el.grid.innerHTML = cardsHtml + (showTba ? renderTbaCard(lang) : '');
   syncAudioUI();
+  syncProfileUI();
 }
 
 // Wire controls
+el.profileBtn?.addEventListener('click', () => {
+  SFX.play('click');
+  openHubRenameModal();
+});
+
 el.langBtn.addEventListener('click', () => {
   SFX.play('click');
   I18n.toggle();

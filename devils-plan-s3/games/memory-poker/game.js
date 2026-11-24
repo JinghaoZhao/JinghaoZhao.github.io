@@ -9,18 +9,55 @@ const ui = {
   lastCtx: null,
 };
 
-function suitSvg(suit, className = '') {
+let svgUid = 0;
+
+function suitSvg(suit, className = '', glossy = false) {
   const paths = {
-    S: '<path d="M12 2C9.5 6.4 4 10.1 4 14.3c0 2.5 1.9 4.2 4.1 4.2 1.4 0 2.6-.7 3.2-1.7-.1 1.7-.7 3.1-2.1 4.2h5.6c-1.4-1.1-2-2.5-2.1-4.2.6 1 1.8 1.7 3.2 1.7 2.2 0 4.1-1.7 4.1-4.2C20 10.1 14.5 6.4 12 2z"/>',
-    H: '<path d="M12 21.2C11.5 20.8 3.5 14.9 3.5 8.8 3.5 5.6 5.9 3.2 8.7 3.2c1.6 0 2.8.8 3.3 2 .5-1.2 1.7-2 3.3-2 2.8 0 5.2 2.4 5.2 5.6 0 6.1-8 12-8.5 12.4z"/>',
-    D: '<path d="M12 2L20.5 12 12 22 3.5 12 12 2z"/>',
-    C: '<path d="M12 3a3.7 3.7 0 0 0-3.2 5.5 3.8 3.8 0 1 0-1.1 7.4c1.5 0 2.8-.8 3.5-2-.1 2-.7 3.8-2.2 5.1h6c-1.5-1.3-2.1-3.1-2.2-5.1.7 1.2 2 2 3.5 2a3.8 3.8 0 1 0-1.1-7.4A3.7 3.7 0 0 0 12 3z"/>',
+    S: 'M12 1.8C9.2 6.5 3.6 10.3 3.6 14.6c0 2.7 2 4.5 4.4 4.5 1.5 0 2.7-.8 3.3-1.8-.1 1.8-.7 3.3-2.2 4.5h5.8c-1.5-1.2-2.1-2.7-2.2-4.5.6 1 1.8 1.8 3.3 1.8 2.4 0 4.4-1.8 4.4-4.5 0-4.3-5.6-8.1-8.4-12.8z',
+    H: 'M12 21.6C11.4 21.1 3 15 3 8.6 3 5.2 5.6 2.7 8.6 2.7c1.7 0 2.9.9 3.4 2.2.5-1.3 1.7-2.2 3.4-2.2 3 0 5.6 2.5 5.6 5.9 0 6.4-8.4 12.5-9 13z',
+    D: 'M12 1.6L21 12 12 22.4 3 12 12 1.6z',
+    C: 'M12 2.4a3.9 3.9 0 0 0-3.3 5.9 4 4 0 1 0-1.2 7.8c1.6 0 2.9-.8 3.7-2.1-.1 2.1-.8 4-2.4 5.4h6.4c-1.6-1.4-2.3-3.3-2.4-5.4.8 1.3 2.1 2.1 3.7 2.1a4 4 0 1 0-1.2-7.8 3.9 3.9 0 0 0-3.3-5.9z',
   };
-  return `<svg class="${className}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${paths[suit] || paths.S}</svg>`;
+  const d = paths[suit] || paths.S;
+  if (!glossy) {
+    return `<svg class="${className}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`;
+  }
+  const gid = `mp-sg-${++svgUid}`;
+  const isRed = suit === 'H' || suit === 'D';
+  const c1 = isRed ? '#f42c44' : '#2c3344';
+  const c2 = isRed ? '#b31227' : '#090b10';
+  return `<svg class="${className}" viewBox="0 0 24 24" aria-hidden="true">
+    <defs>
+      <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${c1}"/>
+        <stop offset="100%" stop-color="${c2}"/>
+      </linearGradient>
+    </defs>
+    <path d="${d}" fill="url(#${gid})"/>
+  </svg>`;
 }
 
-const CROWN_SVG =
-  '<svg class="mp-court-crown" viewBox="0 0 24 16" fill="currentColor" aria-hidden="true"><path d="M2 13L4 4l5 4 3-6 3 6 5-4 2 9H2zm1 2h18v1H3v-1z"/></svg>';
+const ROYAL_WATERMARK_SVG = `
+  <svg class="mp-royal-watermark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <path d="M32 4L58 32L32 60L6 32Z" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M32 12L50 32L32 52L14 32Z" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M22 25L26 17L32 22L38 17L42 25H22Z" fill="currentColor"/>
+  </svg>
+`;
+
+const CARD_BACK_FILIGREE_SVG = `
+  <svg class="mp-back-svg" viewBox="0 0 120 144" preserveAspectRatio="none" fill="none" aria-hidden="true">
+    <rect x="6" y="6" width="108" height="132" rx="8" stroke="rgba(212,175,106,0.45)" stroke-width="1.2"/>
+    <rect x="11" y="11" width="98" height="122" rx="5" stroke="rgba(212,175,106,0.22)" stroke-width="0.9"/>
+    <path d="M60 16L104 72L60 128L16 72Z" stroke="rgba(212,175,106,0.28)" stroke-width="1.1"/>
+    <path d="M60 28L93 72L60 116L27 72Z" stroke="rgba(212,175,106,0.18)" stroke-width="0.9"/>
+    <path d="M16 24L32 16M104 24L88 16M16 120L32 128M104 120L88 128" stroke="rgba(242,213,145,0.45)" stroke-width="1.2"/>
+    <circle cx="18" cy="18" r="2" fill="rgba(242,213,145,0.55)"/>
+    <circle cx="102" cy="18" r="2" fill="rgba(242,213,145,0.55)"/>
+    <circle cx="18" cy="126" r="2" fill="rgba(242,213,145,0.55)"/>
+    <circle cx="102" cy="126" r="2" fill="rgba(242,213,145,0.55)"/>
+  </svg>
+`;
 
 function cardText(card) {
   if (!card) return '?';
@@ -36,44 +73,28 @@ function renderCardFrontHtml(card, coordLabel, isCommunity = false) {
   const meta = SUIT_META[card.suit] || SUIT_META.S;
   const suitCls = meta.color === 'red' ? 'is-suit-red' : 'is-suit-black';
   const rLabel = RANK_LABELS[card.rank] || String(card.rank);
-
-  let centerHtml = '';
-  if (card.rank === 14) {
-    centerHtml = `
-      <div class="mp-center-art">
-        <div class="mp-ace-halo">${suitSvg(card.suit, 'mp-center-pip')}</div>
-      </div>
-    `;
-  } else if (card.rank >= 11) {
-    centerHtml = `
-      <div class="mp-center-art">
-        <div class="mp-court-frame">
-          ${CROWN_SVG}
-          <span class="mp-court-letter">${rLabel}</span>
-          ${suitSvg(card.suit, 'mp-court-suit')}
-        </div>
-      </div>
-    `;
-  } else {
-    centerHtml = `
-      <div class="mp-center-art">
-        ${suitSvg(card.suit, 'mp-center-pip')}
-      </div>
-    `;
-  }
+  const isRoyalOrAce = card.rank >= 11;
 
   return `
     <div class="mp-card-face mp-card-front ${suitCls} ${isCommunity ? 'is-community-face' : ''}">
-      <span class="mp-corner mp-corner-tl">
-        <span class="mp-corner-rank">${rLabel}</span>
-        ${suitSvg(card.suit, 'mp-corner-pip')}
-      </span>
-      ${coordLabel ? `<span class="mp-card-coord">${coordLabel}</span>` : ''}
-      ${centerHtml}
-      <span class="mp-corner mp-corner-br">
-        <span class="mp-corner-rank">${rLabel}</span>
-        ${suitSvg(card.suit, 'mp-corner-pip')}
-      </span>
+      <div class="mp-jumbo-index">
+        <span class="mp-jumbo-rank">${rLabel}</span>
+        ${suitSvg(card.suit, 'mp-jumbo-pip', false)}
+      </div>
+      ${isRoyalOrAce ? ROYAL_WATERMARK_SVG : ''}
+      <div class="mp-hero-suit-wrap">
+        ${suitSvg(card.suit, 'mp-hero-suit', true)}
+      </div>
+      ${coordLabel && !isCommunity ? `<span class="mp-card-coord">${coordLabel}</span>` : ''}
+    </div>
+  `;
+}
+
+function renderCardBackHtml(label) {
+  return `
+    <div class="mp-card-face mp-card-back">
+      ${CARD_BACK_FILIGREE_SVG}
+      <span class="mp-back-crest">${label}</span>
     </div>
   `;
 }
@@ -85,7 +106,7 @@ function renderMiniCardHtml(card, isPicked = false) {
   return `
     <span class="mp-mini-card ${suitCls} ${isPicked ? 'is-picked' : ''}" title="${cardText(card)}">
       <span>${rLabel}</span>
-      ${suitSvg(card.suit, 'mp-mini-suit')}
+      ${suitSvg(card.suit, 'mp-mini-suit', false)}
     </span>
   `;
 }
@@ -132,21 +153,21 @@ mountGame({
     rulesSummary: {
       zh: `### 游戏流程
 1. **标准 52 张传统红黑扑克（♠ ♥ ♣ ♦）**：每局从完整 52 张牌库中不重复发出 **16 张网格牌（4×4）+ 3 张公共牌**。
-2. **20 秒极限记忆**：牌桌中央 16 张传统红黑扑克牌正面展示 **20 秒**，牢记每个坐标的点数与花色。
+2. **20 秒极限记忆**：牌桌中央 16 张大字号红黑扑克牌正面展示 **20 秒**，牢记每个坐标的点数与花色。
 3. **翻面与公共牌揭晓**：倒计时结束，16 张牌齐齐翻面扣下，桌面正上方亮出 **3 张公共牌**。
 4. **盲选 2 张**：每位选手凭记忆秘密选定 2 个不同位置（不同玩家可重复选同一张牌），与 3 张公共牌组成 5 张扑克牌型。
 5. **牌型大小**：
    - **默认 S3 剧集 7 级规则**（花色用于唯一辨识 52 张牌，计分不含同花）：**四条 > 葫芦 > 顺子 > 三条 > 两对 > 一对 > 高牌**。
-   - 亦可在房间选项中开启 **「启用同花 / 同花顺」** 升级为完整 9 级德州扑克（皇家同花顺 / 同花顺 > 四条 > 葫芦 > 同花 > 顺子 > 三条 > 两对 > 一对 > 高牌）。
+   - 亦可在房间选项中开启 **「启用同花 / 同花顺」** 升级为完整 9 级德州扑克。
    - 按每局排名发放胜点（前 25% +5 分、前 50% +3 分、其余 +1 分）。`,
       en: `### Round Flow
 1. **Standard 52-Card Red/Black Deck (♠ ♥ ♣ ♦)**: Every round deals **16 unique grid cards (4×4) + 3 unique Community Cards** with zero duplicates.
-2. **20-Second Memory Flash**: All 16 traditional red/black playing cards face up for **20 seconds**. Memorize every slot!
+2. **20-Second Memory Flash**: All 16 jumbo-index red/black playing cards face up for **20 seconds**. Memorize every slot!
 3. **Flip & Community Reveal**: All 16 cards flip face-down in unison while **3 spotlighted Community Cards** reveal overhead.
 4. **Blind 2-Card Selection**: Secretly pick **2 distinct slots** (players may pick overlapping slots) to combine with the 3 community cards.
 5. **Hand Rankings**:
    - **Show Default (7-Tier S3 Rules)**: Traditional suits identify every card in the 52-card deck while S3 scoring ignores flushes (**Four of a Kind > Full House > Straight > Three of a Kind > Two Pair > One Pair > High Card**).
-   - Toggle **Enable Flush & Straight Flush** in lobby options for full **9-Tier Texas Hold'em** (adds Royal/Straight Flush & Flush).
+   - Toggle **Enable Flush & Straight Flush** in lobby options for full **9-Tier Texas Hold'em**.
    - Scored each round: Top 25% **+5 pts**, Top 50% **+3 pts**, others **+1 pt**.`,
     },
   },
@@ -180,9 +201,9 @@ mountGame({
 
     const pickedCount = state.seats.filter((s) => Boolean(state.picks[s.seatId])).length;
     const phaseTitle = isMemorize
-      ? (lang === 'zh' ? '记忆阶段 · 死记 16 张扑克！' : 'MEMORIZE · STUDY ALL 16 CARDS!')
+      ? (lang === 'zh' ? '记忆阶段 · 死记 16 张扑克' : 'MEMORIZE · STUDY ALL 16 CARDS')
       : isSelect
-      ? (lang === 'zh' ? '盲选阶段 · 结合 3 张公共牌盲选 2 张！' : 'BLIND PICK · SELECT 2 HIDDEN SLOTS')
+      ? (lang === 'zh' ? '盲选阶段 · 选 2 张配公共牌' : 'BLIND PICK · SELECT 2 SLOTS')
       : (lang === 'zh' ? '亮牌决胜 · SHOWDOWN' : 'SHOWDOWN REVEAL');
 
     const optPair = isShowdown && state.optimal ? state.optimal.pair : [];
@@ -217,20 +238,21 @@ mountGame({
           }
 
           <div class="mp-community-zone">
-            <div class="mp-community-label">
-              ${lang === 'zh' ? '✦ 公共牌 · COMMUNITY CARDS (3) ✦' : '✦ COMMUNITY CARDS (3) ✦'}
+            <div class="mp-community-meta">
+              <span class="mp-community-label">✦ ${lang === 'zh' ? '公共牌 (3)' : 'COMMUNITY (3)'}</span>
+              <span class="mp-community-sub">
+                ${isMemorize ? (lang === 'zh' ? '翻面后揭晓' : 'Reveals after flip') : (lang === 'zh' ? '与盲选 2 张凑 5 张' : 'Combine + 2 picks')}
+              </span>
             </div>
             <div class="mp-community-row">
               ${state.community
-                .map((card, i) => {
+                .map((card) => {
                   const facedown = card == null;
                   return `
                     <div class="mp-card-slot is-community">
                       <div class="mp-card ${facedown ? 'is-facedown' : ''}">
-                        ${renderCardFrontHtml(card, `C${i + 1}`, true)}
-                        <div class="mp-card-face mp-card-back">
-                          <span class="mp-back-num">?</span>
-                        </div>
+                        ${renderCardFrontHtml(card, '', true)}
+                        ${renderCardBackHtml('?')}
                       </div>
                     </div>
                   `;
@@ -250,10 +272,7 @@ mountGame({
                   <div class="mp-card-slot ${isSel ? 'is-selected' : ''} ${isOpt ? 'is-optimal' : ''}">
                     <div class="mp-card ${facedown ? 'is-facedown' : ''} ${canClick ? 'is-clickable' : ''}" data-slot="${idx}">
                       ${renderCardFrontHtml(card, state.coords[idx], false)}
-                      <div class="mp-card-face mp-card-back">
-                        <span class="mp-card-coord">${state.coords[idx]}</span>
-                        <span class="mp-back-num">#${idx + 1}</span>
-                      </div>
+                      ${renderCardBackHtml(state.coords[idx])}
                     </div>
                     ${isSel ? `<span class="mp-pick-tag">${lang === 'zh' ? '已选' : 'PICK'}</span>` : ''}
                     ${isOpt && !isSel ? `<span class="mp-pick-tag" style="background:#38bdf8;">MAX</span>` : ''}
@@ -266,19 +285,19 @@ mountGame({
           ${
             isSelect && mySeatId && !myLockedPick
               ? `
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:6px;border-top:1px solid var(--dp-border-subtle);">
+                <div class="mp-action-bar">
                   <span style="font-size:13px;color:var(--dp-ink-muted);">
                     ${lang === 'zh'
                       ? `已选位置 (${ui.selected.length}/2)：<strong id="mp-sel-readout" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || '请点击 2 张暗牌'}</strong>`
                       : `Selected (${ui.selected.length}/2): <strong id="mp-sel-readout" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || 'Click 2 hidden cards'}</strong>`}
                   </span>
-                  <button type="button" class="dp-btn dp-btn-primary" id="mp-confirm-pick" ${ui.selected.length !== 2 ? 'disabled' : ''}>
+                  <button type="button" class="dp-btn dp-btn-sm dp-btn-primary" id="mp-confirm-pick" ${ui.selected.length !== 2 ? 'disabled' : ''}>
                     ${lang === 'zh' ? '锁定 2 张暗牌 →' : 'Lock 2 Cards →'}
                   </button>
                 </div>
               `
               : isSelect && myLockedPick
-              ? `<div style="text-align:center;font-size:13px;color:#86efac;padding:6px;">
+              ? `<div style="text-align:center;font-size:12.5px;color:#86efac;padding:4px;">
                   ✓ ${lang === 'zh'
                     ? `已锁定位置 ${myLockedPick.map((i) => state.coords[i]).join(' & ')}，等待其他选手提交...`
                     : `Locked ${myLockedPick.map((i) => state.coords[i]).join(' & ')} — waiting for other players...`}
@@ -300,8 +319,8 @@ mountGame({
                 ? `
                   ${
                     state.optimal
-                      ? `<div style="margin-top:10px;padding:9px 11px;border-radius:10px;border:1px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.09);font-size:12px;">
-                          <strong style="color:#7dd3fc;">✦ ${lang === 'zh' ? '牌桌理论最强解' : 'THEORETICAL BEST HAND'}:</strong>
+                      ? `<div style="margin-top:9px;padding:8px 10px;border-radius:10px;border:1px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.09);font-size:12px;">
+                          <strong style="color:#7dd3fc;">✦ ${lang === 'zh' ? '牌桌理论最强解' : 'THEORETICAL BEST'}:</strong>
                           ${UI.escapeHtml(state.optimal.eval.name[lang] || state.optimal.eval.name.en)}
                           (${state.optimal.pair.map((i) => `${state.coords[i]}[${cardText(state.grid[i])}]`).join(' + ')})
                          </div>`
@@ -338,7 +357,7 @@ mountGame({
                   </div>
                   ${
                     state.phase === 'showdown'
-                      ? `<button type="button" class="dp-btn dp-btn-primary" id="mp-next-round" style="width:100%;margin-top:14px;min-height:46px;">
+                      ? `<button type="button" class="dp-btn dp-btn-primary" id="mp-next-round" style="width:100%;margin-top:12px;min-height:44px;">
                           ${state.round >= state.totalRounds
                             ? (lang === 'zh' ? '查看最终排名 →' : 'Final Verdict →')
                             : (lang === 'zh' ? `进入第 ${state.round + 1} 局 →` : `Next Round (${state.round + 1}/${state.totalRounds}) →`)}
@@ -347,13 +366,13 @@ mountGame({
                   }
                 `
                 : `
-                  <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px;">
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px;">
                     ${[...state.seats]
                       .sort((a, b) => (state.scores[b.seatId] || 0) - (state.scores[a.seatId] || 0))
                       .map((s) => {
                         const locked = Boolean(state.picks[s.seatId]);
                         return `
-                          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:9px;border:1px solid ${s.seatId === mySeatId ? 'var(--dp-border-strong)' : 'var(--dp-border-subtle)'};background:rgba(255,255,255,0.025);font-size:13px;">
+                          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:9px;border:1px solid ${s.seatId === mySeatId ? 'var(--dp-border-strong)' : 'var(--dp-border-subtle)'};background:rgba(255,255,255,0.025);font-size:12.5px;">
                             <span><strong style="color:var(--dp-brass);margin-right:5px;">${UI.escapeHtml(s.avatar || '◆')}</strong>${UI.escapeHtml(s.name)}</span>
                             <span style="display:flex;align-items:center;gap:8px;">
                               ${isSelect ? `<span style="font-size:11px;color:${locked ? '#86efac' : 'var(--dp-ink-faint)'};">${locked ? '✓' : '...'}</span>` : ''}
@@ -369,12 +388,10 @@ mountGame({
           </div>
 
           <div class="mp-panel">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-              <span style="font-size:11px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
-                ${includeFlushes
-                  ? (lang === 'zh' ? '9 级完整扑克牌型 (含同花)' : '9-TIER POKER RANKING (FLUSHES ON)')
-                  : (lang === 'zh' ? 'S3 剧集 7 级牌型 (不含同花)' : 'S3 7-TIER RANKING (NO FLUSH)')}
-              </span>
+            <div style="font-size:11px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
+              ${includeFlushes
+                ? (lang === 'zh' ? '9 级完整扑克牌型 (含同花)' : '9-TIER POKER RANKING (FLUSHES ON)')
+                : (lang === 'zh' ? 'S3 剧集 7 级牌型 (不含同花)' : 'S3 7-TIER RANKING (NO FLUSH)')}
             </div>
             <div class="mp-hand-ladder">
               ${

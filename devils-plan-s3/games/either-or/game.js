@@ -10,29 +10,58 @@ import {
   canPlaceGrass,
 } from './rules.js';
 
-function eoSuitSvg(suit, cls = '') {
+const EO_POKER_COORDS = [
+  'A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4',
+  'C1', 'C2', 'C3', 'C4', 'D1', 'D2', 'D3', 'D4',
+];
+
+const EO_BACK_SVG = `
+  <svg class="eo-pc-back-svg" viewBox="0 0 120 144" preserveAspectRatio="none" fill="none" aria-hidden="true">
+    <rect x="6" y="6" width="108" height="132" rx="8" stroke="rgba(212,175,106,0.45)" stroke-width="1.2"/>
+    <path d="M60 16L104 72L60 128L16 72Z" stroke="rgba(212,175,106,0.28)" stroke-width="1.1"/>
+    <path d="M60 30L92 72L60 114L28 72Z" stroke="rgba(212,175,106,0.18)" stroke-width="0.9"/>
+    <circle cx="18" cy="18" r="2" fill="rgba(242,213,145,0.55)"/>
+    <circle cx="102" cy="18" r="2" fill="rgba(242,213,145,0.55)"/>
+    <circle cx="18" cy="126" r="2" fill="rgba(242,213,145,0.55)"/>
+    <circle cx="102" cy="126" r="2" fill="rgba(242,213,145,0.55)"/>
+  </svg>
+`;
+
+let eoSvgUid = 0;
+
+function eoSuitSvg(suit, cls = '', glossy = false) {
   const paths = {
-    S: '<path d="M12 2C9.5 6.4 4 10.1 4 14.3c0 2.5 1.9 4.2 4.1 4.2 1.4 0 2.6-.7 3.2-1.7-.1 1.7-.7 3.1-2.1 4.2h5.6c-1.4-1.1-2-2.5-2.1-4.2.6 1 1.8 1.7 3.2 1.7 2.2 0 4.1-1.7 4.1-4.2C20 10.1 14.5 6.4 12 2z"/>',
-    H: '<path d="M12 21.2C11.5 20.8 3.5 14.9 3.5 8.8 3.5 5.6 5.9 3.2 8.7 3.2c1.6 0 2.8.8 3.3 2 .5-1.2 1.7-2 3.3-2 2.8 0 5.2 2.4 5.2 5.6 0 6.1-8 12-8.5 12.4z"/>',
-    D: '<path d="M12 2L20.5 12 12 22 3.5 12 12 2z"/>',
-    C: '<path d="M12 3a3.7 3.7 0 0 0-3.2 5.5 3.8 3.8 0 1 0-1.1 7.4c1.5 0 2.8-.8 3.5-2-.1 2-.7 3.8-2.2 5.1h6c-1.5-1.3-2.1-3.1-2.2-5.1.7 1.2 2 2 3.5 2a3.8 3.8 0 1 0-1.1-7.4A3.7 3.7 0 0 0 12 3z"/>',
+    S: 'M12 1.8C9.2 6.5 3.6 10.3 3.6 14.6c0 2.7 2 4.5 4.4 4.5 1.5 0 2.7-.8 3.3-1.8-.1 1.8-.7 3.3-2.2 4.5h5.8c-1.5-1.2-2.1-2.7-2.2-4.5.6 1 1.8 1.8 3.3 1.8 2.4 0 4.4-1.8 4.4-4.5 0-4.3-5.6-8.1-8.4-12.8z',
+    H: 'M12 21.6C11.4 21.1 3 15 3 8.6 3 5.2 5.6 2.7 8.6 2.7c1.7 0 2.9.9 3.4 2.2.5-1.3 1.7-2.2 3.4-2.2 3 0 5.6 2.5 5.6 5.9 0 6.4-8.4 12.5-9 13z',
+    D: 'M12 1.6L21 12 12 22.4 3 12 12 1.6z',
+    C: 'M12 2.4a3.9 3.9 0 0 0-3.3 5.9 4 4 0 1 0-1.2 7.8c1.6 0 2.9-.8 3.7-2.1-.1 2.1-.8 4-2.4 5.4h6.4c-1.6-1.4-2.3-3.3-2.4-5.4.8 1.3 2.1 2.1 3.7 2.1a4 4 0 1 0-1.2-7.8 3.9 3.9 0 0 0-3.3-5.9z',
   };
-  return `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${paths[suit] || paths.S}</svg>`;
+  const d = paths[suit] || paths.S;
+  if (!glossy) {
+    return `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`;
+  }
+  const gid = `eo-sg-${++eoSvgUid}`;
+  const isRed = suit === 'H' || suit === 'D';
+  return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+    <defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${isRed ? '#f42c44' : '#2c3344'}"/><stop offset="100%" stop-color="${isRed ? '#b31227' : '#090b10'}"/></linearGradient></defs>
+    <path d="${d}" fill="url(#${gid})"/>
+  </svg>`;
 }
 
-function renderEoPlayingCardInner(card) {
+function renderEoPlayingCardInner(card, coordLabel = '') {
   const r = RANK_LABELS[card.rank] || String(card.rank);
   return `
-    <span class="eo-pc-corner eo-pc-tl">
+    <span class="eo-pc-jumbo">
       <span class="eo-pc-rank">${r}</span>
-      ${eoSuitSvg(card.suit, 'eo-pc-pip')}
+      ${eoSuitSvg(card.suit, 'eo-pc-pip', false)}
     </span>
-    ${eoSuitSvg(card.suit, 'eo-pc-center')}
-    <span class="eo-pc-corner eo-pc-br">
-      <span class="eo-pc-rank">${r}</span>
-      ${eoSuitSvg(card.suit, 'eo-pc-pip')}
-    </span>
+    ${eoSuitSvg(card.suit, 'eo-pc-center', true)}
+    ${coordLabel ? `<span class="eo-pc-coord">${coordLabel}</span>` : ''}
   `;
+}
+
+function renderEoCardBackInner(label) {
+  return `${EO_BACK_SVG}<span class="eo-pc-back-crest">${label}</span>`;
 }
 
 function renderEoCardChip(card, picked = false) {
@@ -408,9 +437,9 @@ mountGame({
               <span style="font-size:11px;color:var(--dp-brass);letter-spacing:0.1em;font-weight:700;">COMMUNITY:</span>
               ${m.community
                 .map((card) => {
-                  if (!card) return `<span class="eo-mini-comm-card is-hidden">?</span>`;
+                  if (!card) return `<span class="eo-mini-comm-card is-hidden">${renderEoCardBackInner('?')}</span>`;
                   const suitCls = (SUIT_META[card.suit]?.color === 'red') ? 'is-suit-red' : 'is-suit-black';
-                  return `<span class="eo-mini-comm-card ${suitCls}">${renderEoPlayingCardInner(card)}</span>`;
+                  return `<span class="eo-mini-comm-card ${suitCls}">${renderEoPlayingCardInner(card, '')}</span>`;
                 })
                 .join('')}
             </div>
@@ -420,8 +449,9 @@ mountGame({
                 .map((card, idx) => {
                   const sel = activePick.includes(idx);
                   const suitCls = card && !isSel ? (SUIT_META[card.suit]?.color === 'red' ? 'is-suit-red' : 'is-suit-black') : '';
+                  const coord = EO_POKER_COORDS[idx] || `#${idx + 1}`;
                   return `<button type="button" class="eo-mini-pcard ${isSel ? 'is-hidden' : suitCls} ${sel ? 'is-sel' : ''}" data-pcard="${idx}" ${isSel && mySeatId && !myPick ? '' : 'disabled'}>
-                    ${isSel || !card ? `#${idx + 1}` : renderEoPlayingCardInner(card)}
+                    ${isSel || !card ? renderEoCardBackInner(coord) : renderEoPlayingCardInner(card, coord)}
                   </button>`;
                 })
                 .join('')}

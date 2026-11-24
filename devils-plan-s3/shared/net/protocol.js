@@ -28,6 +28,15 @@ export function normalizeRoomCode(raw) {
     .slice(0, 6);
 }
 
+export function sanitizePlayerName(raw, fallback = '') {
+  const cleaned = String(raw ?? '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .slice(0, 20);
+  return cleaned || fallback;
+}
+
 /**
  * Per-tab persistent client ID (sessionStorage so 2 tabs on 1 device are 2 distinct players,
  * while refreshing a tab preserves identity for reconnection).
@@ -223,6 +232,7 @@ export class ClockSync {
 export const MSG = {
   JOIN: 'JOIN',
   READY: 'READY',
+  RENAME: 'RENAME',
   ACTION: 'ACTION',
   CHAT: 'CHAT',
   PING: 'PING',

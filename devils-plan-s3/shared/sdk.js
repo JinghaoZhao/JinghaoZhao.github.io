@@ -14,5 +14,6 @@ export {
   createSeededRng,
   generateRoomCode,
   normalizeRoomCode,
+  sanitizePlayerName,
   getClientId,
 } from './net/protocol.js';

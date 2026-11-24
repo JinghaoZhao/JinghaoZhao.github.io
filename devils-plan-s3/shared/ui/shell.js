@@ -9,14 +9,14 @@
 import { I18n } from '../i18n.js';
 import { SFX } from '../audio/sound-engine.js';
 import { GameEngine } from '../net/game-engine.js';
-import { normalizeRoomCode } from '../net/protocol.js';
+import { normalizeRoomCode, sanitizePlayerName } from '../net/protocol.js';
 import { showPrivacyCurtain, removePrivacyCurtain } from './privacy-curtain.js';
 
 const NAME_STORAGE_KEY = 'dp3_player_name';
 
 function getSavedName() {
   try {
-    return localStorage.getItem(NAME_STORAGE_KEY) || '';
+    return sanitizePlayerName(localStorage.getItem(NAME_STORAGE_KEY) || '', '');
   } catch (_) {
     return '';
   }
@@ -24,7 +24,8 @@ function getSavedName() {
 
 function savePlayerName(name) {
   try {
-    if (name && name.trim()) localStorage.setItem(NAME_STORAGE_KEY, name.trim().slice(0, 20));
+    const clean = sanitizePlayerName(name, '');
+    if (clean) localStorage.setItem(NAME_STORAGE_KEY, clean);
   } catch (_) {}
 }
 
@@ -233,6 +234,11 @@ export function mountGame({ config, rules, root, render }) {
           </span>
         </div>
         <div class="dp-hud-right">
+          <button type="button" class="dp-profile-pill" id="dp-btn-profile" title="Edit Player Name">
+            <span style="color:var(--dp-brass);" aria-hidden="true">◆</span>
+            <span class="dp-profile-pill-name" id="dp-profile-name"></span>
+            <span class="dp-profile-pill-edit" aria-hidden="true">✎</span>
+          </button>
           <button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" id="dp-btn-lobby"></button>
           <button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" id="dp-btn-rules">?</button>
           <button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" id="dp-btn-lang">中/EN</button>
@@ -371,6 +377,110 @@ export function mountGame({ config, rules, root, render }) {
 
   const btnMute = container.querySelector('#dp-btn-mute');
   const btnAmb = container.querySelector('#dp-btn-ambience');
+  const btnProfile = container.querySelector('#dp-btn-profile');
+  const profileNameEl = container.querySelector('#dp-profile-name');
+
+  function getCurrentDisplayName() {
+    const lang = I18n.getLang();
+    if (latestSnap) {
+      const seatId = latestSnap.activeSeatId || latestSnap.mySeatId;
+      const seat = latestSnap.lobby?.seats?.find((s) => s.seatId === seatId);
+      if (seat?.name) return seat.name;
+      const spec = latestSnap.lobby?.spectators?.find((sp) => sp.clientId === engine.clientId);
+      if (spec?.name) return spec.name;
+    }
+    return playerNameInput.trim() || (lang === 'zh' ? '参赛者' : 'Player');
+  }
+
+  function openRenameModal() {
+    document.getElementById('dp-rename-modal')?.remove();
+    const lang = I18n.getLang();
+    const current = getCurrentDisplayName();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'dp-modal-backdrop';
+    backdrop.id = 'dp-rename-modal';
+    backdrop.style.zIndex = '105';
+    backdrop.innerHTML = `
+      <div class="dp-modal" style="width:min(420px,100%);" role="dialog" aria-modal="true">
+        <div class="dp-modal-header" style="margin-bottom:12px;">
+          <div>
+            <span class="dp-badge">${lang === 'zh' ? '参赛身份' : 'PLAYER IDENTITY'}</span>
+            <h3 class="dp-modal-title" style="font-size:19px;">${lang === 'zh' ? '修改参赛代号' : 'Edit Player Name'}</h3>
+          </div>
+          <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="dp-rename-close" aria-label="Close">✕</button>
+        </div>
+        <form id="dp-rename-form">
+          <input class="dp-input" id="dp-rename-input" type="text" maxlength="20" value="${UI.escapeHtml(current)}" placeholder="${lang === 'zh' ? '输入你的代号（最多 20 字）' : 'Enter your name (max 20 chars)'}" autocomplete="nickname" />
+          <p style="font-size:12px;color:var(--dp-ink-muted);margin:8px 0 16px;">
+            ${
+              latestSnap && engine.mode === 'online'
+                ? lang === 'zh'
+                  ? '修改后将立即实时同步给房间内所有玩家。'
+                  : 'Syncs instantaneously to everyone in the room.'
+                : lang === 'zh'
+                ? '将自动记住并在所有第三季游戏中生效。'
+                : 'Saved automatically across all Season 3 games.'
+            }
+          </p>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button type="button" class="dp-btn dp-btn-ghost" id="dp-rename-cancel">${lang === 'zh' ? '取消' : 'Cancel'}</button>
+            <button type="submit" class="dp-btn dp-btn-primary">${lang === 'zh' ? '保存代号' : 'Save Name'}</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    const input = backdrop.querySelector('#dp-rename-input');
+    const close = () => {
+      backdrop.remove();
+      document.removeEventListener('keydown', onKey);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', onKey);
+    backdrop.querySelector('#dp-rename-close')?.addEventListener('click', close);
+    backdrop.querySelector('#dp-rename-cancel')?.addEventListener('click', close);
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) close();
+    });
+
+    backdrop.querySelector('#dp-rename-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const next = sanitizePlayerName(input.value, '');
+      if (!next) {
+        SFX.play('error');
+        UI.toast(lang === 'zh' ? '代号不能为空' : 'Name cannot be empty', 'error');
+        input.focus();
+        return;
+      }
+      SFX.play('click');
+      if (engine.mode !== 'hotseat' || !latestSnap) {
+        playerNameInput = next;
+        savePlayerName(next);
+        if (hotseatNames.length > 0) hotseatNames[0] = next;
+      }
+      if (latestSnap) {
+        engine.renameSelf(next);
+      } else {
+        renderAll();
+      }
+      close();
+      UI.toast(
+        lang === 'zh' ? `代号已更新为：${next}` : `Name updated to: ${next}`,
+        'success'
+      );
+    });
+
+    input?.focus();
+    input?.select();
+  }
+
+  btnProfile?.addEventListener('click', () => {
+    SFX.play('click');
+    openRenameModal();
+  });
 
   function syncAudioButtons() {
     btnMute.textContent = SFX.isMuted() ? '🔇' : '🔊';
@@ -479,6 +589,8 @@ export function mountGame({ config, rules, root, render }) {
   function renderHudAndSidebar() {
     const lang = I18n.getLang();
     hudTitleEl.textContent = I18n.t(config.title);
+    if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
+    if (btnProfile) btnProfile.title = lang === 'zh' ? '修改参赛代号' : 'Edit Player Name';
     container.querySelector('[data-i18n-hub]').textContent = lang === 'zh' ? '大厅' : 'Hub';
     container.querySelector('#dp-btn-lobby').textContent = lang === 'zh' ? '房间' : 'Room';
     container.querySelector('#dp-roster-heading').textContent = lang === 'zh' ? '参赛席位' : 'PLAYERS';
@@ -529,12 +641,16 @@ export function mountGame({ config, rules, root, render }) {
     rosterCountEl.textContent = specs.length ? `${seats.length} (+${specs.length})` : String(seats.length);
     rosterListEl.innerHTML = seats
       .map((s) => {
-        const isMe = s.seatId === latestSnap?.mySeatId;
+        const isMe = s.seatId === (latestSnap?.activeSeatId || latestSnap?.mySeatId);
         const statusTag = s.isBot
           ? `<span style="color:var(--dp-cyan);font-size:11px;">BOT</span>`
           : !s.connected
           ? `<span style="color:var(--dp-amber);font-size:11px;">${lang === 'zh' ? '掉线' : 'OFF'}</span>`
           : `<span style="color:var(--dp-emerald);font-size:11px;">●</span>`;
+        const renameBtn =
+          isMe && !s.isBot
+            ? `<button type="button" class="dp-inline-edit-btn" data-rename-me title="${lang === 'zh' ? '修改代号' : 'Rename'}" aria-label="${lang === 'zh' ? '修改代号' : 'Rename'}">✎</button>`
+            : '';
         const takeoverBtn =
           engine.isHost && !s.isBot && !s.connected && latestSnap?.lobby?.phase === 'playing'
             ? `<button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" data-takeover="${UI.escapeHtml(s.seatId)}" style="padding:2px 6px;min-height:22px;font-size:10px;">AI</button>`
@@ -545,11 +661,18 @@ export function mountGame({ config, rules, root, render }) {
               <span style="color:var(--dp-brass);margin-right:5px;">${UI.escapeHtml(s.avatar || '◆')}</span>
               ${UI.escapeHtml(s.name)}${isMe ? (lang === 'zh' ? ' (你)' : ' (You)') : ''}
             </span>
-            <span style="display:flex;align-items:center;gap:6px;">${takeoverBtn}${statusTag}</span>
+            <span style="display:flex;align-items:center;gap:6px;">${renameBtn}${takeoverBtn}${statusTag}</span>
           </div>
         `;
       })
       .join('');
+
+    rosterListEl.querySelectorAll('[data-rename-me]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        SFX.play('click');
+        openRenameModal();
+      });
+    });
 
     rosterListEl.querySelectorAll('[data-takeover]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -686,7 +809,9 @@ export function mountGame({ config, rules, root, render }) {
             <div class="dp-seat-grid">
               ${lobby.seats
                 .map(
-                  (s, idx) => `
+                  (s, idx) => {
+                    const isMine = s.seatId === latestSnap.mySeatId && !s.isBot;
+                    return `
                   <div class="dp-seat-card ${s.ready ? 'is-ready' : ''} ${s.isBot ? 'is-bot' : ''}">
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                       <strong style="color:var(--dp-brass);margin-right:4px;">${UI.escapeHtml(s.avatar || '◆')}</strong>
@@ -694,6 +819,11 @@ export function mountGame({ config, rules, root, render }) {
                       ${idx === 0 ? `<small style="color:var(--dp-brass);"> ★</small>` : ''}
                     </span>
                     <span style="display:flex;align-items:center;gap:6px;">
+                      ${
+                        isMine
+                          ? `<button type="button" class="dp-inline-edit-btn" id="dp-lobby-rename-me" title="${lang === 'zh' ? '修改代号' : 'Rename'}">✎</button>`
+                          : ''
+                      }
                       <span style="font-size:11px;color:${s.ready ? 'var(--dp-emerald)' : 'var(--dp-ink-faint)'};">
                         ${s.isBot ? 'AI' : s.ready ? (lang === 'zh' ? '就绪' : 'READY') : (lang === 'zh' ? '等待' : 'WAIT')}
                       </span>
@@ -704,7 +834,8 @@ export function mountGame({ config, rules, root, render }) {
                       }
                     </span>
                   </div>
-                `
+                `;
+                  }
                 )
                 .join('')}
             </div>
@@ -764,6 +895,10 @@ export function mountGame({ config, rules, root, render }) {
 
       overlayRoot.querySelector('#dp-lobby-copy-link')?.addEventListener('click', () => copyInviteUrl(engine.roomCode));
       overlayRoot.querySelector('#dp-lobby-share-btn')?.addEventListener('click', () => copyInviteUrl(engine.roomCode));
+      overlayRoot.querySelector('#dp-lobby-rename-me')?.addEventListener('click', () => {
+        SFX.play('click');
+        openRenameModal();
+      });
       overlayRoot.querySelector('#dp-lobby-add-bot')?.addEventListener('click', () => {
         SFX.play('click');
         engine.addBot(lang);
@@ -937,6 +1072,11 @@ export function mountGame({ config, rules, root, render }) {
     const nameEl = overlayRoot.querySelector('#dp-name-input');
     nameEl?.addEventListener('input', () => {
       playerNameInput = nameEl.value;
+      savePlayerName(playerNameInput);
+      if (hotseatNames.length > 0 && playerNameInput.trim()) {
+        hotseatNames[0] = playerNameInput.trim().slice(0, 20);
+      }
+      if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
     });
 
     bindOptionsFields(overlayRoot, localOptions, null);
@@ -1012,7 +1152,13 @@ export function mountGame({ config, rules, root, render }) {
     // Hotseat handlers
     overlayRoot.querySelectorAll('[data-hs-idx]').forEach((inp) => {
       inp.addEventListener('input', () => {
-        hotseatNames[Number(inp.dataset.hsIdx)] = inp.value;
+        const idx = Number(inp.dataset.hsIdx);
+        hotseatNames[idx] = inp.value;
+        if (idx === 0 && inp.value.trim()) {
+          playerNameInput = inp.value;
+          savePlayerName(inp.value);
+          if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
+        }
       });
     });
     overlayRoot.querySelectorAll('[data-hs-rm]').forEach((btn) => {

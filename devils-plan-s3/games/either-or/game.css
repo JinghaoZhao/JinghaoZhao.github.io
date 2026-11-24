@@ -393,52 +393,60 @@
 
 .eo-mini-comm-card {
   position: relative;
-  width: 64px;
-  height: 90px;
-  border-radius: 9px;
+  width: 68px;
+  height: 86px;
+  border-radius: 10px;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.85), transparent 55%),
-    linear-gradient(155deg, #fbf8f1 0%, #f4eee1 56%, #eae0cb 100%);
-  border: 1.5px solid #f0cf80;
-  box-shadow: 0 0 20px rgba(212, 175, 106, 0.42), inset 0 0 0 3px rgba(251, 247, 238, 0.9), inset 0 0 0 4px rgba(188, 148, 72, 0.4);
+  background: linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
+  border: 1.5px solid #f4d78d;
+  box-shadow: 0 0 22px rgba(242, 213, 145, 0.45), 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 #ffffff;
+}
+
+.eo-mini-comm-card::after,
+.eo-mini-pcard::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 7px;
+  border: 1px solid rgba(18, 21, 28, 0.1);
+  pointer-events: none;
+}
+
+.eo-mini-comm-card.is-suit-red::after,
+.eo-mini-pcard.is-suit-red::after {
+  border-color: rgba(217, 30, 54, 0.16);
+}
+
+.eo-mini-comm-card.is-hidden::after,
+.eo-mini-pcard.is-hidden::after {
+  display: none;
 }
 
 .eo-mini-comm-card.is-hidden {
-  background:
-    repeating-linear-gradient(45deg, rgba(212, 175, 106, 0.07) 0 2px, transparent 2px 9px),
-    radial-gradient(circle at 50% 50%, #241926, #0e1018 72%);
-  border-color: rgba(212, 175, 106, 0.42);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
-  color: var(--dp-brass);
-  font-family: var(--dp-font-mono);
-  font-size: 16px;
-  font-weight: 700;
+  background: radial-gradient(circle at 50% 42%, #1d2133 0%, #0d1019 62%, #07090f 100%);
+  border: 1.5px solid rgba(212, 175, 106, 0.54);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
 }
 
 .eo-mini-poker-grid {
-  width: min(100%, 410px);
+  width: min(100%, 428px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 9px;
+  gap: 8px;
 }
 
 .eo-mini-pcard {
   position: relative;
-  aspect-ratio: 5 / 7;
-  border-radius: 10px;
-  border: 1.5px solid #d7be84;
-  background:
-    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.85), transparent 55%),
-    linear-gradient(155deg, #fbf8f1 0%, #f4eee1 56%, #eae0cb 100%);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.48), inset 0 0 0 3px rgba(250, 245, 234, 0.88), inset 0 0 0 4px rgba(188, 148, 72, 0.32);
+  aspect-ratio: 4 / 4.75;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.48), inset 0 1px 0 #ffffff;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -453,82 +461,126 @@
 .eo-mini-pcard.is-suit-red,
 .eo-mini-comm-card.is-suit-red,
 .eo-mini-chip.is-suit-red {
-  color: #c81e32;
+  color: #d91e36;
 }
 
 .eo-mini-pcard.is-suit-black,
 .eo-mini-comm-card.is-suit-black,
 .eo-mini-chip.is-suit-black {
-  color: #14171f;
+  color: #12151c;
 }
 
 .eo-mini-pcard.is-hidden {
-  background:
-    repeating-linear-gradient(45deg, rgba(212, 175, 106, 0.07) 0 2px, transparent 2px 9px),
-    radial-gradient(circle at 50% 50%, #241926, #0e1018 72%);
-  border-color: rgba(212, 175, 106, 0.42);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5), inset 0 0 0 3px rgba(10, 12, 18, 0.72), inset 0 0 0 4px rgba(212, 175, 106, 0.24);
-  color: var(--dp-brass);
-  font-family: var(--dp-font-mono);
-  font-size: 14px;
-  font-weight: 700;
+  background: radial-gradient(circle at 50% 42%, #1d2133 0%, #0d1019 62%, #07090f 100%);
+  border: 1.5px solid rgba(212, 175, 106, 0.54);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(242, 213, 145, 0.2);
 }
 
 .eo-mini-pcard.is-sel {
-  border: 2.5px solid #38bdf8;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
+  border: 2.5px solid #f4d78d;
+  box-shadow: 0 0 22px rgba(242, 213, 145, 0.78);
   transform: translateY(-2px);
 }
 
-.eo-pc-corner {
+.eo-pc-jumbo {
   position: absolute;
+  top: 5px;
+  left: 7px;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 0.95;
   gap: 1px;
   pointer-events: none;
 }
 
-.eo-pc-tl { top: 4px; left: 5px; }
-.eo-pc-br { bottom: 4px; right: 5px; transform: rotate(180deg); }
-
 .eo-pc-rank {
-  font-family: "Space Grotesk", "Cinzel", Georgia, serif;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(1.38rem, 2vw, 1.85rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.eo-mini-comm-card .eo-pc-rank {
+  font-size: 1.5rem;
 }
 
 .eo-pc-pip {
-  width: 9px;
-  height: 9px;
+  width: 14px;
+  height: 14px;
   display: block;
 }
 
 .eo-pc-center {
-  width: 26px;
-  height: 26px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.14));
+  position: absolute;
+  right: 7px;
+  bottom: 11px;
+  width: clamp(32px, 3vw, 42px);
+  height: clamp(32px, 3vw, 42px);
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.16));
+}
+
+.eo-mini-comm-card .eo-pc-center {
+  right: 6px;
+  bottom: 7px;
+  width: 30px;
+  height: 30px;
+}
+
+.eo-pc-coord {
+  position: absolute;
+  bottom: 3px;
+  right: 6px;
+  z-index: 4;
+  font-family: var(--dp-font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #8b93a6;
+  line-height: 1;
+}
+
+.eo-pc-back-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.eo-pc-back-crest {
+  position: relative;
+  z-index: 2;
+  padding: 4px 8px;
+  border-radius: 7px;
+  border: 1px solid rgba(242, 213, 145, 0.62);
+  background: linear-gradient(160deg, rgba(22, 26, 40, 0.94), rgba(10, 12, 19, 0.96));
+  font-family: var(--dp-font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: #f4d78d;
+  letter-spacing: 0.04em;
 }
 
 .eo-mini-chip {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  padding: 2px 6px;
-  border-radius: 5px;
-  border: 1px solid #d4b678;
-  background: linear-gradient(155deg, #fbf8f1, #ede3cf);
-  font-family: "Space Grotesk", var(--dp-font-mono);
-  font-size: 11px;
-  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(155deg, #ffffff, #eef1f6);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 900;
   line-height: 1.1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 .eo-mini-chip.is-picked {
-  border-color: #38bdf8;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+  border: 1.5px solid #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
 }
 
 .eo-mini-grass-board {

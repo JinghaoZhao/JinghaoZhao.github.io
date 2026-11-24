@@ -96,6 +96,25 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.hub-profile-pill {
+  max-width: 170px;
+}
+
+@media (max-width: 520px) {
+  .hub-brand-title {
+    display: none;
+  }
+
+  .hub-divider {
+    display: none;
+  }
+
+  .hub-profile-pill {
+    max-width: 126px;
+  }
 }
 
 /* Hero Stage */
