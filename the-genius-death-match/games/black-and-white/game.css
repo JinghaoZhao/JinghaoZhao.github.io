@@ -1,0 +1,664 @@
+/* ==========================================================================
+ * Black and White (黑与白) — Chiaroscuro Obsidian & Ivory Broadcast Altar
+ * ========================================================================== */
+
+.bw-arena {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 6px 4px 20px;
+}
+
+/* ---- 9-Round Broadcast Scoreboard & Pip Ribbon ---- */
+.bw-scoreboard {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background:
+    linear-gradient(135deg, rgba(16, 19, 32, 0.92), rgba(8, 10, 17, 0.96));
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius-md);
+  box-shadow: var(--tg-shadow-card);
+}
+
+.bw-score-side {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bw-score-side.is-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.bw-player-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bw-player-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--tg-ink);
+}
+
+.bw-first-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(228, 185, 91, 0.16);
+  border: 1px solid rgba(228, 185, 91, 0.55);
+  color: var(--tg-gold-bright);
+}
+
+.bw-pips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bw-pip {
+  width: 14px;
+  height: 16px;
+  clip-path: polygon(50% 0%, 100% 30%, 82% 100%, 18% 100%, 0% 30%);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.35s var(--tg-ease), background 0.35s, box-shadow 0.35s;
+}
+
+.bw-pip.is-won-me {
+  background: linear-gradient(145deg, #fff2c6 0%, #e4b95b 50%, #9b6c1c 100%);
+  box-shadow: 0 0 12px rgba(228, 185, 91, 0.75);
+  transform: scale(1.12);
+}
+
+.bw-pip.is-won-opp {
+  background: linear-gradient(145deg, #ff7a93 0%, #d91b3a 50%, #7a091e 100%);
+  box-shadow: 0 0 12px rgba(255, 46, 84, 0.75);
+  transform: scale(1.12);
+}
+
+.bw-rem-counts {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--tg-font-mono);
+  font-size: 11.5px;
+  color: var(--tg-ink-muted);
+}
+
+.bw-color-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.bw-color-pill.is-black {
+  background: linear-gradient(180deg, #1b1e2c, #080a10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #cbd5e1;
+}
+
+.bw-color-pill.is-white {
+  background: linear-gradient(180deg, #f8f5ee, #dcd5c6);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: #11131b;
+}
+
+.bw-score-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+
+.bw-big-score {
+  font-family: var(--tg-font-display);
+  font-size: clamp(24px, 3.6vw, 34px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bw-big-score .is-gold {
+  color: var(--tg-gold-bright);
+  text-shadow: 0 0 18px var(--tg-gold-glow);
+}
+
+.bw-big-score .is-garnet {
+  color: #ff6c87;
+  text-shadow: 0 0 18px var(--tg-garnet-glow);
+}
+
+.bw-round-sub {
+  font-family: var(--tg-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--tg-ink-muted);
+  text-transform: uppercase;
+}
+
+/* ---- Central Dealer Laser Judge Chamber ---- */
+.bw-chamber {
+  position: relative;
+  border-radius: var(--tg-radius-lg);
+  padding: 22px 20px 20px;
+  background:
+    radial-gradient(ellipse 65% 60% at 50% 45%, rgba(228, 185, 91, 0.09), transparent 70%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(217, 27, 58, 0.08), transparent 72%),
+    linear-gradient(180deg, rgba(14, 17, 28, 0.96), rgba(7, 9, 15, 0.98));
+  border: 1px solid var(--tg-border-strong);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.72),
+    inset 0 0 50px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.bw-chamber::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(228, 185, 91, 0.025) 0px,
+      rgba(228, 185, 91, 0.025) 1px,
+      transparent 1px,
+      transparent 36px
+    );
+  pointer-events: none;
+}
+
+.bw-chamber-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.bw-chamber-status {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tg-ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bw-chamber-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  min-height: 190px;
+}
+
+.bw-pedestal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.bw-pedestal-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tg-ink-muted);
+}
+
+/* Heavy 3D Monolith Placed Tile on Judge Pedestal */
+.bw-monolith {
+  position: relative;
+  width: 116px;
+  height: 144px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.45s var(--tg-ease), box-shadow 0.45s var(--tg-ease);
+}
+
+.bw-monolith.is-empty {
+  border: 2px dashed rgba(228, 185, 91, 0.26);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--tg-ink-faint);
+}
+
+.bw-monolith.is-empty.is-awaiting {
+  border-color: var(--tg-gold);
+  box-shadow: 0 0 24px rgba(228, 185, 91, 0.18), inset 0 0 24px rgba(228, 185, 91, 0.07);
+  animation: bw-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes bw-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.bw-monolith.is-black {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12), transparent 48%),
+    linear-gradient(160deg, #25293b 0%, #10131e 52%, #05060a 100%);
+  border: 2px solid rgba(180, 195, 225, 0.45);
+  color: #f8fafc;
+  box-shadow:
+    0 10px 0 #040508,
+    0 22px 44px rgba(0, 0, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.18),
+    0 0 32px rgba(100, 116, 139, 0.24);
+  animation: bw-tile-slam 0.42s var(--tg-ease);
+}
+
+.bw-monolith.is-white {
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.96), transparent 48%),
+    linear-gradient(160deg, #fffdf8 0%, #ebe3d5 56%, #cfc4b0 100%);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  color: #0b0d14;
+  box-shadow:
+    0 10px 0 #8d826e,
+    0 22px 44px rgba(0, 0, 0, 0.72),
+    inset 0 2px 0 #ffffff,
+    0 0 36px rgba(255, 245, 220, 0.35);
+  animation: bw-tile-slam 0.42s var(--tg-ease);
+}
+
+@keyframes bw-tile-slam {
+  0% { transform: translateY(-28px) scale(1.12); opacity: 0.2; }
+  70% { transform: translateY(3px) scale(0.98); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.bw-monolith.is-winner {
+  border-color: var(--tg-gold-bright);
+  box-shadow:
+    0 10px 0 #5b4111,
+    0 0 0 3px rgba(255, 240, 194, 0.65),
+    0 0 46px rgba(228, 185, 91, 0.65);
+  transform: translateY(-5px) scale(1.05);
+}
+
+.bw-monolith.is-loser {
+  opacity: 0.72;
+  filter: saturate(0.65);
+  transform: scale(0.95);
+}
+
+.bw-monolith-num {
+  font-family: var(--tg-font-display);
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.bw-monolith-mystery {
+  font-family: var(--tg-font-display);
+  font-size: 46px;
+  font-weight: 800;
+  opacity: 0.82;
+}
+
+.bw-monolith-tag {
+  font-family: var(--tg-font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+
+/* Central Judge Beam & Verdict Core */
+.bw-vs-core {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.bw-judge-orb {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--tg-font-display);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: radial-gradient(circle at 35% 30%, #2b3048, #0c0f1a 72%);
+  border: 2px solid var(--tg-border-strong);
+  color: var(--tg-gold-bright);
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.7);
+}
+
+.bw-judge-orb.is-win {
+  background: radial-gradient(circle at 35% 30%, #fff4cf, #e4b95b 58%, #855e17);
+  color: #090a10;
+  border-color: #fff6db;
+  box-shadow: 0 0 38px rgba(228, 185, 91, 0.7);
+}
+
+.bw-judge-orb.is-loss {
+  background: radial-gradient(circle at 35% 30%, #ff7a93, #d91b3a 58%, #6d0719);
+  color: #fff;
+  border-color: #ffb3c1;
+  box-shadow: 0 0 38px rgba(255, 46, 84, 0.7);
+}
+
+.bw-judge-orb.is-draw {
+  background: radial-gradient(circle at 35% 30%, #a5f3fc, #0891b2 62%, #164e63);
+  color: #041318;
+  border-color: #cffafe;
+  box-shadow: 0 0 32px rgba(34, 211, 238, 0.55);
+}
+
+.bw-verdict-banner {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tg-gold-bright);
+  text-align: center;
+}
+
+.bw-verdict-sub {
+  font-size: 11.5px;
+  color: var(--tg-ink-muted);
+}
+
+.bw-laser-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--tg-gold-bright), var(--tg-garnet-bright), transparent);
+  box-shadow: 0 0 16px var(--tg-gold);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.bw-chamber.is-judging .bw-laser-sweep {
+  animation: bw-scan 0.7s var(--tg-ease);
+}
+
+@keyframes bw-scan {
+  0% { opacity: 0; transform: translateY(-70px) scaleX(0.3); }
+  50% { opacity: 0.95; transform: translateY(0) scaleX(1); }
+  100% { opacity: 0; transform: translateY(70px) scaleX(0.4); }
+}
+
+/* ---- Player's 3D Alternating Obsidian & Marble Tile Rack ---- */
+.bw-rack-panel {
+  padding: 16px 18px 18px;
+  background: var(--tg-glass);
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius-md);
+  box-shadow: var(--tg-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bw-rack-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bw-rack-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tg-gold);
+}
+
+.bw-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bw-tile-btn {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  min-height: 82px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 0.2s var(--tg-ease), box-shadow 0.2s var(--tg-ease), opacity 0.2s;
+  user-select: none;
+}
+
+.bw-tile-btn.is-black {
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.14), transparent 50%),
+    linear-gradient(175deg, #252a3d 0%, #10131e 58%, #06070c 100%);
+  border: 1.5px solid rgba(186, 200, 224, 0.36);
+  color: #f8fafc;
+  box-shadow:
+    0 6px 0 #040508,
+    0 12px 22px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.bw-tile-btn.is-white {
+  background:
+    radial-gradient(circle at 30% 18%, #ffffff, transparent 52%),
+    linear-gradient(175deg, #fffdf9 0%, #eae2d3 60%, #cfc3ae 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.92);
+  color: #0b0d14;
+  box-shadow:
+    0 6px 0 #8a7f6b,
+    0 12px 22px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 #ffffff;
+}
+
+.bw-tile-btn:hover:not(:disabled):not(.is-used) {
+  transform: translateY(-7px) scale(1.04);
+  border-color: var(--tg-gold-bright);
+  box-shadow:
+    0 12px 0 #090a10,
+    0 18px 32px rgba(0, 0, 0, 0.7),
+    0 0 24px rgba(228, 185, 91, 0.45);
+}
+
+.bw-tile-btn.is-selected {
+  transform: translateY(-10px) scale(1.06);
+  border: 2px solid var(--tg-gold-bright);
+  box-shadow:
+    0 14px 0 #5b4111,
+    0 0 0 3px rgba(255, 240, 194, 0.55),
+    0 0 34px rgba(228, 185, 91, 0.68);
+}
+
+.bw-tile-btn.is-used {
+  opacity: 0.16;
+  filter: grayscale(1);
+  transform: scale(0.92);
+  box-shadow: none;
+  cursor: default;
+}
+
+.bw-tile-num {
+  font-family: var(--tg-font-display);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.bw-tile-sub {
+  font-family: var(--tg-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.72;
+}
+
+.bw-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.bw-hint-text {
+  font-size: 12.5px;
+  color: var(--tg-ink-muted);
+}
+
+/* ---- 9-Round Deduction History Strip ---- */
+.bw-history-panel {
+  padding: 12px 16px;
+  background: rgba(10, 12, 20, 0.84);
+  border: 1px solid var(--tg-border-subtle);
+  border-radius: var(--tg-radius-md);
+}
+
+.bw-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tg-ink-muted);
+}
+
+.bw-history-strip {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bw-hist-cell {
+  border-radius: 10px;
+  padding: 7px 5px;
+  border: 1px solid var(--tg-border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--tg-font-mono);
+  font-size: 11px;
+}
+
+.bw-hist-cell.is-current {
+  border-color: var(--tg-gold);
+  background: rgba(228, 185, 91, 0.08);
+}
+
+.bw-hist-cell.is-win-me {
+  border-color: rgba(228, 185, 91, 0.55);
+  background: rgba(228, 185, 91, 0.1);
+}
+
+.bw-hist-cell.is-win-opp {
+  border-color: rgba(255, 46, 84, 0.5);
+  background: rgba(217, 27, 58, 0.1);
+}
+
+.bw-hist-cell.is-draw {
+  border-color: rgba(34, 211, 238, 0.45);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.bw-hist-round {
+  font-size: 10px;
+  color: var(--tg-ink-faint);
+}
+
+.bw-hist-tokens {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bw-mini-tile {
+  width: 24px;
+  height: 28px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.bw-mini-tile.is-black {
+  background: #10131e;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #e2e8f0;
+}
+
+.bw-mini-tile.is-white {
+  background: #f3ede0;
+  border: 1px solid #fff;
+  color: #0b0d14;
+}
+
+.bw-hist-verdict {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 780px) {
+  .bw-scoreboard {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .bw-score-side.is-right {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .bw-chamber-stage {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .bw-tile-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .bw-history-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,1510 @@
+{
+  "title": "The Genius: Death Match Archive (S1–S4)",
+  "updatedAt": "2026-11-24",
+  "meta": {
+    "totalSeasons": 4,
+    "totalEpisodes": 44,
+    "totalUniqueGames": 20
+  },
+  "games": [
+    {
+      "slug": "winning-streak",
+      "title": {
+        "zh": "连胜游戏",
+        "en": "Winning Streak",
+        "ko": "연승게임"
+      },
+      "seasons": [
+        "S1"
+      ],
+      "episodes": [
+        "S1E1",
+        "S1E2",
+        "S1E5"
+      ],
+      "finalAppearances": [],
+      "category": "Mind Games",
+      "mechanic": "Mind Games",
+      "tags": [
+        "Rock-Paper-Scissors",
+        "Social Diplomacy",
+        "Streak Optimization",
+        "Psychology"
+      ],
+      "difficulty": 2,
+      "duration": "5–8 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "依次与观战嘉宾队列进行猜拳，争夺最长连胜纪录。在有限情报与游说机制下博弈，连胜中断仍须打完全程。",
+        "en": "Face a shared gauntlet of studio guests in Rock-Paper-Scissors to build the longest unbroken winning streak. Lobby guests, read tells, and manage your streak risk."
+      },
+      "rulesBrief": {
+        "zh": "依次与观战嘉宾队列进行猜拳，争夺最长连胜纪录。在有限情报与游说机制下博弈，连胜中断仍须打完全程。 胜负条件：Higher longest consecutive winning streak after all 9 guests are played.",
+        "en": "Face a shared gauntlet of studio guests in Rock-Paper-Scissors to build the longest unbroken winning streak. Lobby guests, read tells, and manage your streak risk. Win: Higher longest consecutive winning streak after all 9 guests are played."
+      },
+      "accent": "#FF3B5C",
+      "icon": "rps",
+      "status": "ready"
+    },
+    {
+      "slug": "tactical-yutnori",
+      "title": {
+        "zh": "战略掷柶",
+        "en": "Tactical Yutnori",
+        "ko": "전략 윷놀이"
+      },
+      "seasons": [
+        "S1",
+        "S4"
+      ],
+      "episodes": [
+        "S1E3",
+        "S1E4",
+        "S1E10",
+        "S4E2"
+      ],
+      "finalAppearances": [],
+      "category": "Board Strategy",
+      "mechanic": "Board Strategy",
+      "tags": [
+        "Yutnori",
+        "Simultaneous Choice",
+        "Simultaneous Bluffing",
+        "2v2 Team"
+      ],
+      "difficulty": 4,
+      "duration": "10–15 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "零运气的心理博弈掷柶：每方由主将与搭档组成，4人同时秘密决定投出平面或弧面柶木，4根合成步数（猪必为倒退猪！），先让主将2枚棋子绕完29格棋盘冲线者胜。",
+        "en": "Zero-luck strategic Korean Yutnori: all 4 players secretly pick one of two Yut sticks (Flat vs Round) simultaneously—meaning you control half the throw and must outread your rival's half!"
+      },
+      "rulesBrief": {
+        "zh": "零运气的心理博弈掷柶：每方由主将与搭档组成，4人同时秘密决定投出平面或弧面柶木，4根合成步数（猪必为倒退猪！），先让主将2枚棋子绕完29格棋盘冲线者胜。 胜负条件：First side to get BOTH of its Candidate Mals past the finish line wins immediately.",
+        "en": "Zero-luck strategic Korean Yutnori: all 4 players secretly pick one of two Yut sticks (Flat vs Round) simultaneously—meaning you control half the throw and must outread your rival's half! Win: First side to get BOTH of its Candidate Mals past the finish line wins immediately."
+      },
+      "accent": "#F59E0B",
+      "icon": "yut",
+      "status": "ready"
+    },
+    {
+      "slug": "indian-poker",
+      "title": {
+        "zh": "印第安扑克",
+        "en": "Indian Poker",
+        "ko": "인디언 포커"
+      },
+      "seasons": [
+        "S1",
+        "S4"
+      ],
+      "episodes": [
+        "S1E6",
+        "S1E7",
+        "S1E9",
+        "S4E5"
+      ],
+      "finalAppearances": [
+        "S1E12"
+      ],
+      "category": "Bluffing",
+      "mechanic": "Bluffing",
+      "tags": [
+        "Poker",
+        "Bluffing",
+        "Card Counting",
+        "No-Limit Betting"
+      ],
+      "difficulty": 3,
+      "duration": "8–12 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "《The Genius》最具代表性的心理博弈：双方将1–10数字牌贴于额头，只能看到对手的牌而看不到自己的牌。加注、跟注或弃牌——若拿10弃牌将额外罚给对手10枚筹码！",
+        "en": "The signature Genius bluffing battle: you see your opponent's card (1–10) on their forehead, but NOT your own. Bet, raise, or fold—but folding a 10 costs a brutal 10-chip penalty!"
+      },
+      "rulesBrief": {
+        "zh": "《The Genius》最具代表性的心理博弈：双方将1–10数字牌贴于额头，只能看到对手的牌而看不到自己的牌。加注、跟注或弃牌——若拿10弃牌将额外罚给对手10枚筹码！ 胜负条件：Reduce opponent's chip stack to 0.",
+        "en": "The signature Genius bluffing battle: you see your opponent's card (1–10) on their forehead, but NOT your own. Bet, raise, or fold—but folding a 10 costs a brutal 10-chip penalty! Win: Reduce opponent's chip stack to 0."
+      },
+      "accent": "#D91B3A",
+      "icon": "poker",
+      "status": "ready"
+    },
+    {
+      "slug": "image-game",
+      "title": {
+        "zh": "图像联想游戏",
+        "en": "Image Game",
+        "ko": "이미지 게임"
+      },
+      "seasons": [
+        "S1"
+      ],
+      "episodes": [
+        "S1E8"
+      ],
+      "finalAppearances": [],
+      "category": "Mind Games",
+      "mechanic": "Mind Games",
+      "tags": [
+        "Dixit-Style",
+        "Visual Association",
+        "Deduction",
+        "Psychology"
+      ],
+      "difficulty": 3,
+      "duration": "8–12 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "致命版《只言片语》：两位淘汰候选人轮流出题，为自己的抽象画卡给出提示词，其余5人各混入1张干扰卡后投票。对手猜中则出题者失1石榴石，对手猜错则对手失1石榴石；但若全场全中或全错，出题者重罚2石榴石！",
+        "en": "A deadly Dixit-style psychological mind game: give a clue for your surreal art card that fools your rival—but if ALL 5 guessers miss OR all 5 get it right, YOU lose 2 Garnets!"
+      },
+      "rulesBrief": {
+        "zh": "致命版《只言片语》：两位淘汰候选人轮流出题，为自己的抽象画卡给出提示词，其余5人各混入1张干扰卡后投票。对手猜中则出题者失1石榴石，对手猜错则对手失1石榴石；但若全场全中或全错，出题者重罚2石榴石！ 胜负条件：First candidate to reduce their rival to 0 Garnets wins.",
+        "en": "A deadly Dixit-style psychological mind game: give a clue for your surreal art card that fools your rival—but if ALL 5 guessers miss OR all 5 get it right, YOU lose 2 Garnets! Win: First candidate to reduce their rival to 0 Garnets wins."
+      },
+      "accent": "#EC4899",
+      "icon": "garnet",
+      "status": "ready"
+    },
+    {
+      "slug": "same-picture-hunt",
+      "title": {
+        "zh": "寻找相同图片",
+        "en": "Same Picture Hunt",
+        "ko": "같은 그림 찾기"
+      },
+      "seasons": [
+        "S1",
+        "S2",
+        "S4"
+      ],
+      "episodes": [
+        "S1E11",
+        "S2E8",
+        "S4E7"
+      ],
+      "finalAppearances": [
+        "S1E12"
+      ],
+      "category": "Memory & Logic",
+      "mechanic": "Memory & Logic",
+      "tags": [
+        "Memory",
+        "Conveyor Belt",
+        "Combo Streak",
+        "Spatial Recall"
+      ],
+      "difficulty": 3,
+      "duration": "6–10 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "面对共享的16块字母翻转板（A–P），在自己的20格传送带上寻找眼前图案的对应位置。猜中前进1格并获得连翻机会；猜错则传送带倒退1格并换人。先冲到终点者胜，跌落传送带者立即淘汰！",
+        "en": "Race to the front of a 20-tile conveyor belt by locating matching icons behind a shared 4×4 (A–P) flip wall. Hit a match to advance AND keep going; miss and your belt slides backward toward the abyss!"
+      },
+      "rulesBrief": {
+        "zh": "面对共享的16块字母翻转板（A–P），在自己的20格传送带上寻找眼前图案的对应位置。猜中前进1格并获得连翻机会；猜错则传送带倒退1格并换人。先冲到终点者胜，跌落传送带者立即淘汰！ 胜负条件：1) First player to reach Slot 20 (Finish Line), OR 2) Opponent falls off the back of their conveyor belt (position ≤ 0).",
+        "en": "Race to the front of a 20-tile conveyor belt by locating matching icons behind a shared 4×4 (A–P) flip wall. Hit a match to advance AND keep going; miss and your belt slides backward toward the abyss! Win: 1) First player to reach Slot 20 (Finish Line), OR 2) Opponent falls off the back of their conveyor belt (position ≤ 0)."
+      },
+      "accent": "#06B6D4",
+      "icon": "grid",
+      "status": "ready"
+    },
+    {
+      "slug": "quattro",
+      "title": {
+        "zh": "四色牌",
+        "en": "Quattro",
+        "ko": "콰트로"
+      },
+      "seasons": [
+        "S2",
+        "S4"
+      ],
+      "episodes": [
+        "S2E1",
+        "S4E9"
+      ],
+      "finalAppearances": [
+        "S2E12"
+      ],
+      "category": "Auction & Math",
+      "mechanic": "Auction & Math",
+      "tags": [
+        "Set Collection",
+        "Card Trading",
+        "Deduction",
+        "Mulligan"
+      ],
+      "difficulty": 4,
+      "duration": "8–12 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "凑齐4张颜色与数字均不相同的“Quattro”且总和更大者胜！采用第4季官方6名虚拟玩家规则（红蓝绿黄1–6共24张+2张黑0牌），在逐步翻开手牌的过程中与6位虚拟玩家各交换1次，精准算牌与规避0牌陷阱。",
+        "en": "Build the highest-sum 'Quattro'—4 cards of 4 different colors AND 4 different numbers—by revealing cards one by one and executing mandatory 1-for-1 trades with 6 deterministic Virtual Players."
+      },
+      "rulesBrief": {
+        "zh": "凑齐4张颜色与数字均不相同的“Quattro”且总和更大者胜！采用第4季官方6名虚拟玩家规则（红蓝绿黄1–6共24张+2张黑0牌），在逐步翻开手牌的过程中与6位虚拟玩家各交换1次，精准算牌与规避0牌陷阱。 胜负条件：1) Completing a legal Quattro beats failing to complete a Quattro.\n2) If BOTH complete a Quattro: higher sum of the 4 cards wins.\n3) If NEITHER completes a Quattro: higher sum of the 4 cards wins.",
+        "en": "Build the highest-sum 'Quattro'—4 cards of 4 different colors AND 4 different numbers—by revealing cards one by one and executing mandatory 1-for-1 trades with 6 deterministic Virtual Players. Win: 1) Completing a legal Quattro beats failing to complete a Quattro.\n2) If BOTH complete a Quattro: higher sum of the 4 cards wins.\n3) If NEITHER completes a Quattro: higher sum of the 4 cards wins."
+      },
+      "accent": "#10B981",
+      "icon": "poker",
+      "status": "ready"
+    },
+    {
+      "slug": "sun-moon-star",
+      "title": {
+        "zh": "日月星",
+        "en": "Sun, Moon, Star",
+        "ko": "해, 달, 별"
+      },
+      "seasons": [
+        "S2"
+      ],
+      "episodes": [
+        "S2E2",
+        "S2E4"
+      ],
+      "finalAppearances": [],
+      "category": "Bluffing",
+      "mechanic": "Bluffing",
+      "tags": [
+        "Asymmetric Betting",
+        "Chip Doubling",
+        "2x Forced Bet",
+        "Deduction"
+      ],
+      "difficulty": 3,
+      "duration": "6–10 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "10个神秘杯子各藏有日、月、星之一。双方初始各4枚筹码：先手下注额不得超过对手筹码的一半，后手则必须下注至少先手2倍的筹码！猜中获得3倍返还（净赚2倍），猜错全失，10轮后筹码多者胜或破产即淘汰。",
+        "en": "10 sealed cups hide Sun, Moon, or Star. The first bettor chooses a symbol and wager (up to half the rival's chips); the second bettor is FORCED to wager AT LEAST DOUBLE that amount on a symbol!"
+      },
+      "rulesBrief": {
+        "zh": "10个神秘杯子各藏有日、月、星之一。双方初始各4枚筹码：先手下注额不得超过对手筹码的一半，后手则必须下注至少先手2倍的筹码！猜中获得3倍返还（净赚2倍），猜错全失，10轮后筹码多者胜或破产即淘汰。 胜负条件：1) Opponent busts to 0 chips, OR 2) Have strictly more chips after Round 10.",
+        "en": "10 sealed cups hide Sun, Moon, or Star. The first bettor chooses a symbol and wager (up to half the rival's chips); the second bettor is FORCED to wager AT LEAST DOUBLE that amount on a symbol! Win: 1) Opponent busts to 0 chips, OR 2) Have strictly more chips after Round 10."
+      },
+      "accent": "#FBBF24",
+      "icon": "star",
+      "status": "ready"
+    },
+    {
+      "slug": "gyul-hap",
+      "title": {
+        "zh": "结!合!",
+        "en": "Gyul! Hap!",
+        "ko": "결! 합!"
+      },
+      "seasons": [
+        "S2",
+        "S4"
+      ],
+      "episodes": [
+        "S2E3",
+        "S4E8"
+      ],
+      "finalAppearances": [
+        "S1E12"
+      ],
+      "category": "Pattern & Speed",
+      "mechanic": "Pattern & Speed",
+      "tags": [
+        "SET-Like",
+        "Visual Pattern",
+        "Real-Time Timer",
+        "Combinatorics"
+      ],
+      "difficulty": 4,
+      "duration": "8–12 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "在3×3共9张几何图块中（3种形状×3种图形色×3种背景色），轮流在10秒内寻找3个属性各自“全同或全异”的3张牌组合喊“合!”（+1分，错-1分）；当场上再无任何“合”时喊“结!”（+3分并结束本局，错-1分）。共10回合，总分高者胜。",
+        "en": "Scan a 3×3 grid of 9 geometric tiles (Shape × Shape Color × Background Color) to call 'Hap!' on 3-tile sets where each attribute is all-same or all-different (+1 pt), and shout 'Gyul!' when ZERO sets remain (+3 pts)!"
+      },
+      "rulesBrief": {
+        "zh": "在3×3共9张几何图块中（3种形状×3种图形色×3种背景色），轮流在10秒内寻找3个属性各自“全同或全异”的3张牌组合喊“合!”（+1分，错-1分）；当场上再无任何“合”时喊“结!”（+3分并结束本局，错-1分）。共10回合，总分高者胜。 胜负条件：Highest cumulative score after 10 rounds.",
+        "en": "Scan a 3×3 grid of 9 geometric tiles (Shape × Shape Color × Background Color) to call 'Hap!' on 3-tile sets where each attribute is all-same or all-different (+1 pt), and shout 'Gyul!' when ZERO sets remain (+3 pts)! Win: Highest cumulative score after 10 rounds."
+      },
+      "accent": "#38BDF8",
+      "icon": "shapes",
+      "status": "ready"
+    },
+    {
+      "slug": "laser-chess",
+      "title": {
+        "zh": "激光象棋",
+        "en": "Laser Chess",
+        "ko": "레이저 장기"
+      },
+      "seasons": [
+        "S2"
+      ],
+      "episodes": [
+        "S2E5"
+      ],
+      "finalAppearances": [],
+      "category": "Board Strategy",
+      "mechanic": "Board Strategy",
+      "tags": [
+        "Abstract Strategy",
+        "Optics / Mirrors",
+        "Khet-Inspired",
+        "Tactical Chess"
+      ],
+      "difficulty": 5,
+      "duration": "10–18 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "在8×8棋盘上运用激光反射与分光原理消灭对方的“王”！双方各有10枚棋子（1激光炮、1分光器、1王、5三棱镜骑士、2四棱镜骑士）。每回合移动1格或旋转90°，随后己方激光自动发射，击中任何无镜面的一侧即摧毁棋子。",
+        "en": "Command mirrors, beam-splitters, and your corner laser cannon on an 8×8 board. Move or rotate 1 piece per turn, then automatically fire your laser—vaporize the enemy King to win!"
+      },
+      "rulesBrief": {
+        "zh": "在8×8棋盘上运用激光反射与分光原理消灭对方的“王”！双方各有10枚棋子（1激光炮、1分光器、1王、5三棱镜骑士、2四棱镜骑士）。每回合移动1格或旋转90°，随后己方激光自动发射，击中任何无镜面的一侧即摧毁棋子。 胜负条件：Destroy the opponent's King with a laser beam (yours or theirs!).",
+        "en": "Command mirrors, beam-splitters, and your corner laser cannon on an 8×8 board. Move or rotate 1 piece per turn, then automatically fire your laser—vaporize the enemy King to win! Win: Destroy the opponent's King with a laser beam (yours or theirs!)."
+      },
+      "accent": "#EF4444",
+      "icon": "laser",
+      "status": "ready"
+    },
+    {
+      "slug": "blackout-game",
+      "title": {
+        "zh": "暗战游戏",
+        "en": "Blackout Game",
+        "ko": "암전 게임"
+      },
+      "seasons": [
+        "S2"
+      ],
+      "episodes": [
+        "S2E6"
+      ],
+      "finalAppearances": [],
+      "category": "Bluffing",
+      "mechanic": "Bluffing",
+      "tags": [
+        "Stealth / Darkness",
+        "Red/Green Button",
+        "Resource Scarcity",
+        "Squad Tactics"
+      ],
+      "difficulty": 3,
+      "duration": "6–10 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "双方各自率领4人小队互换攻守进行4回合“关灯越线”心理战！进攻方秘密决定派几名队员在暗黑中越过红线（同一队员第k次成功越线得k分）；防守方仅有3次按红钮抓捕机会（抓到即淘汰越线者，但空按红钮则罚送进攻方任选1人免费得分），绿钮不限次数。",
+        "en": "Command a 4-agent squad in pitch darkness! As Attacker, secretly choose which agents cross the red line for escalating combo points (1→2→3→4 pts). As Defender, press RED to eliminate crossers (only 3 uses!) or GREEN to hold fire—false Red alarms gift a free crossing!"
+      },
+      "rulesBrief": {
+        "zh": "双方各自率领4人小队互换攻守进行4回合“关灯越线”心理战！进攻方秘密决定派几名队员在暗黑中越过红线（同一队员第k次成功越线得k分）；防守方仅有3次按红钮抓捕机会（抓到即淘汰越线者，但空按红钮则罚送进攻方任选1人免费得分），绿钮不限次数。 胜负条件：Higher total points after both halves (4 Attack rounds + 4 Defend rounds each).",
+        "en": "Command a 4-agent squad in pitch darkness! As Attacker, secretly choose which agents cross the red line for escalating combo points (1→2→3→4 pts). As Defender, press RED to eliminate crossers (only 3 uses!) or GREEN to hold fire—false Red alarms gift a free crossing! Win: Higher total points after both halves (4 Attack rounds + 4 Defend rounds each)."
+      },
+      "accent": "#F43F5E",
+      "icon": "tiles",
+      "status": "ready"
+    },
+    {
+      "slug": "indian-holdem",
+      "title": {
+        "zh": "印第安德州扑克",
+        "en": "Indian Hold'em",
+        "ko": "인디언 홀덤"
+      },
+      "seasons": [
+        "S2"
+      ],
+      "episodes": [
+        "S2E7",
+        "S2E10"
+      ],
+      "finalAppearances": [
+        "S2E12"
+      ],
+      "category": "Bluffing",
+      "mechanic": "Bluffing",
+      "tags": [
+        "Poker",
+        "Community Cards",
+        "Hand Ranking",
+        "Bluffing"
+      ],
+      "difficulty": 4,
+      "duration": "10–15 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "印第安扑克与德州扑克的终极融合！40张牌（1–10各4张），每人额头1张暗牌+桌面2张公共牌，组成3张牌型：三条 > 顺子（10与1可相连！）> 对子 > 散牌。若握有顺子或三条弃牌，须额外罚给对手10枚筹码！",
+        "en": "Indian Poker meets Texas Hold'em! Combine your hidden forehead card with 2 face-up community cards to form Three-of-a-Kind > Straight (wrap-around 10-1 allowed!) > Pair > High Card—and NEVER fold a Straight or Triple (-10 chip penalty)!"
+      },
+      "rulesBrief": {
+        "zh": "印第安扑克与德州扑克的终极融合！40张牌（1–10各4张），每人额头1张暗牌+桌面2张公共牌，组成3张牌型：三条 > 顺子（10与1可相连！）> 对子 > 散牌。若握有顺子或三条弃牌，须额外罚给对手10枚筹码！ 胜负条件：Reduce opponent's chips to 0.",
+        "en": "Indian Poker meets Texas Hold'em! Combine your hidden forehead card with 2 face-up community cards to form Three-of-a-Kind > Straight (wrap-around 10-1 allowed!) > Pair > High Card—and NEVER fold a Straight or Triple (-10 chip penalty)! Win: Reduce opponent's chips to 0."
+      },
+      "accent": "#8B5CF6",
+      "icon": "poker",
+      "status": "ready"
+    },
+    {
+      "slug": "black-and-white",
+      "title": {
+        "zh": "黑与白",
+        "en": "Black and White",
+        "ko": "흑과 백"
+      },
+      "seasons": [
+        "S2",
+        "S4"
+      ],
+      "episodes": [
+        "S2E9",
+        "S2E11",
+        "S4E1"
+      ],
+      "finalAppearances": [],
+      "category": "Mind Games",
+      "mechanic": "Mind Games",
+      "tags": [
+        "Hidden Number Duel",
+        "Information Asymmetry",
+        "Bluffing",
+        "9 Rounds"
+      ],
+      "difficulty": 3,
+      "duration": "5–8 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "双方各有0–8共9张数字砖（偶数0,2,4,6,8为黑，奇数1,3,5,7为白）。每轮由上轮胜者先出，数字全程保密仅公开黑白颜色与当轮胜负！利用黑白线索推理对手残牌，9轮后胜分高者胜（先得5分即锁定胜局）。",
+        "en": "Play 9 blind rounds with tiles 0–8 (Even = Black, Odd = White). The numbers played are NEVER revealed—only their Black/White color and who won the round! Deduce your rival's remaining tiles and out-tempo them."
+      },
+      "rulesBrief": {
+        "zh": "双方各有0–8共9张数字砖（偶数0,2,4,6,8为黑，奇数1,3,5,7为白）。每轮由上轮胜者先出，数字全程保密仅公开黑白颜色与当轮胜负！利用黑白线索推理对手残牌，9轮后胜分高者胜（先得5分即锁定胜局）。 胜负条件：More Win Points after 9 rounds (or first to reach an insurmountable lead, e.g. 5 points).",
+        "en": "Play 9 blind rounds with tiles 0–8 (Even = Black, Odd = White). The numbers played are NEVER revealed—only their Black/White color and who won the round! Deduce your rival's remaining tiles and out-tempo them. Win: More Win Points after 9 rounds (or first to reach an insurmountable lead, e.g. 5 points)."
+      },
+      "accent": "#E2E8F0",
+      "icon": "tiles",
+      "status": "ready"
+    },
+    {
+      "slug": "black-and-white-2",
+      "title": {
+        "zh": "黑与白II",
+        "en": "Black and White II",
+        "ko": "흑과 백 II"
+      },
+      "seasons": [
+        "S3"
+      ],
+      "episodes": [
+        "S3E1",
+        "S3E3"
+      ],
+      "finalAppearances": [],
+      "category": "Auction & Math",
+      "mechanic": "Auction & Math",
+      "tags": [
+        "99-Point Blind Auction",
+        "Gauge Inference",
+        "Resource Allocation",
+        "9 Rounds"
+      ],
+      "difficulty": 4,
+      "duration": "6–10 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "双方各有99点能量，分9回合盲注对决！投入点数保密，但对手可见两大线索：①单数(0–9)亮黑牌、双位数(10+)亮白牌；②5格剩余能量灯（每跌破80/60/40/20/0即熄灭1格，且在确认出价瞬间立即变化）。先得5胜或9轮胜多者胜！",
+        "en": "Budget 99 points across 9 blind rounds! Every bid stays secret—revealing ONLY a Black card (0–9) or White card (10+), plus 5 energy lamps that drop off every 20 remaining points. Outsmart your rival's resource math to win 5 rounds!"
+      },
+      "rulesBrief": {
+        "zh": "双方各有99点能量，分9回合盲注对决！投入点数保密，但对手可见两大线索：①单数(0–9)亮黑牌、双位数(10+)亮白牌；②5格剩余能量灯（每跌破80/60/40/20/0即熄灭1格，且在确认出价瞬间立即变化）。先得5胜或9轮胜多者胜！ 胜负条件：More Win Points after 9 rounds (or first to insurmountable lead, e.g. 5 wins).",
+        "en": "Budget 99 points across 9 blind rounds! Every bid stays secret—revealing ONLY a Black card (0–9) or White card (10+), plus 5 energy lamps that drop off every 20 remaining points. Outsmart your rival's resource math to win 5 rounds! Win: More Win Points after 9 rounds (or first to insurmountable lead, e.g. 5 wins)."
+      },
+      "accent": "#F97316",
+      "icon": "tiles",
+      "status": "ready"
+    },
+    {
+      "slug": "betting-rps",
+      "title": {
+        "zh": "下注猜拳",
+        "en": "Betting! Rock, Paper, Scissors",
+        "ko": "베팅! 가위바위보"
+      },
+      "seasons": [
+        "S3",
+        "S4"
+      ],
+      "episodes": [
+        "S3E2",
+        "S3E6",
+        "S4E3"
+      ],
+      "finalAppearances": [
+        "S3E12"
+      ],
+      "category": "Bluffing",
+      "mechanic": "Bluffing",
+      "tags": [
+        "Rock-Paper-Scissors",
+        "Asymmetric Role Choice",
+        "Betting",
+        "Social Reads"
+      ],
+      "difficulty": 3,
+      "duration": "7–10 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "双方仅持1枚筹码开局，共11回合（8名观战嘉宾+3名手势全公开的虚拟玩家）。每回合先手决定亲自猜拳（赢可得1/2/3/4枚递增筹码）或押注对手胜负（押胜/负中赔2倍、平局退回；押平局中赔3倍！）。11轮后筹码多者胜！",
+        "en": "Start with just 1 chip! Each round, the First Player chooses either to PLAY Rock-Paper-Scissors against the round's guest (for escalating 1→4 chip rewards) OR force the rival to play while BETTING on Win (2×), Lose (2×), or Draw (3×)!"
+      },
+      "rulesBrief": {
+        "zh": "双方仅持1枚筹码开局，共11回合（8名观战嘉宾+3名手势全公开的虚拟玩家）。每回合先手决定亲自猜拳（赢可得1/2/3/4枚递增筹码）或押注对手胜负（押胜/负中赔2倍、平局退回；押平局中赔3倍！）。11轮后筹码多者胜！ 胜负条件：More chips after Round 11.",
+        "en": "Start with just 1 chip! Each round, the First Player chooses either to PLAY Rock-Paper-Scissors against the round's guest (for escalating 1→4 chip rewards) OR force the rival to play while BETTING on Win (2×), Lose (2×), or Draw (3×)! Win: More chips after Round 11."
+      },
+      "accent": "#F59E0B",
+      "icon": "rps",
+      "status": "ready"
+    },
+    {
+      "slug": "double-sided-poker",
+      "title": {
+        "zh": "双面扑克",
+        "en": "Double-Sided Poker",
+        "ko": "양면포커"
+      },
+      "seasons": [
+        "S3",
+        "S4"
+      ],
+      "episodes": [
+        "S3E4",
+        "S3E5",
+        "S4E10"
+      ],
+      "finalAppearances": [],
+      "category": "Bluffing",
+      "mechanic": "Bluffing",
+      "tags": [
+        "Poker",
+        "Double-Sided Cards",
+        "Double-Bet +10 Bonus",
+        "No-Limit"
+      ],
+      "difficulty": 4,
+      "duration": "10–15 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "每张双面牌正面公开、背面仅本人可见（第4季规则：正反面必为一奇一偶，1–10）。开局各40枚筹码，下注前锁定押正面或押背面（不可更改），或发动“双面下注”（需下对手2倍筹码）：若己方正反两面均大于对手所选面则大获全胜并额外抢走对手10枚筹码！",
+        "en": "Every card has a PUBLIC Front number and a SECRET Back number (opposite parity: odd ↔ even!). Choose to bet on your Front, your Back, or declare a 2× DOUBLE-BET—beat your rival with BOTH sides to steal an extra +10 bonus chips!"
+      },
+      "rulesBrief": {
+        "zh": "每张双面牌正面公开、背面仅本人可见（第4季规则：正反面必为一奇一偶，1–10）。开局各40枚筹码，下注前锁定押正面或押背面（不可更改），或发动“双面下注”（需下对手2倍筹码）：若己方正反两面均大于对手所选面则大获全胜并额外抢走对手10枚筹码！ 胜负条件：Reduce opponent's chip stack to 0.",
+        "en": "Every card has a PUBLIC Front number and a SECRET Back number (opposite parity: odd ↔ even!). Choose to bet on your Front, your Back, or declare a 2× DOUBLE-BET—beat your rival with BOTH sides to steal an extra +10 bonus chips! Win: Reduce opponent's chip stack to 0."
+      },
+      "accent": "#E11D48",
+      "icon": "poker",
+      "status": "ready"
+    },
+    {
+      "slug": "twelve-janggi",
+      "title": {
+        "zh": "十二将棋",
+        "en": "Twelve Janggi",
+        "ko": "십이장기"
+      },
+      "seasons": [
+        "S3",
+        "S4"
+      ],
+      "episodes": [
+        "S3E7",
+        "S4E11"
+      ],
+      "finalAppearances": [
+        "S3E12"
+      ],
+      "category": "Board Strategy",
+      "mechanic": "Board Strategy",
+      "tags": [
+        "Dobutsu Shogi",
+        "Abstract Chess",
+        "Piece Drops",
+        "Best-of-3"
+      ],
+      "difficulty": 5,
+      "duration": "6–12 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "改编自《动物将棋》的3×4极致策略棋！每方4枚棋子（王、将、相、子），吃掉敌子可俘虏并在己方回合空降重用（不可空降到敌方底线3格）。“子”冲入敌阵升变为“侯”。吃掉敌王或己方王闯入敌阵并挺过对手1回合即获胜！三局两胜制。",
+        "en": "Deceptively deep micro-chess on a 3×4 board! Capture enemy pieces to drop them back as your own soldiers, promote your Pawn (子) into a Feudal Lord (侯), and win by capturing the enemy King (王) OR surviving 1 full turn with your King inside enemy territory!"
+      },
+      "rulesBrief": {
+        "zh": "改编自《动物将棋》的3×4极致策略棋！每方4枚棋子（王、将、相、子），吃掉敌子可俘虏并在己方回合空降重用（不可空降到敌方底线3格）。“子”冲入敌阵升变为“侯”。吃掉敌王或己方王闯入敌阵并挺过对手1回合即获胜！三局两胜制。 胜负条件：Win a single game by: 1) Capturing opponent's King (王), 2) Your King enters enemy Territory and survives 1 turn (Try Rule), or 3) Opponent times out. Win the Death Match by winning 2 games (Best-of-3).",
+        "en": "Deceptively deep micro-chess on a 3×4 board! Capture enemy pieces to drop them back as your own soldiers, promote your Pawn (子) into a Feudal Lord (侯), and win by capturing the enemy King (王) OR surviving 1 full turn with your King inside enemy territory! Win: Win a single game by: 1) Capturing opponent's King (王), 2) Your King enters enemy Territory and survives 1 turn (Try Rule), or 3) Opponent times out. Win the Death Match by winning 2 games (Best-of-3)."
+      },
+      "accent": "#D97706",
+      "icon": "janggi",
+      "status": "ready"
+    },
+    {
+      "slug": "memory-maze",
+      "title": {
+        "zh": "记忆迷宫",
+        "en": "Memory Maze",
+        "ko": "기억의 미로"
+      },
+      "seasons": [
+        "S3"
+      ],
+      "episodes": [
+        "S3E8",
+        "S3E9"
+      ],
+      "finalAppearances": [],
+      "category": "Memory & Logic",
+      "mechanic": "Memory & Logic",
+      "tags": [
+        "Invisible Maze",
+        "Spatial Memory",
+        "Pathfinding",
+        "Double Chance"
+      ],
+      "difficulty": 4,
+      "duration": "6–10 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "在暗藏32堵隐形墙的7×7棋盘上竞速抵达对角终点！每回合可上下左右移动3步（每人全场拥有2次“双倍机会”可连走6步）。一旦撞上隐形墙立即响起警报并退回起点重来，考验空间记忆与路线规划！",
+        "en": "Race across a 7×7 grid hiding 32 invisible walls! Move 3 steps per turn (plus TWO 6-step 'Double Chances' per match). Cross an invisible wall and the siren blasts—sending you all the way back to Start while both players memorize the barrier!"
+      },
+      "rulesBrief": {
+        "zh": "在暗藏32堵隐形墙的7×7棋盘上竞速抵达对角终点！每回合可上下左右移动3步（每人全场拥有2次“双倍机会”可连走6步）。一旦撞上隐形墙立即响起警报并退回起点重来，考验空间记忆与路线规划！ 胜负条件：First player to step onto their Goal square wins immediately.",
+        "en": "Race across a 7×7 grid hiding 32 invisible walls! Move 3 steps per turn (plus TWO 6-step 'Double Chances' per match). Cross an invisible wall and the siren blasts—sending you all the way back to Start while both players memorize the barrier! Win: First player to step onto their Goal square wins immediately."
+      },
+      "accent": "#22D3EE",
+      "icon": "maze",
+      "status": "ready"
+    },
+    {
+      "slug": "monorail",
+      "title": {
+        "zh": "单轨铁路",
+        "en": "Monorail",
+        "ko": "모노레일"
+      },
+      "seasons": [
+        "S3",
+        "S4"
+      ],
+      "episodes": [
+        "S3E10",
+        "S4E6"
+      ],
+      "finalAppearances": [],
+      "category": "Board Strategy",
+      "mechanic": "Board Strategy",
+      "tags": [
+        "Venice Connection",
+        "Tile Placement",
+        "Loop Geometry",
+        "Impossible Challenge"
+      ],
+      "difficulty": 5,
+      "duration": "8–15 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "改编自桌游《威尼斯连线》：起始放置2块相邻车站砖，轮流使用16块双面铁轨砖（正面直线、背面90°弯道），每回合须沿同一直线连续放置1–3块（至少1块紧邻已有砖块）。放完最后一块使全部已放砖块连成单一闭合环路者胜；或在己方回合宣告“不可能”，逼对手用剩余砖块拼出闭合环路，对手拼不出即宣告者胜！",
+        "en": "Lay 1 to 3 double-sided track tiles (Straight / 90° Curve) per turn to build a single closed monorail loop connecting both sides of the Station. Place the final closing tile to win—OR declare 'IMPOSSIBLE!' to force your rival to prove a loop still exists!"
+      },
+      "rulesBrief": {
+        "zh": "改编自桌游《威尼斯连线》：起始放置2块相邻车站砖，轮流使用16块双面铁轨砖（正面直线、背面90°弯道），每回合须沿同一直线连续放置1–3块（至少1块紧邻已有砖块）。放完最后一块使全部已放砖块连成单一闭合环路者胜；或在己方回合宣告“不可能”，逼对手用剩余砖块拼出闭合环路，对手拼不出即宣告者胜！ 胜负条件：1) Place the tile(s) that complete a single closed loop using all placed tiles, OR 2) Correctly declare 'IMPOSSIBLE!' when the opponent cannot complete a valid loop with remaining tiles.",
+        "en": "Lay 1 to 3 double-sided track tiles (Straight / 90° Curve) per turn to build a single closed monorail loop connecting both sides of the Station. Place the final closing tile to win—OR declare 'IMPOSSIBLE!' to force your rival to prove a loop still exists! Win: 1) Place the tile(s) that complete a single closed loop using all placed tiles, OR 2) Correctly declare 'IMPOSSIBLE!' when the opponent cannot complete a valid loop with remaining tiles."
+      },
+      "accent": "#F59E0B",
+      "icon": "rail",
+      "status": "ready"
+    },
+    {
+      "slug": "betting-black-and-white",
+      "title": {
+        "zh": "下注黑与白",
+        "en": "Betting! Black and White",
+        "ko": "베팅! 흑과 백"
+      },
+      "seasons": [
+        "S3"
+      ],
+      "episodes": [
+        "S3E11"
+      ],
+      "finalAppearances": [
+        "S4E12"
+      ],
+      "category": "Auction & Math",
+      "mechanic": "Auction & Math",
+      "tags": [
+        "Pre-Commitment",
+        "Chip Reallocation",
+        "Bluffing",
+        "10 Rounds"
+      ],
+      "difficulty": 4,
+      "duration": "8–12 min",
+      "hasHiddenInfo": true,
+      "tagline": {
+        "zh": "《黑与白》终极进化版！双方各有0–9共10张砖（偶黑奇白）与30枚筹码。开局先在屏风后秘密排定10回合出牌顺序并把30枚筹码全部分配到10张砖下（每张至少1枚）。撤掉屏风后逐轮亮出筹码与黑白颜色：筹码少的一方选择跟注（须从已赢筹码或后续牌堆借调补齐，后续每格仍须留至少1枚）或弃牌（不亮数字直接输掉己方筹码）。10轮后筹码多者胜！",
+        "en": "Behind a privacy screen, lock the exact play order of your 10 tiles (0–9: Even=Black, Odd=White) AND split 30 chips across all 10 slots (min 1 per slot). Drop the screen! Each round, the lower bettor must either FOLD or CALL by borrowing chips from future slots or winnings!"
+      },
+      "rulesBrief": {
+        "zh": "《黑与白》终极进化版！双方各有0–9共10张砖（偶黑奇白）与30枚筹码。开局先在屏风后秘密排定10回合出牌顺序并把30枚筹码全部分配到10张砖下（每张至少1枚）。撤掉屏风后逐轮亮出筹码与黑白颜色：筹码少的一方选择跟注（须从已赢筹码或后续牌堆借调补齐，后续每格仍须留至少1枚）或弃牌（不亮数字直接输掉己方筹码）。10轮后筹码多者胜！ 胜负条件：More total chips after all 10 rounds conclude.",
+        "en": "Behind a privacy screen, lock the exact play order of your 10 tiles (0–9: Even=Black, Odd=White) AND split 30 chips across all 10 slots (min 1 per slot). Drop the screen! Each round, the lower bettor must either FOLD or CALL by borrowing chips from future slots or winnings! Win: More total chips after all 10 rounds conclude."
+      },
+      "accent": "#D91B3A",
+      "icon": "auction",
+      "status": "ready"
+    },
+    {
+      "slug": "same-number-hunt",
+      "title": {
+        "zh": "寻找相同数字",
+        "en": "Same Number Hunt",
+        "ko": "같은 숫자 찾기"
+      },
+      "seasons": [
+        "S4"
+      ],
+      "episodes": [
+        "S4E4"
+      ],
+      "finalAppearances": [
+        "S3E12"
+      ],
+      "category": "Pattern & Speed",
+      "mechanic": "Pattern & Speed",
+      "tags": [
+        "Mental Arithmetic",
+        "Memory",
+        "Speed Buzzer",
+        "4x4 Flip Wall"
+      ],
+      "difficulty": 4,
+      "duration": "8–12 min",
+      "hasHiddenInfo": false,
+      "tagline": {
+        "zh": "A–P共16块翻板背面藏有数字1–12与4个运算符号（第4季版为 +, ×, ÷, √x+√y），开局全盘仅展示5秒！每轮随机抽出目标自然数，先按抢答器者在5秒内按“数字→符号→数字”顺序点出3个字母拼出目标值即得1分（用√x+√y得2分！），超时或答错则机会不限时转交对手，每轮结束后依序重显1块板3秒。先达10分胜！",
+        "en": "You get just 5 SECONDS to memorize a 4×4 wall (A–P) hiding numbers 1–12 and 4 operators! When a Target Number drops, slam the buzzer and pick 3 letters (Number → Operator → Number) within 5 seconds to hit the exact target. First to 10 points wins!"
+      },
+      "rulesBrief": {
+        "zh": "A–P共16块翻板背面藏有数字1–12与4个运算符号（第4季版为 +, ×, ÷, √x+√y），开局全盘仅展示5秒！每轮随机抽出目标自然数，先按抢答器者在5秒内按“数字→符号→数字”顺序点出3个字母拼出目标值即得1分（用√x+√y得2分！），超时或答错则机会不限时转交对手，每轮结束后依序重显1块板3秒。先达10分胜！ 胜负条件：First player to reach 10 points wins immediately.",
+        "en": "You get just 5 SECONDS to memorize a 4×4 wall (A–P) hiding numbers 1–12 and 4 operators! When a Target Number drops, slam the buzzer and pick 3 letters (Number → Operator → Number) within 5 seconds to hit the exact target. First to 10 points wins! Win: First player to reach 10 points wins immediately."
+      },
+      "accent": "#38BDF8",
+      "icon": "auction",
+      "status": "ready"
+    }
+  ],
+  "episodes": [
+    {
+      "id": "S1E1",
+      "season": 1,
+      "episode": 1,
+      "airDate": "2013-04-26",
+      "mainMatch": "1, 2, 3 Game",
+      "gameSlug": "winning-streak",
+      "gameTitle": {
+        "zh": "连胜游戏",
+        "en": "Winning Streak",
+        "ko": "연승게임"
+      },
+      "winner": "Kim Min-seo",
+      "eliminated": "Lee Jun-seok",
+      "note": "Safe players drew random order to face both candidates in RPS."
+    },
+    {
+      "id": "S1E2",
+      "season": 1,
+      "episode": 2,
+      "airDate": "2013-05-03",
+      "mainMatch": "Election Game",
+      "gameSlug": "winning-streak",
+      "gameTitle": {
+        "zh": "连胜游戏",
+        "en": "Winning Streak",
+        "ko": "연승게임"
+      },
+      "winner": "Cha Yu-ram",
+      "eliminated": "Kim Min-seo",
+      "note": "Safe players collaboratively chose the order (same order for both candidates)."
+    },
+    {
+      "id": "S1E3",
+      "season": 1,
+      "episode": 3,
+      "airDate": "2013-05-10",
+      "mainMatch": "Abundance & Famine",
+      "gameSlug": "tactical-yutnori",
+      "gameTitle": {
+        "zh": "战略掷柶",
+        "en": "Tactical Yutnori",
+        "ko": "전략 윷놀이"
+      },
+      "winner": "Kim Sung-kyu",
+      "eliminated": "Cha Min-soo",
+      "note": "Kim Sung-kyu partnered with Lee Sang-min; Cha Min-soo partnered with Hong Jin-ho."
+    },
+    {
+      "id": "S1E4",
+      "season": 1,
+      "episode": 4,
+      "airDate": "2013-05-17",
+      "mainMatch": "Zombie Game",
+      "gameSlug": "tactical-yutnori",
+      "gameTitle": {
+        "zh": "战略掷柶",
+        "en": "Tactical Yutnori",
+        "ko": "전략 윷놀이"
+      },
+      "winner": "Choi Jung-moon",
+      "eliminated": "Choi Chang-yeop",
+      "note": "Back-Do shortcut plays showcased high-level Yutnori stick reading."
+    },
+    {
+      "id": "S1E5",
+      "season": 1,
+      "episode": 5,
+      "airDate": "2013-05-24",
+      "mainMatch": "Scamming Horse Race",
+      "gameSlug": "winning-streak",
+      "gameTitle": {
+        "zh": "连胜游戏",
+        "en": "Winning Streak",
+        "ko": "연승게임"
+      },
+      "winner": "Cha Yu-ram",
+      "eliminated": "Choi Jung-moon",
+      "note": "Previously eliminated players (Ep 1–4) returned as guest RPS opponents in fixed order."
+    },
+    {
+      "id": "S1E6",
+      "season": 1,
+      "episode": 6,
+      "airDate": "2013-05-31",
+      "mainMatch": "Catch the Thief",
+      "gameSlug": "indian-poker",
+      "gameTitle": {
+        "zh": "印第安扑克",
+        "en": "Indian Poker",
+        "ko": "인디언 포커"
+      },
+      "winner": "Hong Jin-ho",
+      "eliminated": "Kim Gu-ra",
+      "note": "Iconic debut of Indian Poker; 1 Garnet = 5 chips buy-in."
+    },
+    {
+      "id": "S1E7",
+      "season": 1,
+      "episode": 7,
+      "airDate": "2013-06-07",
+      "mainMatch": "Open, Pass",
+      "gameSlug": "indian-poker",
+      "gameTitle": {
+        "zh": "印第安扑克",
+        "en": "Indian Poker",
+        "ko": "인디언 포커"
+      },
+      "winner": "Park Eun-ji",
+      "eliminated": "Kim Poong",
+      "note": "High-variance bluff battle; Park Eun-ji overcame chip pressure."
+    },
+    {
+      "id": "S1E8",
+      "season": 1,
+      "episode": 8,
+      "airDate": "2013-06-14",
+      "mainMatch": "Kong's Dilemma",
+      "gameSlug": "image-game",
+      "gameTitle": {
+        "zh": "图像联想游戏",
+        "en": "Image Game",
+        "ko": "이미지 게임"
+      },
+      "winner": "Park Eun-ji",
+      "eliminated": "Cha Yu-ram",
+      "note": "Dixit-style clue game with the 4 safe players guessing alongside the opponent."
+    },
+    {
+      "id": "S1E9",
+      "season": 1,
+      "episode": 9,
+      "airDate": "2013-06-21",
+      "mainMatch": "Expression Auction",
+      "gameSlug": "indian-poker",
+      "gameTitle": {
+        "zh": "印第安扑克",
+        "en": "Indian Poker",
+        "ko": "인디언 포커"
+      },
+      "winner": "Hong Jin-ho",
+      "eliminated": "Park Eun-ji",
+      "note": "Judge variant: safe players anonymously advised Go/Fold via code letters."
+    },
+    {
+      "id": "S1E10",
+      "season": 1,
+      "episode": 10,
+      "airDate": "2013-06-28",
+      "mainMatch": "Confined! Scamming Horse Race",
+      "gameSlug": "tactical-yutnori",
+      "gameTitle": {
+        "zh": "战略掷柶",
+        "en": "Tactical Yutnori",
+        "ko": "전략 윷놀이"
+      },
+      "winner": "Hong Jin-ho",
+      "eliminated": "Kim Sung-kyu",
+      "note": "Default matchup (other 2 safe); played with invited Ep 10 guest partners (Lee Yun-yeol & Lee Jung-yeop)."
+    },
+    {
+      "id": "S1E11",
+      "season": 1,
+      "episode": 11,
+      "airDate": "2013-07-05",
+      "mainMatch": "5:5 Game",
+      "gameSlug": "same-picture-hunt",
+      "gameTitle": {
+        "zh": "寻找相同图片",
+        "en": "Same Picture Hunt",
+        "ko": "같은 그림 찾기"
+      },
+      "winner": "Kim Kyung-ran",
+      "eliminated": "Lee Sang-min",
+      "note": "Default Final 3 matchup; dramatic memory race on 20-tile conveyor belts."
+    },
+    {
+      "id": "S2E1",
+      "season": 2,
+      "episode": 1,
+      "airDate": "2013-12-07",
+      "mainMatch": "Food Chain",
+      "gameSlug": "quattro",
+      "gameTitle": {
+        "zh": "四色牌",
+        "en": "Quattro",
+        "ko": "콰트로"
+      },
+      "winner": "Lim Yoon-sun",
+      "eliminated": "Nam Hwee-jong",
+      "note": "Classic 41-card Quattro with 11 onlookers and the lethal Black 0 card."
+    },
+    {
+      "id": "S2E2",
+      "season": 2,
+      "episode": 2,
+      "airDate": "2013-12-14",
+      "mainMatch": "Seat Exchange",
+      "gameSlug": "sun-moon-star",
+      "gameTitle": {
+        "zh": "日月星",
+        "en": "Sun, Moon, Star",
+        "ko": "해, 달, 별"
+      },
+      "winner": "Noh Hong-chul",
+      "eliminated": "Kim Jae-kyung",
+      "note": "Onlookers could wager Garnets on the Death Match winner, fueling social mind games."
+    },
+    {
+      "id": "S2E3",
+      "season": 2,
+      "episode": 3,
+      "airDate": "2013-12-21",
+      "mainMatch": "King Game",
+      "gameSlug": "gyul-hap",
+      "gameTitle": {
+        "zh": "结!合!",
+        "en": "Gyul! Hap!",
+        "ko": "결! 합!"
+      },
+      "winner": "Jo Yoo-young",
+      "eliminated": "Lee Da-hye",
+      "note": "First Ep 1–11 Death Match appearance of Gyul! Hap! (added 5-pass auto-end rule)."
+    },
+    {
+      "id": "S2E4",
+      "season": 2,
+      "episode": 4,
+      "airDate": "2013-12-28",
+      "mainMatch": "Blackout Game",
+      "gameSlug": "sun-moon-star",
+      "gameTitle": {
+        "zh": "日月星",
+        "en": "Sun, Moon, Star",
+        "ko": "해, 달, 별"
+      },
+      "winner": "Eun Ji-won",
+      "eliminated": "Lee Eun-gyeol",
+      "note": "Tight chip-doubling psychology with alliance leaks."
+    },
+    {
+      "id": "S2E5",
+      "season": 2,
+      "episode": 5,
+      "airDate": "2014-01-04",
+      "mainMatch": "7 Commandments",
+      "gameSlug": "laser-chess",
+      "gameTitle": {
+        "zh": "激光象棋",
+        "en": "Laser Chess",
+        "ko": "레이저 장기"
+      },
+      "winner": "Lim Yo-hwan",
+      "eliminated": "Lim Yoon-sun",
+      "note": "Only broadcast appearance of Laser Chess; StarCraft legend Lim Yo-hwan won via mirror geometry."
+    },
+    {
+      "id": "S2E6",
+      "season": 2,
+      "episode": 6,
+      "airDate": "2014-01-11",
+      "mainMatch": "Monopoly Game",
+      "gameSlug": "blackout-game",
+      "gameTitle": {
+        "zh": "暗战游戏",
+        "en": "Blackout Game",
+        "ko": "암전 게임"
+      },
+      "winner": "Jo Yoo-young",
+      "eliminated": "Lee Doo-hee",
+      "note": "Adapted 4v4 team Death Match (4 rounds, 3 red buttons per side) after the notorious ID-card episode."
+    },
+    {
+      "id": "S2E7",
+      "season": 2,
+      "episode": 7,
+      "airDate": "2014-01-18",
+      "mainMatch": "God's Judgment",
+      "gameSlug": "indian-holdem",
+      "gameTitle": {
+        "zh": "印第安德州扑克",
+        "en": "Indian Hold'em",
+        "ko": "인디언 홀덤"
+      },
+      "winner": "Eun Ji-won",
+      "eliminated": "Hong Jin-ho",
+      "note": "Shocking upset eliminating S1 Champion Hong Jin-ho via Straight/Pair community reads."
+    },
+    {
+      "id": "S2E8",
+      "season": 2,
+      "episode": 8,
+      "airDate": "2014-01-25",
+      "mainMatch": "Minus Auction",
+      "gameSlug": "same-picture-hunt",
+      "gameTitle": {
+        "zh": "寻找相同图片",
+        "en": "Same Picture Hunt",
+        "ko": "같은 그림 찾기"
+      },
+      "winner": "Yoo Jung-hyun",
+      "eliminated": "Noh Hong-chul",
+      "note": "Steady memory discipline beat aggressive guessing."
+    },
+    {
+      "id": "S2E9",
+      "season": 2,
+      "episode": 9,
+      "airDate": "2014-02-01",
+      "mainMatch": "Layoff",
+      "gameSlug": "black-and-white",
+      "gameTitle": {
+        "zh": "黑与白",
+        "en": "Black and White",
+        "ko": "흑과 백"
+      },
+      "winner": "Yoo Jung-hyun",
+      "eliminated": "Jo Yoo-young",
+      "note": "Debut of the iconic 0–8 hidden-tile psychological duel Black and White."
+    },
+    {
+      "id": "S2E10",
+      "season": 2,
+      "episode": 10,
+      "airDate": "2014-02-08",
+      "mainMatch": "Big Deal Game",
+      "gameSlug": "indian-holdem",
+      "gameTitle": {
+        "zh": "印第安德州扑克",
+        "en": "Indian Hold'em",
+        "ko": "인디언 홀덤"
+      },
+      "winner": "Yoo Jung-hyun",
+      "eliminated": "Eun Ji-won",
+      "note": "Lim Yo-hwan used Lee Sang-min's Token of Immortality to send Eun Ji-won in his place; 1 Garnet = 2 chips."
+    },
+    {
+      "id": "S2E11",
+      "season": 2,
+      "episode": 11,
+      "airDate": "2014-02-15",
+      "mainMatch": "Elevator Game",
+      "gameSlug": "black-and-white",
+      "gameTitle": {
+        "zh": "黑与白",
+        "en": "Black and White",
+        "ko": "흑과 백"
+      },
+      "winner": "Lim Yo-hwan",
+      "eliminated": "Yoo Jung-hyun",
+      "note": "Final 3 Death Match; Lim Yo-hwan cracked Yoo Jung-hyun's tile tempo to reach the Finals."
+    },
+    {
+      "id": "S3E1",
+      "season": 3,
+      "episode": 1,
+      "airDate": "2014-10-01",
+      "mainMatch": "Fruit Stand",
+      "gameSlug": "black-and-white-2",
+      "gameTitle": {
+        "zh": "黑与白II",
+        "en": "Black and White II",
+        "ko": "흑과 백 II"
+      },
+      "winner": "Shin Ah-young",
+      "eliminated": "Kwon Ju-ri",
+      "note": "Debut of 99-point blind auction Black and White II with 20-point gauge lamps."
+    },
+    {
+      "id": "S3E2",
+      "season": 3,
+      "episode": 2,
+      "airDate": "2014-10-08",
+      "mainMatch": "Jury Game",
+      "gameSlug": "betting-rps",
+      "gameTitle": {
+        "zh": "下注猜拳",
+        "en": "Betting! Rock, Paper, Scissors",
+        "ko": "베팅! 가위바위보"
+      },
+      "winner": "Kang Yong-suk",
+      "eliminated": "Kim Kyung-hoon",
+      "note": "Debut of Betting! RPS (10 rounds, escalating 1/2/3 chip win payouts)."
+    },
+    {
+      "id": "S3E3",
+      "season": 3,
+      "episode": 3,
+      "airDate": "2014-10-15",
+      "mainMatch": "Middle Race",
+      "gameSlug": "black-and-white-2",
+      "gameTitle": {
+        "zh": "黑与白II",
+        "en": "Black and White II",
+        "ko": "흑과 백 II"
+      },
+      "winner": "Choi Yeon-seung",
+      "eliminated": "Kang Yong-suk",
+      "note": "1st and 11th place in Middle Race automatically met; Choi Yeon-seung dominated gauge math."
+    },
+    {
+      "id": "S3E4",
+      "season": 3,
+      "episode": 4,
+      "airDate": "2014-10-22",
+      "mainMatch": "Swords and Shields",
+      "gameSlug": "double-sided-poker",
+      "gameTitle": {
+        "zh": "双面扑克",
+        "en": "Double-Sided Poker",
+        "ko": "양면포커"
+      },
+      "winner": "Kim Jung-hoon",
+      "eliminated": "Nam Hwee-jong",
+      "note": "Debut of Double-Sided Poker (90 cards, front public / back private, double-bet +10 chip bonus)."
+    },
+    {
+      "id": "S3E5",
+      "season": 3,
+      "episode": 5,
+      "airDate": "2014-10-29",
+      "mainMatch": "Miner Game",
+      "gameSlug": "double-sided-poker",
+      "gameTitle": {
+        "zh": "双面扑克",
+        "en": "Double-Sided Poker",
+        "ko": "양면포커"
+      },
+      "winner": "Choi Yeon-seung",
+      "eliminated": "Yoo Su-jin",
+      "note": "Sharp front/back odds discipline secured Choi Yeon-seung's second Death Match win."
+    },
+    {
+      "id": "S3E6",
+      "season": 3,
+      "episode": 6,
+      "airDate": "2014-11-05",
+      "mainMatch": "Stormy Stock Market",
+      "gameSlug": "betting-rps",
+      "gameTitle": {
+        "zh": "下注猜拳",
+        "en": "Betting! Rock, Paper, Scissors",
+        "ko": "베팅! 가위바위보"
+      },
+      "winner": "Lee Jong-bum",
+      "eliminated": "Kim Jung-hoon",
+      "note": "12-round version mixing 6 live spectators and 6 revealed virtual players (S/R/P pairs)."
+    },
+    {
+      "id": "S3E7",
+      "season": 3,
+      "episode": 7,
+      "airDate": "2014-11-12",
+      "mainMatch": "Constellation Game",
+      "gameSlug": "twelve-janggi",
+      "gameTitle": {
+        "zh": "十二将棋",
+        "en": "Twelve Janggi",
+        "ko": "십이장기"
+      },
+      "winner": "Oh Hyun-min",
+      "eliminated": "Lee Jong-bum",
+      "note": "Debut of Twelve Janggi (3x4 Dobutsu Shogi adaptation); Oh Hyun-min's tactical clinic."
+    },
+    {
+      "id": "S3E8",
+      "season": 3,
+      "episode": 8,
+      "airDate": "2014-11-19",
+      "mainMatch": "Investment and Donation",
+      "gameSlug": "memory-maze",
+      "gameTitle": {
+        "zh": "记忆迷宫",
+        "en": "Memory Maze",
+        "ko": "기억의 미로"
+      },
+      "winner": "Kim Yoo-hyun",
+      "eliminated": "Shin Ah-young",
+      "note": "Debut of Memory Maze: 7x7 grid with 32 invisible walls and two 6-step Double Chances."
+    },
+    {
+      "id": "S3E9",
+      "season": 3,
+      "episode": 9,
+      "airDate": "2014-11-26",
+      "mainMatch": "Middle Race",
+      "gameSlug": "memory-maze",
+      "gameTitle": {
+        "zh": "记忆迷宫",
+        "en": "Memory Maze",
+        "ko": "기억의 미로"
+      },
+      "winner": "Ha Yeon-joo",
+      "eliminated": "Kim Yoo-hyun",
+      "note": "Ha Yeon-joo memorized the wall map cleanly to upset Kim Yoo-hyun."
+    },
+    {
+      "id": "S3E10",
+      "season": 3,
+      "episode": 10,
+      "airDate": "2014-12-03",
+      "mainMatch": "Chain Auction",
+      "gameSlug": "monorail",
+      "gameTitle": {
+        "zh": "单轨铁路",
+        "en": "Monorail",
+        "ko": "모노레일"
+      },
+      "winner": "Jang Dong-min",
+      "eliminated": "Ha Yeon-joo",
+      "note": "Legendary debut of Monorail; Jang Dong-min won via an 'Impossible!' call."
+    },
+    {
+      "id": "S3E11",
+      "season": 3,
+      "episode": 11,
+      "airDate": "2014-12-10",
+      "mainMatch": "Doubting Yutnori",
+      "gameSlug": "betting-black-and-white",
+      "gameTitle": {
+        "zh": "下注黑与白",
+        "en": "Betting! Black and White",
+        "ko": "베팅! 흑과 백"
+      },
+      "winner": "Oh Hyun-min",
+      "eliminated": "Choi Yeon-seung",
+      "note": "Pre-committed 10-tile (0–9) + 30-chip schedule with call/fold chip-borrowing mind games."
+    },
+    {
+      "id": "S4E1",
+      "season": 4,
+      "episode": 1,
+      "airDate": "2015-06-27",
+      "mainMatch": "ID Exchange",
+      "gameSlug": "black-and-white",
+      "gameTitle": {
+        "zh": "黑与白",
+        "en": "Black and White",
+        "ko": "흑과 백"
+      },
+      "winner": "Lee Jun-seok",
+      "eliminated": "Yoo Jung-hyun",
+      "note": "Grand Final opener; Lee Jun-seok defeated S2 veteran Yoo Jung-hyun."
+    },
+    {
+      "id": "S4E2",
+      "season": 4,
+      "episode": 2,
+      "airDate": "2015-07-04",
+      "mainMatch": "Horror Race (Garnet Match)",
+      "gameSlug": "tactical-yutnori",
+      "gameTitle": {
+        "zh": "战略掷柶",
+        "en": "Tactical Yutnori",
+        "ko": "전략 윷놀이"
+      },
+      "winner": "Choi Yeon-seung",
+      "eliminated": "Lim Yo-hwan",
+      "note": "Choi Yeon-seung (with Jang Dong-min) defeated Lim Yo-hwan (with Hong Jin-ho)."
+    },
+    {
+      "id": "S4E3",
+      "season": 4,
+      "episode": 3,
+      "airDate": "2015-07-11",
+      "mainMatch": "Today's Menu",
+      "gameSlug": "betting-rps",
+      "gameTitle": {
+        "zh": "下注猜拳",
+        "en": "Betting! Rock, Paper, Scissors",
+        "ko": "베팅! 가위바위보"
+      },
+      "winner": "Kim Kyung-hoon",
+      "eliminated": "Lee Sang-min",
+      "note": "11-round edition with 3x Draw bet payout; Kim Kyung-hoon shocked S2 Champion Lee Sang-min."
+    },
+    {
+      "id": "S4E4",
+      "season": 4,
+      "episode": 4,
+      "airDate": "2015-07-18",
+      "mainMatch": "Fish Shop",
+      "gameSlug": "same-number-hunt",
+      "gameTitle": {
+        "zh": "寻找相同数字",
+        "en": "Same Number Hunt",
+        "ko": "같은 숫자 찾기"
+      },
+      "winner": "Oh Hyun-min",
+      "eliminated": "Lim Yoon-sun",
+      "note": "First Ep 1–11 Death Match appearance; upgraded with √x+√y (+2 pts) and progressive 1-tile reveals."
+    },
+    {
+      "id": "S4E5",
+      "season": 4,
+      "episode": 5,
+      "airDate": "2015-07-25",
+      "mainMatch": "Loyalists and Rebels",
+      "gameSlug": "indian-poker",
+      "gameTitle": {
+        "zh": "印第安扑克",
+        "en": "Indian Poker",
+        "ko": "인디언 포커"
+      },
+      "winner": "Kim Kyung-ran",
+      "eliminated": "Kim Yoo-hyun",
+      "note": "30-chip equal start; Kim Kyung-ran read poker pro Kim Yoo-hyun cold."
+    },
+    {
+      "id": "S4E6",
+      "season": 4,
+      "episode": 6,
+      "airDate": "2015-08-01",
+      "mainMatch": "Garnet Thief (Garnet Match)",
+      "gameSlug": "monorail",
+      "gameTitle": {
+        "zh": "单轨铁路",
+        "en": "Monorail",
+        "ko": "모노레일"
+      },
+      "winner": "Lee Jun-seok",
+      "eliminated": "Choi Yeon-seung",
+      "note": "High-speed tactical loop geometry between two math-focused players."
+    },
+    {
+      "id": "S4E7",
+      "season": 4,
+      "episode": 7,
+      "airDate": "2015-08-08",
+      "mainMatch": "Seed Poker",
+      "gameSlug": "same-picture-hunt",
+      "gameTitle": {
+        "zh": "寻找相同图片",
+        "en": "Same Picture Hunt",
+        "ko": "같은 그림 찾기"
+      },
+      "winner": "Kim Kyung-hoon",
+      "eliminated": "Choi Jung-moon",
+      "note": "Equal starting positions on the conveyor belt; Kim Kyung-hoon's comeback streak."
+    },
+    {
+      "id": "S4E8",
+      "season": 4,
+      "episode": 8,
+      "airDate": "2015-08-15",
+      "mainMatch": "Minus Auction II",
+      "gameSlug": "gyul-hap",
+      "gameTitle": {
+        "zh": "结!合!",
+        "en": "Gyul! Hap!",
+        "ko": "결! 합!"
+      },
+      "winner": "Jang Dong-min",
+      "eliminated": "Kim Kyung-ran",
+      "note": "Jang Dong-min won 10-round Gyul! Hap! with relentless tempo & Gyul timing."
+    },
+    {
+      "id": "S4E9",
+      "season": 4,
+      "episode": 9,
+      "airDate": "2015-08-22",
+      "mainMatch": "Horror Race II",
+      "gameSlug": "quattro",
+      "gameTitle": {
+        "zh": "四色牌",
+        "en": "Quattro",
+        "ko": "콰트로"
+      },
+      "winner": "Kim Kyung-hoon",
+      "eliminated": "Lee Jun-seok",
+      "note": "S4 deterministic 26-card + 6 Virtual Players rule set (0-card valid in Quattro)."
+    },
+    {
+      "id": "S4E10",
+      "season": 4,
+      "episode": 10,
+      "airDate": "2015-08-29",
+      "mainMatch": "Cooperative Hold'em (Garnet Match)",
+      "gameSlug": "double-sided-poker",
+      "gameTitle": {
+        "zh": "双面扑克",
+        "en": "Double-Sided Poker",
+        "ko": "양면포커"
+      },
+      "winner": "Kim Kyung-hoon",
+      "eliminated": "Hong Jin-ho",
+      "note": "S4 200-card odd/even-paired deck, 40 chips each; legendary match eliminating Hong Jin-ho."
+    },
+    {
+      "id": "S4E11",
+      "season": 4,
+      "episode": 11,
+      "airDate": "2015-09-05",
+      "mainMatch": "How Much",
+      "gameSlug": "twelve-janggi",
+      "gameTitle": {
+        "zh": "十二将棋",
+        "en": "Twelve Janggi",
+        "ko": "십이장기"
+      },
+      "winner": "Jang Dong-min",
+      "eliminated": "Oh Hyun-min",
+      "note": "Best-of-3 Twelve Janggi (30s turn clock) between the S3 finalists; Jang Dong-min won 2–1."
+    }
+  ]
+}

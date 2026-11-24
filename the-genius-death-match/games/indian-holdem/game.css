@@ -1,0 +1,548 @@
+/* ==========================================================================
+ * Indian Hold'em (印第安德州扑克) — Emerald Velvet & Violet Holo Hold'em Table
+ * ========================================================================== */
+
+.ih-arena {
+  width: 100%;
+  max-width: 1020px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px 4px 18px;
+}
+
+/* Top 40-Card Shoe Tracker */
+.ih-shoe-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--tg-radius-md);
+  background: rgba(10, 14, 22, 0.88);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.48);
+}
+
+.ih-shoe-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--tg-ink-muted);
+}
+
+.ih-shoe-count {
+  font-family: var(--tg-font-mono);
+  font-weight: 800;
+  color: #ddd6fe;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+}
+
+.ih-tracker-grid {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.ih-tracker-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 34px;
+  padding: 4px 5px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--tg-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tg-ink-muted);
+}
+
+.ih-tracker-cell.is-exhausted {
+  opacity: 0.32;
+}
+
+.ih-tracker-pips {
+  display: grid;
+  grid-template-columns: repeat(2, 5px);
+  gap: 2.5px;
+}
+
+.ih-pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 5px rgba(52, 211, 153, 0.6);
+}
+
+.ih-pip.is-spent {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+
+.ih-pip.is-live-board {
+  background: #c084fc;
+  box-shadow: 0 0 7px rgba(192, 132, 252, 0.85);
+}
+
+.ih-pip.is-live-opp {
+  background: var(--tg-cyan);
+  box-shadow: 0 0 7px var(--tg-cyan-glow);
+}
+
+/* Luxury Emerald-Velvet Hold'em Table */
+.ih-table {
+  position: relative;
+  border-radius: 30px;
+  padding: 22px 20px 24px;
+  background:
+    radial-gradient(ellipse 68% 52% at 50% 48%, rgba(12, 62, 52, 0.86) 0%, rgba(10, 26, 28, 0.96) 56%, #07090f 100%);
+  border: 2px solid rgba(228, 185, 91, 0.45);
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.82),
+    inset 0 0 0 9px rgba(52, 211, 153, 0.06),
+    0 24px 66px rgba(0, 0, 0, 0.74),
+    0 0 46px rgba(139, 92, 246, 0.16);
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.ih-table::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 22px;
+  border: 1px solid rgba(228, 185, 91, 0.18);
+  pointer-events: none;
+}
+
+.ih-table.is-penalty-flash {
+  animation: ih-shake 0.7s ease-out;
+  border-color: var(--tg-garnet-bright);
+  box-shadow:
+    inset 0 0 90px rgba(217, 27, 58, 0.45),
+    0 0 55px rgba(255, 46, 84, 0.55);
+}
+
+@keyframes ih-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.ih-seat-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.ih-plate {
+  min-width: 210px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(7, 10, 16, 0.82);
+  border: 1px solid var(--tg-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.ih-plate.is-active {
+  border-color: var(--tg-gold-bright);
+  box-shadow: 0 0 24px rgba(228, 185, 91, 0.3);
+}
+
+.ih-plate.is-winner {
+  border-color: var(--tg-emerald);
+  box-shadow: 0 0 28px rgba(34, 197, 94, 0.38);
+}
+
+.ih-plate-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ih-chip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ih-chip-num {
+  font-family: var(--tg-font-mono);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--tg-gold-bright);
+}
+
+.ih-bet-tag {
+  font-family: var(--tg-font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(217, 27, 58, 0.22);
+  border: 1px solid rgba(255, 46, 84, 0.5);
+  color: #ffb3c1;
+}
+
+/* Hand Rank Telemetry Pill */
+.ih-rank-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--tg-ink-muted);
+}
+
+.ih-rank-pill.tier-4 {
+  background: linear-gradient(135deg, rgba(255, 46, 84, 0.3), rgba(139, 92, 246, 0.3));
+  border-color: #ff4d6d;
+  color: #ffe2e8;
+  box-shadow: 0 0 18px rgba(255, 46, 84, 0.35);
+}
+
+.ih-rank-pill.tier-3 {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.28), rgba(56, 189, 248, 0.22));
+  border-color: #c084fc;
+  color: #f3e8ff;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.32);
+}
+
+.ih-rank-pill.tier-2 {
+  background: rgba(228, 185, 91, 0.18);
+  border-color: rgba(228, 185, 91, 0.55);
+  color: var(--tg-gold-bright);
+}
+
+/* Cards */
+.ih-card-3d {
+  width: 108px;
+  height: 152px;
+  perspective: 1000px;
+}
+
+.ih-card-3d.is-community {
+  width: 114px;
+  height: 158px;
+}
+
+.ih-card-front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(228, 185, 91, 0.18), transparent 64%),
+    linear-gradient(160deg, #1d2438 0%, #0d101b 70%, #07090f 100%);
+  border: 2px solid var(--tg-gold);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.72), 0 0 22px rgba(228, 185, 91, 0.2);
+}
+
+.ih-card-front.is-comm-card {
+  background:
+    radial-gradient(circle at 50% 24%, rgba(168, 85, 247, 0.32), transparent 66%),
+    linear-gradient(160deg, #241942 0%, #100c20 68%, #090712 100%);
+  border-color: #c084fc;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.78),
+    0 0 34px rgba(168, 85, 247, 0.38),
+    inset 0 0 24px rgba(192, 132, 252, 0.16);
+}
+
+.ih-card-num {
+  font-family: var(--tg-font-display);
+  font-size: 54px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #fff8de 0%, #e4b95b 62%, #9a7022 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ih-card-front.is-comm-card .ih-card-num {
+  background: linear-gradient(180deg, #faf5ff 0%, #d8b4fe 55%, #9333ea 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 3px 14px rgba(168, 85, 247, 0.6));
+}
+
+.ih-card-corner {
+  position: absolute;
+  font-family: var(--tg-font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--tg-gold);
+}
+.ih-card-corner.tl { top: 9px; left: 10px; }
+.ih-card-corner.br { bottom: 9px; right: 10px; transform: rotate(180deg); }
+.ih-card-front.is-comm-card .ih-card-corner { color: #d8b4fe; }
+
+.ih-card-tag {
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.ih-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(217, 27, 58, 0.08) 0px,
+      rgba(217, 27, 58, 0.08) 2px,
+      transparent 2px,
+      transparent 10px
+    ),
+    radial-gradient(circle at 50% 50%, #2d0b18 0%, #0d0a16 76%);
+  border: 2px solid rgba(255, 46, 84, 0.65);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.78), 0 0 28px rgba(217, 27, 58, 0.32);
+}
+
+.ih-back-q {
+  font-family: var(--tg-font-display);
+  font-size: 50px;
+  font-weight: 900;
+  color: #ff6280;
+  text-shadow: 0 0 22px rgba(255, 46, 84, 0.75);
+  line-height: 1;
+}
+
+/* Center Community Pedestal + Pot */
+.ih-center-arena {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+}
+
+.ih-community-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.ih-community-pedestal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-radius: 20px;
+  background: rgba(12, 10, 26, 0.76);
+  border: 1.5px solid rgba(168, 85, 247, 0.52);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.68),
+    0 0 36px rgba(139, 92, 246, 0.25),
+    inset 0 0 24px rgba(168, 85, 247, 0.12);
+}
+
+.ih-pot-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: rgba(10, 12, 20, 0.9);
+  border: 1.5px solid var(--tg-gold);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), 0 0 24px rgba(228, 185, 91, 0.22);
+}
+
+.ih-pot-val {
+  font-family: var(--tg-font-mono);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--tg-gold-bright);
+  line-height: 1.05;
+}
+
+/* Board Outs Telemetry Strip */
+.ih-outs-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(8, 11, 20, 0.8);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  font-size: 11.5px;
+  color: var(--tg-ink-muted);
+}
+
+.ih-out-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ih-out-num {
+  font-family: var(--tg-font-mono);
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.ih-out-num.is-triple { background: rgba(255, 46, 84, 0.24); color: #ff99ab; border: 1px solid rgba(255, 46, 84, 0.5); }
+.ih-out-num.is-straight { background: rgba(168, 85, 247, 0.24); color: #e9d5ff; border: 1px solid rgba(192, 132, 252, 0.5); }
+.ih-out-num.is-pair { background: rgba(228, 185, 91, 0.2); color: var(--tg-gold-bright); border: 1px solid rgba(228, 185, 91, 0.45); }
+
+/* Showdown Banner & Controls */
+.ih-banner {
+  width: 100%;
+  max-width: 600px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(20, 26, 44, 0.95), rgba(10, 13, 24, 0.97));
+  border: 1.5px solid var(--tg-gold);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.ih-banner.is-penalty {
+  background: linear-gradient(135deg, rgba(96, 10, 28, 0.94), rgba(32, 6, 14, 0.97));
+  border-color: var(--tg-garnet-bright);
+  box-shadow: 0 14px 42px rgba(217, 27, 58, 0.48);
+}
+
+.ih-controls {
+  padding: 14px 16px;
+  border-radius: var(--tg-radius-md);
+  background: rgba(10, 12, 20, 0.92);
+  border: 1px solid var(--tg-border-strong);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.58);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.ih-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ih-act-btn {
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 10px;
+}
+
+.ih-act-btn small {
+  font-family: var(--tg-font-mono);
+  font-size: 10.5px;
+  opacity: 0.85;
+}
+
+.ih-slider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ih-slider {
+  flex: 1;
+  min-width: 120px;
+  accent-color: #a855f7;
+  cursor: pointer;
+}
+
+.ih-warn-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(217, 27, 58, 0.14);
+  border: 1px solid rgba(255, 46, 84, 0.42);
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff99ab;
+}
+
+.ih-rank-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--tg-ink-faint);
+}
+
+@media (max-width: 640px) {
+  .ih-table {
+    padding: 15px 12px 18px;
+    border-radius: 20px;
+  }
+  .ih-card-3d,
+  .ih-card-3d.is-community {
+    width: 92px;
+    height: 132px;
+  }
+  .ih-card-num {
+    font-size: 44px;
+  }
+  .ih-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,436 @@
+/* ==========================================================================
+ * Betting! Black and White (下注黑与白) — Two-Phase Broadcast Partition Table
+ * ========================================================================== */
+
+.bbw-arena {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px 4px 20px;
+}
+
+/* ---- Top Reserve Bank & Phase Telemetry ---- */
+.bbw-header-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--tg-radius-md);
+  background: linear-gradient(135deg, rgba(16, 19, 32, 0.94), rgba(8, 10, 17, 0.96));
+  border: 1px solid var(--tg-border);
+  box-shadow: var(--tg-shadow-card);
+}
+
+.bbw-bank-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bbw-bank-side.is-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.bbw-bank-chip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(217, 27, 58, 0.22), rgba(90, 8, 24, 0.36));
+  border: 1px solid rgba(255, 68, 102, 0.56);
+  font-family: var(--tg-font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffd5dd;
+}
+
+.bbw-bank-chip-pill.is-gold {
+  background: linear-gradient(135deg, rgba(228, 185, 91, 0.22), rgba(110, 78, 16, 0.34));
+  border-color: rgba(228, 185, 91, 0.65);
+  color: var(--tg-gold-bright);
+}
+
+/* ---- PHASE 1: Secret Partition Setup Planner ---- */
+.bbw-setup-panel {
+  padding: 18px 20px;
+  border-radius: var(--tg-radius-lg);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(217, 27, 58, 0.14), transparent 65%),
+    linear-gradient(180deg, rgba(15, 18, 30, 0.96), rgba(8, 10, 17, 0.98));
+  border: 1px solid var(--tg-border-strong);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bbw-setup-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bbw-preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.bbw-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bbw-setup-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 4px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--tg-border-subtle);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.bbw-setup-col.is-swap-selected {
+  border-color: var(--tg-gold-bright);
+  background: rgba(228, 185, 91, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(228, 185, 91, 0.3);
+}
+
+.bbw-slot-idx {
+  font-family: var(--tg-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tg-ink-faint);
+}
+
+.bbw-setup-tile {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-width: 72px;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.16s var(--tg-ease), box-shadow 0.16s;
+}
+
+.bbw-setup-tile.is-black {
+  background: linear-gradient(170deg, #252a3d 0%, #0d1019 65%, #05060a 100%);
+  border: 1.5px solid rgba(186, 200, 224, 0.42);
+  color: #f8fafc;
+  box-shadow: 0 4px 0 #040508, 0 8px 16px rgba(0, 0, 0, 0.6);
+}
+
+.bbw-setup-tile.is-white {
+  background: linear-gradient(170deg, #fffdf9 0%, #ebe3d4 62%, #cfc3ae 100%);
+  border: 1.5px solid #ffffff;
+  color: #0b0d14;
+  box-shadow: 0 4px 0 #8a7f6b, 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.bbw-setup-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--tg-gold-bright);
+}
+
+.bbw-setup-num {
+  font-family: var(--tg-font-display);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.bbw-chip-ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.bbw-chip-stack-vis {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  height: 44px;
+  justify-content: flex-start;
+  gap: 2px;
+}
+
+.bbw-chip-disc {
+  width: 30px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff5475, #d91b3a 50%, #8f0820);
+  border: 1px solid rgba(255, 220, 170, 0.65);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.bbw-chip-disc.is-gold {
+  background: linear-gradient(90deg, #fff2c6, #e4b95b 50%, #9b6c1c);
+}
+
+.bbw-chip-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bbw-mini-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--tg-border);
+  color: var(--tg-ink);
+  font-family: var(--tg-font-mono);
+  font-weight: 800;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bbw-mini-btn:hover:not(:disabled) {
+  border-color: var(--tg-gold-bright);
+  background: rgba(228, 185, 91, 0.22);
+}
+
+.bbw-chip-count {
+  font-family: var(--tg-font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 20px;
+  text-align: center;
+  color: var(--tg-gold-bright);
+}
+
+/* ---- PHASE 2: Twin 10-Column Monolith Skylines ---- */
+.bbw-skyline-panel {
+  padding: 12px 14px;
+  border-radius: var(--tg-radius-md);
+  background: rgba(11, 13, 22, 0.9);
+  border: 1px solid var(--tg-border);
+  box-shadow: var(--tg-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bbw-skyline-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tg-ink-muted);
+}
+
+.bbw-skyline-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.bbw-monolith-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 4px;
+  border-radius: 10px;
+  border: 1px solid var(--tg-border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+  transition: transform 0.25s var(--tg-ease), border-color 0.25s, opacity 0.25s;
+}
+
+.bbw-monolith-col.is-active-slot {
+  border: 2px solid var(--tg-gold-bright);
+  background: rgba(228, 185, 91, 0.13);
+  box-shadow: 0 0 24px rgba(228, 185, 91, 0.32);
+  transform: scale(1.04);
+  z-index: 2;
+}
+
+.bbw-monolith-col.is-resolved {
+  opacity: 0.62;
+}
+
+.bbw-monolith-col.is-won {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.bbw-monolith-col.is-lost {
+  border-color: rgba(217, 27, 58, 0.45);
+  background: rgba(217, 27, 58, 0.07);
+}
+
+.bbw-pillar {
+  width: 100%;
+  max-width: 56px;
+  height: 60px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--tg-font-display);
+  font-weight: 900;
+  font-size: 22px;
+}
+
+.bbw-pillar.is-black {
+  background: linear-gradient(170deg, #24293a, #0b0d15);
+  border: 1.5px solid rgba(186, 200, 224, 0.38);
+  color: #f8fafc;
+}
+
+.bbw-pillar.is-white {
+  background: linear-gradient(170deg, #fffdf8, #dfd5c2);
+  border: 1.5px solid #ffffff;
+  color: #0b0d14;
+}
+
+.bbw-pillar-chips {
+  font-family: var(--tg-font-mono);
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(217, 27, 58, 0.24);
+  border: 1px solid rgba(255, 68, 102, 0.5);
+  color: #ffd5dd;
+}
+
+.bbw-pillar-chips.is-borrowed {
+  background: rgba(245, 158, 11, 0.24);
+  border-color: rgba(245, 158, 11, 0.65);
+  color: #fde68a;
+}
+
+/* ---- Central Clash & Call/Borrow Stage ---- */
+.bbw-clash-stage {
+  padding: 18px 20px;
+  border-radius: var(--tg-radius-lg);
+  background:
+    radial-gradient(ellipse 65% 58% at 50% 45%, rgba(217, 27, 58, 0.14), transparent 70%),
+    linear-gradient(180deg, rgba(16, 19, 32, 0.96), rgba(8, 10, 17, 0.98));
+  border: 1px solid var(--tg-border-strong);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.72);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bbw-clash-duel {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.bbw-duel-card-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bbw-duel-tile {
+  width: 112px;
+  height: 132px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: transform 0.35s var(--tg-ease), box-shadow 0.35s;
+}
+
+.bbw-duel-tile.is-black {
+  background: linear-gradient(160deg, #272c40, #0d101a 60%, #05060a);
+  border: 2px solid rgba(186, 200, 224, 0.5);
+  color: #f8fafc;
+  box-shadow: 0 8px 0 #040508, 0 18px 34px rgba(0, 0, 0, 0.75);
+}
+
+.bbw-duel-tile.is-white {
+  background: linear-gradient(160deg, #fffdf9, #ebe3d4 60%, #cfc3ae);
+  border: 2px solid #ffffff;
+  color: #0b0d14;
+  box-shadow: 0 8px 0 #8a7f6b, 0 18px 34px rgba(0, 0, 0, 0.6);
+}
+
+.bbw-duel-tile.is-winner {
+  border-color: var(--tg-gold-bright);
+  box-shadow: 0 8px 0 #5b4111, 0 0 0 3px rgba(255, 240, 194, 0.65), 0 0 38px rgba(228, 185, 91, 0.65);
+  transform: translateY(-4px) scale(1.05);
+}
+
+.bbw-duel-num {
+  font-family: var(--tg-font-display);
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Borrow Drawer (Choose Reserve / Future Slots) */
+.bbw-borrow-drawer {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(8, 10, 18, 0.85);
+  border: 1px solid rgba(228, 185, 91, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bbw-borrow-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bbw-borrow-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--tg-border-subtle);
+  font-family: var(--tg-font-mono);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .bbw-setup-grid,
+  .bbw-skyline-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .bbw-header-bar,
+  .bbw-clash-duel {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}

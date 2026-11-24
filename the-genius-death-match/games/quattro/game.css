@@ -1,0 +1,409 @@
+/* ==========================================================================
+ * Quattro (四色牌) — Radiant 4-Suit Crystal Card Salon & 6 Holographic VP Pods
+ * ========================================================================== */
+
+.qt-arena {
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px 4px 20px;
+}
+
+/* Top Progress & Quota Strip */
+.qt-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: var(--tg-radius-md);
+  background: rgba(10, 14, 24, 0.9);
+  border: 1px solid rgba(16, 185, 129, 0.36);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+.qt-phase-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--tg-ink);
+}
+
+.qt-quota-pill {
+  font-family: var(--tg-font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  color: #a7f3d0;
+}
+
+/* Main Card Salon Table */
+.qt-salon {
+  position: relative;
+  border-radius: 28px;
+  padding: 20px 18px 22px;
+  background:
+    radial-gradient(ellipse 68% 50% at 50% 48%, rgba(16, 52, 46, 0.72) 0%, rgba(11, 15, 26, 0.96) 62%, #06080f 100%);
+  border: 2px solid rgba(228, 185, 91, 0.38);
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.8),
+    0 24px 60px rgba(0, 0, 0, 0.72),
+    0 0 42px rgba(16, 185, 129, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Player Tray Sections */
+.qt-tray {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(8, 11, 19, 0.78);
+  border: 1.5px solid var(--tg-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.28s, box-shadow 0.28s;
+}
+
+.qt-tray.is-my-turn {
+  border-color: var(--tg-gold-bright);
+  box-shadow: 0 0 28px rgba(228, 185, 91, 0.24);
+}
+
+.qt-tray.is-valid-quattro {
+  border-color: #34d399;
+  box-shadow: 0 0 32px rgba(16, 185, 129, 0.34), inset 0 0 24px rgba(16, 185, 129, 0.1);
+}
+
+.qt-tray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.qt-cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Radiant Crystal Cards (R / B / G / Y / Black 0) */
+.qt-card {
+  position: relative;
+  aspect-ratio: 3 / 4.2;
+  min-height: 124px;
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s var(--tg-ease), box-shadow 0.22s var(--tg-ease), border-color 0.2s;
+  user-select: none;
+  overflow: hidden;
+}
+
+.qt-card.is-clickable {
+  cursor: pointer;
+}
+
+.qt-card.is-clickable:hover {
+  transform: translateY(-5px) scale(1.03);
+}
+
+.qt-card.is-selected {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 0 0 3px #fff, 0 0 30px rgba(255, 240, 194, 0.7) !important;
+}
+
+.qt-card.is-dragging {
+  opacity: 0.55;
+  transform: scale(0.95);
+}
+
+.qt-card.is-revealed {
+  border-style: solid;
+}
+
+.qt-card.is-hidden-own::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.32);
+  pointer-events: none;
+}
+
+/* Suit Crystal Gradients */
+.qt-card.suit-R {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 130, 155, 0.35), transparent 60%),
+    linear-gradient(155deg, #5c0f22 0%, #2b0710 62%, #140307 100%);
+  border-color: #ff4769;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(255, 46, 84, 0.32);
+}
+
+.qt-card.suit-B {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(125, 211, 252, 0.35), transparent 60%),
+    linear-gradient(155deg, #0d3659 0%, #071c33 62%, #030d19 100%);
+  border-color: #38bdf8;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(56, 189, 248, 0.3);
+}
+
+.qt-card.suit-G {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(134, 239, 172, 0.34), transparent 60%),
+    linear-gradient(155deg, #0c4729 0%, #062415 62%, #03110a 100%);
+  border-color: #22c55e;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(34, 197, 94, 0.3);
+}
+
+.qt-card.suit-Y {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(254, 240, 138, 0.38), transparent 60%),
+    linear-gradient(155deg, #5c4308 0%, #2d2004 62%, #140e02 100%);
+  border-color: #facc15;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(250, 204, 21, 0.28);
+}
+
+.qt-card.suit-K {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 46, 84, 0.1) 0 2px, transparent 2px 10px),
+    radial-gradient(circle at 50% 40%, #26293d 0%, #090a10 75%);
+  border-color: #94a3b8;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.78), 0 0 24px rgba(255, 46, 84, 0.28);
+}
+
+.qt-card.suit-hidden {
+  background:
+    repeating-linear-gradient(45deg, rgba(228, 185, 91, 0.06) 0 2px, transparent 2px 10px),
+    linear-gradient(155deg, #171c2e 0%, #090b13 100%);
+  border-color: rgba(228, 185, 91, 0.3);
+}
+
+.qt-card-num {
+  font-family: var(--tg-font-display);
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.6);
+}
+
+.qt-card.suit-K .qt-card-num {
+  color: #ff6b86;
+  text-shadow: 0 0 18px rgba(255, 46, 84, 0.75);
+}
+
+.qt-card-suit-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.qt-card-state-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--tg-gold-bright);
+}
+
+.qt-card.is-conflict {
+  box-shadow: 0 0 0 2px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.45);
+}
+
+/* Live 4-Color Validity & Total-Sum Power Meter */
+.qt-meter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(12, 16, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.qt-color-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.qt-color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.25;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.qt-color-dot.is-lit {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.qt-color-dot.c-R { background: #dc2626; color: #fff; box-shadow: 0 0 12px rgba(239, 68, 68, 0.55); }
+.qt-color-dot.c-B { background: #0284c7; color: #fff; box-shadow: 0 0 12px rgba(56, 189, 248, 0.55); }
+.qt-color-dot.c-G { background: #16a34a; color: #fff; box-shadow: 0 0 12px rgba(34, 197, 94, 0.55); }
+.qt-color-dot.c-Y { background: #ca8a04; color: #fff; box-shadow: 0 0 12px rgba(250, 204, 21, 0.55); }
+.qt-color-dot.c-K { background: #1e293b; color: #ff6b86; border-color: #ff4769; box-shadow: 0 0 12px rgba(255, 46, 84, 0.5); }
+
+.qt-power-meter {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.qt-meter-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.qt-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #38bdf8, #34d399, #facc15);
+  transition: width 0.35s var(--tg-ease);
+}
+
+.qt-meter-fill.is-quattro {
+  background: linear-gradient(90deg, #22c55e, #e4b95b, #fff0c2);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+}
+
+/* 6 Holographic Virtual Player Pods */
+.qt-vp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.qt-vp-pod {
+  position: relative;
+  padding: 12px 13px;
+  border-radius: 15px;
+  background: linear-gradient(155deg, rgba(16, 22, 38, 0.9), rgba(8, 11, 20, 0.94));
+  border: 1.5px solid rgba(56, 189, 248, 0.32);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.18s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.qt-vp-pod.is-tradeable {
+  cursor: pointer;
+  border-color: rgba(52, 211, 153, 0.65);
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.22);
+}
+
+.qt-vp-pod.is-tradeable:hover,
+.qt-vp-pod.is-drag-over {
+  transform: translateY(-3px);
+  border-color: var(--tg-gold-bright);
+  box-shadow: 0 0 30px rgba(228, 185, 91, 0.45);
+}
+
+.qt-vp-pod.is-used-by-me {
+  opacity: 0.6;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.qt-vp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.qt-vp-deposits {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 24px;
+}
+
+.qt-mini-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: var(--tg-font-mono);
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.qt-mini-card.suit-R { background: #be123c; }
+.qt-mini-card.suit-B { background: #0369a1; }
+.qt-mini-card.suit-G { background: #15803d; }
+.qt-mini-card.suit-Y { background: #a16207; }
+.qt-mini-card.suit-K { background: #0f172a; color: #ff6b86; border-color: #ff4769; }
+
+/* Action Dock */
+.qt-controls {
+  padding: 13px 16px;
+  border-radius: var(--tg-radius-md);
+  background: rgba(10, 12, 20, 0.92);
+  border: 1px solid var(--tg-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .qt-vp-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .qt-cards-row {
+    gap: 8px;
+  }
+  .qt-card {
+    min-height: 102px;
+  }
+  .qt-card-num {
+    font-size: 34px;
+  }
+}

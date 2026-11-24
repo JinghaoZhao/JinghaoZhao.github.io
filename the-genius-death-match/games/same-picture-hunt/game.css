@@ -1,0 +1,458 @@
+/* ==========================================================================
+ * SAME PICTURE HUNT (寻找相同图片) — 3D Flip-Wall & Dual Neon Conveyor Belts
+ * ========================================================================== */
+
+.sph-arena {
+  width: 100%;
+  max-width: 1060px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Target Spotlight & Combo Header */
+.sph-spotlight {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-radius: var(--tg-radius-lg);
+  background:
+    radial-gradient(ellipse 60% 100% at 50% 0%, rgba(34, 211, 238, 0.16), transparent 70%),
+    linear-gradient(160deg, rgba(18, 22, 38, 0.96), rgba(9, 11, 19, 0.98));
+  border: 1px solid var(--tg-border-strong);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.65);
+  flex-wrap: wrap;
+}
+
+.sph-target-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sph-target-frame {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.12), #0a0e1a 82%);
+  border: 2px solid var(--tg-gold-bright);
+  box-shadow: 0 0 28px var(--tg-gold-glow), inset 0 0 18px rgba(228, 185, 91, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  animation: sph-target-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes sph-target-pulse {
+  0%, 100% { box-shadow: 0 0 22px rgba(228, 185, 91, 0.35), inset 0 0 16px rgba(228, 185, 91, 0.15); }
+  50% { box-shadow: 0 0 36px rgba(228, 185, 91, 0.65), inset 0 0 22px rgba(228, 185, 91, 0.28); }
+}
+
+.sph-target-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sph-target-kicker {
+  font-family: var(--tg-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tg-cyan);
+}
+
+.sph-target-name {
+  font-family: var(--tg-font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--tg-ink);
+}
+
+.sph-combo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: var(--tg-font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgba(228, 185, 91, 0.26), rgba(217, 27, 58, 0.32));
+  border: 1px solid var(--tg-gold-bright);
+  color: var(--tg-gold-bright);
+  box-shadow: 0 0 24px rgba(228, 185, 91, 0.42);
+  animation: sph-combo-pop 0.4s var(--tg-ease);
+}
+
+@keyframes sph-combo-pop {
+  0% { transform: scale(0.75); }
+  60% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* Main Content Grid: 4x4 Flip Wall + Dual Conveyor Belts */
+.sph-main {
+  display: grid;
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+/* 4x4 3D Flip Wall */
+.sph-wall-panel {
+  padding: 16px;
+  border-radius: var(--tg-radius-lg);
+  background: linear-gradient(165deg, rgba(16, 20, 34, 0.96), rgba(7, 9, 15, 0.98));
+  border: 1px solid var(--tg-border-strong);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72);
+}
+
+.sph-wall-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.sph-tile-slot {
+  aspect-ratio: 1 / 1;
+  perspective: 900px;
+  position: relative;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.sph-tile-slot:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.sph-tile-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sph-tile-slot.is-flipped .sph-tile-inner {
+  transform: rotateY(180deg);
+}
+
+.sph-tile-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 13px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Closed Metallic A–P Face */
+.sph-tile-front {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08), transparent 55%),
+    linear-gradient(165deg, #212842 0%, #101422 100%);
+  border: 1.5px solid rgba(228, 185, 91, 0.35);
+  box-shadow: 0 6px 0 #070910, 0 12px 22px rgba(0, 0, 0, 0.55);
+  transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
+}
+
+.sph-tile-slot.is-clickable:hover .sph-tile-front {
+  border-color: var(--tg-gold-bright);
+  box-shadow: 0 7px 0 #070910, 0 0 24px rgba(228, 185, 91, 0.42);
+  transform: translateY(-2px);
+}
+
+.sph-tile-letter {
+  font-family: var(--tg-font-display);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--tg-gold-bright);
+  text-shadow: 0 2px 14px rgba(228, 185, 91, 0.35);
+  line-height: 1;
+}
+
+.sph-tile-sub {
+  margin-top: 4px;
+  font-family: var(--tg-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--tg-ink-faint);
+}
+
+/* Revealed Emblem Face */
+.sph-tile-back {
+  transform: rotateY(180deg);
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.1), #0b0e19 85%);
+  border: 2px solid var(--tg-cyan);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.32), inset 0 0 20px rgba(34, 211, 238, 0.12);
+  padding: 10px;
+}
+
+.sph-tile-slot.is-match .sph-tile-back {
+  border-color: var(--tg-emerald);
+  background: radial-gradient(circle at 50% 35%, rgba(34, 197, 94, 0.25), #071911 85%);
+  box-shadow: 0 0 34px rgba(34, 197, 94, 0.65), inset 0 0 24px rgba(34, 197, 94, 0.22);
+}
+
+.sph-tile-slot.is-miss .sph-tile-back {
+  border-color: var(--tg-garnet-bright);
+  background: radial-gradient(circle at 50% 35%, rgba(255, 46, 84, 0.24), #1d070e 85%);
+  box-shadow: 0 0 30px rgba(255, 46, 84, 0.58), inset 0 0 20px rgba(255, 46, 84, 0.2);
+}
+
+.sph-tile-badge-corner {
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  font-family: var(--tg-font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sph-tile-emblem-name {
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--tg-ink);
+  letter-spacing: 0.04em;
+}
+
+.sph-emblem-svg {
+  width: 56%;
+  height: 56%;
+  display: block;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
+}
+
+/* Reveal Outcome Banner */
+.sph-reveal-bar {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sph-reveal-bar.is-match {
+  background: rgba(34, 197, 94, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  color: #bbf7d0;
+}
+
+.sph-reveal-bar.is-miss {
+  background: rgba(217, 27, 58, 0.2);
+  border: 1px solid rgba(255, 46, 84, 0.65);
+  color: #ffd0da;
+}
+
+/* Right Side: Dual 20-Slot Conveyor Belts */
+.sph-belts-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sph-belt-card {
+  padding: 14px 16px;
+  border-radius: var(--tg-radius-md);
+  background: var(--tg-glass);
+  border: 1px solid var(--tg-border);
+  box-shadow: var(--tg-shadow-card);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sph-belt-card.is-active-cyan {
+  border-color: rgba(34, 211, 238, 0.72);
+  box-shadow: 0 0 28px rgba(34, 211, 238, 0.18), var(--tg-shadow-card);
+}
+
+.sph-belt-card.is-active-garnet {
+  border-color: rgba(255, 46, 84, 0.75);
+  box-shadow: 0 0 28px rgba(255, 46, 84, 0.2), var(--tg-shadow-card);
+}
+
+.sph-belt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sph-belt-name {
+  font-weight: 800;
+  font-size: 14.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sph-belt-metrics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--tg-font-mono);
+  font-size: 12px;
+}
+
+/* 20-Slot Conveyor Track Visual */
+.sph-track-wrap {
+  position: relative;
+  padding: 8px 6px;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 6px,
+      transparent 6px,
+      transparent 14px
+    ),
+    #070911;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  margin-bottom: 12px;
+}
+
+.sph-track-ends {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--tg-font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+}
+
+.sph-track-slots {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 2px;
+}
+
+.sph-track-cell {
+  height: 22px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transition: all 0.25s var(--tg-ease);
+}
+
+.sph-track-cell.is-danger {
+  background: rgba(217, 27, 58, 0.18);
+  border-color: rgba(255, 46, 84, 0.35);
+}
+
+.sph-track-cell.is-finish {
+  background: rgba(228, 185, 91, 0.22);
+  border-color: rgba(228, 185, 91, 0.6);
+}
+
+.sph-track-cell.is-passed-cyan {
+  background: rgba(34, 211, 238, 0.22);
+  border-color: rgba(34, 211, 238, 0.45);
+}
+.sph-track-cell.is-passed-garnet {
+  background: rgba(255, 46, 84, 0.22);
+  border-color: rgba(255, 46, 84, 0.45);
+}
+
+.sph-track-cell.is-runner-cyan {
+  background: var(--tg-cyan);
+  border-color: #ecfeff;
+  box-shadow: 0 0 14px var(--tg-cyan);
+  color: #03151c;
+  font-weight: 900;
+  transform: scale(1.18);
+  z-index: 2;
+}
+.sph-track-cell.is-runner-garnet {
+  background: var(--tg-garnet-bright);
+  border-color: #ffe4e9;
+  box-shadow: 0 0 14px var(--tg-garnet-bright);
+  color: #fff;
+  font-weight: 900;
+  transform: scale(1.18);
+  z-index: 2;
+}
+
+/* Upcoming 5 Conveyor Cards Preview */
+.sph-upcoming-label {
+  font-family: var(--tg-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--tg-ink-faint);
+  margin-bottom: 6px;
+}
+
+.sph-upcoming-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+.sph-belt-item {
+  position: relative;
+  border-radius: 9px;
+  padding: 7px 5px 5px;
+  background: rgba(12, 15, 26, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.sph-belt-item.is-next {
+  border: 1.5px solid var(--tg-gold-bright);
+  background: radial-gradient(circle at 50% 25%, rgba(228, 185, 91, 0.2), rgba(14, 17, 30, 0.96));
+  box-shadow: 0 0 16px rgba(228, 185, 91, 0.28);
+}
+
+.sph-belt-item-slot {
+  font-family: var(--tg-font-mono);
+  font-size: 9px;
+  color: var(--tg-ink-faint);
+}
+
+.sph-belt-item.is-next .sph-belt-item-slot {
+  color: var(--tg-gold-bright);
+  font-weight: 800;
+}
+
+.sph-mini-svg {
+  width: 30px;
+  height: 30px;
+}
+
+@media (max-width: 900px) {
+  .sph-main {
+    grid-template-columns: 1fr;
+  }
+  .sph-wall-panel {
+    max-width: 460px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
