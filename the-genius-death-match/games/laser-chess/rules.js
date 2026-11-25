@@ -30,8 +30,10 @@ function createS2Classic8x8() {
   const rows = 8;
   const cols = 8;
   const b = Array.from({ length: rows }, () => Array(cols).fill(null));
+  let seq = 0;
   const put = (r, c, type, owner, dir) => {
-    b[r][c] = { type, owner, dir };
+    seq += 1;
+    b[r][c] = { id: `p${owner}-${type}-${seq}`, type, owner, dir };
   };
 
   // Owner 1 (Cyan, Top-Left laser at 0,0) — 10 pieces
@@ -65,8 +67,10 @@ function createGrand8x10() {
   const rows = 8;
   const cols = 10;
   const b = Array.from({ length: rows }, () => Array(cols).fill(null));
+  let seq = 0;
   const put = (r, c, type, owner, dir) => {
-    b[r][c] = { type, owner, dir };
+    seq += 1;
+    b[r][c] = { id: `p${owner}-${type}-${seq}`, type, owner, dir };
   };
 
   // Classic Khet 8x10 Symmetric Formation (13 pieces per side)
@@ -104,7 +108,7 @@ function createGrand8x10() {
 }
 
 function cloneBoard(board) {
-  return board.map((row) => row.map((p) => (p ? { type: p.type, owner: p.owner, dir: p.dir } : null)));
+  return board.map((row) => row.map((p) => (p ? { id: p.id, type: p.type, owner: p.owner, dir: p.dir } : null)));
 }
 
 export function validLaserDirs(owner) {

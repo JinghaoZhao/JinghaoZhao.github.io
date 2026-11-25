@@ -1,5 +1,6 @@
 /* ==========================================================================
  * Betting! RPS (下注猜拳) — Neon Velvet Broadcast Sportsbook Stage
+ * Dual-Theme (Dark & Light) · GPU-Compositor-Only · In-Place Sportsbook Ticket
  * ========================================================================== */
 
 .brps-arena {
@@ -19,7 +20,7 @@
   gap: 12px;
   padding: 12px 18px;
   border-radius: var(--tg-radius-md);
-  background: linear-gradient(135deg, rgba(16, 19, 32, 0.94), rgba(8, 10, 17, 0.96));
+  background: var(--tg-surface-card);
   border: 1px solid var(--tg-border);
   box-shadow: var(--tg-shadow-card);
 }
@@ -37,32 +38,32 @@
 }
 
 .brps-chip-vault {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(228, 185, 91, 0.2), rgba(112, 78, 14, 0.34));
-  border: 1px solid rgba(228, 185, 91, 0.65);
+  background: var(--tg-gold-soft);
+  border: 1px solid var(--tg-border-strong);
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 16px;
   font-weight: 900;
   color: var(--tg-gold-bright);
-  box-shadow: 0 0 18px rgba(228, 185, 91, 0.2);
 }
 
 .brps-chip-vault.is-opp {
-  background: linear-gradient(135deg, rgba(217, 27, 58, 0.22), rgba(92, 8, 24, 0.36));
-  border-color: rgba(255, 68, 102, 0.58);
-  color: #ffd5dd;
-  box-shadow: 0 0 18px rgba(217, 27, 58, 0.22);
+  background: var(--tg-garnet-soft);
+  border-color: var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
 }
 
 /* ---- 11-Round Escalator Broadcast Rail ---- */
 .brps-rail-panel {
   padding: 11px 14px;
   border-radius: var(--tg-radius-md);
-  background: rgba(10, 12, 20, 0.88);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border-subtle);
 }
 
@@ -77,26 +78,26 @@
   border-radius: 9px;
   padding: 6px 4px;
   border: 1px solid var(--tg-border-subtle);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--tg-bg-recessed);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10.5px;
-  transition: transform 0.2s var(--tg-ease), border-color 0.2s;
+  transition: transform var(--tg-dur-fast) var(--tg-ease-spring), border-color var(--tg-dur-fast) var(--tg-ease-out), opacity var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .brps-rail-card.is-vp {
-  border-color: rgba(34, 211, 238, 0.45);
-  background: rgba(34, 211, 238, 0.08);
+  border-color: var(--tg-cyan);
+  background: var(--tg-cyan-soft);
 }
 
 .brps-rail-card.is-active {
-  border: 2px solid var(--tg-gold-bright);
-  background: rgba(228, 185, 91, 0.14);
-  box-shadow: 0 0 18px rgba(228, 185, 91, 0.32);
-  transform: translateY(-2px);
+  border: 2px solid var(--tg-gold);
+  background: var(--tg-gold-soft);
+  transform: translate3d(0, -2px, 0);
 }
 
 .brps-rail-card.is-done {
@@ -106,7 +107,7 @@
 .brps-rail-reward {
   font-size: 10px;
   font-weight: 800;
-  color: var(--tg-gold);
+  color: var(--tg-gold-bright);
 }
 
 .brps-rail-icon {
@@ -119,12 +120,9 @@
   position: relative;
   padding: 20px;
   border-radius: var(--tg-radius-lg);
-  background:
-    radial-gradient(ellipse 65% 55% at 50% 42%, rgba(245, 158, 11, 0.12), transparent 72%),
-    radial-gradient(ellipse 50% 45% at 80% 70%, rgba(34, 211, 238, 0.08), transparent 68%),
-    linear-gradient(180deg, rgba(15, 18, 31, 0.96), rgba(7, 9, 15, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border-strong);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -145,6 +143,7 @@
 }
 
 .brps-emblem-card {
+  position: relative;
   width: 136px;
   height: 158px;
   border-radius: 16px;
@@ -153,45 +152,42 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(160deg, #1f2438 0%, #0d1019 100%);
+  background: var(--tg-surface-card);
   border: 2px solid var(--tg-border-strong);
-  box-shadow: 0 10px 0 #05060a, 0 20px 38px rgba(0, 0, 0, 0.75);
-  transition: transform 0.35s var(--tg-ease), box-shadow 0.35s;
+  box-shadow: var(--tg-shadow-card);
+  transition: transform var(--tg-dur-base) var(--tg-ease-spring), border-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .brps-emblem-card.is-vp {
   border-color: var(--tg-cyan);
-  background: linear-gradient(160deg, rgba(14, 52, 70, 0.9), rgba(7, 16, 26, 0.98));
-  box-shadow: 0 10px 0 #04131a, 0 0 30px rgba(34, 211, 238, 0.28);
+  background: var(--tg-cyan-soft);
 }
 
 .brps-emblem-card.is-locked {
   border-color: var(--tg-gold);
-  background:
-    repeating-linear-gradient(45deg, rgba(228, 185, 91, 0.08) 0 3px, transparent 3px 12px),
-    linear-gradient(160deg, #231d14, #0d0b08);
-  animation: brps-slam 0.38s var(--tg-ease);
+  background: var(--tg-gold-soft);
+}
+
+.brps-emblem-card.is-entering {
+  animation: brps-slam 280ms var(--tg-ease-spring);
 }
 
 .brps-emblem-card.is-win {
   border-color: var(--tg-emerald);
-  box-shadow: 0 10px 0 #083318, 0 0 38px rgba(34, 197, 94, 0.45);
-  transform: translateY(-5px) scale(1.04);
+  transform: translate3d(0, -4px, 0) scale(1.04);
 }
 
 .brps-emblem-card.is-lose {
   border-color: var(--tg-garnet-bright);
-  box-shadow: 0 10px 0 #450611, 0 0 32px rgba(255, 46, 84, 0.4);
 }
 
 .brps-emblem-card.is-draw {
   border-color: var(--tg-cyan);
-  box-shadow: 0 10px 0 #083344, 0 0 34px rgba(34, 211, 238, 0.45);
 }
 
 @keyframes brps-slam {
-  0% { transform: translateY(-22px) scale(1.08); opacity: 0.25; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0% { transform: translate3d(0, -14px, 0) scale(1.06); opacity: 0.3; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
 }
 
 .brps-emblem-glyph {
@@ -214,7 +210,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  min-width: 210px;
+  min-width: 224px;
   text-align: center;
 }
 
@@ -222,7 +218,7 @@
   width: 100%;
   padding: 10px 12px;
   border-radius: 11px;
-  background: rgba(8, 10, 18, 0.85);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border);
   display: flex;
   flex-direction: column;
@@ -233,24 +229,45 @@
   display: flex;
   justify-content: space-between;
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--tg-ink-muted);
 }
 
-.brps-odds-bar {
-  display: flex;
+/* GPU-Composited 3-Segment Odds Bar (scaleX + translateX, zero width reflow!) */
+.brps-odds-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.brps-odds-track {
   height: 7px;
   border-radius: 999px;
+  background: var(--tg-track-bg);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
 }
+
+.brps-odds-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  transform-origin: left center;
+  transition: transform var(--tg-dur-base) var(--tg-ease-out);
+  will-change: transform;
+}
+
+.brps-odds-fill.is-rock { background: var(--tg-amber); }
+.brps-odds-fill.is-paper { background: var(--tg-cyan); }
+.brps-odds-fill.is-scissors { background: var(--tg-garnet-bright); }
 
 .brps-whisper-pill {
   padding: 6px 11px;
   border-radius: 9px;
-  background: rgba(167, 139, 250, 0.14);
-  border: 1px solid rgba(167, 139, 250, 0.48);
-  color: #ddd6fe;
+  background: rgba(109, 40, 217, 0.12);
+  border: 1px solid var(--tg-violet);
+  color: var(--tg-ink);
   font-size: 12px;
   font-weight: 600;
 }
@@ -277,19 +294,23 @@
   padding: 16px;
   border-radius: 13px;
   border: 1.5px solid var(--tg-border);
-  background: linear-gradient(160deg, rgba(22, 26, 42, 0.92), rgba(10, 12, 20, 0.96));
+  background: var(--tg-surface-card);
+  color: var(--tg-ink);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
   text-align: left;
-  transition: transform 0.18s var(--tg-ease), border-color 0.18s, box-shadow 0.18s;
+  transition: transform var(--tg-dur-fast) var(--tg-ease-snappy), border-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .brps-role-card:hover:not(:disabled) {
-  transform: translateY(-3px);
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55), 0 0 24px rgba(228, 185, 91, 0.22);
+  transform: translate3d(0, -3px, 0);
+  border-color: var(--tg-gold);
+}
+
+.brps-role-card:active:not(:disabled) {
+  transform: scale(var(--tg-press-card));
 }
 
 .brps-rps-grid {
@@ -302,34 +323,39 @@
   padding: 16px 12px;
   border-radius: 14px;
   border: 1.5px solid var(--tg-border-strong);
-  background: linear-gradient(165deg, rgba(28, 33, 52, 0.92), rgba(11, 13, 22, 0.96));
+  background: var(--tg-surface-card);
+  color: var(--tg-ink);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  transition: transform 0.18s var(--tg-ease), border-color 0.18s, box-shadow 0.18s;
+  transition: transform var(--tg-dur-micro) var(--tg-ease-snappy), border-color var(--tg-dur-micro) var(--tg-ease-out);
 }
 
 .brps-rps-btn:hover:not(:disabled) {
-  transform: translateY(-4px);
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.6), 0 0 22px rgba(228, 185, 91, 0.3);
+  transform: translate3d(0, -4px, 0);
+  border-color: var(--tg-gold);
+}
+
+.brps-rps-btn:active:not(:disabled) {
+  transform: scale(var(--tg-press-tile));
 }
 
 .brps-rps-btn.is-win-hint {
-  border-color: rgba(34, 197, 94, 0.65);
+  border-color: var(--tg-emerald);
 }
 
 .brps-rps-btn.is-lose-hint {
-  border-color: rgba(255, 46, 84, 0.6);
+  border-color: var(--tg-garnet-bright);
 }
 
 .brps-rps-btn.is-draw-hint {
-  border-color: rgba(34, 211, 238, 0.6);
+  border-color: var(--tg-cyan);
 }
 
-/* Sportsbook Betting Ticket Grid */
+/* Sportsbook Betting Ticket Grid (explicit property transitions only) */
 .brps-ticket-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
@@ -339,29 +365,35 @@
   padding: 13px 10px;
   border-radius: 12px;
   border: 1.5px solid var(--tg-border);
-  background: rgba(14, 17, 28, 0.9);
+  background: var(--tg-surface-card);
+  color: var(--tg-ink);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  transition: all 0.18s var(--tg-ease);
+  transition:
+    transform var(--tg-dur-micro) var(--tg-ease-snappy),
+    border-color var(--tg-dur-micro) var(--tg-ease-out),
+    background-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .brps-ticket:hover:not(:disabled) {
   border-color: var(--tg-gold);
-  transform: translateY(-2px);
+  transform: translate3d(0, -2px, 0);
+}
+
+.brps-ticket:active:not(:disabled) {
+  transform: scale(var(--tg-press-btn));
 }
 
 .brps-ticket.is-selected {
-  border-color: var(--tg-gold-bright);
-  background: linear-gradient(160deg, rgba(228, 185, 91, 0.2), rgba(120, 82, 16, 0.18));
-  box-shadow: 0 0 24px rgba(228, 185, 91, 0.3);
+  border-color: var(--tg-gold);
+  background: var(--tg-gold-soft);
 }
 
 .brps-ticket.is-draw.is-selected {
   border-color: var(--tg-cyan);
-  background: linear-gradient(160deg, rgba(34, 211, 238, 0.22), rgba(14, 116, 144, 0.24));
-  box-shadow: 0 0 26px rgba(34, 211, 238, 0.35);
+  background: var(--tg-cyan-soft);
 }
 
 .brps-wager-row {
@@ -385,5 +417,15 @@
   .brps-role-card,
   .brps-ticket {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brps-emblem-card.is-entering {
+    animation: none !important;
+  }
+  .brps-emblem-card.is-win,
+  .brps-rail-card.is-active {
+    transform: none !important;
   }
 }

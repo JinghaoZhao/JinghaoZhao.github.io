@@ -1,5 +1,6 @@
 /* ==========================================================================
- * SAME PICTURE HUNT (寻找相同图片) — 3D Flip-Wall & Dual Neon Conveyor Belts
+ * SAME PICTURE HUNT (寻找相同图片) — 3D Flip-Wall & Dual Conveyor Belts
+ * Dual Theme (Dark & Light) · GPU-Compositor-Only · Zero box-shadow Keyframes
  * ========================================================================== */
 
 .sph-arena {
@@ -18,11 +19,9 @@
   gap: 16px;
   padding: 14px 20px;
   border-radius: var(--tg-radius-lg);
-  background:
-    radial-gradient(ellipse 60% 100% at 50% 0%, rgba(34, 211, 238, 0.16), transparent 70%),
-    linear-gradient(160deg, rgba(18, 22, 38, 0.96), rgba(9, 11, 19, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border-strong);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.65);
+  box-shadow: var(--tg-shadow-card);
   flex-wrap: wrap;
 }
 
@@ -33,22 +32,32 @@
 }
 
 .sph-target-frame {
+  position: relative;
   width: 64px;
   height: 64px;
   border-radius: 14px;
-  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.12), #0a0e1a 82%);
-  border: 2px solid var(--tg-gold-bright);
-  box-shadow: 0 0 28px var(--tg-gold-glow), inset 0 0 18px rgba(228, 185, 91, 0.16);
+  background: var(--tg-surface-card);
+  border: 2px solid var(--tg-gold);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
-  animation: sph-target-pulse 2.2s ease-in-out infinite;
 }
 
-@keyframes sph-target-pulse {
-  0%, 100% { box-shadow: 0 0 22px rgba(228, 185, 91, 0.35), inset 0 0 16px rgba(228, 185, 91, 0.15); }
-  50% { box-shadow: 0 0 36px rgba(228, 185, 91, 0.65), inset 0 0 22px rgba(228, 185, 91, 0.28); }
+.sph-target-frame::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  box-shadow: 0 0 28px var(--tg-gold-glow);
+  pointer-events: none;
+  opacity: 0.45;
+  animation: sph-halo-breathe 2.2s var(--tg-ease-out) infinite;
+}
+
+@keyframes sph-halo-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.92; }
 }
 
 .sph-target-meta {
@@ -63,7 +72,8 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--tg-cyan);
+  color: var(--tg-cyan-ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .sph-target-name {
@@ -82,17 +92,10 @@
   font-family: var(--tg-font-mono);
   font-size: 13px;
   font-weight: 800;
-  background: linear-gradient(135deg, rgba(228, 185, 91, 0.26), rgba(217, 27, 58, 0.32));
-  border: 1px solid var(--tg-gold-bright);
+  background: var(--tg-gold-soft);
+  border: 1px solid var(--tg-gold);
   color: var(--tg-gold-bright);
-  box-shadow: 0 0 24px rgba(228, 185, 91, 0.42);
-  animation: sph-combo-pop 0.4s var(--tg-ease);
-}
-
-@keyframes sph-combo-pop {
-  0% { transform: scale(0.75); }
-  60% { transform: scale(1.12); }
-  100% { transform: scale(1); }
+  font-variant-numeric: tabular-nums;
 }
 
 /* Main Content Grid: 4x4 Flip Wall + Dual Conveyor Belts */
@@ -107,9 +110,9 @@
 .sph-wall-panel {
   padding: 16px;
   border-radius: var(--tg-radius-lg);
-  background: linear-gradient(165deg, rgba(16, 20, 34, 0.96), rgba(7, 9, 15, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border-strong);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--tg-shadow-card);
 }
 
 .sph-wall-grid {
@@ -120,11 +123,12 @@
 
 .sph-tile-slot {
   aspect-ratio: 1 / 1;
-  perspective: 900px;
+  perspective: 960px;
   position: relative;
   padding: 0;
   background: none;
   border: none;
+  transition: transform var(--tg-dur-micro) var(--tg-ease-snappy);
 }
 
 .sph-tile-slot:disabled {
@@ -132,12 +136,17 @@
   cursor: default;
 }
 
+.sph-tile-slot.is-clickable:active {
+  transform: scale(var(--tg-press-tile));
+}
+
 .sph-tile-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 420ms var(--tg-ease-out);
+  will-change: transform;
 }
 
 .sph-tile-slot.is-flipped .sph-tile-inner {
@@ -159,17 +168,16 @@
 
 /* Closed Metallic A–P Face */
 .sph-tile-front {
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08), transparent 55%),
-    linear-gradient(165deg, #212842 0%, #101422 100%);
-  border: 1.5px solid rgba(228, 185, 91, 0.35);
-  box-shadow: 0 6px 0 #070910, 0 12px 22px rgba(0, 0, 0, 0.55);
-  transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
+  background: var(--tg-surface-tile);
+  border: 1.5px solid var(--tg-border-strong);
+  box-shadow: 0 5px 0 var(--tg-surface-tile-edge), var(--tg-shadow-card);
+  transition:
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    transform var(--tg-dur-fast) var(--tg-ease-spring);
 }
 
 .sph-tile-slot.is-clickable:hover .sph-tile-front {
   border-color: var(--tg-gold-bright);
-  box-shadow: 0 7px 0 #070910, 0 0 24px rgba(228, 185, 91, 0.42);
   transform: translateY(-2px);
 }
 
@@ -178,7 +186,6 @@
   font-size: 30px;
   font-weight: 800;
   color: var(--tg-gold-bright);
-  text-shadow: 0 2px 14px rgba(228, 185, 91, 0.35);
   line-height: 1;
 }
 
@@ -193,22 +200,22 @@
 /* Revealed Emblem Face */
 .sph-tile-back {
   transform: rotateY(180deg);
-  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.1), #0b0e19 85%);
+  background: var(--tg-surface-card);
   border: 2px solid var(--tg-cyan);
-  box-shadow: 0 0 24px rgba(34, 211, 238, 0.32), inset 0 0 20px rgba(34, 211, 238, 0.12);
   padding: 10px;
+  transition:
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    background-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .sph-tile-slot.is-match .sph-tile-back {
   border-color: var(--tg-emerald);
-  background: radial-gradient(circle at 50% 35%, rgba(34, 197, 94, 0.25), #071911 85%);
-  box-shadow: 0 0 34px rgba(34, 197, 94, 0.65), inset 0 0 24px rgba(34, 197, 94, 0.22);
+  background: color-mix(in srgb, var(--tg-emerald) 16%, var(--tg-bg-velvet));
 }
 
 .sph-tile-slot.is-miss .sph-tile-back {
   border-color: var(--tg-garnet-bright);
-  background: radial-gradient(circle at 50% 35%, rgba(255, 46, 84, 0.24), #1d070e 85%);
-  box-shadow: 0 0 30px rgba(255, 46, 84, 0.58), inset 0 0 20px rgba(255, 46, 84, 0.2);
+  background: color-mix(in srgb, var(--tg-garnet) 16%, var(--tg-bg-velvet));
 }
 
 .sph-tile-badge-corner {
@@ -218,7 +225,7 @@
   font-family: var(--tg-font-mono);
   font-size: 10px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--tg-ink-faint);
 }
 
 .sph-tile-emblem-name {
@@ -233,7 +240,7 @@
   width: 56%;
   height: 56%;
   display: block;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
 }
 
 /* Reveal Outcome Banner */
@@ -250,15 +257,15 @@
 }
 
 .sph-reveal-bar.is-match {
-  background: rgba(34, 197, 94, 0.16);
-  border: 1px solid rgba(34, 197, 94, 0.6);
-  color: #bbf7d0;
+  background: color-mix(in srgb, var(--tg-emerald) 14%, var(--tg-bg-velvet));
+  border: 1px solid var(--tg-emerald);
+  color: var(--tg-emerald-ink);
 }
 
 .sph-reveal-bar.is-miss {
-  background: rgba(217, 27, 58, 0.2);
-  border: 1px solid rgba(255, 46, 84, 0.65);
-  color: #ffd0da;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-garnet-bright);
+  color: var(--tg-garnet-ink);
 }
 
 /* Right Side: Dual 20-Slot Conveyor Belts */
@@ -274,17 +281,15 @@
   background: var(--tg-glass);
   border: 1px solid var(--tg-border);
   box-shadow: var(--tg-shadow-card);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .sph-belt-card.is-active-cyan {
-  border-color: rgba(34, 211, 238, 0.72);
-  box-shadow: 0 0 28px rgba(34, 211, 238, 0.18), var(--tg-shadow-card);
+  border-color: var(--tg-cyan);
 }
 
 .sph-belt-card.is-active-garnet {
-  border-color: rgba(255, 46, 84, 0.75);
-  box-shadow: 0 0 28px rgba(255, 46, 84, 0.2), var(--tg-shadow-card);
+  border-color: var(--tg-garnet-bright);
 }
 
 .sph-belt-header {
@@ -309,23 +314,16 @@
   gap: 8px;
   font-family: var(--tg-font-mono);
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-/* 20-Slot Conveyor Track Visual */
+/* 20-Slot Conveyor Track Visual with Smooth Gliding Runner */
 .sph-track-wrap {
   position: relative;
   padding: 8px 6px;
   border-radius: 10px;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.03) 0px,
-      rgba(255, 255, 255, 0.03) 6px,
-      transparent 6px,
-      transparent 14px
-    ),
-    #070911;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-subtle);
   margin-bottom: 12px;
 }
 
@@ -339,6 +337,10 @@
   margin-bottom: 5px;
 }
 
+.sph-track-stage {
+  position: relative;
+}
+
 .sph-track-slots {
   display: grid;
   grid-template-columns: repeat(20, 1fr);
@@ -348,52 +350,69 @@
 .sph-track-cell {
   height: 22px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--tg-track-bg);
+  border: 1px solid var(--tg-border-subtle);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  transition: all 0.25s var(--tg-ease);
+  color: var(--tg-gold-bright);
+  transition:
+    background-color var(--tg-dur-base) var(--tg-ease-out),
+    border-color var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .sph-track-cell.is-danger {
-  background: rgba(217, 27, 58, 0.18);
-  border-color: rgba(255, 46, 84, 0.35);
+  background: var(--tg-garnet-soft);
+  border-color: var(--tg-border-garnet);
 }
 
 .sph-track-cell.is-finish {
-  background: rgba(228, 185, 91, 0.22);
-  border-color: rgba(228, 185, 91, 0.6);
+  background: var(--tg-gold-soft);
+  border-color: var(--tg-border-strong);
 }
 
 .sph-track-cell.is-passed-cyan {
-  background: rgba(34, 211, 238, 0.22);
-  border-color: rgba(34, 211, 238, 0.45);
+  background: var(--tg-cyan-soft);
+  border-color: var(--tg-cyan);
 }
 .sph-track-cell.is-passed-garnet {
-  background: rgba(255, 46, 84, 0.22);
-  border-color: rgba(255, 46, 84, 0.45);
+  background: var(--tg-garnet-soft);
+  border-color: var(--tg-garnet-bright);
 }
 
-.sph-track-cell.is-runner-cyan {
-  background: var(--tg-cyan);
-  border-color: #ecfeff;
-  box-shadow: 0 0 14px var(--tg-cyan);
-  color: #03151c;
+/* Persistent GPU-Gliding Runner Token over the 20-slot track */
+.sph-runner-marker {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 5%;
+  height: 26px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
   font-weight: 900;
-  transform: scale(1.18);
-  z-index: 2;
+  pointer-events: none;
+  z-index: 3;
+  will-change: transform;
+  transition: transform var(--tg-dur-base) var(--tg-ease-spring);
 }
-.sph-track-cell.is-runner-garnet {
-  background: var(--tg-garnet-bright);
-  border-color: #ffe4e9;
-  box-shadow: 0 0 14px var(--tg-garnet-bright);
+
+.sph-runner-marker.is-cyan {
+  background: var(--tg-cyan);
+  border: 1.5px solid #fff;
   color: #fff;
-  font-weight: 900;
-  transform: scale(1.18);
-  z-index: 2;
+  box-shadow: 0 2px 10px var(--tg-cyan-glow);
+}
+
+.sph-runner-marker.is-garnet {
+  background: var(--tg-garnet-bright);
+  border: 1.5px solid #fff;
+  color: #fff;
+  box-shadow: 0 2px 10px var(--tg-garnet-glow);
 }
 
 /* Upcoming 5 Conveyor Cards Preview */
@@ -416,24 +435,27 @@
   position: relative;
   border-radius: 9px;
   padding: 7px 5px 5px;
-  background: rgba(12, 15, 26, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--tg-surface-card);
+  border: 1px solid var(--tg-border-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  transition:
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    background-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .sph-belt-item.is-next {
-  border: 1.5px solid var(--tg-gold-bright);
-  background: radial-gradient(circle at 50% 25%, rgba(228, 185, 91, 0.2), rgba(14, 17, 30, 0.96));
-  box-shadow: 0 0 16px rgba(228, 185, 91, 0.28);
+  border: 1.5px solid var(--tg-gold);
+  background: color-mix(in srgb, var(--tg-gold) 14%, var(--tg-bg-velvet));
 }
 
 .sph-belt-item-slot {
   font-family: var(--tg-font-mono);
   font-size: 9px;
   color: var(--tg-ink-faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .sph-belt-item.is-next .sph-belt-item-slot {
@@ -454,5 +476,15 @@
     max-width: 460px;
     width: 100%;
     margin: 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sph-target-frame::after {
+    animation: none !important;
+  }
+  .sph-tile-inner,
+  .sph-runner-marker {
+    transition-duration: 0.01ms !important;
   }
 }

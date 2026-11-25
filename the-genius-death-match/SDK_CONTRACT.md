@@ -48,11 +48,16 @@ import {
   SFX,
   I18n,
   UI,
+  Motion,
+  Theme,
   GarnetVault,
   createSeededRng,
   AI_DIFFICULTIES,
 } from '../../shared/sdk.js';
 ```
+
+> **Note:** `ctx.motion` and `ctx.theme` are also passed directly inside `render(container, ctx)`.
+> **Anti-`innerHTML`-Nuke Rule:** To let 3D flips, FLIP piece moves, and numeric rollups animate smoothly at 60fps, mount your static board/card skeleton once per phase (`container.dataset.mountedPhase`) and patch classes, `textContent`, `style.transform`, and keyed child nodes in place. See `MOTION_DESIGN_SPEC.md` for full per-game checklists.
 
 ---
 
@@ -209,12 +214,29 @@ mountGame({
 
 ---
 
-## 6. Design Tokens & Reusable CSS Classes (`shared/theme.css`)
+## 6. Design Tokens, Motion SDK & Dual Theme (`shared/theme.css`, `shared/ui/motion.js`, `shared/theme.js`)
 
-### Core Tokens
-- Surfaces: `--tg-bg-void` (`#06070b`), `--tg-bg-noir` (`#0c0e16`), `--tg-bg-velvet` (`#121522`), `--tg-bg-elevated` (`#1a1f31`), `--tg-glass`, `--tg-border`, `--tg-border-strong`, `--tg-border-garnet`
-- Accents: `--tg-garnet` (`#d91b3a`), `--tg-garnet-bright` (`#ff2e54`), `--tg-gold` (`#e4b95b`), `--tg-gold-bright` (`#fff0c2`), `--tg-cyan` (`#22d3ee`), `--tg-emerald` (`#22c55e`), `--tg-amber` (`#f59e0b`)
-- Fonts: `--tg-font-display`, `--tg-font-ui`, `--tg-font-mono`
+### Core & Dual-Theme Tokens (`[data-theme="dark"]` & `[data-theme="light"]`)
+- Surfaces: `--tg-bg-void`, `--tg-bg-noir`, `--tg-bg-velvet`, `--tg-bg-elevated`, `--tg-bg-recessed`, `--tg-glass`, `--tg-glass-strong`, `--tg-scrim`, `--tg-border`, `--tg-border-strong`, `--tg-border-garnet`, `--tg-border-subtle`
+- Accents & Inks: `--tg-garnet`, `--tg-garnet-bright`, `--tg-garnet-ink`, `--tg-garnet-soft`, `--tg-gold`, `--tg-gold-bright`, `--tg-gold-soft`, `--tg-cyan`, `--tg-cyan-ink`, `--tg-emerald`, `--tg-emerald-ink`, `--tg-amber`, `--tg-ink`, `--tg-ink-muted`, `--tg-ink-faint`
+- **Game-Table Semantic Bridge Tokens** (use instead of hardcoded dark hexes so every game shines in Light & Dark modes!):
+  - `--tg-surface-table`, `--tg-surface-felt`, `--tg-surface-card`, `--tg-surface-tile`, `--tg-surface-tile-edge`, `--tg-board-cell-a`, `--tg-board-cell-b`, `--tg-board-frame`, `--tg-track-bg`, `--tg-hover-fill`
+- **Unified Motion Language Tokens**:
+  - Curves: `--tg-ease-out`, `--tg-ease-spring`, `--tg-ease-snappy`, `--tg-ease-in`
+  - Durations: `--tg-dur-micro` (`120ms`), `--tg-dur-fast` (`160ms`), `--tg-dur-base` (`240ms`), `--tg-dur-sheet` (`320ms`), `--tg-dur-drama` (`440ms`)
+  - Press scales: `--tg-press-btn` (`0.97`), `--tg-press-tile` (`0.955`), `--tg-press-card` (`0.985`)
+- **Shared `Motion` Primitives (`shared/ui/motion.js`)**:
+  - `Motion.reduced()`, `Motion.onReducedChange(cb)`
+  - `Motion.animateNumber(el, from, to, { duration?, format?, highlightClass?, deltaEl? })`
+  - `Motion.slideIndicator(container, activeBtn, { immediate?, className? })`
+  - `Motion.flipList(container, itemSelector, { keyAttr?, duration?, easing?, staggerMs?, enterScale? })`
+  - `Motion.nudgeError(el, { intensity?: 'subtle'|'impact', duration?, flashClass? })`
+  - `Motion.pulseConfirm(el, { tone?: 'gold'|'emerald'|'cyan', duration? })`
+  - `Motion.morphIcon(el, nextSvgHtml, { duration?, revertAfterMs?, revertSvgHtml? })`
+  - `Motion.crossfade(el, mutateFn, { duration?, shiftPx? })`
+  - `Motion.transitionPresence(el, present, { preset?, duration?, onAfterExit?, removeOnExit? })`
+- **Shared `Theme` Controller (`shared/theme.js`)**: `Theme.init()`, `Theme.get()`, `Theme.set('dark'|'light'|'system')`, `Theme.toggle()`, `Theme.onChange(cb)` (anti-FOUC runs synchronously inside `shared/https-guard.js`).
+- **GPU Budget Rule**: Never use `transition: all`, never animate `width`/`height` (use `transform: scaleX(...)`), and never animate `box-shadow` in `@keyframes` (use a `::after` opacity pulse). Always apply `font-variant-numeric: tabular-nums` on dynamic numbers.
 
 ### Ready-to-Use Component Classes
 - **Containers**: `.tg-panel`, `.tg-grid-board`

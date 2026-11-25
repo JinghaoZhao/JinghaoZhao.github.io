@@ -1,5 +1,6 @@
 /* ==========================================================================
- * BLACKOUT GAME (暗战游戏) — Atmospheric Illuminated Studio Floor-Plan & Console
+ * BLACKOUT GAME (暗战游戏) — Illuminated Studio Floor-Plan & Console
+ * Dual Theme (Dark & Light) · GPU Opacity Veil · Spring Operative Glides
  * ========================================================================== */
 
 .bg-arena {
@@ -18,9 +19,9 @@
   gap: 14px;
   padding: 14px 18px;
   border-radius: var(--tg-radius-lg);
-  background: linear-gradient(165deg, rgba(16, 19, 32, 0.96), rgba(7, 9, 15, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border-strong);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.65);
+  box-shadow: var(--tg-shadow-card);
 }
 
 .bg-team-box {
@@ -30,18 +31,23 @@
   gap: 10px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(10, 12, 22, 0.8);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border-subtle);
+  transition: border-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .bg-team-box.is-attacker {
-  border-color: rgba(34, 211, 238, 0.62);
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.16);
+  border-color: var(--tg-cyan);
 }
 
 .bg-team-box.is-defender {
-  border-color: rgba(255, 46, 84, 0.62);
-  box-shadow: 0 0 20px rgba(255, 46, 84, 0.16);
+  border-color: var(--tg-garnet-bright);
+}
+
+.bg-team-score-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .bg-team-score {
@@ -50,6 +56,7 @@
   font-weight: 900;
   color: var(--tg-gold-bright);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .bg-half-badge {
@@ -58,67 +65,78 @@
   align-items: center;
   gap: 5px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Studio Floor-Plan Stage (Blackout vs Floodlight States) */
+/* Studio Floor-Plan Stage: GPU Opacity Veil Crossfade (Blackout <-> Floodlight) */
 .bg-studio-floor {
   position: relative;
   border-radius: var(--tg-radius-lg);
   padding: 20px;
   border: 1.5px solid var(--tg-border-strong);
+  background: var(--tg-surface-table);
+  box-shadow: var(--tg-shadow-card);
   overflow: hidden;
-  transition: background 0.45s var(--tg-ease), border-color 0.45s, box-shadow 0.45s;
+  transition: border-color 360ms var(--tg-ease-out);
 }
 
-.bg-studio-floor.is-blackout {
+/* Deep obsidian blackout veil (fades smoothly via GPU opacity!) */
+.bg-dark-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
   background:
-    radial-gradient(ellipse 60% 45% at 50% 50%, rgba(217, 27, 58, 0.12), transparent 72%),
+    radial-gradient(ellipse 62% 48% at 50% 50%, rgba(217, 27, 58, 0.14), transparent 72%),
     repeating-linear-gradient(
       0deg,
-      rgba(255, 255, 255, 0.018) 0px,
-      rgba(255, 255, 255, 0.018) 1px,
+      rgba(255, 255, 255, 0.022) 0px,
+      rgba(255, 255, 255, 0.022) 1px,
       transparent 1px,
       transparent 32px
     ),
     repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.018) 0px,
-      rgba(255, 255, 255, 0.018) 1px,
+      rgba(255, 255, 255, 0.022) 0px,
+      rgba(255, 255, 255, 0.022) 1px,
       transparent 1px,
       transparent 32px
     ),
-    #04050a;
-  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.95), 0 24px 60px rgba(0, 0, 0, 0.8);
-  animation: bg-grid-flicker 4.5s ease-in-out infinite;
+    #06080f;
+  opacity: 0;
+  transition: opacity 360ms var(--tg-ease-out);
 }
 
-@keyframes bg-grid-flicker {
-  0%, 93%, 100% { filter: brightness(1); }
-  95% { filter: brightness(0.84); }
-  97% { filter: brightness(1.06); }
+.bg-studio-floor.is-blackout .bg-dark-veil {
+  opacity: 1;
 }
 
-.bg-studio-floor.is-lights-on {
-  background:
-    radial-gradient(ellipse 90% 65% at 50% 0%, rgba(255, 240, 194, 0.22), transparent 68%),
-    radial-gradient(ellipse 65% 50% at 50% 100%, rgba(34, 211, 238, 0.14), transparent 70%),
-    linear-gradient(180deg, #1b2238 0%, #0e1222 100%);
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 0 60px rgba(228, 185, 91, 0.25), inset 0 0 40px rgba(255, 240, 194, 0.12);
-  animation: bg-floodlight-flash 0.55s var(--tg-ease);
+/* Crimson alarm veil on BUSTED */
+.bg-busted-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse 80% 65% at 50% 50%, rgba(255, 46, 84, 0.28), transparent 74%);
+  opacity: 0;
+  transition: opacity 320ms var(--tg-ease-out);
 }
 
 .bg-studio-floor.is-busted {
-  background:
-    radial-gradient(ellipse 80% 65% at 50% 50%, rgba(255, 46, 84, 0.3), transparent 70%),
-    linear-gradient(180deg, #270b14 0%, #100509 100%);
   border-color: var(--tg-garnet-bright);
-  box-shadow: 0 0 64px rgba(255, 46, 84, 0.45), inset 0 0 50px rgba(217, 27, 58, 0.35);
 }
 
-@keyframes bg-floodlight-flash {
-  0% { filter: brightness(2.2); }
-  100% { filter: brightness(1); }
+.bg-studio-floor.is-busted .bg-busted-veil {
+  opacity: 1;
+}
+
+.bg-studio-floor.is-lights-on {
+  border-color: var(--tg-gold);
+}
+
+.bg-floor-content {
+  position: relative;
+  z-index: 1;
 }
 
 .bg-floor-topbar {
@@ -141,19 +159,22 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  transition:
+    background-color var(--tg-dur-base) var(--tg-ease-out),
+    border-color var(--tg-dur-base) var(--tg-ease-out),
+    color var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .bg-power-pill.is-dark {
-  background: rgba(15, 18, 30, 0.92);
-  border: 1px solid rgba(255, 46, 84, 0.55);
+  background: rgba(15, 18, 30, 0.9);
+  border: 1px solid rgba(255, 46, 84, 0.65);
   color: #ff99ab;
 }
 
 .bg-power-pill.is-lit {
-  background: rgba(228, 185, 91, 0.22);
-  border: 1px solid var(--tg-gold-bright);
+  background: var(--tg-gold-soft);
+  border: 1px solid var(--tg-gold);
   color: var(--tg-gold-bright);
-  box-shadow: 0 0 18px rgba(228, 185, 91, 0.35);
 }
 
 /* Red Charge Capacitors */
@@ -164,20 +185,33 @@
   font-family: var(--tg-font-mono);
   font-size: 11.5px;
   color: var(--tg-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-studio-floor.is-blackout .bg-charges {
+  color: #a2a8bc;
 }
 
 .bg-charge-cell {
   width: 24px;
   height: 11px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition:
+    opacity var(--tg-dur-base) var(--tg-ease-out),
+    transform var(--tg-dur-base) var(--tg-ease-spring),
+    background-color var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .bg-charge-cell.is-live {
   background: linear-gradient(90deg, #ff2e54, #ff7a93);
   border-color: #ffd1db;
-  box-shadow: 0 0 12px rgba(255, 46, 84, 0.85);
+}
+
+.bg-charge-cell:not(.is-live) {
+  opacity: 0.35;
+  transform: scaleX(0.88);
 }
 
 /* 4-Chamber Studio Floor-Plan Grid split by Crimson Laser Line */
@@ -192,15 +226,26 @@
   position: relative;
   border-radius: 14px;
   padding: 12px 10px;
-  min-height: 210px;
-  background: rgba(10, 13, 24, 0.84);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  min-height: 214px;
+  background: var(--tg-surface-card);
+  border: 1.5px solid var(--tg-border-subtle);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  transition: transform 0.2s var(--tg-ease), border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  transition:
+    transform var(--tg-dur-micro) var(--tg-ease-snappy),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    background-color 320ms var(--tg-ease-out),
+    opacity var(--tg-dur-base) var(--tg-ease-out);
   overflow: hidden;
+}
+
+/* Intentional dark chamber surface while Blackout is active (crisp in BOTH Light & Dark themes!) */
+.bg-studio-floor.is-blackout .bg-chamber {
+  background: rgba(12, 16, 28, 0.88);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f6f3ec;
 }
 
 .bg-chamber::before {
@@ -211,7 +256,7 @@
   top: 50%;
   height: 2.5px;
   background: linear-gradient(90deg, rgba(255, 46, 84, 0.3), #ff2e54, rgba(255, 46, 84, 0.3));
-  box-shadow: 0 0 14px #ff2e54, 0 0 28px rgba(255, 46, 84, 0.6);
+  box-shadow: 0 0 12px rgba(255, 46, 84, 0.72);
   z-index: 1;
 }
 
@@ -220,40 +265,32 @@
 }
 
 .bg-chamber.is-clickable:hover {
-  border-color: var(--tg-gold-bright);
+  border-color: var(--tg-gold);
   transform: translateY(-2px);
-  box-shadow: 0 0 24px rgba(228, 185, 91, 0.26);
+}
+
+.bg-chamber.is-clickable:active {
+  transform: scale(var(--tg-press-card));
 }
 
 .bg-chamber.is-crossing {
   border-color: var(--tg-cyan);
-  background: radial-gradient(circle at 50% 22%, rgba(34, 211, 238, 0.22), rgba(8, 14, 26, 0.92) 72%);
-  box-shadow: 0 0 28px rgba(34, 211, 238, 0.32);
 }
 
 .bg-chamber.is-eliminated {
-  opacity: 0.44;
-  border-color: rgba(255, 46, 84, 0.3);
-  background: repeating-linear-gradient(
-    -45deg,
-    rgba(217, 27, 58, 0.12) 0px,
-    rgba(217, 27, 58, 0.12) 6px,
-    rgba(8, 9, 14, 0.92) 6px,
-    rgba(8, 9, 14, 0.92) 14px
-  );
+  opacity: 0.45;
+  border-color: var(--tg-border-garnet);
 }
 
 .bg-chamber.is-busted-hit {
   border-color: var(--tg-garnet-bright);
-  background: radial-gradient(circle at 50% 30%, rgba(255, 46, 84, 0.42), #1b060d 78%);
-  box-shadow: 0 0 34px rgba(255, 46, 84, 0.72);
+  background: color-mix(in srgb, var(--tg-garnet) 22%, var(--tg-bg-velvet));
   opacity: 1;
 }
 
 .bg-chamber.is-bonus-glow {
-  border-color: var(--tg-gold-bright);
-  background: radial-gradient(circle at 50% 25%, rgba(228, 185, 91, 0.34), #1d1607 78%);
-  box-shadow: 0 0 34px rgba(228, 185, 91, 0.58);
+  border-color: var(--tg-gold);
+  background: color-mix(in srgb, var(--tg-gold) 20%, var(--tg-bg-velvet));
 }
 
 .bg-zone-label {
@@ -265,33 +302,50 @@
   z-index: 2;
 }
 
+/* Persistent Operative Token that smoothly glides across the Crimson Laser Line! */
 .bg-operative-token {
   position: relative;
   z-index: 3;
   width: 100%;
   padding: 9px 8px;
   border-radius: 10px;
-  background: rgba(16, 22, 38, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--tg-bg-elevated);
+  border: 1px solid var(--tg-border);
+  color: var(--tg-ink);
   text-align: center;
-  transition: transform 0.35s var(--tg-ease), border-color 0.25s, box-shadow 0.25s;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 220ms var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    background-color var(--tg-dur-fast) var(--tg-ease-out);
+}
+
+.bg-studio-floor.is-blackout .bg-operative-token {
+  background: rgba(18, 24, 42, 0.94);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f6f3ec;
 }
 
 .bg-chamber.is-crossing .bg-operative-token {
   border-color: var(--tg-cyan);
-  background: linear-gradient(160deg, rgba(14, 116, 144, 0.56), rgba(8, 28, 42, 0.96));
-  box-shadow: 0 0 22px rgba(34, 211, 238, 0.5);
-  transform: translateY(-76px);
+  background: color-mix(in srgb, var(--tg-cyan) 20%, var(--tg-bg-velvet));
+  transform: translate3d(0, -78px, 0);
 }
 
-.bg-chamber.is-safe-zone .bg-operative-token {
-  transform: translateY(0);
+.bg-studio-floor.is-blackout .bg-chamber.is-crossing .bg-operative-token {
+  background: rgba(14, 116, 144, 0.42);
+  color: #f0fdff;
 }
 
 .bg-op-glyph {
   font-size: 20px;
   line-height: 1;
   color: var(--tg-gold-bright);
+}
+
+.bg-studio-floor.is-blackout .bg-op-glyph {
+  color: #fff0c2;
 }
 
 .bg-op-name {
@@ -303,8 +357,13 @@
 .bg-op-streak {
   font-family: var(--tg-font-mono);
   font-size: 11px;
-  color: var(--tg-cyan);
+  color: var(--tg-cyan-ink);
   margin-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-studio-floor.is-blackout .bg-op-streak {
+  color: #67e8f9;
 }
 
 .bg-streak-dots {
@@ -318,12 +377,17 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--tg-track-bg);
+  transition: background-color var(--tg-dur-fast) var(--tg-ease-out), transform var(--tg-dur-fast) var(--tg-ease-spring);
+}
+
+.bg-studio-floor.is-blackout .bg-streak-dot {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .bg-streak-dot.is-lit {
-  background: var(--tg-gold-bright);
-  box-shadow: 0 0 8px var(--tg-gold);
+  background: var(--tg-gold);
+  transform: scale(1.15);
 }
 
 /* Bottom Broadcast Action Console */
@@ -345,7 +409,7 @@
 }
 
 .bg-big-btn {
-  padding: 20px 18px;
+  padding: 18px 16px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -353,42 +417,48 @@
   justify-content: center;
   gap: 6px;
   font-weight: 900;
-  letter-spacing: 0.06em;
-  transition: transform 0.14s var(--tg-ease), box-shadow 0.14s;
+  letter-spacing: 0.05em;
+  transition: transform var(--tg-dur-micro) var(--tg-ease-snappy);
 }
 
 .bg-big-btn-red {
   background: radial-gradient(circle at 35% 25%, #ff5c7c, #d91b3a 58%, #7a091e 100%);
-  border: 2.5px solid #ffb3c1;
+  border: 2px solid #ffb3c1;
   color: #fff;
-  box-shadow: 0 8px 0 #420410, 0 0 34px rgba(255, 46, 84, 0.5);
+  box-shadow: 0 7px 0 #420410, 0 12px 28px rgba(217, 27, 58, 0.35);
 }
 
 .bg-big-btn-red:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 0 #420410, 0 0 46px rgba(255, 46, 84, 0.72);
+}
+
+.bg-big-btn-red:active:not(:disabled) {
+  transform: translateY(3px) scale(var(--tg-press-btn));
 }
 
 .bg-big-btn-green {
   background: radial-gradient(circle at 35% 25%, #4ade80, #16a34a 58%, #14532d 100%);
-  border: 2.5px solid #bbf7d0;
+  border: 2px solid #bbf7d0;
   color: #031a0c;
-  box-shadow: 0 8px 0 #052e16, 0 0 32px rgba(34, 197, 94, 0.42);
+  box-shadow: 0 7px 0 #052e16, 0 12px 26px rgba(22, 163, 74, 0.3);
 }
 
 .bg-big-btn-green:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 0 #052e16, 0 0 44px rgba(34, 197, 94, 0.65);
+}
+
+.bg-big-btn-green:active:not(:disabled) {
+  transform: translateY(3px) scale(var(--tg-press-btn));
 }
 
 .bg-big-btn-title {
   font-family: var(--tg-font-display);
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .bg-big-btn-sub {
   font-size: 12px;
-  opacity: 0.9;
+  opacity: 0.92;
   font-weight: 600;
 }
 
@@ -411,20 +481,20 @@
 }
 
 .bg-outcome-banner.is-safe {
-  background: rgba(34, 197, 94, 0.16);
-  border: 1px solid rgba(34, 197, 94, 0.6);
-  color: #bbf7d0;
+  background: color-mix(in srgb, var(--tg-emerald) 14%, var(--tg-bg-velvet));
+  border: 1px solid var(--tg-emerald);
+  color: var(--tg-emerald-ink);
 }
 
 .bg-outcome-banner.is-busted {
-  background: rgba(217, 27, 58, 0.24);
-  border: 1px solid rgba(255, 46, 84, 0.75);
-  color: #ffd1db;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-garnet-bright);
+  color: var(--tg-garnet-ink);
 }
 
 .bg-outcome-banner.is-false {
-  background: rgba(228, 185, 91, 0.2);
-  border: 1px solid rgba(228, 185, 91, 0.75);
+  background: var(--tg-gold-soft);
+  border: 1px solid var(--tg-gold);
   color: var(--tg-gold-bright);
 }
 
@@ -440,8 +510,9 @@
   font-family: var(--tg-font-mono);
   font-size: 11px;
   font-weight: 700;
-  background: rgba(12, 15, 26, 0.86);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border-subtle);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 780px) {
@@ -453,5 +524,13 @@
   }
   .bg-button-duo {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-operative-token,
+  .bg-dark-veil,
+  .bg-busted-veil {
+    transition-duration: 120ms !important;
   }
 }

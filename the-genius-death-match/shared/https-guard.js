@@ -1,6 +1,15 @@
-/* Synchronous Secure Context guard for production HTTPS domains.
- * WebRTC, navigator.clipboard, and crypto.subtle require HTTPS outside localhost. */
+/* Synchronous Secure Context guard + Anti-FOUC Theme bootstrap.
+ * Loaded in <head> of index.html and all 20 games/<slug>/index.html before first paint. */
 (function () {
+  try {
+    var saved = null;
+    try { saved = localStorage.getItem('tgm_theme'); } catch (_) {}
+    var theme = (saved === 'light' || saved === 'dark')
+      ? saved
+      : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.dataset.theme = theme;
+  } catch (_) {}
+
   try {
     var host = window.location.hostname;
     if (

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>THE GENIUS · 死亡对决殿堂 (S1–S4 Death Match Archive)</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 48'%3E%3Cpolygon points='20,2 37,15 31,44 20,47 9,44 3,15' fill='%23d91b3a' stroke='%23e4b95b' stroke-width='2'/%3E%3Cpolygon points='20,2 29,17 20,36 11,17' fill='rgba(255,255,255,0.28)'/%3E%3C/svg%3E" />
-  <meta name="description" content="The Genius (더 지니어스 / 游戏的法则) Seasons 1–4 Complete Death Match Web Game Arcade — Online P2P Multiplayer, Smart Genius AI & Local Pass-and-Play." />
+  <meta name="description" content="The Genius (더 지니어스 / 游戏的法则) Seasons 1–4 Complete Death Match Web Game Arcade — Online Multiplayer, 3-Tier Genius AI & Local Pass-and-Play." />
   <script src="./shared/https-guard.js"></script>
   <link rel="stylesheet" href="./shared/theme.css" />
   <link rel="stylesheet" href="./hub.css" />
@@ -46,21 +46,22 @@
           <span class="hub-vault-sep" aria-hidden="true">·</span>
           <span class="hub-vault-streak" id="nav-streak-label">🔥 0</span>
         </button>
-        <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost" id="btn-lang-toggle">中文 / EN</button>
-        <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="btn-ambience" title="Studio Tension Ambience">〰</button>
-        <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="btn-mute" title="Mute / Unmute SFX">🔊</button>
+        <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost tg-lang-pill" id="btn-lang-toggle" style="min-width:58px;"><span class="is-active-lang">中</span><span class="is-inactive-lang">/</span><span class="is-inactive-lang">EN</span></button>
+        <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="btn-theme-toggle"><span class="tg-icon-slot" id="hub-icon-theme"></span></button>
+        <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="btn-ambience"><span class="tg-icon-slot" id="hub-icon-ambience"></span></button>
+        <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="btn-mute"><span class="tg-icon-slot" id="hub-icon-mute"></span></button>
       </div>
     </div>
   </header>
 
   <main class="hub-main">
     <!-- Cinematic Hero Stage -->
-    <section class="hub-hero">
+    <section class="hub-hero" id="hub-hero">
       <div class="hub-hero-grid">
         <div class="hub-hero-copy">
           <div class="hub-kicker">
             <span class="hub-live-dot" aria-hidden="true"></span>
-            <span id="hero-kicker-text">TVN 2013–2015 · 全四季 44 场死亡对决完全收录</span>
+            <span id="hero-kicker-text">TVN 2013–2015 · S1–S4 全 44 场死亡对决</span>
           </div>
 
           <h1 class="hub-title">
@@ -69,7 +70,7 @@
           </h1>
 
           <p class="hub-subtitle" id="hero-subtitle">
-            더 지니어스 · 《游戏的法则》S1–S4 传奇死亡对决全集。零安装在线 WebRTC 实时联机、三档天才级 AI 博弈、以及带加内特隐私护盾的本地传屏对战。
+            《游戏的法则》全四季 20 款经典死亡对决。支持实时好友联机、三档天才 AI 与本地同屏对战。
           </p>
 
           <!-- Broadcast Stats Strip -->
@@ -83,21 +84,21 @@
               <span id="stat-episodes-label">场经典死亡对决</span>
             </div>
             <div class="hub-stat">
-              <strong class="hub-stat-num" id="stat-games-num">--</strong>
+              <strong class="hub-stat-num" id="stat-games-num">0</strong>
               <span id="stat-games-label">款独立对决游戏</span>
             </div>
             <div class="hub-stat">
-              <strong class="hub-stat-num" id="stat-playable-num">--</strong>
+              <strong class="hub-stat-num" id="stat-playable-num">0</strong>
               <span id="stat-playable-label">已开放畅玩</span>
             </div>
           </div>
         </div>
 
-        <!-- Rotating 3D-Faceted SVG Garnet Centerpiece -->
+        <!-- Rotating 3D-Faceted SVG Garnet Centerpiece (Separated Float & Tilt Layers) -->
         <div class="hub-garnet-stage" id="hero-garnet-stage" aria-hidden="true">
           <div class="hub-garnet-halo"></div>
           <svg class="hub-orbital-ring is-outer" viewBox="0 0 320 320">
-            <circle cx="160" cy="160" r="146" fill="none" stroke="rgba(228,185,91,0.22)" stroke-width="1" stroke-dasharray="4 8"/>
+            <circle cx="160" cy="160" r="146" fill="none" stroke="rgba(228,185,91,0.26)" stroke-width="1" stroke-dasharray="4 8"/>
             <circle cx="160" cy="160" r="126" fill="none" stroke="rgba(217,27,58,0.34)" stroke-width="1.2" stroke-dasharray="36 18 8 18"/>
             <circle cx="160" cy="14" r="3.5" fill="#e4b95b"/>
             <circle cx="306" cy="160" r="3" fill="#ff2e54"/>
@@ -106,48 +107,44 @@
           <svg class="hub-orbital-ring is-inner" viewBox="0 0 320 320">
             <circle cx="160" cy="160" r="102" fill="none" stroke="rgba(34,211,238,0.24)" stroke-width="1" stroke-dasharray="2 10"/>
           </svg>
-          <div class="hub-garnet-crystal" id="hero-garnet-crystal">
-            <svg viewBox="0 0 180 220" width="176" height="214">
-              <defs>
-                <linearGradient id="heroRubyMain" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#ff6e89"/>
-                  <stop offset="35%" stop-color="#e11d48"/>
-                  <stop offset="72%" stop-color="#980823"/>
-                  <stop offset="100%" stop-color="#3c020d"/>
-                </linearGradient>
-                <linearGradient id="heroRubyTop" x1="0" y1="0" x2="0.8" y2="1">
-                  <stop offset="0%" stop-color="#ffd6df"/>
-                  <stop offset="45%" stop-color="#ff335c"/>
-                  <stop offset="100%" stop-color="#b80e2e"/>
-                </linearGradient>
-                <linearGradient id="heroGoldRim" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#fff4cf"/>
-                  <stop offset="50%" stop-color="#e4b95b"/>
-                  <stop offset="100%" stop-color="#8b651f"/>
-                </linearGradient>
-                <filter id="garnetGlow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ff2e54" flood-opacity="0.65"/>
-                </filter>
-              </defs>
-              <g filter="url(#garnetGlow)">
-                <!-- Outer Crystal Silhouette -->
-                <polygon points="90,8 164,62 142,194 90,212 38,194 16,62" fill="url(#heroRubyMain)" stroke="url(#heroGoldRim)" stroke-width="2.6"/>
-                <!-- Upper Crown Facets -->
-                <polygon points="90,8 164,62 128,74 90,46" fill="url(#heroRubyTop)" opacity="0.92"/>
-                <polygon points="90,8 16,62 52,74 90,46" fill="#ff476c" opacity="0.62"/>
-                <!-- Central Table Facet -->
-                <polygon points="90,46 128,74 114,154 90,174 66,154 52,74" fill="rgba(255,220,230,0.16)" stroke="rgba(255,240,194,0.38)" stroke-width="1"/>
-                <!-- Side Pavilion Facets -->
-                <polygon points="164,62 142,194 114,154 128,74" fill="rgba(60,2,14,0.46)"/>
-                <polygon points="16,62 38,194 66,154 52,74" fill="rgba(255,95,126,0.22)"/>
-                <!-- Bottom Point Facets -->
-                <polygon points="90,174 114,154 142,194 90,212" fill="rgba(40,0,10,0.68)"/>
-                <polygon points="90,174 66,154 38,194 90,212" fill="rgba(190,18,52,0.48)"/>
-                <!-- Specular Light Glints -->
-                <polygon points="90,46 128,74 90,94 52,74" fill="rgba(255,255,255,0.24)"/>
-                <line x1="90" y1="8" x2="90" y2="212" stroke="rgba(255,240,194,0.22)" stroke-width="1"/>
-              </g>
-            </svg>
+          <div class="hub-garnet-float-wrap">
+            <div class="hub-garnet-crystal" id="hero-garnet-crystal">
+              <svg viewBox="0 0 180 220" width="176" height="214">
+                <defs>
+                  <linearGradient id="heroRubyMain" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ff6e89"/>
+                    <stop offset="35%" stop-color="#e11d48"/>
+                    <stop offset="72%" stop-color="#980823"/>
+                    <stop offset="100%" stop-color="#3c020d"/>
+                  </linearGradient>
+                  <linearGradient id="heroRubyTop" x1="0" y1="0" x2="0.8" y2="1">
+                    <stop offset="0%" stop-color="#ffd6df"/>
+                    <stop offset="45%" stop-color="#ff335c"/>
+                    <stop offset="100%" stop-color="#b80e2e"/>
+                  </linearGradient>
+                  <linearGradient id="heroGoldRim" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#fff4cf"/>
+                    <stop offset="50%" stop-color="#e4b95b"/>
+                    <stop offset="100%" stop-color="#8b651f"/>
+                  </linearGradient>
+                  <filter id="garnetGlow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#d91b3a" flood-opacity="0.52"/>
+                  </filter>
+                </defs>
+                <g filter="url(#garnetGlow)">
+                  <polygon points="90,8 164,62 142,194 90,212 38,194 16,62" fill="url(#heroRubyMain)" stroke="url(#heroGoldRim)" stroke-width="2.6"/>
+                  <polygon points="90,8 164,62 128,74 90,46" fill="url(#heroRubyTop)" opacity="0.92"/>
+                  <polygon points="90,8 16,62 52,74 90,46" fill="#ff476c" opacity="0.62"/>
+                  <polygon points="90,46 128,74 114,154 90,174 66,154 52,74" fill="rgba(255,220,230,0.16)" stroke="rgba(255,240,194,0.38)" stroke-width="1"/>
+                  <polygon points="164,62 142,194 114,154 128,74" fill="rgba(60,2,14,0.46)"/>
+                  <polygon points="16,62 38,194 66,154 52,74" fill="rgba(255,95,126,0.22)"/>
+                  <polygon points="90,174 114,154 142,194 90,212" fill="rgba(40,0,10,0.68)"/>
+                  <polygon points="90,174 66,154 38,194 90,212" fill="rgba(190,18,52,0.48)"/>
+                  <polygon points="90,46 128,74 90,94 52,74" fill="rgba(255,255,255,0.24)"/>
+                  <line x1="90" y1="8" x2="90" y2="212" stroke="rgba(255,240,194,0.22)" stroke-width="1"/>
+                </g>
+              </svg>
+            </div>
           </div>
           <div class="hub-garnet-caption">
             <span class="hub-garnet-tag">GARNET · 가넷</span>
@@ -159,15 +156,15 @@
       <!-- Live Room Quick-Join & Quick Duel Dock -->
       <div class="hub-dock tg-panel">
         <div class="hub-dock-label">
-          <span class="tg-badge tg-badge-cyan" id="dock-badge">LIVE SYNC</span>
-          <span id="dock-title">快速联机加入 / 极速开局</span>
+          <span class="tg-badge tg-badge-cyan" id="dock-badge">LIVE</span>
+          <span id="dock-title">快速入局</span>
         </div>
         <form class="hub-dock-controls" id="hub-quick-join-form">
           <select class="tg-input hub-dock-select" id="dock-game-select" aria-label="Select Death Match Game"></select>
           <input class="tg-input tg-input-mono hub-dock-code" id="dock-room-code" maxlength="10" placeholder="房间码 TGM-K7M4P" autocomplete="off" />
           <button type="submit" class="tg-btn tg-btn-gold" id="dock-join-btn">加入房间</button>
           <button type="button" class="tg-btn tg-btn-ghost" id="dock-spectate-btn">观战</button>
-          <button type="button" class="tg-btn tg-btn-garnet" id="dock-quick-duel">⚡ 极速单人 AI</button>
+          <button type="button" class="tg-btn tg-btn-garnet" id="dock-quick-duel">⚡ 极速 AI</button>
         </form>
       </div>
     </section>
@@ -175,12 +172,12 @@
     <!-- Interactive Filter, Search & View Mode Control Bar -->
     <section class="hub-controls" id="arena-section">
       <div class="hub-controls-top">
-        <!-- View Mode Toggle -->
-        <div class="hub-view-toggle" role="tablist" aria-label="View Mode">
+        <!-- View Mode Toggle (with sliding indicator) -->
+        <div class="hub-view-toggle" id="hub-view-toggle" role="tablist" aria-label="View Mode">
           <button type="button" class="hub-view-btn is-active" data-view="grid" id="btn-view-grid">
             <span aria-hidden="true">◆</span>
             <span id="label-view-grid">对决殿堂</span>
-            <span class="hub-count-chip" id="chip-grid-count">0</span>
+            <span class="hub-count-chip" id="chip-grid-count">20</span>
           </button>
           <button type="button" class="hub-view-btn" data-view="chronicle" id="btn-view-chronicle">
             <span aria-hidden="true">❖</span>
@@ -196,24 +193,25 @@
         </div>
       </div>
 
-      <!-- Season Filter Pills -->
+      <!-- Season Filter Pills (Persistent + Sliding Indicator) -->
       <div class="hub-filter-row" id="season-filter-row" role="group" aria-label="Filter by Season"></div>
 
-      <!-- Mechanics Filter Pills -->
+      <!-- Mechanics Filter Pills (Persistent + Sliding Indicator) -->
       <div class="hub-filter-row is-mechanics" id="mechanics-filter-row" role="group" aria-label="Filter by Mechanics"></div>
     </section>
 
-    <!-- Arena Grid View -->
-    <section id="arena-grid-view" class="hub-section">
-      <div class="arena-grid" id="arena-grid"></div>
-      <div class="hub-empty" id="arena-empty" hidden></div>
-    </section>
+    <!-- Content Stage (Crossfade container for Arena Grid <-> Chronicle) -->
+    <div id="hub-content-stage">
+      <section id="arena-grid-view" class="hub-section">
+        <div class="arena-grid" id="arena-grid"></div>
+        <div class="hub-empty" id="arena-empty" hidden></div>
+      </section>
 
-    <!-- 44-Episode Death Match Chronicle Timeline -->
-    <section id="chronicle-view" class="hub-section" hidden>
-      <div class="chronicle-container" id="chronicle-container"></div>
-      <div class="hub-empty" id="chronicle-empty" hidden></div>
-    </section>
+      <section id="chronicle-view" class="hub-section" hidden>
+        <div class="chronicle-container" id="chronicle-container"></div>
+        <div class="hub-empty" id="chronicle-empty" hidden></div>
+      </section>
+    </div>
   </main>
 
   <footer class="hub-footer">
@@ -225,7 +223,7 @@
         </span>
       </div>
       <div style="font-family:var(--tg-font-mono);font-size:11.5px;color:var(--tg-ink-faint);">
-        ZERO-BUILD ES MODULES · WEBRTC P2P + AES-GCM WSS RELAY
+        THE GENIUS S1–S4 · INTERACTIVE DEATH MATCH ARCHIVE
       </div>
     </div>
   </footer>

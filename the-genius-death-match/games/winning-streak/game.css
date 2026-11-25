@@ -1,5 +1,6 @@
 /* ==========================================================================
  * WINNING STREAK (연승게임 / 连胜游戏) — Studio Gauntlet Runway & RPS Duel
+ * Unified Motion Tokens · GPU-Only · Dual Dark/Light Theme Parity
  * ========================================================================== */
 
 .ws-arena {
@@ -19,7 +20,7 @@
   align-items: center;
   padding: 12px 16px;
   border-radius: var(--tg-radius-md);
-  background: linear-gradient(145deg, rgba(16, 19, 32, 0.94), rgba(8, 10, 17, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border);
   box-shadow: var(--tg-shadow-card);
 }
@@ -37,17 +38,20 @@
   gap: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border-subtle);
+  transition: border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out);
+  position: relative;
 }
 
 .ws-player-gauge.is-me {
-  border-color: rgba(228, 185, 91, 0.42);
-  background: linear-gradient(135deg, rgba(228, 185, 91, 0.1), rgba(217, 27, 58, 0.05));
+  border-color: var(--tg-border-strong);
+  background: linear-gradient(135deg, var(--tg-gold-soft), var(--tg-garnet-soft));
 }
 
 .ws-player-gauge.is-leading {
-  box-shadow: 0 0 22px rgba(228, 185, 91, 0.2);
+  box-shadow: 0 0 22px var(--tg-gold-glow);
 }
 
 .ws-player-gauge.is-right {
@@ -73,6 +77,7 @@
 
 .ws-p-sub {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--tg-ink-muted);
 }
@@ -84,37 +89,49 @@
 }
 
 .ws-metric-box {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 5px 10px;
   border-radius: 9px;
-  background: rgba(8, 10, 18, 0.85);
+  background: var(--tg-bg-velvet);
   border: 1px solid var(--tg-border-subtle);
-  min-width: 60px;
+  min-width: 64px;
+  transition: transform var(--tg-dur-fast) var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    opacity var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .ws-metric-box.is-flame {
-  border-color: rgba(255, 59, 92, 0.55);
-  background: linear-gradient(180deg, rgba(217, 27, 58, 0.25), rgba(14, 10, 18, 0.9));
+  border-color: var(--tg-border-garnet);
+  background: linear-gradient(180deg, var(--tg-garnet-soft), var(--tg-bg-velvet));
+}
+
+.ws-metric-box.is-flame.is-cold {
+  opacity: 0.78;
 }
 
 .ws-metric-box.is-best {
-  border-color: rgba(228, 185, 91, 0.58);
-  background: linear-gradient(180deg, rgba(228, 185, 91, 0.2), rgba(14, 12, 16, 0.9));
+  border-color: var(--tg-border-strong);
+  background: linear-gradient(180deg, var(--tg-gold-soft), var(--tg-bg-velvet));
 }
 
 .ws-metric-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   font-family: var(--tg-font-mono);
-  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  font-size: 21px;
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--tg-gold-bright);
 }
 
 .ws-metric-box.is-flame .ws-metric-val {
-  color: #ff7a93;
-  text-shadow: 0 0 12px rgba(255, 46, 84, 0.65);
+  color: var(--tg-garnet-ink);
+  text-shadow: 0 0 10px var(--tg-garnet-glow);
 }
 
 .ws-metric-lbl {
@@ -136,7 +153,7 @@
 .ws-runway-wrap {
   padding: 14px;
   border-radius: var(--tg-radius-md);
-  background: linear-gradient(180deg, rgba(16, 20, 34, 0.92), rgba(9, 11, 18, 0.96));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border);
   box-shadow: var(--tg-shadow-card);
 }
@@ -151,25 +168,43 @@
 }
 
 .ws-runway-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(9, minmax(84px, 1fr));
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 3px 2px 6px;
+}
+
+.ws-runway-focus {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 13px;
+  pointer-events: none;
+  z-index: 1;
+  border: 2px solid var(--tg-garnet-bright);
+  background: var(--tg-garnet-soft);
+  box-shadow: 0 0 22px var(--tg-garnet-glow);
+  opacity: 0;
 }
 
 .ws-guest-card {
   position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5px;
   padding: 9px 6px;
   border-radius: 12px;
-  background: linear-gradient(165deg, rgba(24, 30, 48, 0.92), rgba(12, 15, 25, 0.96));
+  background: var(--tg-surface-card);
   border: 1px solid var(--tg-border-subtle);
   text-align: center;
-  transition: transform 0.18s var(--tg-ease), border-color 0.18s, box-shadow 0.18s;
+  transition: transform var(--tg-dur-micro) var(--tg-ease-snappy),
+    border-color var(--tg-dur-micro) var(--tg-ease-out),
+    box-shadow var(--tg-dur-micro) var(--tg-ease-out),
+    opacity var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .ws-guest-card.is-clickable {
@@ -179,13 +214,15 @@
 .ws-guest-card.is-clickable:hover {
   transform: translateY(-3px);
   border-color: var(--tg-gold);
-  box-shadow: 0 8px 20px rgba(228, 185, 91, 0.22);
+  box-shadow: 0 8px 20px var(--tg-gold-glow);
+}
+
+.ws-guest-card.is-clickable:active {
+  transform: scale(var(--tg-press-tile));
 }
 
 .ws-guest-card.is-current {
   border-color: var(--tg-garnet-bright);
-  background: linear-gradient(165deg, rgba(64, 16, 30, 0.94), rgba(16, 12, 22, 0.98));
-  box-shadow: 0 0 26px rgba(255, 46, 84, 0.42), inset 0 0 18px rgba(255, 46, 84, 0.18);
   transform: translateY(-2px);
 }
 
@@ -194,8 +231,8 @@
 }
 
 .ws-guest-card.is-lobbied {
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 0 18px rgba(228, 185, 91, 0.26);
+  border-color: var(--tg-gold);
+  box-shadow: 0 0 16px var(--tg-gold-glow);
 }
 
 .ws-guest-num {
@@ -203,6 +240,7 @@
   top: 5px;
   left: 6px;
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10px;
   font-weight: 800;
   color: var(--tg-ink-faint);
@@ -216,7 +254,8 @@
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  background: radial-gradient(circle at 35% 30%, rgba(228, 185, 91, 0.26), rgba(10, 12, 20, 0.9));
+  color: var(--tg-ink);
+  background: radial-gradient(circle at 35% 30%, var(--tg-gold-soft), var(--tg-bg-recessed));
   border: 1px solid var(--tg-border);
 }
 
@@ -235,21 +274,33 @@
   letter-spacing: 0.04em;
 }
 
-.ws-arch-loyal { background: rgba(34, 197, 94, 0.16); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); }
-.ws-arch-mercenary { background: rgba(228, 185, 91, 0.16); color: #fff0c2; border: 1px solid rgba(228, 185, 91, 0.42); }
-.ws-arch-contrarian { background: rgba(217, 27, 58, 0.18); color: #ff8ba0; border: 1px solid rgba(255, 46, 84, 0.45); }
-.ws-arch-patterned { background: rgba(34, 211, 238, 0.14); color: #67e8f9; border: 1px solid rgba(34, 211, 238, 0.42); }
+.ws-arch-loyal { background: rgba(34, 197, 94, 0.14); color: var(--tg-emerald-ink); border: 1px solid rgba(34, 197, 94, 0.4); }
+.ws-arch-mercenary { background: var(--tg-gold-soft); color: var(--tg-gold-bright); border: 1px solid var(--tg-border-strong); }
+.ws-arch-contrarian { background: var(--tg-garnet-soft); color: var(--tg-garnet-ink); border: 1px solid var(--tg-border-garnet); }
+.ws-arch-patterned { background: var(--tg-cyan-soft); color: var(--tg-cyan-ink); border: 1px solid rgba(34, 211, 238, 0.42); }
 
 .ws-lobby-gems {
   display: inline-flex;
   gap: 3px;
   margin-top: 2px;
+  min-height: 13px;
+  align-items: center;
+}
+
+.ws-gem-pop {
+  animation: ws-gem-in var(--tg-dur-micro) var(--tg-ease-spring);
+}
+
+@keyframes ws-gem-in {
+  from { opacity: 0; transform: scale(0.45); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .ws-res-row {
   display: flex;
   gap: 4px;
   margin-top: 2px;
+  min-height: 18px;
 }
 
 .ws-res-dot {
@@ -264,19 +315,17 @@
   font-weight: 800;
 }
 
-.ws-res-dot.is-win { background: rgba(34, 197, 94, 0.25); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.6); }
-.ws-res-dot.is-draw { background: rgba(245, 158, 11, 0.22); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.55); }
-.ws-res-dot.is-loss { background: rgba(217, 27, 58, 0.22); color: #ff8ba0; border: 1px solid rgba(255, 46, 84, 0.55); }
+.ws-res-dot.is-win { background: rgba(34, 197, 94, 0.2); color: var(--tg-emerald-ink); border: 1px solid rgba(34, 197, 94, 0.55); }
+.ws-res-dot.is-draw { background: var(--tg-gold-soft); color: var(--tg-gold-bright); border: 1px solid var(--tg-border-strong); }
+.ws-res-dot.is-loss { background: var(--tg-garnet-soft); color: var(--tg-garnet-ink); border: 1px solid var(--tg-border-garnet); }
 
 /* Center Duel Stage */
 .ws-stage-card {
   padding: 20px;
   border-radius: 18px;
-  background:
-    radial-gradient(ellipse 68% 52% at 50% 0%, rgba(255, 59, 92, 0.16), transparent 62%),
-    linear-gradient(165deg, rgba(18, 22, 36, 0.95), rgba(8, 10, 17, 0.99));
+  background: var(--tg-surface-table);
   border: 1.5px solid var(--tg-border-strong);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -290,7 +339,7 @@
   flex-wrap: wrap;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(10, 12, 20, 0.85);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border);
 }
 
@@ -308,25 +357,27 @@
   align-items: center;
   justify-content: center;
   font-size: 26px;
-  background: radial-gradient(circle at 30% 25%, rgba(255, 46, 84, 0.35), rgba(14, 17, 28, 0.95));
+  color: var(--tg-ink);
+  background: radial-gradient(circle at 30% 25%, var(--tg-garnet-soft), var(--tg-bg-velvet));
   border: 2px solid var(--tg-garnet-bright);
-  box-shadow: 0 0 24px rgba(255, 46, 84, 0.42);
+  box-shadow: 0 0 22px var(--tg-garnet-glow);
 }
 
 .ws-intel-box {
   padding: 10px 14px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(228, 185, 91, 0.14), rgba(34, 211, 238, 0.08));
-  border: 1px solid rgba(228, 185, 91, 0.46);
+  background: linear-gradient(135deg, var(--tg-gold-soft), var(--tg-cyan-soft));
+  border: 1px solid var(--tg-border-strong);
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 13px;
+  font-weight: 600;
   color: var(--tg-gold-bright);
 }
 
 .ws-intel-box.is-none {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--tg-bg-recessed);
   border-color: var(--tg-border-subtle);
   color: var(--tg-ink-muted);
 }
@@ -353,27 +404,32 @@
   gap: 10px;
   padding: 20px 12px;
   border-radius: 16px;
-  background: linear-gradient(160deg, #1d2338 0%, #0e111d 100%);
+  background: var(--tg-surface-card);
   border: 1.5px solid var(--tg-border);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: transform 0.2s var(--tg-ease), border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--tg-shadow-card);
+  transition: transform var(--tg-dur-micro) var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .ws-rps-card:hover:not(:disabled) {
-  transform: translateY(-6px) scale(1.02);
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.65), 0 0 28px var(--tg-gold-glow);
+  transform: translateY(-5px) scale(1.02);
+  border-color: var(--tg-gold);
 }
 
-.ws-rps-card.is-rock:hover:not(:disabled) { border-color: #ff4769; box-shadow: 0 16px 34px rgba(255, 46, 84, 0.4); }
-.ws-rps-card.is-paper:hover:not(:disabled) { border-color: #38bdf8; box-shadow: 0 16px 34px rgba(56, 189, 248, 0.38); }
-.ws-rps-card.is-scissors:hover:not(:disabled) { border-color: #f5c451; box-shadow: 0 16px 34px rgba(245, 196, 81, 0.4); }
+.ws-rps-card:active:not(:disabled) {
+  transform: scale(var(--tg-press-card));
+}
+
+.ws-rps-card.is-rock:hover:not(:disabled) { border-color: var(--tg-garnet-bright); box-shadow: 0 14px 30px var(--tg-garnet-glow); }
+.ws-rps-card.is-paper:hover:not(:disabled) { border-color: var(--tg-cyan); box-shadow: 0 14px 30px var(--tg-cyan-glow); }
+.ws-rps-card.is-scissors:hover:not(:disabled) { border-color: var(--tg-gold); box-shadow: 0 14px 30px var(--tg-gold-glow); }
 
 .ws-rps-sigil {
   width: 72px;
   height: 72px;
   display: block;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.28));
 }
 
 .ws-rps-title {
@@ -405,31 +461,31 @@
 .ws-clash-lane {
   padding: 16px;
   border-radius: 14px;
-  background: rgba(10, 12, 21, 0.9);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: ws-clash-in 0.35s var(--tg-ease);
+  animation: ws-clash-in var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .ws-clash-lane.is-win {
-  border-color: rgba(34, 197, 94, 0.65);
-  box-shadow: 0 0 26px rgba(34, 197, 94, 0.22);
+  border-color: var(--tg-emerald);
+  box-shadow: 0 0 22px rgba(34, 197, 94, 0.2);
 }
 
 .ws-clash-lane.is-loss {
-  border-color: rgba(255, 46, 84, 0.58);
-  box-shadow: 0 0 22px rgba(217, 27, 58, 0.2);
+  border-color: var(--tg-garnet-bright);
+  box-shadow: 0 0 20px var(--tg-garnet-glow);
 }
 
 .ws-clash-lane.is-draw {
-  border-color: rgba(245, 158, 11, 0.58);
+  border-color: var(--tg-amber);
 }
 
 @keyframes ws-clash-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
 }
 
 .ws-clash-versus {
@@ -451,7 +507,6 @@
   font-size: 20px;
   font-weight: 900;
   color: var(--tg-gold-bright);
-  text-shadow: 0 0 18px var(--tg-gold-glow);
 }
 
 /* Pre-Match Lobby Controls */
@@ -463,4 +518,16 @@
   flex-wrap: wrap;
   padding-top: 10px;
   border-top: 1px solid var(--tg-border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-clash-lane,
+  .ws-gem-pop {
+    animation: none !important;
+  }
+  .ws-guest-card,
+  .ws-rps-card,
+  .ws-metric-box {
+    transition-duration: 120ms !important;
+  }
 }

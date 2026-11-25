@@ -72,41 +72,39 @@ export function computeDestination(pos, prevNode, steps) {
   // Back-Do (-1)
   if (steps === -1) {
     if (pos === -1) return null; // Cannot enter from off-board on Back-Do
+    let res;
     if (pos === 1) {
       // Iconic Tactical Yutnori Back-Do shortcut: step back from Node 1 onto Home (20), ready to exit next forward move!
-      return { pos: 20, prevNode: 19 };
-    }
-    if (pos === 21) return { pos: 5, prevNode: 4 };
-    if (pos === 22) return { pos: 21, prevNode: 5 };
-    if (pos === 23) {
-      return prevNode === 27 ? { pos: 27, prevNode: 26 } : { pos: 22, prevNode: 21 };
-    }
-    if (pos === 24) return { pos: 23, prevNode: 22 };
-    if (pos === 25) return { pos: 24, prevNode: 23 };
-    if (pos === 26) return { pos: 10, prevNode: 9 };
-    if (pos === 27) return { pos: 26, prevNode: 10 };
-    if (pos === 28) return { pos: 23, prevNode: 27 };
-    if (pos === 29) return { pos: 28, prevNode: 23 };
-    if (pos === 20) {
-      return prevNode === 29 ? { pos: 29, prevNode: 28 } : { pos: 19, prevNode: 18 };
-    }
-    if (pos === 15) {
-      return prevNode === 25 ? { pos: 25, prevNode: 24 } : { pos: 14, prevNode: 13 };
-    }
-    return { pos: pos - 1, prevNode: pos - 2 > 0 ? pos - 2 : 0 };
+      res = { pos: 20, prevNode: 19 };
+    } else if (pos === 21) res = { pos: 5, prevNode: 4 };
+    else if (pos === 22) res = { pos: 21, prevNode: 5 };
+    else if (pos === 23) res = prevNode === 27 ? { pos: 27, prevNode: 26 } : { pos: 22, prevNode: 21 };
+    else if (pos === 24) res = { pos: 23, prevNode: 22 };
+    else if (pos === 25) res = { pos: 24, prevNode: 23 };
+    else if (pos === 26) res = { pos: 10, prevNode: 9 };
+    else if (pos === 27) res = { pos: 26, prevNode: 10 };
+    else if (pos === 28) res = { pos: 23, prevNode: 27 };
+    else if (pos === 29) res = { pos: 28, prevNode: 23 };
+    else if (pos === 20) res = prevNode === 29 ? { pos: 29, prevNode: 28 } : { pos: 19, prevNode: 18 };
+    else if (pos === 15) res = prevNode === 25 ? { pos: 25, prevNode: 24 } : { pos: 14, prevNode: 13 };
+    else res = { pos: pos - 1, prevNode: pos - 2 > 0 ? pos - 2 : 0 };
+    return { ...res, path: [pos, res.pos] };
   }
 
   // Forward movement (+2, +3, +4, +5)
   if (pos === -1) {
-    return { pos: steps, prevNode: steps - 1 };
+    const path = [20];
+    for (let s = 1; s <= steps; s++) path.push(s);
+    return { pos: steps, prevNode: steps - 1, path };
   }
   if (pos === 20) {
-    return { pos: FINISH_POS, prevNode: 20 };
+    return { pos: FINISH_POS, prevNode: 20, path: [20, FINISH_POS] };
   }
 
   let cur = pos;
   let prev = prevNode;
   let diagTrack = null; // 'A' (5->21->22->23->24->25->15) or 'B' (10->26->27->23->28->29->20)
+  const path = [pos];
 
   if (cur === 21 || cur === 22 || cur === 24 || cur === 25) diagTrack = 'A';
   else if (cur === 26 || cur === 27 || cur === 28 || cur === 29) diagTrack = 'B';
@@ -123,7 +121,8 @@ export function computeDestination(pos, prevNode, steps) {
       nextNode = 28;
       diagTrack = 'B';
     } else if (cur === 20) {
-      return { pos: FINISH_POS, prevNode: 20 };
+      path.push(FINISH_POS);
+      return { pos: FINISH_POS, prevNode: 20, path };
     } else if (cur === 21) {
       nextNode = 22;
     } else if (cur === 22) {
@@ -148,9 +147,10 @@ export function computeDestination(pos, prevNode, steps) {
     }
     prev = cur;
     cur = nextNode;
+    path.push(cur);
   }
 
-  return { pos: cur, prevNode: prev };
+  return { pos: cur, prevNode: prev, path };
 }
 
 function createInitialMals(owner) {
@@ -182,6 +182,7 @@ export function getLegalMoveOptions(state, owner, throwIdx) {
           fromPos: m.pos,
           toPos: dest.pos,
           prevNode: dest.prevNode,
+          path: dest.path,
           stackCount,
           hasCandidate,
         });
@@ -203,6 +204,7 @@ export function getLegalMoveOptions(state, owner, throwIdx) {
           fromPos: -1,
           toPos: dest.pos,
           prevNode: dest.prevNode,
+          path: dest.path,
           stackCount: 1,
           hasCandidate: true,
         });
@@ -215,6 +217,7 @@ export function getLegalMoveOptions(state, owner, throwIdx) {
           fromPos: -1,
           toPos: dest.pos,
           prevNode: dest.prevNode,
+          path: dest.path,
           stackCount: 1,
           hasCandidate: false,
         });
@@ -796,6 +799,7 @@ export const GameRules = {
         owner,
         fromPos: chosen.fromPos,
         toPos: chosen.toPos,
+        pathNodes: chosen.path || [chosen.fromPos, chosen.toPos],
         movedCount,
         capturedCount,
         stackedCount,

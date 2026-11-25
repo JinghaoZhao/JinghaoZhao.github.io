@@ -1,21 +1,38 @@
 /**
- * Tactical Yutnori (전략 윷놀이 / 战略掷柶) — Broadcast Interactive Renderer
+ * Tactical Yutnori (전략 윷놀이 / 战略掷柶) — Persistent-SVG Node-Hopping Renderer
+ * Zero innerHTML nukes on clicks; step-by-step 110ms Mal hops; staggered 4-stick reveal; Dual Theme.
  */
 
-import { mountGame, SFX, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, UI, Motion } from '../../shared/sdk.js';
 import {
   GameRules,
   BOARD_NODES,
-  THROW_TABLE,
   FINISH_POS,
   getLegalMoveOptions,
 } from './rules.js';
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
 let selectedThrowIdx = 0;
 let selectedSource = null; // { sourceKind: 'board', fromPos } | { sourceKind: 'entry', entryRole }
 let lastEventSig = null;
+let lastRevealSeq = 0;
+let lastMoveSeq = 0;
+let lastGoalCounts = [0, 0];
+let hopGen = 0;
+let latestCtx = null;
+let latestState = null;
 
-function renderYutBoardSvg(state, myOwner, isMoveTurn, legalOptions, lang) {
+function svgEl(tag, attrs = {}) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    el.setAttribute(k, String(v));
+  }
+  return el;
+}
+
+function mountSkeleton(container) {
+  container.dataset.mountedGame = 'tactical-yutnori';
   const outerCoords = [20, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     .map((id) => `${BOARD_NODES[id].x},${BOARD_NODES[id].y}`)
     .join(' ');
@@ -26,8 +43,255 @@ function renderYutBoardSvg(state, myOwner, isMoveTurn, legalOptions, lang) {
     .map((id) => `${BOARD_NODES[id].x},${BOARD_NODES[id].y}`)
     .join(' ');
 
-  // Group Mals currently on board by node id
-  const stacksByPos = new Map(); // pos -> { owner, mals: [] }
+  let staticNodesSvg = '';
+  for (const [idStr, node] of Object.entries(BOARD_NODES)) {
+    const id = Number(idStr);
+    const isCornerOrCenter = node.kind === 'corner' || node.kind === 'center' || node.kind === 'home';
+    const r = node.kind === 'center' || node.kind === 'home' ? 22 : isCornerOrCenter ? 19 : 14;
+    const circleCls = [
+      'ty-node-circle',
+      node.kind === 'home' ? 'is-home' : '',
+      node.kind === 'center' ? 'is-center' : '',
+      node.shortcut && node.kind !== 'center' ? 'is-shortcut' : '',
+    ].filter(Boolean).join(' ');
+
+    staticNodesSvg += `<g class="ty-node-ring" data-node-id="${id}">`;
+    staticNodesSvg += `<circle class="${circleCls}" cx="${node.x}" cy="${node.y}" r="${r}" stroke-width="${isCornerOrCenter ? 2.4 : 1.7}" />`;
+    if (node.kind === 'home') {
+      staticNodesSvg += `<text id="ty-home-label" class="ty-node-text-home" x="${node.x}" y="${node.y + 4}" text-anchor="middle">GOAL</text>`;
+    } else if (node.kind === 'center') {
+      staticNodesSvg += `<text class="ty-node-text-center" x="${node.x}" y="${node.y + 5}" text-anchor="middle">★</text>`;
+    } else if (id === 1) {
+      staticNodesSvg += `<text class="ty-node-text-n1" x="${node.x + 25}" y="${node.y + 4}" text-anchor="start">1</text>`;
+    }
+    staticNodesSvg += `</g>`;
+  }
+
+  container.innerHTML = `
+    <div class="ty-arena">
+      <div class="ty-banner">
+        <div class="ty-team-scores">
+          <div class="ty-team-pill is-p0" id="ty-pill-0">
+            <span class="ty-swatch"></span>
+            <span id="ty-name-0"></span>
+            <span class="ty-goal-badge">♛ <span id="ty-goal-0">0</span>/2</span>
+          </div>
+          <div class="ty-team-pill is-p1" id="ty-pill-1">
+            <span class="ty-swatch"></span>
+            <span id="ty-name-1"></span>
+            <span class="ty-goal-badge">♛ <span id="ty-goal-1">0</span>/2</span>
+          </div>
+        </div>
+        <span class="tg-badge tg-badge-gold" id="ty-turn-badge"></span>
+      </div>
+
+      <div class="ty-flash-banner" id="ty-flash-banner" hidden></div>
+
+      <div class="ty-board-shell" id="ty-board-shell">
+        <svg class="ty-board-svg" id="ty-board-svg" viewBox="0 0 500 500" role="img" aria-label="Tactical Yutnori 29-node board">
+          <defs>
+            <linearGradient id="ty-grad-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fff0c2" />
+              <stop offset="100%" stop-color="#d49b35" />
+            </linearGradient>
+            <radialGradient id="ty-mal-p0" cx="35%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#ff5a7a" />
+              <stop offset="55%" stop-color="#c61131" />
+              <stop offset="100%" stop-color="#6b0618" />
+            </radialGradient>
+            <radialGradient id="ty-mal-p1" cx="35%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#38bdf8" />
+              <stop offset="55%" stop-color="#0284c7" />
+              <stop offset="100%" stop-color="#083344" />
+            </radialGradient>
+            <filter id="ty-shadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity="0.45" />
+            </filter>
+            <marker id="ty-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path class="ty-arrow-head" d="M 0 1 L 7 4 L 0 7 Z" />
+            </marker>
+          </defs>
+          <path class="ty-arrow-line" d="M 462 396 L 462 325" stroke-width="2" marker-end="url(#ty-arrow)" />
+          <polyline class="ty-track-outer" points="${outerCoords}" />
+          <polyline class="ty-track-diag" points="${diagA}" />
+          <polyline class="ty-track-diag" points="${diagB}" />
+          <g id="ty-nodes-layer">${staticNodesSvg}</g>
+          <g id="ty-dest-layer"></g>
+          <g id="ty-mals-layer"></g>
+          <g id="ty-finish-layer"></g>
+        </svg>
+      </div>
+
+      <div class="ty-console">
+        <div class="ty-card" id="ty-reveal-card">
+          <h4 class="ty-card-title">
+            <span id="ty-title-reveal"></span>
+            <span id="ty-sub-reveal" style="font-family:var(--tg-font-mono);font-size:11px;color:var(--tg-ink-muted);"></span>
+          </h4>
+          <div class="ty-sticks-stage" id="ty-sticks-stage"></div>
+          <div class="ty-reveal-summary" id="ty-reveal-summary" hidden>
+            <span class="ty-reveal-result" id="ty-reveal-result"></span>
+            <span class="tg-badge" id="ty-reveal-badge"></span>
+          </div>
+          <div class="ty-matrix-hint" id="ty-matrix-hint" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="ty-card" id="ty-stick-card">
+          <h4 class="ty-card-title">
+            <span id="ty-title-pick"></span>
+            <span class="tg-badge" id="ty-role-badge"></span>
+          </h4>
+          <p id="ty-pick-prompt" style="margin:0 0 11px;font-size:12.5px;color:var(--tg-ink-muted);"></p>
+          <div class="ty-stick-picker" id="ty-stick-picker">
+            ${[
+              { flats: 0, s: [0, 0] },
+              { flats: 1, s: [1, 0] },
+              { flats: 2, s: [1, 1] },
+            ]
+              .map(
+                (ch) => `
+              <button type="button" class="ty-pick-card" data-flats="${ch.flats}">
+                <div class="ty-mini-sticks">
+                  <span class="ty-mini-stick ${ch.s[0] ? 'is-flat' : 'is-round'}"></span>
+                  <span class="ty-mini-stick ${ch.s[1] ? 'is-flat' : 'is-round'}"></span>
+                </div>
+                <span class="ty-pick-label" data-pick-label="${ch.flats}"></span>
+                <span class="ty-pick-sub" data-pick-sub="${ch.flats}"></span>
+              </button>
+            `
+              )
+              .join('')}
+          </div>
+          <p id="ty-opp-locked" style="margin:10px 0 0;font-size:11.5px;color:var(--tg-cyan-ink);font-family:var(--tg-font-mono);" hidden></p>
+        </div>
+
+        <div class="ty-card" id="ty-move-card" hidden>
+          <h4 class="ty-card-title">
+            <span id="ty-title-throws"></span>
+            <span class="tg-badge tg-badge-gold" id="ty-mover-badge"></span>
+          </h4>
+          <div class="ty-throws-row" id="ty-throws-row"></div>
+          <p id="ty-move-prompt" style="margin:0 0 10px;font-size:12.5px;color:var(--tg-ink-muted);"></p>
+          <div id="ty-entry-row" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+        </div>
+
+        <div class="ty-card">
+          <h4 class="ty-card-title" id="ty-title-roster"></h4>
+          <div class="ty-roster-docks">
+            <div class="ty-dock-box">
+              <div class="ty-dock-box-head"><span id="ty-dock-name-0"></span><span id="ty-dock-col-0"></span></div>
+              <div class="ty-mal-pills" id="ty-dock-pills-0"></div>
+            </div>
+            <div class="ty-dock-box">
+              <div class="ty-dock-box-head"><span id="ty-dock-name-1"></span><span id="ty-dock-col-1"></span></div>
+              <div class="ty-mal-pills" id="ty-dock-pills-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Bind permanent 3-card stick picker buttons once
+  container.querySelectorAll('.ty-pick-card').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const state = latestState;
+      const ctx = latestCtx;
+      if (!state || !ctx || state.phase !== 'STICK_SELECT' || ctx.isSpectator) return;
+      const mySeat = state.seats.find((s) => s.seatId === ctx.activeSeatId);
+      if (!mySeat || state.stickChoices[mySeat.owner] !== null) return;
+      const flats = Number(btn.dataset.flats);
+      SFX.play('click');
+      Motion.pulseConfirm(btn, { tone: 'cyan', duration: 220 });
+      const res = await ctx.dispatch({ type: 'SELECT_STICKS', payload: { flats } });
+      if (!res.ok) {
+        SFX.play('error');
+        Motion.nudgeError(btn, { intensity: 'subtle' });
+        UI.toast(res.reason || 'Cannot select sticks', 'error');
+      }
+    });
+  });
+}
+
+function getMoveContext(state, ctx) {
+  const mySeat = state.seats.find((s) => s.seatId === ctx.activeSeatId);
+  const myOwner = mySeat ? mySeat.owner : -1;
+  const isMovePhase = state.phase === 'MOVE';
+  const isMyMoveTurn = isMovePhase && !ctx.isSpectator && myOwner === state.turnOwner;
+  const legalOptions = isMyMoveTurn ? getLegalMoveOptions(state, myOwner, selectedThrowIdx) : [];
+  return { myOwner, isMovePhase, isMyMoveTurn, legalOptions };
+}
+
+/**
+ * Animates an SVG Mal group step-by-step along `pathNodes` (110ms per node hop).
+ * Skips immediately when Motion.reduced() is true, and is 100% interruptible via hopGen.
+ */
+function animateMalHop(malGroupEl, pathNodes) {
+  if (!malGroupEl || !Array.isArray(pathNodes) || pathNodes.length < 2) return;
+  const validCoords = pathNodes
+    .map((id) => BOARD_NODES[id])
+    .filter(Boolean);
+  if (validCoords.length < 2) return;
+
+  const finalPt = validCoords[validCoords.length - 1];
+  if (Motion.reduced() || typeof malGroupEl.animate !== 'function') {
+    malGroupEl.setAttribute('transform', `translate(${finalPt.x}, ${finalPt.y})`);
+    return;
+  }
+
+  const gen = ++hopGen;
+  const stepMs = 110;
+  let stepIdx = 0;
+
+  const runNextHop = () => {
+    if (hopGen !== gen || stepIdx >= validCoords.length - 1) {
+      malGroupEl.setAttribute('transform', `translate(${finalPt.x}, ${finalPt.y})`);
+      return;
+    }
+    const a = validCoords[stepIdx];
+    const b = validCoords[stepIdx + 1];
+    stepIdx++;
+    const midX = (a.x + b.x) / 2;
+    const midY = (a.y + b.y) / 2 - 12;
+
+    const anim = malGroupEl.animate(
+      [
+        { transform: `translate(${a.x}px, ${a.y}px) scale(1)` },
+        { transform: `translate(${midX}px, ${midY}px) scale(1.12)`, offset: 0.5 },
+        { transform: `translate(${b.x}px, ${b.y}px) scale(1)` },
+      ],
+      { duration: stepMs, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+    );
+    anim.onfinish = () => {
+      if (hopGen !== gen) return;
+      malGroupEl.setAttribute('transform', `translate(${b.x}, ${b.y})`);
+      anim.cancel();
+      runNextHop();
+    };
+  };
+
+  malGroupEl.setAttribute('transform', `translate(${validCoords[0].x}, ${validCoords[0].y})`);
+  runNextHop();
+}
+
+/**
+ * In-place interactive board & throw-chip patcher (zero DOM rebuild on clicks!)
+ */
+function patchBoardInteractivity(container, state, ctx, animateMoveInfo = null) {
+  const { isMyMoveTurn, legalOptions } = getMoveContext(state, ctx);
+  const lang = ctx.lang;
+
+  // Validate current selection
+  if (selectedSource) {
+    const stillValid = legalOptions.some((o) =>
+      selectedSource.sourceKind === 'entry'
+        ? o.sourceKind === 'entry' && o.entryRole === selectedSource.entryRole
+        : o.sourceKind === 'board' && o.fromPos === selectedSource.fromPos
+    );
+    if (!stillValid) selectedSource = null;
+  }
+
+  const stacksByPos = new Map();
   for (let o = 0; o < 2; o++) {
     for (const m of state.mals[o]) {
       if (m.pos >= 1 && m.pos <= 29) {
@@ -37,9 +301,8 @@ function renderYutBoardSvg(state, myOwner, isMoveTurn, legalOptions, lang) {
     }
   }
 
-  // Filter matching destination options if a source is selected
-  const activeDests = new Map(); // toPos -> option
-  if (isMoveTurn && selectedSource) {
+  const activeDests = new Map();
+  if (isMyMoveTurn && selectedSource) {
     for (const opt of legalOptions) {
       const match =
         selectedSource.sourceKind === 'entry'
@@ -49,71 +312,57 @@ function renderYutBoardSvg(state, myOwner, isMoveTurn, legalOptions, lang) {
     }
   }
 
-  // Clickable friendly on-board sources
   const movablePositions = new Set(
-    isMoveTurn ? legalOptions.filter((o) => o.sourceKind === 'board').map((o) => o.fromPos) : []
+    isMyMoveTurn ? legalOptions.filter((o) => o.sourceKind === 'board').map((o) => o.fromPos) : []
   );
 
-  // Nodes SVG
-  let nodesSvg = '';
-  for (const [idStr, node] of Object.entries(BOARD_NODES)) {
-    const id = Number(idStr);
+  // Patch Destination Highlight Rings layer
+  const destLayer = container.querySelector('#ty-dest-layer');
+  destLayer.textContent = '';
+  for (const [id] of activeDests.entries()) {
+    if (id === FINISH_POS) continue;
+    const node = BOARD_NODES[id];
+    if (!node) continue;
     const isCornerOrCenter = node.kind === 'corner' || node.kind === 'center' || node.kind === 'home';
     const r = node.kind === 'center' || node.kind === 'home' ? 22 : isCornerOrCenter ? 19 : 14;
-    const isDest = activeDests.has(id);
     const destStack = stacksByPos.get(id);
-    const isCaptureDest = isDest && destStack && destStack.owner !== state.turnOwner;
-
-    const fill =
-      node.kind === 'home'
-        ? 'url(#ty-grad-home)'
-        : node.kind === 'center'
-        ? 'url(#ty-grad-center)'
-        : node.shortcut
-        ? 'rgba(34, 211, 238, 0.16)'
-        : 'rgba(18, 22, 36, 0.96)';
-
-    const stroke =
-      node.kind === 'home'
-        ? '#ff4d6d'
-        : node.shortcut
-        ? '#22d3ee'
-        : 'rgba(228, 185, 91, 0.55)';
-
-    const clickAttr = isDest
-      ? `data-dest-pos="${id}" class="ty-node-ring ty-node-interactive"`
-      : movablePositions.has(id)
-      ? `data-src-pos="${id}" class="ty-node-ring ty-node-interactive"`
-      : `class="ty-node-ring"`;
-
-    nodesSvg += `<g ${clickAttr}>`;
-    if (isDest) {
-      nodesSvg += `<circle cx="${node.x}" cy="${node.y}" r="${r + 9}" class="ty-dest-pulse ${isCaptureDest ? 'is-capture' : ''}" />`;
-    }
-    nodesSvg += `<circle class="ty-node-circle" cx="${node.x}" cy="${node.y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${isCornerOrCenter ? 2.4 : 1.6}" />`;
-    if (node.kind === 'home') {
-      nodesSvg += `<text x="${node.x}" y="${node.y + 4}" text-anchor="middle" fill="#ffd6de" font-size="9.5" font-weight="800" font-family="var(--tg-font-mono)">${lang === 'zh' ? '起点' : 'GOAL'}</text>`;
-    } else if (node.kind === 'center') {
-      nodesSvg += `<text x="${node.x}" y="${node.y + 5}" text-anchor="middle" fill="#fff0c2" font-size="14" font-weight="800">★</text>`;
-    } else if (id === 1) {
-      nodesSvg += `<text x="${node.x + 25}" y="${node.y + 4}" text-anchor="start" fill="rgba(255,150,170,0.75)" font-size="9" font-weight="700" font-family="var(--tg-font-mono)">1</text>`;
-    }
-    nodesSvg += `</g>`;
+    const isCaptureDest = Boolean(destStack && destStack.owner !== state.turnOwner);
+    const ring = svgEl('circle', {
+      cx: node.x,
+      cy: node.y,
+      r: r + 9,
+      class: `ty-dest-pulse ${isCaptureDest ? 'is-capture' : ''}`,
+    });
+    ring.addEventListener('click', () => executeMove(container));
+    destLayer.appendChild(ring);
   }
 
-  // Finish exit button if activeDest contains FINISH_POS (99)
-  let finishSvg = '';
+  // Patch Finish Goal button layer
+  const finishLayer = container.querySelector('#ty-finish-layer');
+  finishLayer.textContent = '';
   if (activeDests.has(FINISH_POS)) {
-    finishSvg = `
-      <g data-dest-pos="${FINISH_POS}" class="ty-node-interactive" style="cursor:pointer;">
-        <rect x="366" y="458" width="124" height="32" rx="16" fill="url(#ty-grad-gold)" stroke="#fff6d9" stroke-width="2" filter="url(#ty-glow)" />
-        <text x="428" y="478" text-anchor="middle" fill="#120c04" font-size="12" font-weight="900" font-family="var(--tg-font-ui)">${lang === 'zh' ? '★ 冲线得分！' : '★ SCORE GOAL!'}</text>
-      </g>
-    `;
+    const g = svgEl('g', { class: 'ty-node-interactive' });
+    g.appendChild(
+      svgEl('rect', {
+        x: 366, y: 458, width: 124, height: 32, rx: 16,
+        fill: 'url(#ty-grad-gold)', stroke: '#fff6d9', 'stroke-width': 2,
+      })
+    );
+    const txt = svgEl('text', {
+      x: 428, y: 478, 'text-anchor': 'middle',
+      fill: '#120c04', 'font-size': 12, 'font-weight': 900,
+    });
+    txt.textContent = lang === 'zh' ? '★ 冲线得分！' : '★ SCORE GOAL!';
+    g.appendChild(txt);
+    g.addEventListener('click', () => executeMove(container));
+    finishLayer.appendChild(g);
   }
 
-  // Render Mal Stacks on top of nodes
-  let malsSvg = '';
+  // Patch Mals layer (centered at 0,0 inside translate(x,y) so step-by-step hop animates cleanly!)
+  const malsLayer = container.querySelector('#ty-mals-layer');
+  malsLayer.textContent = '';
+  let hopTargetEl = null;
+
   for (const [pos, group] of stacksByPos.entries()) {
     const node = BOARD_NODES[pos];
     const hasCand = group.mals.some((m) => m.role === 'candidate');
@@ -122,150 +371,138 @@ function renderYutBoardSvg(state, myOwner, isMoveTurn, legalOptions, lang) {
     const isMovable = movablePositions.has(pos);
     const isDest = activeDests.has(pos);
 
+    const g = svgEl('g', {
+      class: 'ty-mal-group',
+      transform: `translate(${node.x}, ${node.y})`,
+      style: isDest || isMovable ? 'cursor:pointer;' : '',
+    });
+
     const fill = group.owner === 0 ? 'url(#ty-mal-p0)' : 'url(#ty-mal-p1)';
     const rim = hasCand ? '#fff0c2' : '#cbd5e1';
 
-    const attrs = isDest
-      ? `data-dest-pos="${pos}" style="cursor:pointer;"`
-      : isMovable
-      ? `data-src-pos="${pos}" style="cursor:pointer;"`
-      : '';
-
-    malsSvg += `<g ${attrs}>`;
     if (isSel) {
-      malsSvg += `<circle cx="${node.x}" cy="${node.y}" r="23" fill="none" stroke="#fff0c2" stroke-width="3" stroke-dasharray="5 3" />`;
+      g.appendChild(
+        svgEl('circle', {
+          cx: 0, cy: 0, r: 23, fill: 'none', stroke: 'var(--tg-gold-bright)',
+          'stroke-width': 3, 'stroke-dasharray': '5 3',
+        })
+      );
     }
-    // Stacked subtle offset disc
     if (count > 1) {
-      malsSvg += `<circle cx="${node.x + 3}" cy="${node.y - 4}" r="15" fill="${fill}" stroke="${rim}" stroke-width="1.6" opacity="0.72" />`;
+      g.appendChild(
+        svgEl('circle', {
+          cx: 3, cy: -4, r: 15, fill, stroke: rim, 'stroke-width': 1.6, opacity: 0.72,
+        })
+      );
     }
-    malsSvg += `<circle cx="${node.x}" cy="${node.y}" r="16" fill="${fill}" stroke="${rim}" stroke-width="${hasCand ? 2.8 : 1.8}" filter="url(#ty-shadow)" />`;
-    malsSvg += `<text x="${node.x}" y="${node.y + 4.5}" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="900" font-family="var(--tg-font-ui)">${hasCand ? '♛' : '●'}</text>`;
+    g.appendChild(
+      svgEl('circle', {
+        cx: 0, cy: 0, r: 16, fill, stroke: rim, 'stroke-width': hasCand ? 2.8 : 1.8, filter: 'url(#ty-shadow)',
+      })
+    );
+    const glyph = svgEl('text', {
+      x: 0, y: 4.5, 'text-anchor': 'middle', fill: '#ffffff', 'font-size': 12, 'font-weight': 900,
+    });
+    glyph.textContent = hasCand ? '♛' : '●';
+    g.appendChild(glyph);
 
-    // Stack count badge (×2, ×3, ×4)
     if (count > 1) {
-      malsSvg += `
-        <rect x="${node.x + 8}" y="${node.y - 21}" width="24" height="16" rx="8" fill="#090b12" stroke="#e4b95b" stroke-width="1.4" />
-        <text x="${node.x + 20}" y="${node.y - 10}" text-anchor="middle" fill="#fff0c2" font-size="10" font-weight="800" font-family="var(--tg-font-mono)">×${count}</text>
-      `;
+      g.appendChild(svgEl('rect', { class: 'ty-stack-badge-bg', x: 8, y: -21, width: 24, height: 16, rx: 8 }));
+      const bTxt = svgEl('text', { class: 'ty-stack-badge-text', x: 20, y: -10, 'text-anchor': 'middle' });
+      bTxt.textContent = `×${count}`;
+      g.appendChild(bTxt);
     }
-    malsSvg += `</g>`;
+
+    if (isDest) {
+      g.addEventListener('click', () => executeMove(container));
+    } else if (isMovable) {
+      g.addEventListener('click', () => {
+        SFX.play('click');
+        if (selectedSource?.sourceKind === 'board' && selectedSource.fromPos === pos) {
+          selectedSource = null;
+        } else {
+          selectedSource = { sourceKind: 'board', fromPos: pos };
+        }
+        patchBoardInteractivity(container, latestState, latestCtx);
+      });
+    }
+
+    if (animateMoveInfo && animateMoveInfo.toPos === pos && animateMoveInfo.owner === group.owner) {
+      hopTargetEl = g;
+    }
+
+    malsLayer.appendChild(g);
   }
 
-  return `
-    <svg class="ty-board-svg" viewBox="0 0 500 500" role="img" aria-label="Tactical Yutnori 29-node board">
-      <defs>
-        <radialGradient id="ty-grad-home" cx="40%" cy="35%" r="70%">
-          <stop offset="0%" stop-color="#6b1024" />
-          <stop offset="100%" stop-color="#25060e" />
-        </radialGradient>
-        <radialGradient id="ty-grad-center" cx="40%" cy="35%" r="70%">
-          <stop offset="0%" stop-color="#4e3914" />
-          <stop offset="100%" stop-color="#191308" />
-        </radialGradient>
-        <linearGradient id="ty-grad-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#fff0c2" />
-          <stop offset="100%" stop-color="#d49b35" />
-        </linearGradient>
-        <radialGradient id="ty-mal-p0" cx="35%" cy="30%" r="75%">
-          <stop offset="0%" stop-color="#ff5a7a" />
-          <stop offset="55%" stop-color="#c61131" />
-          <stop offset="100%" stop-color="#6b0618" />
-        </radialGradient>
-        <radialGradient id="ty-mal-p1" cx="35%" cy="30%" r="75%">
-          <stop offset="0%" stop-color="#67e8f9" />
-          <stop offset="55%" stop-color="#0284c7" />
-          <stop offset="100%" stop-color="#083344" />
-        </radialGradient>
-        <filter id="ty-shadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.7" />
-        </filter>
-        <filter id="ty-glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
+  if (hopTargetEl && animateMoveInfo?.pathNodes) {
+    animateMalHop(hopTargetEl, animateMoveInfo.pathNodes);
+  }
 
-      <!-- Direction arrow subtle guide near start -->
-      <path d="M 462 396 L 462 325" stroke="rgba(228,185,91,0.45)" stroke-width="2" marker-end="url(#ty-arrow)" />
-      <defs>
-        <marker id="ty-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-          <path d="M 0 1 L 7 4 L 0 7 Z" fill="rgba(228,185,91,0.65)" />
-        </marker>
-      </defs>
+  // Patch throw chips & entry buttons active highlights in place
+  container.querySelectorAll('#ty-throws-row .ty-throw-chip').forEach((btn) => {
+    btn.classList.toggle('is-active', Number(btn.dataset.throwIdx) === selectedThrowIdx);
+  });
 
-      <!-- Track Ley-lines -->
-      <polyline class="ty-track-outer" points="${outerCoords}" />
-      <polyline class="ty-track-diag" points="${diagA}" />
-      <polyline class="ty-track-diag" points="${diagB}" />
+  const entryRow = container.querySelector('#ty-entry-row');
+  if (entryRow) {
+    entryRow.textContent = '';
+    if (isMyMoveTurn) {
+      const canEnterCand = legalOptions.some((o) => o.sourceKind === 'entry' && o.entryRole === 'candidate');
+      const canEnterPart = legalOptions.some((o) => o.sourceKind === 'entry' && o.entryRole === 'partner');
+      const addEntryBtn = (role, label) => {
+        const isSel = selectedSource?.sourceKind === 'entry' && selectedSource.entryRole === role;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `tg-btn tg-btn-sm ${isSel ? 'tg-btn-gold' : role === 'candidate' ? 'tg-btn-cyan' : ''}`;
+        b.textContent = label;
+        b.addEventListener('click', () => {
+          SFX.play('click');
+          if (selectedSource?.sourceKind === 'entry' && selectedSource.entryRole === role) {
+            selectedSource = null;
+          } else {
+            selectedSource = { sourceKind: 'entry', entryRole: role };
+          }
+          patchBoardInteractivity(container, latestState, latestCtx);
+        });
+        entryRow.appendChild(b);
+      };
+      if (canEnterCand) addEntryBtn('candidate', lang === 'zh' ? '♛ 派出主将棋入场' : '♛ Enter Candidate Mal');
+      if (canEnterPart) addEntryBtn('partner', lang === 'zh' ? '● 派出搭档棋入场' : '● Enter Partner Mal');
+    }
+  }
 
-      <!-- Board Stations -->
-      ${nodesSvg}
-
-      <!-- Pieces / Stacks -->
-      ${malsSvg}
-
-      <!-- Exit Goal Trigger -->
-      ${finishSvg}
-    </svg>
-  `;
+  const movePrompt = container.querySelector('#ty-move-prompt');
+  if (movePrompt) {
+    const activeName = state.seats[state.turnOwner]?.name || '';
+    movePrompt.textContent = isMyMoveTurn
+      ? selectedSource
+        ? lang === 'zh'
+          ? '请点击棋盘上青色/绯红高亮的目标格完成移动！'
+          : 'Tap the glowing destination node on the board to move!'
+        : lang === 'zh'
+        ? '选择下方新入场棋子，或点击棋盘上已有己方棋子：'
+        : 'Enter a waiting Mal below, or click one of your Mals on the board:'
+      : lang === 'zh'
+      ? `等待 ${activeName} 走棋…`
+      : `Waiting for ${activeName} to move…`;
+  }
 }
 
-function renderSticksDisplay(state, lang) {
-  const rev = state.lastReveal;
-  if (!rev) {
-    return `
-      <div class="ty-sticks-stage">
-        <span style="color:var(--tg-ink-muted);font-size:13px;">${
-          lang === 'zh' ? '等待双方同时秘密选择 2 根柶木…' : 'Awaiting simultaneous 2-stick lock from both teams…'
-        }</span>
-      </div>
-    `;
+async function executeMove(container) {
+  const state = latestState;
+  const ctx = latestCtx;
+  if (!state || !ctx || !selectedSource) return;
+  const payload =
+    selectedSource.sourceKind === 'entry'
+      ? { throwIdx: selectedThrowIdx, sourceKind: 'entry', entryRole: selectedSource.entryRole }
+      : { throwIdx: selectedThrowIdx, sourceKind: 'board', fromPos: selectedSource.fromPos };
+  selectedSource = null;
+  const res = await ctx.dispatch({ type: 'MOVE_MAL', payload });
+  if (!res.ok) {
+    SFX.play('error');
+    Motion.nudgeError(container.querySelector('#ty-board-shell'), { intensity: 'subtle' });
+    UI.toast(res.reason || 'Illegal move', 'error');
   }
-
-  const sticks = [];
-  for (let i = 0; i < 2; i++) {
-    sticks.push({ flat: i < rev.activeFlats, tag: lang === 'zh' ? '攻' : 'ATK' });
-  }
-  for (let i = 0; i < 2; i++) {
-    sticks.push({ flat: i < rev.defFlats, tag: lang === 'zh' ? '守' : 'DEF' });
-  }
-
-  const sticksHtml = sticks
-    .map(
-      (st) => `
-      <div class="ty-stick-wrap">
-        <div class="ty-stick ${st.flat ? 'is-flat' : 'is-round'}">
-          ${st.flat ? '<span class="ty-stick-x">✕</span><span class="ty-stick-x">✕</span><span class="ty-stick-x">✕</span>' : ''}
-        </div>
-        <span class="ty-stick-owner">${st.tag}·${st.flat ? (lang === 'zh' ? '平' : 'F') : (lang === 'zh' ? '弧' : 'R')}</span>
-      </div>
-    `
-    )
-    .join('');
-
-  return `
-    <div class="ty-sticks-stage">${sticksHtml}</div>
-    <div class="ty-reveal-summary">
-      <span class="ty-reveal-result">${UI.escapeHtml(lang === 'zh' ? rev.spec.zh : rev.spec.en)}</span>
-      <span class="tg-badge ${rev.wasted ? 'tg-badge-garnet' : rev.bonusTriggered ? 'tg-badge-gold' : 'tg-badge-cyan'}">
-        ${
-          rev.wasted
-            ? lang === 'zh'
-              ? '场上无棋 · 倒退猪作废'
-              : 'NO MAL ON BOARD · WASTED'
-            : rev.bonusTriggered
-            ? lang === 'zh'
-              ? '连掷奖励 +1！'
-              : 'BONUS THROW +1!'
-            : `${rev.totalFlats} ${lang === 'zh' ? '平' : 'Flat'} / ${4 - rev.totalFlats} ${lang === 'zh' ? '弧' : 'Round'}`
-        }
-      </span>
-    </div>
-  `;
 }
 
 mountGame({
@@ -310,9 +547,20 @@ Zero-luck psychological Korean Yutnori! Each side commands **2 Candidate Mals (�
   rules: GameRules,
   root: document.getElementById('game-root'),
 
-  render: function renderYutGame(container, ctx) {
-    const { state, activeSeatId, lang, lastEvent, dispatch, setTelemetry } = ctx;
+  render(container, ctx) {
+    const { state, activeSeatId, lang, lastEvent, setTelemetry } = ctx;
     if (!state) return;
+
+    latestCtx = ctx;
+    latestState = state;
+
+    const firstMount = container.dataset.mountedGame !== 'tactical-yutnori';
+    if (firstMount) {
+      mountSkeleton(container);
+      lastRevealSeq = 0;
+      lastMoveSeq = 0;
+      lastGoalCounts = [0, 0];
+    }
 
     if (lastEvent && lastEvent !== lastEventSig) {
       lastEventSig = lastEvent;
@@ -326,6 +574,7 @@ Zero-luck psychological Korean Yutnori! Each side commands **2 Candidate Mals (�
         SFX.play('cardFlip');
       } else if (lastEvent.type === 'BACK_DO_WASTED') {
         SFX.play('error');
+        Motion.nudgeError(container.querySelector('#ty-reveal-card'), { intensity: 'subtle' });
       } else if (lastEvent.type === 'MAL_MOVE') {
         SFX.play('tilePlace');
       }
@@ -337,177 +586,214 @@ Zero-luck psychological Korean Yutnori! Each side commands **2 Candidate Mals (�
       selectedThrowIdx = 0;
     }
 
-    setTelemetry({
-      round: state.round,
-      phase: state.phaseLabel,
-    });
+    setTelemetry({ round: state.round, phase: state.phaseLabel });
 
+    // Patch header scores with Motion.animateNumber
+    const goals = [
+      state.mals[0].filter((m) => m.role === 'candidate' && m.pos === FINISH_POS).length,
+      state.mals[1].filter((m) => m.role === 'candidate' && m.pos === FINISH_POS).length,
+    ];
+    for (let o = 0; o < 2; o++) {
+      container.querySelector(`#ty-name-${o}`).textContent = state.seats[o].name;
+      container.querySelector(`#ty-pill-${o}`).classList.toggle('is-active', state.turnOwner === o);
+      const gEl = container.querySelector(`#ty-goal-${o}`);
+      if (lastGoalCounts[o] !== goals[o]) {
+        Motion.animateNumber(gEl, lastGoalCounts[o], goals[o], { duration: 280 });
+        Motion.pulseConfirm(container.querySelector(`#ty-pill-${o}`), { tone: 'gold' });
+        lastGoalCounts[o] = goals[o];
+      } else {
+        gEl.textContent = String(goals[o]);
+      }
+    }
+
+    container.querySelector('#ty-turn-badge').textContent =
+      lang === 'zh'
+        ? `第 ${state.round} 轮 · ${state.phaseLabel.zh}`
+        : `TURN ${state.round} · ${state.phaseLabel.en}`;
+
+    const homeLabel = container.querySelector('#ty-home-label');
+    if (homeLabel) homeLabel.textContent = lang === 'zh' ? '起点' : 'GOAL';
+
+    // Capture / Bonus Flash Banner
+    const flashEl = container.querySelector('#ty-flash-banner');
+    let flashMsg = '';
+    if (state.lastMoveInfo?.capturedCount > 0 && state.phase !== 'ended') {
+      flashMsg =
+        lang === 'zh'
+          ? `⚡ ${state.seats[state.lastMoveInfo.owner].name} 击飞敌方 ${state.lastMoveInfo.capturedCount} 枚棋子！${state.lastMoveInfo.earnedCaptureBonus ? '获得额外奖励回合！' : ''}`
+          : `⚡ ${state.seats[state.lastMoveInfo.owner].name} CAPTURED ${state.lastMoveInfo.capturedCount} enemy Mal(s)!${state.lastMoveInfo.earnedCaptureBonus ? ' BONUS THROW GRANTED!' : ''}`;
+    } else if (state.lastReveal?.bonusTriggered && state.phase === 'STICK_SELECT') {
+      flashMsg =
+        lang === 'zh'
+          ? `🔥 ${state.seats[state.turnOwner].name} 掷出 ${state.lastReveal.spec.zh}！触发连掷奖励！`
+          : `🔥 ${state.seats[state.turnOwner].name} rolled ${state.lastReveal.spec.en}! BONUS THROW!`;
+    }
+    if (flashMsg) flashEl.textContent = flashMsg;
+    Motion.transitionPresence(flashEl, Boolean(flashMsg), { preset: 'pill' });
+
+    // Staggered 4-stick reveal display (only re-animate when throwSeq advances!)
+    container.querySelector('#ty-title-reveal').textContent = lang === 'zh' ? '柶木合投结果' : '4-Stick Reveal';
+    container.querySelector('#ty-sub-reveal').textContent = lang === 'zh' ? '总平面数决定步数' : 'Total Flats = Throw';
+
+    const sticksStage = container.querySelector('#ty-sticks-stage');
+    const revSummary = container.querySelector('#ty-reveal-summary');
+    const rev = state.lastReveal;
+    if (!rev) {
+      sticksStage.innerHTML = `<span style="color:var(--tg-ink-muted);font-size:13px;">${
+        lang === 'zh' ? '等待双方同时秘密选择 2 根柶木…' : 'Awaiting simultaneous 2-stick lock from both teams…'
+      }</span>`;
+      revSummary.hidden = true;
+    } else {
+      const isFreshReveal = rev.seq !== lastRevealSeq;
+      if (isFreshReveal || sticksStage.dataset.lang !== lang) {
+        lastRevealSeq = rev.seq;
+        sticksStage.dataset.lang = lang;
+        const sticks = [
+          { flat: 0 < rev.activeFlats, tag: lang === 'zh' ? '攻' : 'ATK' },
+          { flat: 1 < rev.activeFlats, tag: lang === 'zh' ? '攻' : 'ATK' },
+          { flat: 0 < rev.defFlats, tag: lang === 'zh' ? '守' : 'DEF' },
+          { flat: 1 < rev.defFlats, tag: lang === 'zh' ? '守' : 'DEF' },
+        ];
+        sticksStage.innerHTML = sticks
+          .map(
+            (st, idx) => `
+            <div class="ty-stick-wrap">
+              <div class="ty-stick ${st.flat ? 'is-flat' : 'is-round'} ${isFreshReveal ? 'is-flipping' : ''}" style="${isFreshReveal ? `animation-delay:${idx * 60}ms;` : ''}">
+                ${st.flat ? '<span class="ty-stick-x">✕</span><span class="ty-stick-x">✕</span><span class="ty-stick-x">✕</span>' : ''}
+              </div>
+              <span class="ty-stick-owner">${st.tag}·${st.flat ? (lang === 'zh' ? '平' : 'F') : (lang === 'zh' ? '弧' : 'R')}</span>
+            </div>
+          `
+          )
+          .join('');
+      }
+      revSummary.hidden = false;
+      container.querySelector('#ty-reveal-result').textContent = lang === 'zh' ? rev.spec.zh : rev.spec.en;
+      const badge = container.querySelector('#ty-reveal-badge');
+      badge.className = `tg-badge ${rev.wasted ? 'tg-badge-garnet' : rev.bonusTriggered ? 'tg-badge-gold' : 'tg-badge-cyan'}`;
+      badge.textContent = rev.wasted
+        ? lang === 'zh'
+          ? '场上无棋 · 倒退猪作废'
+          : 'NO MAL · WASTED'
+        : rev.bonusTriggered
+        ? lang === 'zh'
+          ? '连掷奖励 +1！'
+          : 'BONUS THROW +1!'
+        : `${rev.totalFlats} ${lang === 'zh' ? '平' : 'Flat'} / ${4 - rev.totalFlats} ${lang === 'zh' ? '弧' : 'Round'}`;
+    }
+
+    // Matrix hint strip (update only on lang change)
+    const matHint = container.querySelector('#ty-matrix-hint');
+    if (matHint.dataset.lang !== lang) {
+      matHint.dataset.lang = lang;
+      matHint.innerHTML = `
+        <div class="ty-matrix-cell"><strong>0 ${lang === 'zh' ? '平' : 'F'}</strong>${lang === 'zh' ? '马 +5★' : 'Mo +5★'}</div>
+        <div class="ty-matrix-cell"><strong>1 ${lang === 'zh' ? '平' : 'F'}</strong>${lang === 'zh' ? '倒猪 -1' : 'Back -1'}</div>
+        <div class="ty-matrix-cell"><strong>2 ${lang === 'zh' ? '平' : 'F'}</strong>${lang === 'zh' ? '狗 +2' : 'Gae +2'}</div>
+        <div class="ty-matrix-cell"><strong>3 ${lang === 'zh' ? '平' : 'F'}</strong>${lang === 'zh' ? '羊 +3' : 'Geol +3'}</div>
+        <div class="ty-matrix-cell"><strong>4 ${lang === 'zh' ? '平' : 'F'}</strong>${lang === 'zh' ? '牛 +4★' : 'Yut +4★'}</div>
+      `;
+    }
+
+    // Toggle Stick Picker vs Move Card cleanly without destroying elements
     const mySeat = state.seats.find((s) => s.seatId === activeSeatId);
     const myOwner = mySeat ? mySeat.owner : -1;
     const isStickPhase = state.phase === 'STICK_SELECT';
     const isMovePhase = state.phase === 'MOVE';
     const canPickSticks = isStickPhase && !ctx.isSpectator && myOwner !== -1 && state.stickChoices[myOwner] === null;
-    const isMyMoveTurn = isMovePhase && !ctx.isSpectator && myOwner === state.turnOwner;
-
-    const legalOptions = isMyMoveTurn ? getLegalMoveOptions(state, myOwner, selectedThrowIdx) : [];
-
-    // Validate selectedSource against current legalOptions
-    if (selectedSource) {
-      const stillValid = legalOptions.some((o) =>
-        selectedSource.sourceKind === 'entry'
-          ? o.sourceKind === 'entry' && o.entryRole === selectedSource.entryRole
-          : o.sourceKind === 'board' && o.fromPos === selectedSource.fromPos
-      );
-      if (!stillValid) selectedSource = null;
-    }
-
-    const p0Done = state.mals[0].filter((m) => m.role === 'candidate' && m.pos === FINISH_POS).length;
-    const p1Done = state.mals[1].filter((m) => m.role === 'candidate' && m.pos === FINISH_POS).length;
-
-    let flashHtml = '';
-    if (state.lastMoveInfo?.capturedCount > 0 && state.phase !== 'ended') {
-      flashHtml = `<div class="ty-flash-banner">⚡ ${
-        lang === 'zh'
-          ? `${UI.escapeHtml(state.seats[state.lastMoveInfo.owner].name)} 击飞敌方 ${state.lastMoveInfo.capturedCount} 枚棋子！${state.lastMoveInfo.earnedCaptureBonus ? '获得额外奖励回合！' : ''}`
-          : `${UI.escapeHtml(state.seats[state.lastMoveInfo.owner].name)} CAPTURED ${state.lastMoveInfo.capturedCount} enemy Mal(s)!${state.lastMoveInfo.earnedCaptureBonus ? ' BONUS THROW GRANTED!' : ''}`
-      }</div>`;
-    } else if (state.lastReveal?.bonusTriggered && state.phase === 'STICK_SELECT') {
-      flashHtml = `<div class="ty-flash-banner">🔥 ${
-        lang === 'zh'
-          ? `${UI.escapeHtml(state.seats[state.turnOwner].name)} 掷出 ${state.lastReveal.spec.zh}！触发连掷奖励！`
-          : `${UI.escapeHtml(state.seats[state.turnOwner].name)} rolled ${state.lastReveal.spec.en}! BONUS THROW!`
-      }</div>`;
-    }
-
     const activeName = state.seats[state.turnOwner]?.name || '';
-    const myStickChoice = myOwner !== -1 ? state.stickChoices[myOwner] : null;
-    const oppStickChoice = myOwner !== -1 ? state.stickChoices[1 - myOwner] : null;
 
-    let actionCardHtml = '';
+    const stickCard = container.querySelector('#ty-stick-card');
+    const moveCard = container.querySelector('#ty-move-card');
+    stickCard.hidden = !isStickPhase;
+    moveCard.hidden = !isMovePhase;
+
     if (isStickPhase) {
-      const roleTag =
+      container.querySelector('#ty-title-pick').textContent = lang === 'zh' ? '秘密择柶（2 根）' : 'Secret Stick Pick (2)';
+      const roleBadge = container.querySelector('#ty-role-badge');
+      roleBadge.className = `tg-badge ${myOwner === state.turnOwner ? 'tg-badge-gold' : 'tg-badge-cyan'}`;
+      roleBadge.textContent =
         myOwner === state.turnOwner
           ? lang === 'zh'
-            ? '你是本轮进攻方（移动方）'
-            : 'YOU ARE ACTIVE (MOVER)'
+            ? '本轮进攻方'
+            : 'ACTIVE MOVER'
           : myOwner !== -1
           ? lang === 'zh'
-            ? '你是本轮防守方（干扰对手步数）'
-            : 'YOU ARE DEFENDING (DISRUPT THROW)'
+            ? '本轮防守方'
+            : 'DEFENDING'
           : lang === 'zh'
-          ? '观战模式'
+          ? '观战'
           : 'SPECTATING';
 
-      const choices = [
-        { flats: 0, sticks: [0, 0], zh: '0 平 · 2 弧', en: '0 Flat (R+R)', subZh: '可凑 马/猪/狗', subEn: 'Mo / Back / Gae' },
-        { flats: 1, sticks: [1, 0], zh: '1 平 · 1 弧', en: '1 Flat (F+R)', subZh: '防牛防马 · 稳健', subEn: 'Blocks Yut & Mo' },
-        { flats: 2, sticks: [1, 1], zh: '2 平 · 0 弧', en: '2 Flat (F+F)', subZh: '可凑 狗/羊/牛', subEn: 'Gae / Geol / Yut' },
+      const myChoice = myOwner !== -1 ? state.stickChoices[myOwner] : null;
+      const oppChoice = myOwner !== -1 ? state.stickChoices[1 - myOwner] : null;
+
+      container.querySelector('#ty-pick-prompt').textContent = canPickSticks
+        ? lang === 'zh'
+          ? `本轮由 ${activeName} 走棋。秘密锁定你的 2 根柶木：`
+          : `${activeName} will move. Lock your 2 sticks secretly:`
+        : myChoice !== null
+        ? lang === 'zh'
+          ? '已锁定你的柶木，等待对手锁定…'
+          : 'Your sticks are locked. Waiting for opponent…'
+        : lang === 'zh'
+        ? '等待双方秘密锁定柶木…'
+        : 'Waiting for both teams to lock sticks…';
+
+      const labels = [
+        { zh: '0 平 · 2 弧', en: '0 Flat (R+R)', subZh: '可凑 马/猪/狗', subEn: 'Mo / Back / Gae' },
+        { zh: '1 平 · 1 弧', en: '1 Flat (F+R)', subZh: '防牛防马 · 稳健', subEn: 'Blocks Yut & Mo' },
+        { zh: '2 平 · 0 弧', en: '2 Flat (F+F)', subZh: '可凑 狗/羊/牛', subEn: 'Gae / Geol / Yut' },
       ];
+      container.querySelectorAll('.ty-pick-card').forEach((btn) => {
+        const f = Number(btn.dataset.flats);
+        btn.disabled = !canPickSticks;
+        btn.classList.toggle('is-chosen', myChoice === f);
+        btn.querySelector(`[data-pick-label="${f}"]`).textContent = lang === 'zh' ? labels[f].zh : labels[f].en;
+        btn.querySelector(`[data-pick-sub="${f}"]`).textContent = lang === 'zh' ? labels[f].subZh : labels[f].subEn;
+      });
 
-      actionCardHtml = `
-        <div class="ty-card">
-          <h4 class="ty-card-title">
-            <span>${lang === 'zh' ? '秘密择柶（2 根）' : 'Secret Stick Pick (2 Sticks)'}</span>
-            <span class="tg-badge ${myOwner === state.turnOwner ? 'tg-badge-gold' : 'tg-badge-cyan'}">${roleTag}</span>
-          </h4>
-          <p style="margin:0 0 11px;font-size:12.5px;color:var(--tg-ink-muted);">
-            ${
-              canPickSticks
-                ? lang === 'zh'
-                  ? `本轮由 <strong>${UI.escapeHtml(activeName)}</strong> 走棋。选择你的 2 根柶木与对手合成最终步数：`
-                  : `<strong>${UI.escapeHtml(activeName)}</strong> will move. Lock your 2 sticks secretly:`
-                : myStickChoice !== null
-                ? lang === 'zh'
-                  ? '已锁定你的柶木，等待对手锁定…'
-                  : 'Your sticks are locked. Waiting for opponent…'
-                : lang === 'zh'
-                ? '等待双方秘密锁定柶木…'
-                : 'Waiting for both players to lock sticks…'
-            }
-          </p>
-          <div class="ty-stick-picker">
-            ${choices
-              .map(
-                (ch) => `
-              <button type="button" class="ty-pick-card ${myStickChoice === ch.flats ? 'is-chosen' : ''}" data-flats="${ch.flats}" ${canPickSticks ? '' : 'disabled'}>
-                <div class="ty-mini-sticks">
-                  <span class="ty-mini-stick ${ch.sticks[0] ? 'is-flat' : 'is-round'}"></span>
-                  <span class="ty-mini-stick ${ch.sticks[1] ? 'is-flat' : 'is-round'}"></span>
-                </div>
-                <span class="ty-pick-label">${lang === 'zh' ? ch.zh : ch.en}</span>
-                <span class="ty-pick-sub">${lang === 'zh' ? ch.subZh : ch.subEn}</span>
-              </button>
-            `
-              )
-              .join('')}
-          </div>
-          ${
-            oppStickChoice === 'LOCKED'
-              ? `<p style="margin:10px 0 0;font-size:11.5px;color:var(--tg-cyan);font-family:var(--tg-font-mono);">✓ ${lang === 'zh' ? '对手已锁定柶木！' : 'Opponent has locked their sticks!'}</p>`
-              : ''
-          }
-        </div>
-      `;
-    } else if (isMovePhase) {
-      const throwsHtml = state.pendingThrows
-        .map((th, idx) => {
-          const activeCls = idx === selectedThrowIdx ? 'is-active' : '';
-          const backCls = th.steps < 0 ? 'is-backdo' : '';
-          return `<button type="button" class="ty-throw-chip ${activeCls} ${backCls}" data-throw-idx="${idx}" ${isMyMoveTurn ? '' : 'disabled'}>${UI.escapeHtml(lang === 'zh' ? th.zh : th.en)}</button>`;
-        })
-        .join('');
-
-      const canEnterCand = isMyMoveTurn && legalOptions.some((o) => o.sourceKind === 'entry' && o.entryRole === 'candidate');
-      const canEnterPart = isMyMoveTurn && legalOptions.some((o) => o.sourceKind === 'entry' && o.entryRole === 'partner');
-      const selEntryCand = selectedSource?.sourceKind === 'entry' && selectedSource.entryRole === 'candidate';
-      const selEntryPart = selectedSource?.sourceKind === 'entry' && selectedSource.entryRole === 'partner';
-
-      actionCardHtml = `
-        <div class="ty-card">
-          <h4 class="ty-card-title">
-            <span>${lang === 'zh' ? '待执行步数' : 'Available Throws'}</span>
-            <span class="tg-badge tg-badge-gold">${UI.escapeHtml(activeName)}</span>
-          </h4>
-          <div class="ty-throws-row">${throwsHtml}</div>
-          ${
-            isMyMoveTurn
-              ? `
-                <p style="margin:0 0 10px;font-size:12.5px;color:var(--tg-ink-muted);">
-                  ${
-                    selectedSource
-                      ? lang === 'zh'
-                        ? '请点击棋盘上青色/绯红脉冲高亮的目标格完成移动！'
-                        : 'Tap the glowing destination node on the board to move!'
-                      : lang === 'zh'
-                      ? '选择下方新入场棋子，或点击棋盘上已有己方棋子：'
-                      : 'Enter a waiting Mal below, or click one of your Mals on the board:'
-                  }
-                </p>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                  ${
-                    canEnterCand
-                      ? `<button type="button" class="tg-btn tg-btn-sm ${selEntryCand ? 'tg-btn-gold' : 'tg-btn-cyan'}" data-entry-role="candidate">♛ ${lang === 'zh' ? '派出主将棋入场' : 'Enter Candidate Mal'}</button>`
-                      : ''
-                  }
-                  ${
-                    canEnterPart
-                      ? `<button type="button" class="tg-btn tg-btn-sm ${selEntryPart ? 'tg-btn-gold' : ''}" data-entry-role="partner">● ${lang === 'zh' ? '派出搭档棋入场' : 'Enter Partner Mal'}</button>`
-                      : ''
-                  }
-                </div>
-              `
-              : `<p style="margin:0;font-size:12.5px;color:var(--tg-ink-muted);">${lang === 'zh' ? `等待 ${UI.escapeHtml(activeName)} 走棋…` : `Waiting for ${UI.escapeHtml(activeName)} to move…`}</p>`
-          }
-        </div>
-      `;
+      const oppLockedEl = container.querySelector('#ty-opp-locked');
+      oppLockedEl.hidden = oppChoice !== 'LOCKED';
+      oppLockedEl.textContent = lang === 'zh' ? '✓ 对手已锁定柶木！' : '✓ Opponent has locked their sticks!';
     }
 
-    const renderTeamDock = (o) => {
-      const seat = state.seats[o];
-      const mals = state.mals[o];
-      const pills = mals
+    if (isMovePhase) {
+      container.querySelector('#ty-title-throws').textContent = lang === 'zh' ? '待执行步数' : 'Available Throws';
+      container.querySelector('#ty-mover-badge').textContent = activeName;
+      const isMyMoveTurn = !ctx.isSpectator && myOwner === state.turnOwner;
+
+      const throwsRow = container.querySelector('#ty-throws-row');
+      throwsRow.textContent = '';
+      state.pendingThrows.forEach((th, idx) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `ty-throw-chip ${idx === selectedThrowIdx ? 'is-active' : ''} ${th.steps < 0 ? 'is-backdo' : ''}`;
+        b.dataset.throwIdx = String(idx);
+        b.disabled = !isMyMoveTurn;
+        b.textContent = lang === 'zh' ? th.zh : th.en;
+        b.addEventListener('click', () => {
+          if (!isMyMoveTurn) return;
+          SFX.play('click');
+          selectedThrowIdx = idx;
+          selectedSource = null;
+          patchBoardInteractivity(container, latestState, latestCtx);
+        });
+        throwsRow.appendChild(b);
+      });
+    }
+
+    // Patch Roster Docks
+    container.querySelector('#ty-title-roster').textContent =
+      lang === 'zh' ? '双方棋子状态（仅 ♛ 主将计胜）' : 'Mal Roster (Only ♛ Candidates Score)';
+    for (let o = 0; o < 2; o++) {
+      container.querySelector(`#ty-dock-name-${o}`).textContent = state.seats[o].name;
+      container.querySelector(`#ty-dock-col-${o}`).textContent =
+        o === 0 ? (lang === 'zh' ? '绯红' : 'RED') : lang === 'zh' ? '电光青' : 'CYAN';
+      const pillsEl = container.querySelector(`#ty-dock-pills-${o}`);
+      pillsEl.innerHTML = state.mals[o]
         .map((m) => {
-          const status =
+          const st =
             m.pos === FINISH_POS
               ? lang === 'zh'
                 ? '已冲线'
@@ -517,144 +803,18 @@ Zero-luck psychological Korean Yutnori! Each side commands **2 Candidate Mals (�
                 ? '待命'
                 : 'READY'
               : `#${m.pos}`;
-          return `<span class="ty-mal-pill ${m.role === 'candidate' ? 'is-cand' : ''} ${m.pos === FINISH_POS ? 'is-done' : ''}">${m.role === 'candidate' ? '♛' : '●'} ${status}</span>`;
+          return `<span class="ty-mal-pill ${m.role === 'candidate' ? 'is-cand' : ''} ${m.pos === FINISH_POS ? 'is-done' : ''}">${m.role === 'candidate' ? '♛' : '●'} ${st}</span>`;
         })
         .join('');
+    }
 
-      return `
-        <div class="ty-dock-box">
-          <div class="ty-dock-box-head">
-            <span>${UI.escapeHtml(seat.name)}</span>
-            <span>${o === 0 ? (lang === 'zh' ? '绯红' : 'RED') : (lang === 'zh' ? '电光青' : 'CYAN')}</span>
-          </div>
-          <div class="ty-mal-pills">${pills}</div>
-        </div>
-      `;
-    };
+    // Check if a new Mal move just occurred to trigger step-by-step node hop!
+    let animateMoveInfo = null;
+    if (state.lastMoveInfo && state.lastMoveInfo.seq !== lastMoveSeq) {
+      lastMoveSeq = state.lastMoveInfo.seq;
+      animateMoveInfo = state.lastMoveInfo;
+    }
 
-    container.innerHTML = `
-      <div class="ty-arena">
-        <div class="ty-banner">
-          <div class="ty-team-scores">
-            <div class="ty-team-pill is-p0 ${state.turnOwner === 0 ? 'is-active' : ''}">
-              <span class="ty-swatch"></span>
-              <span>${UI.escapeHtml(state.seats[0].name)}</span>
-              <span class="ty-goal-badge">♛ ${p0Done}/2</span>
-            </div>
-            <div class="ty-team-pill is-p1 ${state.turnOwner === 1 ? 'is-active' : ''}">
-              <span class="ty-swatch"></span>
-              <span>${UI.escapeHtml(state.seats[1].name)}</span>
-              <span class="ty-goal-badge">♛ ${p1Done}/2</span>
-            </div>
-          </div>
-          <span class="tg-badge tg-badge-gold">${lang === 'zh' ? `第 ${state.round} 轮 · ${state.phaseLabel.zh}` : `TURN ${state.round} · ${state.phaseLabel.en}`}</span>
-        </div>
-
-        ${flashHtml}
-
-        <div class="ty-board-shell">
-          ${renderYutBoardSvg(state, myOwner, isMyMoveTurn, legalOptions, lang)}
-        </div>
-
-        <div class="ty-console">
-          <div class="ty-card">
-            <h4 class="ty-card-title">
-              <span>${lang === 'zh' ? '柶木合投结果' : '4-Stick Reveal'}</span>
-              <span style="font-family:var(--tg-font-mono);font-size:11px;color:var(--tg-ink-muted);">${lang === 'zh' ? '总平面数决定步数' : 'Total Flats = Throw'}</span>
-            </h4>
-            ${renderSticksDisplay(state, lang)}
-            <div class="ty-matrix-hint" style="margin-top:10px;">
-              <div class="ty-matrix-cell"><strong>0 平</strong>${lang === 'zh' ? '马 +5★' : 'Mo +5★'}</div>
-              <div class="ty-matrix-cell"><strong>1 平</strong>${lang === 'zh' ? '倒猪 -1' : 'Back -1'}</div>
-              <div class="ty-matrix-cell"><strong>2 平</strong>${lang === 'zh' ? '狗 +2' : 'Gae +2'}</div>
-              <div class="ty-matrix-cell"><strong>3 平</strong>${lang === 'zh' ? '羊 +3' : 'Geol +3'}</div>
-              <div class="ty-matrix-cell"><strong>4 平</strong>${lang === 'zh' ? '牛 +4★' : 'Yut +4★'}</div>
-            </div>
-          </div>
-
-          ${actionCardHtml}
-
-          <div class="ty-card">
-            <h4 class="ty-card-title">${lang === 'zh' ? '双方棋子状态（仅 ♛ 主将计胜）' : 'Mal Roster (Only ♛ Candidates Score)'}</h4>
-            <div class="ty-roster-docks">
-              ${renderTeamDock(0)}
-              ${renderTeamDock(1)}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Bind stick selection cards
-    container.querySelectorAll('.ty-pick-card').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        if (!canPickSticks) return;
-        const flats = Number(btn.dataset.flats);
-        SFX.play('click');
-        const res = await dispatch({ type: 'SELECT_STICKS', payload: { flats } });
-        if (!res.ok) {
-          SFX.play('error');
-          UI.toast(res.reason || 'Cannot select sticks', 'error');
-        }
-      });
-    });
-
-    // Bind throw selector chips
-    container.querySelectorAll('.ty-throw-chip').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (!isMyMoveTurn) return;
-        SFX.play('click');
-        selectedThrowIdx = Number(btn.dataset.throwIdx);
-        selectedSource = null;
-        renderYutGame(container, ctx);
-      });
-    });
-
-    // Bind entry buttons
-    container.querySelectorAll('[data-entry-role]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (!isMyMoveTurn) return;
-        SFX.play('click');
-        const entryRole = btn.dataset.entryRole;
-        if (selectedSource?.sourceKind === 'entry' && selectedSource.entryRole === entryRole) {
-          selectedSource = null;
-        } else {
-          selectedSource = { sourceKind: 'entry', entryRole };
-        }
-        renderYutGame(container, ctx);
-      });
-    });
-
-    // Bind board source selection
-    container.querySelectorAll('[data-src-pos]').forEach((el) => {
-      el.addEventListener('click', () => {
-        if (!isMyMoveTurn) return;
-        SFX.play('click');
-        const fromPos = Number(el.dataset.srcPos);
-        if (selectedSource?.sourceKind === 'board' && selectedSource.fromPos === fromPos) {
-          selectedSource = null;
-        } else {
-          selectedSource = { sourceKind: 'board', fromPos };
-        }
-        renderYutGame(container, ctx);
-      });
-    });
-
-    // Bind destination execution
-    container.querySelectorAll('[data-dest-pos]').forEach((el) => {
-      el.addEventListener('click', async () => {
-        if (!isMyMoveTurn || !selectedSource) return;
-        const payload =
-          selectedSource.sourceKind === 'entry'
-            ? { throwIdx: selectedThrowIdx, sourceKind: 'entry', entryRole: selectedSource.entryRole }
-            : { throwIdx: selectedThrowIdx, sourceKind: 'board', fromPos: selectedSource.fromPos };
-        selectedSource = null;
-        const res = await dispatch({ type: 'MOVE_MAL', payload });
-        if (!res.ok) {
-          SFX.play('error');
-          UI.toast(res.reason || 'Illegal move', 'error');
-        }
-      });
-    });
+    patchBoardInteractivity(container, state, ctx, animateMoveInfo);
   },
 });

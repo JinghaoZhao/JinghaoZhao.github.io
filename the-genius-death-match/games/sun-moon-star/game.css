@@ -1,5 +1,6 @@
 /* ==========================================================================
  * SUN, MOON, STAR (해, 달, 별 / 日月星) — Celestial Orrery & Luxury Tarot Stage
+ * Unified Motion Tokens · GPU-Only · Dual Dark/Light Theme Parity
  * ========================================================================== */
 
 .sms-arena {
@@ -19,7 +20,7 @@
   align-items: center;
   padding: 12px 16px;
   border-radius: var(--tg-radius-md);
-  background: linear-gradient(145deg, rgba(16, 19, 32, 0.94), rgba(8, 10, 17, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border);
   box-shadow: var(--tg-shadow-card);
 }
@@ -31,15 +32,17 @@
 }
 
 .sms-vault-card {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border-subtle);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .sms-vault-card.is-right {
@@ -48,9 +51,9 @@
 }
 
 .sms-vault-card.is-turn {
-  border-color: var(--tg-gold-bright);
-  background: linear-gradient(135deg, rgba(228, 185, 91, 0.14), rgba(217, 27, 58, 0.07));
-  box-shadow: 0 0 24px rgba(228, 185, 91, 0.22);
+  border-color: var(--tg-gold);
+  background: linear-gradient(135deg, var(--tg-gold-soft), var(--tg-garnet-soft));
+  box-shadow: 0 0 22px var(--tg-gold-glow);
 }
 
 .sms-chip-stack {
@@ -61,16 +64,17 @@
 
 .sms-chip-count {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 30px;
   font-weight: 800;
   color: var(--tg-gold-bright);
-  text-shadow: 0 0 16px var(--tg-gold-glow);
+  text-shadow: 0 0 14px var(--tg-gold-glow);
   line-height: 1;
 }
 
 .sms-chip-count.is-danger {
-  color: #ff6b86;
-  text-shadow: 0 0 16px var(--tg-garnet-glow);
+  color: var(--tg-garnet-ink);
+  text-shadow: 0 0 14px var(--tg-garnet-glow);
 }
 
 /* 10-Cup Constellation Track */
@@ -80,7 +84,7 @@
   gap: 6px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(11, 13, 22, 0.9);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border-subtle);
 }
 
@@ -97,22 +101,27 @@
   gap: 3px;
   padding: 6px 4px;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-subtle);
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--tg-ink-faint);
+  transition: transform var(--tg-dur-fast) var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    background-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .sms-cup-pip.is-current {
-  border-color: var(--tg-gold-bright);
-  background: radial-gradient(circle at 50% 30%, rgba(251, 191, 36, 0.22), rgba(14, 16, 26, 0.9));
+  border-color: var(--tg-gold);
+  background: var(--tg-gold-soft);
   color: var(--tg-gold-bright);
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.3);
+  box-shadow: 0 0 16px var(--tg-gold-glow);
+  transform: translateY(-1px);
 }
 
 .sms-cup-pip.is-done {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: var(--tg-border);
   color: var(--tg-ink-muted);
 }
 
@@ -121,9 +130,12 @@
   line-height: 1;
 }
 
-.sms-pip-sym.is-sun { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.7); }
-.sms-pip-sym.is-moon { color: #93c5fd; text-shadow: 0 0 10px rgba(147, 197, 253, 0.7); }
-.sms-pip-sym.is-star { color: #ff5d8f; text-shadow: 0 0 10px rgba(255, 93, 143, 0.7); }
+.sms-pip-sym.is-sun { color: #d97706; }
+[data-theme="dark"] .sms-pip-sym.is-sun { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.7); }
+.sms-pip-sym.is-moon { color: #0369a1; }
+[data-theme="dark"] .sms-pip-sym.is-moon { color: #93c5fd; text-shadow: 0 0 10px rgba(147, 197, 253, 0.7); }
+.sms-pip-sym.is-star { color: var(--tg-garnet-bright); }
+[data-theme="dark"] .sms-pip-sym.is-star { color: #ff5d8f; text-shadow: 0 0 10px rgba(255, 93, 143, 0.7); }
 
 /* Celestial Orrery Center Stage */
 .sms-orrery-stage {
@@ -131,13 +143,9 @@
   overflow: hidden;
   padding: 24px 20px;
   border-radius: 20px;
-  background:
-    radial-gradient(circle at 50% 32%, rgba(251, 191, 36, 0.14), transparent 55%),
-    radial-gradient(circle at 20% 80%, rgba(147, 197, 253, 0.1), transparent 52%),
-    radial-gradient(circle at 80% 80%, rgba(255, 46, 84, 0.1), transparent 52%),
-    linear-gradient(170deg, rgba(16, 19, 34, 0.96), rgba(7, 9, 15, 0.99));
+  background: var(--tg-surface-table);
   border: 1.5px solid var(--tg-border-strong);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -152,8 +160,12 @@
   height: 520px;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  opacity: 0.24;
+  opacity: 0.22;
   animation: sms-spin 42s linear infinite;
+}
+
+[data-theme="light"] .sms-orrery-rings {
+  opacity: 0.18;
 }
 
 @keyframes sms-spin {
@@ -191,7 +203,7 @@
 .sms-bet-pillar {
   padding: 14px;
   border-radius: 14px;
-  background: rgba(10, 12, 22, 0.85);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border);
   display: flex;
   flex-direction: column;
@@ -199,21 +211,27 @@
   min-height: 112px;
   justify-content: center;
   width: 100%;
+  transition: border-color var(--tg-dur-base) var(--tg-ease-out),
+    box-shadow var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .sms-bet-pillar.is-won {
-  border-color: rgba(34, 197, 94, 0.7);
-  box-shadow: 0 0 24px rgba(34, 197, 94, 0.25);
+  border-color: var(--tg-emerald);
+  box-shadow: 0 0 22px rgba(34, 197, 94, 0.22);
 }
 
 .sms-bet-pillar.is-lost {
-  border-color: rgba(255, 46, 84, 0.6);
-  box-shadow: 0 0 22px rgba(217, 27, 58, 0.22);
+  border-color: var(--tg-garnet-bright);
+  box-shadow: 0 0 20px var(--tg-garnet-glow);
 }
 
 .sms-tarot-center {
   width: 158px;
   height: 224px;
+}
+
+.sms-tarot-center .tg-card-3d-inner {
+  transition: transform var(--tg-dur-drama) var(--tg-ease-out);
 }
 
 .sms-tarot-front,
@@ -229,9 +247,10 @@
 
 .sms-tarot-back {
   background:
-    radial-gradient(circle at 50% 42%, rgba(251, 191, 36, 0.26), transparent 62%),
-    linear-gradient(155deg, #1b1e33 0%, #090b13 100%);
+    radial-gradient(circle at 50% 42%, rgba(228, 185, 91, 0.24), transparent 64%),
+    linear-gradient(155deg, #1b1e33 0%, #0a0c16 100%);
   border: 2px solid var(--tg-gold);
+  color: #fff0c2;
 }
 
 .sms-tarot-back::after {
@@ -239,21 +258,42 @@
 }
 
 .sms-tarot-front.is-sun {
-  background: radial-gradient(circle at 50% 35%, rgba(251, 191, 36, 0.34), #181208 75%);
-  border: 2px solid #fde68a;
-  box-shadow: 0 0 36px rgba(251, 191, 36, 0.45);
+  background: radial-gradient(circle at 50% 35%, rgba(251, 191, 36, 0.32), #181208 75%);
+  border: 2px solid #f5bd38;
+  box-shadow: 0 0 32px rgba(251, 191, 36, 0.4);
+  color: #fff0c2;
 }
 
 .sms-tarot-front.is-moon {
-  background: radial-gradient(circle at 50% 35%, rgba(147, 197, 253, 0.32), #0c1424 75%);
-  border: 2px solid #bfdbfe;
-  box-shadow: 0 0 36px rgba(147, 197, 253, 0.42);
+  background: radial-gradient(circle at 50% 35%, rgba(147, 197, 253, 0.3), #0c1424 75%);
+  border: 2px solid #93c5fd;
+  box-shadow: 0 0 32px rgba(147, 197, 253, 0.36);
+  color: #e0f2fe;
 }
 
 .sms-tarot-front.is-star {
-  background: radial-gradient(circle at 50% 35%, rgba(255, 46, 84, 0.34), #1e0a15 75%);
+  background: radial-gradient(circle at 50% 35%, rgba(255, 46, 84, 0.32), #1e0a15 75%);
   border: 2px solid #fda4af;
-  box-shadow: 0 0 36px rgba(255, 46, 84, 0.46);
+  box-shadow: 0 0 32px rgba(255, 46, 84, 0.4);
+  color: #ffe4e6;
+}
+
+[data-theme="light"] .sms-tarot-front.is-sun {
+  background: radial-gradient(circle at 50% 30%, #fffbeb 0%, #fef3c7 65%, #fde68a 100%);
+  border-color: #b45309;
+  color: #78350f;
+}
+
+[data-theme="light"] .sms-tarot-front.is-moon {
+  background: radial-gradient(circle at 50% 30%, #f0f9ff 0%, #e0f2fe 65%, #bae6fd 100%);
+  border-color: #0369a1;
+  color: #0c4a6e;
+}
+
+[data-theme="light"] .sms-tarot-front.is-star {
+  background: radial-gradient(circle at 50% 30%, #fff1f2 0%, #ffe4e6 65%, #fecdd3 100%);
+  border-color: #be1233;
+  color: #881337;
 }
 
 /* Guest Whisper Banner */
@@ -262,8 +302,8 @@
   max-width: 760px;
   padding: 12px 16px;
   border-radius: 13px;
-  background: linear-gradient(135deg, rgba(228, 185, 91, 0.14), rgba(16, 20, 34, 0.92));
-  border: 1px solid rgba(228, 185, 91, 0.45);
+  background: linear-gradient(135deg, var(--tg-gold-soft), var(--tg-glass));
+  border: 1px solid var(--tg-border-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -279,11 +319,11 @@
   letter-spacing: 0.06em;
 }
 
-.sms-trust-reliable { background: rgba(34, 197, 94, 0.18); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.5); }
-.sms-trust-neutral { background: rgba(251, 191, 36, 0.18); color: #fde68a; border: 1px solid rgba(251, 191, 36, 0.5); }
-.sms-trust-trickster { background: rgba(255, 46, 84, 0.2); color: #fda4af; border: 1px solid rgba(255, 46, 84, 0.55); }
+.sms-trust-reliable { background: rgba(34, 197, 94, 0.16); color: var(--tg-emerald-ink); border: 1px solid rgba(34, 197, 94, 0.45); }
+.sms-trust-neutral { background: var(--tg-gold-soft); color: var(--tg-gold-bright); border: 1px solid var(--tg-border-strong); }
+.sms-trust-trickster { background: var(--tg-garnet-soft); color: var(--tg-garnet-ink); border: 1px solid var(--tg-border-garnet); }
 
-/* 3 Luxury Tarot Foil Picker Cards */
+/* 3 Luxury Tarot Foil Picker Cards — 140ms Spring Selection, Zero DOM Nuke */
 .sms-picker-grid {
   width: 100%;
   max-width: 760px;
@@ -307,8 +347,12 @@
   padding: 16px 10px;
   border-radius: 16px;
   border: 1.5px solid var(--tg-border);
-  background: linear-gradient(160deg, rgba(24, 28, 46, 0.95), rgba(10, 12, 20, 0.98));
-  transition: transform 0.2s var(--tg-ease), border-color 0.2s, box-shadow 0.2s;
+  background: var(--tg-surface-card);
+  color: var(--tg-ink);
+  box-shadow: var(--tg-shadow-card);
+  transition: transform 140ms var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out);
   overflow: hidden;
 }
 
@@ -316,9 +360,9 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(125deg, transparent 20%, rgba(255, 255, 255, 0.08) 45%, transparent 70%);
+  background: linear-gradient(125deg, transparent 20%, rgba(255, 255, 255, 0.14) 45%, transparent 70%);
   opacity: 0;
-  transition: opacity 0.25s;
+  transition: opacity var(--tg-dur-fast) var(--tg-ease-out);
   pointer-events: none;
 }
 
@@ -328,30 +372,38 @@
 }
 
 .sms-foil-card:hover:not(:disabled) {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+}
+
+.sms-foil-card:active:not(:disabled) {
+  transform: scale(var(--tg-press-card));
+}
+
+.sms-foil-card.is-selected {
+  transform: translateY(-6px);
 }
 
 .sms-foil-card.is-sun.is-selected,
 .sms-foil-card.is-sun:hover:not(:disabled) {
-  border-color: #fde68a;
-  box-shadow: 0 12px 30px rgba(251, 191, 36, 0.38), inset 0 0 24px rgba(251, 191, 36, 0.14);
+  border-color: #d97706;
+  box-shadow: 0 12px 28px rgba(217, 119, 6, 0.3);
 }
 
 .sms-foil-card.is-moon.is-selected,
 .sms-foil-card.is-moon:hover:not(:disabled) {
-  border-color: #bfdbfe;
-  box-shadow: 0 12px 30px rgba(147, 197, 253, 0.36), inset 0 0 24px rgba(147, 197, 253, 0.14);
+  border-color: var(--tg-cyan);
+  box-shadow: 0 12px 28px var(--tg-cyan-glow);
 }
 
 .sms-foil-card.is-star.is-selected,
 .sms-foil-card.is-star:hover:not(:disabled) {
-  border-color: #fda4af;
-  box-shadow: 0 12px 30px rgba(255, 46, 84, 0.4), inset 0 0 24px rgba(255, 46, 84, 0.14);
+  border-color: var(--tg-garnet-bright);
+  box-shadow: 0 12px 28px var(--tg-garnet-glow);
 }
 
 .sms-foil-name {
   font-family: var(--tg-font-display);
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -362,7 +414,7 @@
   max-width: 760px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(10, 12, 22, 0.9);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border-strong);
   display: flex;
   align-items: center;
@@ -376,10 +428,23 @@
   max-width: 760px;
   padding: 9px 14px;
   border-radius: 10px;
-  background: rgba(217, 27, 58, 0.18);
-  border: 1px solid rgba(255, 46, 84, 0.55);
-  color: #ffd5dd;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
   font-size: 13px;
   font-weight: 600;
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sms-orrery-rings {
+    animation: none !important;
+  }
+  .sms-tarot-center .tg-card-3d-inner {
+    transition-duration: 0.01ms !important;
+  }
+  .sms-foil-card,
+  .sms-cup-pip {
+    transition-duration: 120ms !important;
+  }
 }

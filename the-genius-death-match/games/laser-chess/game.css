@@ -1,5 +1,6 @@
 /* ==========================================================================
  * LASER CHESS (激光象棋) — Showstopper Neon Optical Arena
+ * Dual Theme · Persistent SVG · 180ms Piece Glide · 160ms Rotate · 260ms Beam Sweep
  * ========================================================================== */
 
 .lc-arena {
@@ -24,14 +25,9 @@
   position: relative;
   border-radius: 18px;
   padding: 14px;
-  background:
-    radial-gradient(circle at 8% 8%, rgba(34, 211, 238, 0.14), transparent 36%),
-    radial-gradient(circle at 92% 92%, rgba(255, 46, 84, 0.16), transparent 38%),
-    linear-gradient(160deg, #0d111d 0%, #060810 100%);
-  border: 1.5px solid rgba(228, 185, 91, 0.42);
-  box-shadow:
-    0 26px 68px rgba(0, 0, 0, 0.8),
-    inset 0 0 48px rgba(0, 0, 0, 0.85);
+  background: var(--tg-surface-table);
+  border: 1.5px solid var(--tg-border-strong);
+  box-shadow: var(--tg-shadow-card);
 }
 
 .lc-board-svg {
@@ -41,34 +37,93 @@
   user-select: none;
 }
 
+.lc-outer-frame {
+  fill: var(--tg-board-frame);
+  stroke: var(--tg-border-strong);
+  stroke-width: 1.5;
+}
+
+.lc-coord-text {
+  fill: var(--tg-ink-faint);
+  font-family: var(--tg-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.lc-cell-rect {
+  stroke: var(--tg-border-subtle);
+  stroke-width: 1;
+  transition: stroke var(--tg-dur-micro) var(--tg-ease-snappy), fill var(--tg-dur-micro) var(--tg-ease-snappy);
+}
+
+.lc-cell-rect.is-a {
+  fill: var(--tg-board-cell-a);
+}
+
+.lc-cell-rect.is-b {
+  fill: var(--tg-board-cell-b);
+}
+
+.lc-cell-rect.is-corner-p1 {
+  fill: var(--tg-cyan-soft);
+  stroke: var(--tg-cyan);
+}
+
+.lc-cell-rect.is-corner-p0 {
+  fill: var(--tg-garnet-soft);
+  stroke: var(--tg-garnet-bright);
+}
+
+.lc-cell-rect.is-last-to {
+  stroke: var(--tg-gold);
+  stroke-width: 1.8;
+}
+
+.lc-cell-rect.is-selected {
+  stroke: var(--tg-gold-bright);
+  stroke-width: 2.6;
+}
+
+.lc-cell-rect.is-legal {
+  stroke: var(--tg-cyan);
+  stroke-width: 2.2;
+}
+
+.lc-cell-rect.is-legal-swap {
+  stroke: var(--tg-amber);
+  stroke-width: 2.2;
+}
+
 .lc-cell-hit {
   cursor: pointer;
 }
 
 .lc-cell-hit:hover .lc-cell-rect {
-  stroke: rgba(255, 240, 194, 0.65);
-  stroke-width: 1.8;
+  stroke: var(--tg-gold-bright);
+  stroke-width: 1.9;
 }
 
-/* Animated Laser Beam FX */
+/* Smooth GPU Piece Glide & 90° Rotation */
+.lc-piece-node {
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 180ms var(--tg-ease-out);
+}
+
+.lc-piece-rotator {
+  will-change: transform;
+  transition: transform 160ms var(--tg-ease-snappy);
+}
+
+/* Animated Laser Beam Sweep & Sparks */
 .lc-beam-flow {
-  stroke-dasharray: 18 10;
+  stroke-dasharray: 16 10;
   animation: lc-photon-stream 0.55s linear infinite;
 }
 
 @keyframes lc-photon-stream {
-  from { stroke-dashoffset: 28; }
+  from { stroke-dashoffset: 26; }
   to   { stroke-dashoffset: 0; }
-}
-
-.lc-beam-flash {
-  animation: lc-beam-ignite 0.36s var(--tg-ease);
-}
-
-@keyframes lc-beam-ignite {
-  0%   { opacity: 0.15; stroke-width: 14; }
-  45%  { opacity: 1; }
-  100% { opacity: 0.92; }
 }
 
 .lc-spark-ring {
@@ -78,20 +133,20 @@
 }
 
 @keyframes lc-spark-pulse {
-  0%, 100% { transform: scale(0.82); opacity: 0.85; }
-  50%      { transform: scale(1.22); opacity: 1; }
+  0%, 100% { transform: scale(0.84); opacity: 0.82; }
+  50%      { transform: scale(1.18); opacity: 1; }
 }
 
 .lc-shatter-burst {
   transform-box: fill-box;
   transform-origin: center;
-  animation: lc-shatter-anim 0.9s var(--tg-ease) forwards;
+  animation: lc-shatter-anim 240ms var(--tg-ease-out) forwards;
 }
 
 @keyframes lc-shatter-anim {
-  0%   { transform: scale(0.35) rotate(0deg); opacity: 1; }
-  45%  { transform: scale(1.25) rotate(32deg); opacity: 0.95; }
-  100% { transform: scale(1.55) rotate(68deg); opacity: 0.2; }
+  0%   { transform: scale(0.4) rotate(0deg); opacity: 1; }
+  55%  { transform: scale(1.25) rotate(28deg); opacity: 0.95; }
+  100% { transform: scale(1.5) rotate(52deg); opacity: 0.25; }
 }
 
 /* Right Tactical Console */
@@ -116,7 +171,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--tg-gold);
+  color: var(--tg-gold-bright);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -132,8 +187,8 @@
 .lc-sel-box {
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(8, 11, 20, 0.85);
-  border: 1px solid rgba(228, 185, 91, 0.35);
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-strong);
 }
 
 .lc-sel-name {
@@ -164,17 +219,32 @@
   gap: 8px;
   padding: 7px 10px;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--tg-track-bg);
+  border: 1px solid var(--tg-border-subtle);
   font-size: 12px;
+  color: var(--tg-ink);
 }
 
 .lc-side-row.is-p0 {
-  border-left: 3px solid #ff2e54;
+  border-left: 3px solid var(--tg-garnet-bright);
 }
 
 .lc-side-row.is-p1 {
-  border-left: 3px solid #22d3ee;
+  border-left: 3px solid var(--tg-cyan);
+}
+
+.lc-stat-mono {
+  font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.lc-stat-p0 {
+  color: var(--tg-garnet-ink);
+}
+
+.lc-stat-p1 {
+  color: var(--tg-cyan-ink);
 }
 
 .lc-piece-legend {
@@ -191,6 +261,10 @@
   gap: 8px;
 }
 
+.lc-legend-item strong {
+  color: var(--tg-ink);
+}
+
 .lc-legend-badge {
   width: 22px;
   height: 22px;
@@ -200,8 +274,8 @@
   justify-content: center;
   font-size: 12px;
   font-weight: 800;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(228, 185, 91, 0.35);
+  background: var(--tg-gold-soft);
+  border: 1px solid var(--tg-border-strong);
   color: var(--tg-gold-bright);
   flex: none;
 }
@@ -211,8 +285,20 @@
   border-radius: 10px;
   font-size: 12.5px;
   font-weight: 700;
-  background: rgba(217, 27, 58, 0.18);
-  border: 1px solid rgba(255, 46, 84, 0.55);
-  color: #ffc5d0;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
   margin-bottom: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-piece-node,
+  .lc-piece-rotator {
+    transition: none !important;
+  }
+  .lc-beam-flow,
+  .lc-spark-ring,
+  .lc-shatter-burst {
+    animation: none !important;
+  }
 }

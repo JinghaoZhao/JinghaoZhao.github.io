@@ -1,5 +1,6 @@
 /* ==========================================================================
  * IMAGE GAME (이미지 게임 / 图像联想游戏) — Surreal Gallery & Broadcast Voting Stage
+ * Unified Motion Tokens · GPU-Only · Dual Dark/Light Theme Parity
  * ========================================================================== */
 
 .ig-arena {
@@ -19,7 +20,7 @@
   align-items: center;
   padding: 12px 16px;
   border-radius: var(--tg-radius-md);
-  background: linear-gradient(145deg, rgba(18, 19, 34, 0.94), rgba(8, 10, 17, 0.98));
+  background: var(--tg-surface-table);
   border: 1px solid var(--tg-border);
   box-shadow: var(--tg-shadow-card);
 }
@@ -31,14 +32,17 @@
 }
 
 .ig-cand-card {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border-subtle);
+  transition: border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .ig-cand-card.is-right {
@@ -47,9 +51,9 @@
 }
 
 .ig-cand-card.is-tester {
-  border-color: rgba(236, 72, 153, 0.65);
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.14), rgba(228, 185, 91, 0.08));
-  box-shadow: 0 0 24px rgba(236, 72, 153, 0.22);
+  border-color: var(--tg-border-garnet);
+  background: linear-gradient(135deg, var(--tg-garnet-soft), var(--tg-gold-soft));
+  box-shadow: 0 0 22px var(--tg-garnet-glow);
 }
 
 .ig-gems-row {
@@ -62,13 +66,19 @@
   width: 14px;
   height: 17px;
   clip-path: polygon(50% 0%, 100% 30%, 82% 100%, 18% 100%, 0% 30%);
-  background: rgba(255, 255, 255, 0.1);
-  transition: transform 0.25s var(--tg-ease), opacity 0.25s;
+  background: var(--tg-track-bg);
+  opacity: 0.36;
+  transform: scale(0.76);
+  transition: transform 200ms var(--tg-ease-spring),
+    opacity 200ms var(--tg-ease-out),
+    background-color 200ms var(--tg-ease-out);
 }
 
 .ig-gem-slot.is-lit {
+  opacity: 1;
+  transform: scale(1);
   background: linear-gradient(145deg, #ff7a93 0%, #e11d48 48%, #7f081e 100%);
-  box-shadow: 0 0 12px rgba(255, 46, 84, 0.8);
+  box-shadow: 0 0 10px var(--tg-garnet-glow);
 }
 
 /* Panelist Strip */
@@ -90,7 +100,7 @@
   gap: 8px;
   padding: 7px 10px;
   border-radius: 10px;
-  background: rgba(14, 17, 29, 0.86);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border-subtle);
   font-size: 12px;
 }
@@ -102,9 +112,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(236, 72, 153, 0.16);
-  border: 1px solid rgba(236, 72, 153, 0.45);
-  color: #f9a8d4;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
   font-size: 13px;
   flex: none;
 }
@@ -113,11 +123,9 @@
 .ig-clue-banner {
   padding: 16px 20px;
   border-radius: 16px;
-  background:
-    radial-gradient(ellipse 60% 80% at 50% 0%, rgba(236, 72, 153, 0.22), transparent 70%),
-    linear-gradient(160deg, rgba(22, 19, 38, 0.96), rgba(10, 12, 20, 0.98));
-  border: 1.5px solid rgba(236, 72, 153, 0.55);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), 0 0 28px rgba(236, 72, 153, 0.2);
+  background: linear-gradient(160deg, var(--tg-garnet-soft), var(--tg-surface-table));
+  border: 1.5px solid var(--tg-border-garnet);
+  box-shadow: var(--tg-shadow-card);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -131,7 +139,7 @@
   font-weight: 800;
   color: var(--tg-gold-bright);
   letter-spacing: 0.04em;
-  text-shadow: 0 0 20px rgba(228, 185, 91, 0.45);
+  text-shadow: 0 0 18px var(--tg-gold-glow);
 }
 
 /* Surreal Art Card Frame */
@@ -159,10 +167,13 @@
   flex-direction: column;
   border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(175deg, #1a1d30 0%, #0a0c14 100%);
+  background: var(--tg-surface-card);
   border: 1.5px solid var(--tg-border);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.58);
-  transition: transform 0.2s var(--tg-ease), border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--tg-shadow-card);
+  transition: transform 140ms var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out),
+    opacity var(--tg-dur-fast) var(--tg-ease-out);
   text-align: left;
 }
 
@@ -171,20 +182,24 @@
 }
 
 .ig-art-card.is-clickable:hover:not(:disabled) {
-  transform: translateY(-6px) scale(1.02);
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.72), 0 0 24px rgba(236, 72, 153, 0.35);
+  transform: translateY(-5px) scale(1.015);
+  border-color: var(--tg-gold);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.28), 0 0 22px var(--tg-garnet-glow);
+}
+
+.ig-art-card.is-clickable:active:not(:disabled) {
+  transform: scale(var(--tg-press-card));
 }
 
 .ig-art-card.is-selected {
-  border-color: #f472b6 !important;
+  border-color: var(--tg-garnet-bright) !important;
   transform: translateY(-5px);
-  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.75), 0 16px 34px rgba(236, 72, 153, 0.45);
+  box-shadow: 0 0 0 2px var(--tg-garnet-glow), 0 14px 28px var(--tg-garnet-glow);
 }
 
 .ig-art-card.is-tester-card {
-  border-color: var(--tg-gold-bright) !important;
-  box-shadow: 0 0 0 2px rgba(255, 240, 194, 0.85), 0 0 34px rgba(228, 185, 91, 0.55);
+  border-color: var(--tg-gold) !important;
+  box-shadow: 0 0 0 2px var(--tg-gold-glow), 0 0 28px var(--tg-gold-glow);
 }
 
 .ig-art-card.is-mine-locked {
@@ -199,12 +214,13 @@
   z-index: 3;
   padding: 2px 7px;
   border-radius: 6px;
-  background: rgba(8, 10, 18, 0.86);
-  border: 1px solid rgba(228, 185, 91, 0.5);
+  background: rgba(10, 12, 20, 0.86);
+  border: 1px solid rgba(228, 185, 91, 0.55);
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11.5px;
   font-weight: 800;
-  color: var(--tg-gold-bright);
+  color: #fff0c2;
 }
 
 .ig-art-canvas {
@@ -218,7 +234,7 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--tg-border-subtle);
 }
 
 .ig-art-title {
@@ -240,32 +256,39 @@
   font-size: 9.5px;
   padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--tg-track-bg);
   color: var(--tg-ink-muted);
 }
 
-/* Live Broadcast Vote Tally Bar */
+/* Live Broadcast Vote Tally Bar (GPU scaleX, ZERO width animation!) */
 .ig-vote-tally {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin-top: 4px;
   padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--tg-border-subtle);
 }
 
 .ig-tally-track {
   height: 7px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--tg-track-bg);
   overflow: hidden;
 }
 
 .ig-tally-fill {
+  width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ec4899, #f5c451);
-  transition: width 0.55s var(--tg-ease);
+  background: linear-gradient(90deg, var(--tg-garnet-bright), var(--tg-gold));
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--tg-dur-drama) var(--tg-ease-out);
+}
+
+.ig-tally-fill.is-revealed {
+  transform: scaleX(var(--tally-ratio, 0));
 }
 
 .ig-voter-chips {
@@ -279,14 +302,14 @@
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(236, 72, 153, 0.2);
-  border: 1px solid rgba(236, 72, 153, 0.45);
-  color: #fbcfe8;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
 }
 
 .ig-voter-chip.is-rival {
-  background: rgba(228, 185, 91, 0.24);
-  border-color: rgba(228, 185, 91, 0.65);
+  background: var(--tg-gold-soft);
+  border-color: var(--tg-border-strong);
   color: var(--tg-gold-bright);
 }
 
@@ -294,8 +317,9 @@
 .ig-composer {
   padding: 16px;
   border-radius: 16px;
-  background: rgba(12, 14, 24, 0.92);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border-strong);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -310,35 +334,56 @@
 .ig-prompt-pill {
   padding: 9px 11px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--tg-bg-recessed);
   border: 1px solid var(--tg-border-subtle);
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  transition: border-color 0.16s, background 0.16s, transform 0.16s;
+  transition: border-color var(--tg-dur-micro) var(--tg-ease-out),
+    background-color var(--tg-dur-micro) var(--tg-ease-out),
+    transform var(--tg-dur-micro) var(--tg-ease-snappy);
 }
 
 .ig-prompt-pill:hover {
   border-color: var(--tg-gold);
-  background: rgba(228, 185, 91, 0.08);
+  background: var(--tg-gold-soft);
   transform: translateY(-1px);
 }
 
+.ig-prompt-pill:active {
+  transform: scale(var(--tg-press-btn));
+}
+
 .ig-prompt-pill.is-selected {
-  border-color: #f472b6;
-  background: rgba(236, 72, 153, 0.18);
-  box-shadow: 0 0 18px rgba(236, 72, 153, 0.28);
+  border-color: var(--tg-garnet-bright);
+  background: var(--tg-garnet-soft);
+  box-shadow: 0 0 16px var(--tg-garnet-glow);
 }
 
 .ig-verdict-box {
   padding: 14px 18px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(217, 27, 58, 0.18), rgba(14, 17, 29, 0.94));
+  background: linear-gradient(135deg, var(--tg-garnet-soft), var(--tg-glass));
   border: 1px solid var(--tg-border-garnet);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+.ig-stage-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ig-tally-fill,
+  .ig-gem-slot,
+  .ig-art-card,
+  .ig-prompt-pill {
+    transition-duration: 120ms !important;
+  }
 }

@@ -1,5 +1,6 @@
 /* ==========================================================================
  * MONORAIL (单轨铁路) — Illuminated Architectural Rail Blueprint Arena
+ * Dual Theme · Persistent SVG · Smooth 90° Rail Rotate · ViewBox Lerp · Reduced-Motion Safe
  * ========================================================================== */
 
 .mr-arena {
@@ -19,37 +20,48 @@
   }
 }
 
-/* Proof Challenge Siren Banner */
+/* Proof Challenge Siren Banner (GPU-only ::after opacity pulse — zero box-shadow keyframe) */
 .mr-proof-banner {
+  position: relative;
   grid-column: 1 / -1;
   padding: 13px 18px;
   border-radius: 12px;
-  background: linear-gradient(90deg, rgba(217, 27, 58, 0.3), rgba(245, 158, 11, 0.25), rgba(217, 27, 58, 0.3));
-  border: 1.5px solid #ff4769;
-  color: #fff3d4;
+  background: var(--tg-garnet-soft);
+  border: 1.5px solid var(--tg-garnet-bright);
+  color: var(--tg-garnet-ink);
   font-size: 14px;
   font-weight: 800;
   text-align: center;
-  box-shadow: 0 0 32px rgba(217, 27, 58, 0.38);
-  animation: mr-siren 1.1s ease-in-out infinite;
+  overflow: hidden;
 }
 
-@keyframes mr-siren {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 46, 84, 0.35); border-color: #ff4769; }
-  50% { box-shadow: 0 0 38px rgba(245, 158, 11, 0.65); border-color: #fff0c2; }
+.mr-proof-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 28px var(--tg-garnet-glow), 0 0 26px var(--tg-garnet-glow);
+  opacity: 0.4;
+  animation: mr-siren-opacity 1.15s ease-in-out infinite;
+}
+
+@keyframes mr-siren-opacity {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.95; }
 }
 
 .mr-loop-banner {
   grid-column: 1 / -1;
   padding: 12px 18px;
   border-radius: 12px;
-  background: linear-gradient(90deg, rgba(34, 197, 94, 0.22), rgba(228, 185, 91, 0.28), rgba(34, 197, 94, 0.22));
-  border: 1.5px solid #e4b95b;
-  color: #fff6d9;
+  background: var(--tg-gold-soft);
+  border: 1.5px solid var(--tg-gold);
+  color: var(--tg-gold-bright);
   font-size: 14px;
   font-weight: 800;
   text-align: center;
-  box-shadow: 0 0 28px rgba(228, 185, 91, 0.35);
+  box-shadow: var(--tg-shadow-card);
 }
 
 /* Blueprint Viewport */
@@ -57,22 +69,15 @@
   position: relative;
   border-radius: 18px;
   padding: 14px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(228, 185, 91, 0.08), transparent 65%),
-    linear-gradient(160deg, #101422 0%, #090b13 100%);
+  background: var(--tg-surface-table);
   border: 1.5px solid var(--tg-border-strong);
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.72),
-    inset 0 0 44px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--tg-shadow-card);
   overflow: hidden;
+  transition: border-color var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .mr-blueprint-wrap.is-proof {
-  border-color: #ff4769;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.75),
-    0 0 32px rgba(217, 27, 58, 0.25),
-    inset 0 0 44px rgba(122, 9, 30, 0.35);
+  border-color: var(--tg-garnet-bright);
 }
 
 .mr-svg {
@@ -83,28 +88,106 @@
   user-select: none;
 }
 
-.mr-ghost-cell {
-  cursor: pointer;
-  transition: opacity 0.16s, fill 0.16s;
+.mr-grid-line {
+  stroke: var(--tg-gold);
+  stroke-opacity: 0.14;
+  stroke-width: 1;
 }
 
-.mr-ghost-cell:hover rect {
-  fill: rgba(34, 211, 238, 0.22);
-  stroke: #67e8f9;
+.mr-ghost-cell {
+  cursor: pointer;
+}
+
+.mr-ghost-rect {
+  fill: var(--tg-cyan-soft);
+  stroke: var(--tg-cyan);
+  stroke-opacity: 0.6;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  transition: fill var(--tg-dur-micro) var(--tg-ease-snappy), stroke-opacity var(--tg-dur-micro) var(--tg-ease-snappy);
+}
+
+.mr-ghost-cell:hover .mr-ghost-rect {
+  stroke-opacity: 1;
   stroke-width: 2.2;
+}
+
+.mr-ghost-plus {
+  fill: var(--tg-cyan-ink);
+  opacity: 0.7;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.mr-tile-station-bg {
+  fill: var(--tg-garnet-soft);
+  stroke: var(--tg-garnet-bright);
+}
+
+.mr-tile-p0-bg {
+  fill: var(--tg-board-cell-a);
+  stroke: var(--tg-gold);
+}
+
+.mr-tile-p1-bg {
+  fill: var(--tg-board-cell-b);
+  stroke: var(--tg-cyan);
+}
+
+.mr-tile-staged-bg {
+  fill: var(--tg-cyan-soft);
+  stroke: var(--tg-cyan);
+  transition: stroke var(--tg-dur-micro) var(--tg-ease-snappy);
+}
+
+.mr-station-badge {
+  fill: var(--tg-bg-velvet);
+  stroke: var(--tg-garnet-bright);
+  stroke-width: 1.3;
+}
+
+.mr-station-text {
+  fill: var(--tg-garnet-ink);
+  font-family: var(--tg-font-mono);
+  font-size: 8.5px;
+  font-weight: 800;
 }
 
 .mr-staged-tile {
   cursor: pointer;
 }
 
-.mr-staged-tile:hover .mr-tile-bg {
-  stroke: #ffffff;
+.mr-staged-tile:hover .mr-tile-staged-bg {
+  stroke: var(--tg-gold-bright);
 }
 
-/* Animated Train Pulse */
-.mr-train-glow {
-  filter: drop-shadow(0 0 8px #ff2e54) drop-shadow(0 0 14px #fff0c2);
+.mr-rail-rotator {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 140ms var(--tg-ease-snappy);
+}
+
+.mr-staged-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mr-tile-spring var(--tg-dur-fast) var(--tg-ease-spring);
+}
+
+@keyframes mr-tile-spring {
+  0%   { transform: scale(0.84); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mr-rot-badge-bg {
+  fill: var(--tg-bg-velvet);
+  stroke: var(--tg-cyan);
+  stroke-width: 1.2;
+}
+
+.mr-rot-badge-txt {
+  fill: var(--tg-cyan-ink);
+  font-size: 10px;
+  font-weight: 800;
 }
 
 /* Right Engineering Console */
@@ -129,7 +212,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--tg-gold);
+  color: var(--tg-gold-bright);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -144,11 +227,11 @@
 
 .mr-supply-num {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 32px;
   font-weight: 800;
   color: var(--tg-gold-bright);
   line-height: 1;
-  text-shadow: 0 0 18px var(--tg-gold-glow);
 }
 
 .mr-supply-pips {
@@ -160,53 +243,70 @@
 .mr-supply-pip {
   height: 10px;
   border-radius: 3px;
-  background: linear-gradient(135deg, #fff0c2, #c9922c);
-  box-shadow: 0 0 8px rgba(228, 185, 91, 0.35);
+  background: linear-gradient(135deg, #f5d68a, var(--tg-gold));
+  transition: transform var(--tg-dur-fast) var(--tg-ease-spring), opacity var(--tg-dur-fast) var(--tg-ease-out), background-color var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .mr-supply-pip.is-staged {
-  background: linear-gradient(135deg, #67e8f9, #0891b2);
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.65);
+  background: var(--tg-cyan);
+  transform: scaleY(1.18);
 }
 
 .mr-supply-pip.is-used {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  background: var(--tg-track-bg);
+  opacity: 0.55;
 }
 
-/* Shape Brush Palette */
+/* Shape Brush Palette with Sliding Segmented Indicator */
 .mr-palette {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-subtle);
   margin-bottom: 10px;
 }
 
+.mr-palette > .tg-seg-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 9px;
+  background: var(--tg-cyan-soft);
+  border: 1.5px solid var(--tg-cyan);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .mr-brush-btn {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   padding: 8px 6px;
-  border-radius: 10px;
-  background: rgba(18, 22, 36, 0.92);
-  border: 1.5px solid var(--tg-border);
+  border-radius: 9px;
+  background: transparent;
   color: var(--tg-ink-muted);
   font-size: 11px;
   font-weight: 700;
-  transition: border-color 0.15s, transform 0.15s, background 0.15s;
+  transition: color var(--tg-dur-fast) var(--tg-ease-out), transform var(--tg-dur-micro) var(--tg-ease-snappy);
 }
 
 .mr-brush-btn:hover {
-  border-color: var(--tg-gold);
   color: var(--tg-ink);
 }
 
+.mr-brush-btn:active {
+  transform: scale(var(--tg-press-btn));
+}
+
 .mr-brush-btn.is-active {
-  border-color: var(--tg-cyan);
-  background: rgba(34, 211, 238, 0.14);
-  color: #a5f3fc;
-  box-shadow: 0 0 16px rgba(34, 211, 238, 0.25);
+  color: var(--tg-cyan-ink);
 }
 
 .mr-btn-stack {
@@ -239,4 +339,14 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mr-proof-banner::after,
+  .mr-staged-pop {
+    animation: none !important;
+  }
+  .mr-rail-rotator {
+    transition: none !important;
+  }
 }

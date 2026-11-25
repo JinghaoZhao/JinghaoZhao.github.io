@@ -1,5 +1,6 @@
 /* ==========================================================================
- * Indian Poker (印第安扑克) — Obsidian Broadcast Poker Arena Styling
+ * Indian Poker (印第安扑克) — Dual-Theme Broadcast Poker Arena
+ * GPU-Compositor-Only · Unified Motion Tokens · Dark & Light Parity
  * ========================================================================== */
 
 .ip-arena {
@@ -21,9 +22,9 @@
   gap: 10px;
   padding: 10px 14px;
   border-radius: var(--tg-radius-md);
-  background: rgba(12, 14, 22, 0.86);
+  background: var(--tg-glass);
   border: 1px solid var(--tg-border);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--tg-shadow-card);
 }
 
 .ip-shoe-meta {
@@ -36,12 +37,13 @@
 
 .ip-shoe-count {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 800;
   color: var(--tg-gold-bright);
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
-  background: rgba(228, 185, 91, 0.14);
-  border: 1px solid rgba(228, 185, 91, 0.38);
+  background: var(--tg-gold-soft);
+  border: 1px solid var(--tg-border-strong);
 }
 
 .ip-tracker-grid {
@@ -59,18 +61,19 @@
   min-width: 30px;
   padding: 4px 5px;
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-subtle);
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
   color: var(--tg-ink-muted);
-  transition: border-color 0.2s, opacity 0.2s;
+  transition: border-color var(--tg-dur-fast) var(--tg-ease-out), opacity var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .ip-tracker-cell.is-ten {
-  border-color: rgba(255, 46, 84, 0.42);
-  color: #ff8ba0;
+  border-color: var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
 }
 
 .ip-tracker-cell.is-exhausted {
@@ -88,6 +91,7 @@
   border-radius: 50%;
   background: var(--tg-gold);
   box-shadow: 0 0 6px var(--tg-gold-glow);
+  transition: background-color var(--tg-dur-fast) var(--tg-ease-out), transform var(--tg-dur-fast) var(--tg-ease-spring);
 }
 
 .ip-tracker-cell.is-ten .ip-pip {
@@ -96,32 +100,41 @@
 }
 
 .ip-pip.is-spent {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--tg-track-bg);
   box-shadow: none;
+  transform: scale(0.8);
 }
 
 .ip-pip.is-live-opp {
   background: var(--tg-cyan);
   box-shadow: 0 0 8px var(--tg-cyan-glow);
+  transform: scale(1.15);
 }
 
-/* Main Obsidian Poker Felt Table */
+/* Main Poker Felt Table */
 .ip-table {
   position: relative;
   border-radius: 28px;
   padding: 24px 22px 26px;
   background:
     radial-gradient(ellipse 68% 54% at 50% 48%, rgba(36, 16, 26, 0.92) 0%, rgba(13, 15, 24, 0.98) 68%, #07080d 100%);
-  border: 2px solid rgba(228, 185, 91, 0.42);
-  box-shadow:
-    inset 0 0 70px rgba(0, 0, 0, 0.85),
-    inset 0 0 0 8px rgba(228, 185, 91, 0.06),
-    0 24px 64px rgba(0, 0, 0, 0.72),
-    0 0 42px rgba(217, 27, 58, 0.16);
+  border: 2px solid var(--tg-border-strong);
+  box-shadow: var(--tg-shadow-card);
   display: grid;
   grid-template-rows: auto auto auto;
   gap: 18px;
   overflow: hidden;
+  transition: border-color var(--tg-dur-base) var(--tg-ease-out);
+}
+
+[data-theme="light"] .ip-table {
+  background:
+    radial-gradient(ellipse 72% 56% at 50% 46%, #f9f3eb 0%, #ede3d5 62%, #e2d5c3 100%);
+  border-color: rgba(148, 99, 13, 0.42);
+  box-shadow:
+    inset 0 0 60px rgba(148, 99, 13, 0.1),
+    0 18px 46px rgba(20, 22, 31, 0.1),
+    0 0 0 1px var(--tg-border);
 }
 
 .ip-table::before {
@@ -129,25 +142,12 @@
   position: absolute;
   inset: 12px;
   border-radius: 20px;
-  border: 1px dashed rgba(228, 185, 91, 0.18);
+  border: 1px dashed var(--tg-border);
   pointer-events: none;
 }
 
-.ip-table.is-penalty-flash {
-  animation: ip-penalty-shake 0.7s ease-out;
+.ip-table.is-penalty-rim {
   border-color: var(--tg-garnet-bright);
-  box-shadow:
-    inset 0 0 90px rgba(217, 27, 58, 0.45),
-    0 0 60px rgba(255, 46, 84, 0.55);
-}
-
-@keyframes ip-penalty-shake {
-  0%, 100% { transform: translateX(0); }
-  15% { transform: translateX(-7px); }
-  30% { transform: translateX(7px); }
-  45% { transform: translateX(-5px); }
-  60% { transform: translateX(5px); }
-  75% { transform: translateX(-2px); }
 }
 
 /* Seat Zones */
@@ -162,25 +162,25 @@
 }
 
 .ip-player-plate {
-  min-width: 190px;
+  min-width: 196px;
   padding: 12px 16px;
   border-radius: 14px;
-  background: rgba(8, 10, 17, 0.78);
+  background: var(--tg-glass-strong);
   border: 1px solid var(--tg-border);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition: border-color var(--tg-dur-base) var(--tg-ease-out), box-shadow var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .ip-player-plate.is-active-turn {
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 0 26px rgba(228, 185, 91, 0.28);
+  border-color: var(--tg-gold);
+  box-shadow: 0 0 24px var(--tg-gold-glow);
 }
 
 .ip-player-plate.is-winner {
   border-color: var(--tg-emerald);
-  box-shadow: 0 0 28px rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 26px rgba(34, 197, 94, 0.3);
 }
 
 .ip-plate-top {
@@ -207,9 +207,10 @@
 }
 
 .ip-chip-visual {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
 .ip-mini-chip-tower {
@@ -224,7 +225,7 @@
   background: radial-gradient(circle at 35% 30%, #ff6b86, #b81131 65%, #4a0412);
   border: 1.5px dashed rgba(228, 185, 91, 0.85);
   margin-left: -7px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
 .ip-mini-disc:first-child {
@@ -233,24 +234,31 @@
 
 .ip-chip-num {
   font-family: var(--tg-font-mono);
-  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  font-size: 23px;
   font-weight: 800;
   color: var(--tg-gold-bright);
-  text-shadow: 0 0 12px var(--tg-gold-glow);
+}
+
+.ip-delta-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .ip-bet-pill {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11.5px;
   font-weight: 700;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(217, 27, 58, 0.2);
-  border: 1px solid rgba(255, 46, 84, 0.5);
-  color: #ffb3c1;
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
 }
 
-/* Dramatic Forehead Card (3D Flippable) */
+/* Dramatic Forehead Card (3D Flippable — Preserved Across Phases!) */
 .ip-card-stage {
   display: flex;
   flex-direction: column;
@@ -273,7 +281,7 @@
 }
 
 .ip-card-3d .tg-card-3d-inner {
-  transition: transform 0.72s cubic-bezier(0.2, 0.9, 0.25, 1);
+  transition: transform var(--tg-dur-drama) var(--tg-ease-out);
 }
 
 .ip-card-face-front {
@@ -283,12 +291,16 @@
   justify-content: center;
   background:
     radial-gradient(circle at 50% 25%, rgba(228, 185, 91, 0.18), transparent 64%),
-    linear-gradient(160deg, #1f253a 0%, #0d101b 65%, #07080e 100%);
+    var(--tg-surface-card);
   border: 2px solid var(--tg-gold);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.75),
-    0 0 28px rgba(228, 185, 91, 0.22),
-    inset 0 0 24px rgba(228, 185, 91, 0.08);
+  box-shadow: var(--tg-shadow-card);
+}
+
+[data-theme="light"] .ip-card-face-front {
+  background:
+    radial-gradient(circle at 50% 22%, rgba(184, 130, 24, 0.14), transparent 64%),
+    linear-gradient(165deg, #ffffff 0%, #f6efe3 100%);
+  border-color: var(--tg-gold);
 }
 
 .ip-card-face-front.is-card-ten {
@@ -296,15 +308,21 @@
     radial-gradient(circle at 50% 28%, rgba(255, 46, 84, 0.34), transparent 66%),
     linear-gradient(160deg, #3a101d 0%, #17070d 65%, #0b0306 100%);
   border-color: var(--tg-garnet-bright);
-  box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.8),
-    0 0 38px rgba(255, 46, 84, 0.45),
-    inset 0 0 26px rgba(255, 46, 84, 0.18);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65), 0 0 32px var(--tg-garnet-glow);
+}
+
+[data-theme="light"] .ip-card-face-front.is-card-ten {
+  background:
+    radial-gradient(circle at 50% 24%, rgba(190, 18, 51, 0.16), transparent 66%),
+    linear-gradient(165deg, #fff5f6 0%, #fde4e9 100%);
+  border-color: var(--tg-garnet);
+  box-shadow: 0 14px 30px rgba(190, 18, 51, 0.18);
 }
 
 .ip-card-corner {
   position: absolute;
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 14px;
   font-weight: 800;
   color: var(--tg-gold);
@@ -315,26 +333,24 @@
 .ip-card-corner.is-br { bottom: 10px; right: 11px; transform: rotate(180deg); }
 
 .ip-card-face-front.is-card-ten .ip-card-corner {
-  color: #ff8ba0;
+  color: var(--tg-garnet-ink);
 }
 
 .ip-card-big-num {
   font-family: var(--tg-font-display);
+  font-variant-numeric: tabular-nums;
   font-size: 62px;
   font-weight: 900;
   line-height: 1;
-  background: linear-gradient(180deg, #fff8dc 0%, #e4b95b 60%, #9b7225 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 4px 12px rgba(228, 185, 91, 0.35));
+  color: var(--tg-gold-bright);
 }
 
 .ip-card-face-front.is-card-ten .ip-card-big-num {
-  background: linear-gradient(180deg, #ffe2e8 0%, #ff3d62 55%, #b50c2b 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  filter: drop-shadow(0 4px 18px rgba(255, 46, 84, 0.6));
+  color: var(--tg-garnet-bright);
+}
+
+[data-theme="light"] .ip-card-face-front.is-card-ten .ip-card-big-num {
+  color: var(--tg-garnet);
 }
 
 .ip-card-sub {
@@ -342,10 +358,10 @@
   font-size: 9.5px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(228, 185, 91, 0.72);
+  color: var(--tg-ink-muted);
 }
 
-/* Mystery Crimson-Foil Mirror Back */
+/* Mystery Crimson-Foil Mirror Back (intentionally dramatic in both themes) */
 .ip-card-mirror-back {
   transform: rotateY(180deg);
   display: flex;
@@ -357,17 +373,14 @@
     linear-gradient(135deg, rgba(255, 46, 84, 0.24) 0%, transparent 45%, rgba(228, 185, 91, 0.14) 100%),
     repeating-linear-gradient(
       -45deg,
-      rgba(217, 27, 58, 0.08) 0px,
-      rgba(217, 27, 58, 0.08) 2px,
+      rgba(217, 27, 58, 0.1) 0px,
+      rgba(217, 27, 58, 0.1) 2px,
       transparent 2px,
       transparent 10px
     ),
-    radial-gradient(circle at 50% 50%, #2b0b16 0%, #0d0a14 75%);
-  border: 2px solid rgba(255, 46, 84, 0.65);
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.8),
-    0 0 32px rgba(217, 27, 58, 0.34),
-    inset 0 0 28px rgba(255, 46, 84, 0.18);
+    radial-gradient(circle at 50% 50%, #310c19 0%, #100b17 75%);
+  border: 2px solid var(--tg-garnet-bright);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
 }
 
 .ip-mirror-q {
@@ -375,7 +388,6 @@
   font-size: 58px;
   font-weight: 900;
   color: #ff6280;
-  text-shadow: 0 0 24px rgba(255, 46, 84, 0.75);
   line-height: 1;
 }
 
@@ -383,10 +395,10 @@
   font-size: 9.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(255, 200, 210, 0.75);
+  color: rgba(255, 210, 220, 0.85);
 }
 
-/* Center Pot & Status Console */
+/* Center Pot & Status Console (GPU-Only ::after Opacity Pulse) */
 .ip-center-stage {
   position: relative;
   z-index: 1;
@@ -395,43 +407,52 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 10px 14px;
 }
 
 .ip-pot-orb {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 12px 26px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(24, 15, 24, 0.94), rgba(11, 13, 22, 0.96));
+  background: var(--tg-glass-strong);
   border: 1.5px solid var(--tg-gold);
-  box-shadow:
-    0 12px 34px rgba(0, 0, 0, 0.7),
-    0 0 28px rgba(228, 185, 91, 0.24),
-    inset 0 1px 0 rgba(255, 240, 194, 0.28);
-  animation: ip-pot-pulse 2.6s ease-in-out infinite;
+  box-shadow: var(--tg-shadow-card);
 }
 
-@keyframes ip-pot-pulse {
-  0%, 100% { box-shadow: 0 12px 34px rgba(0, 0, 0, 0.7), 0 0 22px rgba(228, 185, 91, 0.2); }
-  50% { box-shadow: 0 12px 34px rgba(0, 0, 0, 0.7), 0 0 36px rgba(228, 185, 91, 0.4); }
+.ip-pot-orb::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1.5px solid var(--tg-gold);
+  box-shadow: 0 0 28px var(--tg-gold-glow);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: ip-orb-breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes ip-orb-breathe {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.72; transform: scale(1.015); }
 }
 
 .ip-pot-label {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--tg-ink-muted);
 }
 
 .ip-pot-value {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 30px;
   font-weight: 900;
   color: var(--tg-gold-bright);
-  text-shadow: 0 0 18px var(--tg-gold-glow);
   line-height: 1;
 }
 
@@ -441,9 +462,9 @@
   padding: 14px 18px;
   border-radius: 16px;
   text-align: center;
-  background: linear-gradient(135deg, rgba(24, 29, 46, 0.95), rgba(12, 14, 24, 0.97));
+  background: var(--tg-glass-strong);
   border: 1.5px solid var(--tg-gold);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -451,20 +472,20 @@
 }
 
 .ip-resolution-banner.is-penalty {
-  background: linear-gradient(135deg, rgba(95, 10, 26, 0.94), rgba(32, 6, 12, 0.96));
+  background: var(--tg-garnet-soft);
   border-color: var(--tg-garnet-bright);
-  box-shadow: 0 14px 42px rgba(217, 27, 58, 0.45);
+  box-shadow: var(--tg-shadow-garnet);
 }
 
 .ip-resolution-title {
   font-family: var(--tg-font-display);
-  font-size: 18px;
+  font-size: 17.5px;
   font-weight: 800;
   color: var(--tg-gold-bright);
 }
 
 .ip-resolution-banner.is-penalty .ip-resolution-title {
-  color: #ffc2ce;
+  color: var(--tg-garnet-ink);
 }
 
 .ip-resolution-sub {
@@ -490,17 +511,17 @@
   font-size: 11.5px;
   font-weight: 700;
   border: 1px solid var(--tg-border);
-  background: rgba(14, 17, 28, 0.9);
+  background: var(--tg-glass-strong);
 }
 
 .ip-judge-chip.is-go {
-  border-color: rgba(34, 197, 94, 0.55);
-  color: #86efac;
+  border-color: var(--tg-emerald);
+  color: var(--tg-emerald-ink);
 }
 
 .ip-judge-chip.is-fold {
-  border-color: rgba(255, 46, 84, 0.55);
-  color: #ff99ab;
+  border-color: var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
 }
 
 /* Action History Tape */
@@ -515,11 +536,12 @@
 
 .ip-tape-pill {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   padding: 2px 9px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-subtle);
   color: var(--tg-ink-muted);
 }
 
@@ -527,9 +549,9 @@
 .ip-controls {
   padding: 14px 16px;
   border-radius: var(--tg-radius-md);
-  background: rgba(10, 12, 20, 0.92);
+  background: var(--tg-glass-strong);
   border: 1px solid var(--tg-border-strong);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.58);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -554,7 +576,7 @@
 .ip-slider {
   flex: 1;
   min-width: 120px;
-  accent-color: var(--tg-garnet-bright);
+  accent-color: var(--tg-garnet);
   cursor: pointer;
 }
 
@@ -575,7 +597,7 @@
   min-height: 48px;
   font-size: 14px;
   font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -586,9 +608,15 @@
 
 .ip-action-btn small {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10.5px;
   font-weight: 600;
   opacity: 0.85;
+}
+
+.ip-btn-fold-outline {
+  border-color: var(--tg-border-garnet);
+  color: var(--tg-garnet-ink);
 }
 
 .ip-penalty-warn {
@@ -598,18 +626,25 @@
   gap: 8px;
   padding: 6px 12px;
   border-radius: 8px;
-  background: rgba(217, 27, 58, 0.14);
-  border: 1px solid rgba(255, 46, 84, 0.4);
+  background: var(--tg-garnet-soft);
+  border: 1px solid var(--tg-border-garnet);
   font-size: 12px;
   font-weight: 600;
-  color: #ff99ab;
+  color: var(--tg-garnet-ink);
 }
 
 .ip-waiting-bar {
   text-align: center;
-  padding: 14px;
+  padding: 12px;
   font-size: 13.5px;
   color: var(--tg-ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ip-pot-orb::after {
+    animation: none !important;
+    opacity: 0.4;
+  }
 }
 
 @media (max-width: 640px) {

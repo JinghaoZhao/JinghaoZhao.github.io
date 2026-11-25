@@ -50,20 +50,20 @@ export function getPieceDirs(type, owner) {
 function createStartingBoard() {
   const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   // Owner 1 (top, facing down): Back-Left (0,2)=M, Back-Center (0,1)=K, Back-Right (0,0)=G, Front-Center (1,1)=P
-  board[0][0] = { type: 'G', owner: 1 };
-  board[0][1] = { type: 'K', owner: 1 };
-  board[0][2] = { type: 'M', owner: 1 };
-  board[1][1] = { type: 'P', owner: 1 };
+  board[0][0] = { id: 'p1-G', type: 'G', owner: 1 };
+  board[0][1] = { id: 'p1-K', type: 'K', owner: 1 };
+  board[0][2] = { id: 'p1-M', type: 'M', owner: 1 };
+  board[1][1] = { id: 'p1-P', type: 'P', owner: 1 };
   // Owner 0 (bottom, facing up): Back-Left (3,0)=M, Back-Center (3,1)=K, Back-Right (3,2)=G, Front-Center (2,1)=P
-  board[2][1] = { type: 'P', owner: 0 };
-  board[3][0] = { type: 'M', owner: 0 };
-  board[3][1] = { type: 'K', owner: 0 };
-  board[3][2] = { type: 'G', owner: 0 };
+  board[2][1] = { id: 'p0-P', type: 'P', owner: 0 };
+  board[3][0] = { id: 'p0-M', type: 'M', owner: 0 };
+  board[3][1] = { id: 'p0-K', type: 'K', owner: 0 };
+  board[3][2] = { id: 'p0-G', type: 'G', owner: 0 };
   return board;
 }
 
 function cloneBoard(board) {
-  return board.map((row) => row.map((cell) => (cell ? { type: cell.type, owner: cell.owner } : null)));
+  return board.map((row) => row.map((cell) => (cell ? { id: cell.id, type: cell.type, owner: cell.owner } : null)));
 }
 
 function cloneHands(hands) {
@@ -172,22 +172,28 @@ function generateAllMoves(board, hands, owner) {
  * Apply a move on raw board/hands and determine immediate single-game outcome.
  * Returns { board, hands, winnerOwner: null | 0 | 1, winReason: null | 'capture' | 'try', promoted, capturedType }.
  */
-function simulateMove(board, hands, owner, move) {
+function simulateMove(board, hands, owner, move, handIds = null) {
   const nb = cloneBoard(board);
   const nh = cloneHands(hands);
+  const nhIds = handIds ? [handIds[0].slice(), handIds[1].slice()] : null;
   const opp = 1 - owner;
   let capturedType = null;
+  let capturedId = null;
+  let movedId = null;
   let promoted = false;
 
   if (move.kind === 'move') {
     const piece = nb[move.fromR][move.fromC];
     const target = nb[move.toR][move.toC];
+    movedId = piece.id || null;
     nb[move.fromR][move.fromC] = null;
     if (target) {
       capturedType = target.type;
+      capturedId = target.id || null;
       if (target.type !== 'K') {
         // Promoted Hu reverts to Man (P) when captured
         nh[owner].push(target.type === 'H' ? 'P' : target.type);
+        if (nhIds) nhIds[owner].push(target.id || `cap-${owner}-${nh[owner].length}`);
       }
     }
     let nextType = piece.type;
@@ -195,24 +201,29 @@ function simulateMove(board, hands, owner, move) {
       nextType = 'H';
       promoted = true;
     }
-    nb[move.toR][move.toC] = { type: nextType, owner };
+    nb[move.toR][move.toC] = { id: movedId, type: nextType, owner };
   } else {
     const idx = nh[owner].indexOf(move.pieceType);
-    if (idx !== -1) nh[owner].splice(idx, 1);
-    nb[move.toR][move.toC] = { type: move.pieceType, owner };
+    if (idx !== -1) {
+      nh[owner].splice(idx, 1);
+      if (nhIds) {
+        movedId = nhIds[owner].splice(idx, 1)[0] || `drop-${owner}-${move.pieceType}`;
+      }
+    }
+    nb[move.toR][move.toC] = { id: movedId, type: move.pieceType, owner };
   }
 
   // 1. Capture opponent King -> immediate win for mover
   if (capturedType === 'K') {
-    return { board: nb, hands: nh, winnerOwner: owner, winReason: 'capture', promoted, capturedType };
+    return { board: nb, hands: nh, handIds: nhIds, movedId, capturedId, winnerOwner: owner, winReason: 'capture', promoted, capturedType };
   }
 
   // 2. Try Rule check: if opponent's King was in mover's home territory and survived mover's turn -> opponent wins!
   if (isKingInEnemyTerritory(nb, opp)) {
-    return { board: nb, hands: nh, winnerOwner: opp, winReason: 'try', promoted, capturedType };
+    return { board: nb, hands: nh, handIds: nhIds, movedId, capturedId, winnerOwner: opp, winReason: 'try', promoted, capturedType };
   }
 
-  return { board: nb, hands: nh, winnerOwner: null, winReason: null, promoted, capturedType };
+  return { board: nb, hands: nh, handIds: nhIds, movedId, capturedId, winnerOwner: null, winReason: null, promoted, capturedType };
 }
 
 // =========================================================================
@@ -386,10 +397,12 @@ function chooseAiMove(fullState, owner, difficulty, rng) {
 function startFreshGameFields(seats, firstMoverIdx, gameNumber) {
   const board = createStartingBoard();
   const hands = [[], []];
+  const handIds = [[], []];
   const sig = boardSignature(board, hands, firstMoverIdx);
   return {
     board,
     hands,
+    handIds,
     gameNumber,
     ply: 0,
     firstMoverIdx,
@@ -547,9 +560,10 @@ export const GameRules = {
         ? next.board[p.fromR][p.fromC].type
         : p.pieceType;
 
-    const sim = simulateMove(next.board, next.hands, owner, moveObj);
+    const sim = simulateMove(next.board, next.hands, owner, moveObj, next.handIds || [[], []]);
     next.board = sim.board;
     next.hands = sim.hands;
+    if (sim.handIds) next.handIds = sim.handIds;
     next.ply += 1;
 
     const colNames = ['A', 'B', 'C'];

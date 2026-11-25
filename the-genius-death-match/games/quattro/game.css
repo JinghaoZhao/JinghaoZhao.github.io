@@ -1,5 +1,6 @@
 /* ==========================================================================
- * Quattro (四色牌) — Radiant 4-Suit Crystal Card Salon & 6 Holographic VP Pods
+ * Quattro (四色牌) — Dual-Theme Radiant Crystal Salon & 1:1 Pointer Drag
+ * GPU-Compositor-Only · Unified Motion Tokens · Dark & Light Parity
  * ========================================================================== */
 
 .qt-arena {
@@ -21,9 +22,9 @@
   gap: 10px;
   padding: 10px 15px;
   border-radius: var(--tg-radius-md);
-  background: rgba(10, 14, 24, 0.9);
-  border: 1px solid rgba(16, 185, 129, 0.36);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  background: var(--tg-glass);
+  border: 1px solid var(--tg-border);
+  box-shadow: var(--tg-shadow-card);
 }
 
 .qt-phase-banner {
@@ -37,27 +38,24 @@
 
 .qt-quota-pill {
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   font-weight: 800;
   padding: 4px 11px;
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.16);
-  border: 1px solid rgba(52, 211, 153, 0.5);
-  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid var(--tg-emerald);
+  color: var(--tg-emerald-ink);
 }
 
-/* Main Card Salon Table */
+/* Main Card Salon Table (Semantic --tg-surface-felt!) */
 .qt-salon {
   position: relative;
   border-radius: 28px;
   padding: 20px 18px 22px;
-  background:
-    radial-gradient(ellipse 68% 50% at 50% 48%, rgba(16, 52, 46, 0.72) 0%, rgba(11, 15, 26, 0.96) 62%, #06080f 100%);
-  border: 2px solid rgba(228, 185, 91, 0.38);
-  box-shadow:
-    inset 0 0 80px rgba(0, 0, 0, 0.8),
-    0 24px 60px rgba(0, 0, 0, 0.72),
-    0 0 42px rgba(16, 185, 129, 0.14);
+  background: var(--tg-surface-felt);
+  border: 2px solid var(--tg-border-strong);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -67,22 +65,24 @@
 .qt-tray {
   padding: 14px 16px;
   border-radius: 18px;
-  background: rgba(8, 11, 19, 0.78);
+  background: var(--tg-glass-strong);
   border: 1.5px solid var(--tg-border);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: border-color 0.28s, box-shadow 0.28s;
+  transition:
+    border-color var(--tg-dur-base) var(--tg-ease-out),
+    box-shadow var(--tg-dur-base) var(--tg-ease-out);
 }
 
 .qt-tray.is-my-turn {
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 0 28px rgba(228, 185, 91, 0.24);
+  border-color: var(--tg-gold);
+  box-shadow: 0 0 24px var(--tg-gold-glow);
 }
 
 .qt-tray.is-valid-quattro {
-  border-color: #34d399;
-  box-shadow: 0 0 32px rgba(16, 185, 129, 0.34), inset 0 0 24px rgba(16, 185, 129, 0.1);
+  border-color: var(--tg-emerald);
+  box-shadow: 0 0 28px rgba(16, 185, 129, 0.3);
 }
 
 .qt-tray-header {
@@ -91,6 +91,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
+  color: var(--tg-ink);
 }
 
 .qt-cards-row {
@@ -102,7 +103,7 @@
   width: 100%;
 }
 
-/* Radiant Crystal Cards (R / B / G / Y / Black 0) */
+/* Radiant Crystal Cards (R / B / G / Y / Black 0) — Preserved & Pointer-Draggable */
 .qt-card {
   position: relative;
   aspect-ratio: 3 / 4.2;
@@ -114,32 +115,48 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s var(--tg-ease), box-shadow 0.22s var(--tg-ease), border-color 0.2s;
+  border: 2px solid rgba(255, 255, 255, 0.24);
+  transition:
+    transform var(--tg-dur-fast) var(--tg-ease-spring),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    opacity var(--tg-dur-fast) var(--tg-ease-out);
   user-select: none;
+  -webkit-user-select: none;
   overflow: hidden;
+  will-change: transform;
 }
 
 .qt-card.is-clickable {
   cursor: pointer;
 }
 
-.qt-card.is-clickable:hover {
-  transform: translateY(-5px) scale(1.03);
+.qt-card.is-draggable {
+  touch-action: none;
+  cursor: grab;
 }
 
-.qt-card.is-selected {
-  transform: translateY(-8px) scale(1.05);
-  box-shadow: 0 0 0 3px #fff, 0 0 30px rgba(255, 240, 194, 0.7) !important;
+.qt-card.is-clickable:hover:not(.is-dragging) {
+  transform: translateY(-4px) scale(1.025);
 }
 
+.qt-card.is-clickable:active:not(.is-dragging) {
+  transform: scale(var(--tg-press-card));
+  transition-duration: 80ms;
+  transition-timing-function: var(--tg-ease-snappy);
+}
+
+.qt-card.is-selected:not(.is-dragging) {
+  transform: translateY(-8px) scale(1.045);
+  box-shadow: 0 0 0 3px var(--tg-gold), 0 14px 28px var(--tg-gold-glow) !important;
+}
+
+/* Lag-free 1:1 Pointer Tracking: ZERO competing transform transition while dragging! */
 .qt-card.is-dragging {
-  opacity: 0.55;
-  transform: scale(0.95);
-}
-
-.qt-card.is-revealed {
-  border-style: solid;
+  transition: none !important;
+  cursor: grabbing;
+  z-index: 40;
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.55), 0 0 0 2px var(--tg-gold) !important;
 }
 
 .qt-card.is-hidden-own::after {
@@ -147,70 +164,76 @@
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  border: 1.5px dashed rgba(255, 255, 255, 0.32);
+  border: 1.5px dashed rgba(255, 255, 255, 0.42);
   pointer-events: none;
 }
 
-/* Suit Crystal Gradients */
+/* Suit Crystal Gradients (High Saturation & Legibility in Both Dark & Light Themes!) */
 .qt-card.suit-R {
   background:
-    radial-gradient(circle at 30% 20%, rgba(255, 130, 155, 0.35), transparent 60%),
-    linear-gradient(155deg, #5c0f22 0%, #2b0710 62%, #140307 100%);
-  border-color: #ff4769;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(255, 46, 84, 0.32);
+    radial-gradient(circle at 30% 20%, rgba(255, 148, 170, 0.36), transparent 60%),
+    linear-gradient(155deg, #c8193e 0%, #7d0c24 62%, #420512 100%);
+  border-color: #ff5777;
+  box-shadow: 0 10px 24px rgba(190, 18, 51, 0.3);
 }
 
 .qt-card.suit-B {
   background:
-    radial-gradient(circle at 30% 20%, rgba(125, 211, 252, 0.35), transparent 60%),
-    linear-gradient(155deg, #0d3659 0%, #071c33 62%, #030d19 100%);
+    radial-gradient(circle at 30% 20%, rgba(125, 211, 252, 0.36), transparent 60%),
+    linear-gradient(155deg, #0b64a8 0%, #073866 62%, #041d38 100%);
   border-color: #38bdf8;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 10px 24px rgba(2, 132, 199, 0.28);
 }
 
 .qt-card.suit-G {
   background:
     radial-gradient(circle at 30% 20%, rgba(134, 239, 172, 0.34), transparent 60%),
-    linear-gradient(155deg, #0c4729 0%, #062415 62%, #03110a 100%);
-  border-color: #22c55e;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(34, 197, 94, 0.3);
+    linear-gradient(155deg, #127a43 0%, #0a4a28 62%, #052615 100%);
+  border-color: #34d399;
+  box-shadow: 0 10px 24px rgba(21, 128, 61, 0.28);
 }
 
 .qt-card.suit-Y {
   background:
-    radial-gradient(circle at 30% 20%, rgba(254, 240, 138, 0.38), transparent 60%),
-    linear-gradient(155deg, #5c4308 0%, #2d2004 62%, #140e02 100%);
+    radial-gradient(circle at 30% 20%, rgba(254, 240, 138, 0.4), transparent 60%),
+    linear-gradient(155deg, #b87e0c 0%, #754d05 62%, #3d2702 100%);
   border-color: #facc15;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 22px rgba(250, 204, 21, 0.28);
+  box-shadow: 0 10px 24px rgba(180, 83, 9, 0.28);
 }
 
 .qt-card.suit-K {
   background:
-    repeating-linear-gradient(-45deg, rgba(255, 46, 84, 0.1) 0 2px, transparent 2px 10px),
-    radial-gradient(circle at 50% 40%, #26293d 0%, #090a10 75%);
+    repeating-linear-gradient(-45deg, rgba(255, 46, 84, 0.14) 0 2px, transparent 2px 10px),
+    radial-gradient(circle at 50% 40%, #2b3047 0%, #10121c 75%);
   border-color: #94a3b8;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.78), 0 0 24px rgba(255, 46, 84, 0.28);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42);
 }
 
 .qt-card.suit-hidden {
   background:
-    repeating-linear-gradient(45deg, rgba(228, 185, 91, 0.06) 0 2px, transparent 2px 10px),
-    linear-gradient(155deg, #171c2e 0%, #090b13 100%);
-  border-color: rgba(228, 185, 91, 0.3);
+    repeating-linear-gradient(45deg, var(--tg-gold-soft) 0 2px, transparent 2px 10px),
+    var(--tg-surface-card);
+  border-color: var(--tg-border-strong);
 }
 
 .qt-card-num {
   font-family: var(--tg-font-display);
+  font-variant-numeric: tabular-nums;
   font-size: 44px;
   font-weight: 900;
   line-height: 1;
-  color: #fff;
-  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.qt-card.suit-hidden .qt-card-num {
+  color: var(--tg-gold);
+  font-size: 34px;
+  text-shadow: none;
 }
 
 .qt-card.suit-K .qt-card-num {
   color: #ff6b86;
-  text-shadow: 0 0 18px rgba(255, 46, 84, 0.75);
 }
 
 .qt-card-suit-tag {
@@ -218,7 +241,11 @@
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.qt-card.suit-hidden .qt-card-suit-tag {
+  color: var(--tg-ink-faint);
 }
 
 .qt-card-state-badge {
@@ -229,16 +256,16 @@
   font-weight: 800;
   padding: 2px 6px;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.58);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--tg-gold-bright);
+  background: rgba(0, 0, 0, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  color: #fff0c2;
 }
 
 .qt-card.is-conflict {
-  box-shadow: 0 0 0 2px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 0 2px var(--tg-amber), 0 0 18px rgba(245, 158, 11, 0.4);
 }
 
-/* Live 4-Color Validity & Total-Sum Power Meter */
+/* Live 4-Color Validity & GPU-Composited scaleX Total-Sum Power Meter */
 .qt-meter-row {
   display: flex;
   align-items: center;
@@ -247,8 +274,8 @@
   gap: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(12, 16, 28, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--tg-bg-recessed);
+  border: 1px solid var(--tg-border-subtle);
 }
 
 .qt-color-dots {
@@ -267,8 +294,8 @@
   font-size: 11px;
   font-weight: 800;
   opacity: 0.25;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  border: 1.5px solid var(--tg-border-subtle);
+  transition: opacity var(--tg-dur-fast) var(--tg-ease-out), transform var(--tg-dur-fast) var(--tg-ease-spring);
 }
 
 .qt-color-dot.is-lit {
@@ -276,11 +303,11 @@
   transform: scale(1.06);
 }
 
-.qt-color-dot.c-R { background: #dc2626; color: #fff; box-shadow: 0 0 12px rgba(239, 68, 68, 0.55); }
-.qt-color-dot.c-B { background: #0284c7; color: #fff; box-shadow: 0 0 12px rgba(56, 189, 248, 0.55); }
-.qt-color-dot.c-G { background: #16a34a; color: #fff; box-shadow: 0 0 12px rgba(34, 197, 94, 0.55); }
-.qt-color-dot.c-Y { background: #ca8a04; color: #fff; box-shadow: 0 0 12px rgba(250, 204, 21, 0.55); }
-.qt-color-dot.c-K { background: #1e293b; color: #ff6b86; border-color: #ff4769; box-shadow: 0 0 12px rgba(255, 46, 84, 0.5); }
+.qt-color-dot.c-R { background: #dc2626; color: #fff; }
+.qt-color-dot.c-B { background: #0284c7; color: #fff; }
+.qt-color-dot.c-G { background: #16a34a; color: #fff; }
+.qt-color-dot.c-Y { background: #ca8a04; color: #fff; }
+.qt-color-dot.c-K { background: #1e293b; color: #ff6b86; border-color: #ff4769; }
 
 .qt-power-meter {
   flex: 1;
@@ -293,20 +320,24 @@
 .qt-meter-track {
   height: 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--tg-track-bg);
   overflow: hidden;
 }
 
+/* GPU-Compositor-Only scaleX bar (Zero width reflow!) */
 .qt-meter-fill {
+  width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #38bdf8, #34d399, #facc15);
-  transition: width 0.35s var(--tg-ease);
+  background: linear-gradient(90deg, var(--tg-cyan), var(--tg-emerald), var(--tg-gold));
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--tg-dur-base) var(--tg-ease-out);
+  will-change: transform;
 }
 
 .qt-meter-fill.is-quattro {
-  background: linear-gradient(90deg, #22c55e, #e4b95b, #fff0c2);
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+  background: linear-gradient(90deg, var(--tg-emerald), var(--tg-gold), #ffe599);
 }
 
 /* 6 Holographic Virtual Player Pods */
@@ -320,30 +351,38 @@
   position: relative;
   padding: 12px 13px;
   border-radius: 15px;
-  background: linear-gradient(155deg, rgba(16, 22, 38, 0.9), rgba(8, 11, 20, 0.94));
-  border: 1.5px solid rgba(56, 189, 248, 0.32);
+  background: var(--tg-glass-strong);
+  border: 1.5px solid var(--tg-border);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: transform 0.18s, border-color 0.2s, box-shadow 0.2s;
+  transition:
+    transform var(--tg-dur-fast) var(--tg-ease-spring),
+    border-color var(--tg-dur-fast) var(--tg-ease-out),
+    box-shadow var(--tg-dur-fast) var(--tg-ease-out),
+    opacity var(--tg-dur-fast) var(--tg-ease-out);
 }
 
 .qt-vp-pod.is-tradeable {
   cursor: pointer;
-  border-color: rgba(52, 211, 153, 0.65);
-  box-shadow: 0 0 22px rgba(16, 185, 129, 0.22);
+  border-color: var(--tg-emerald);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.16);
 }
 
-.qt-vp-pod.is-tradeable:hover,
+.qt-vp-pod.is-tradeable:hover {
+  transform: translateY(-2px);
+  border-color: var(--tg-gold);
+}
+
 .qt-vp-pod.is-drag-over {
-  transform: translateY(-3px);
-  border-color: var(--tg-gold-bright);
-  box-shadow: 0 0 30px rgba(228, 185, 91, 0.45);
+  transform: translateY(-3px) scale(1.03);
+  border-color: var(--tg-gold);
+  box-shadow: 0 0 0 2px var(--tg-gold), 0 12px 28px var(--tg-gold-glow);
 }
 
 .qt-vp-pod.is-used-by-me {
-  opacity: 0.6;
-  border-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.62;
+  border-color: var(--tg-border-subtle);
 }
 
 .qt-vp-head {
@@ -368,9 +407,10 @@
   padding: 2px 7px;
   border-radius: 6px;
   font-family: var(--tg-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11.5px;
   font-weight: 800;
-  color: #fff;
+  color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
@@ -384,13 +424,32 @@
 .qt-controls {
   padding: 13px 16px;
   border-radius: var(--tg-radius-md);
-  background: rgba(10, 12, 20, 0.92);
+  background: var(--tg-glass-strong);
   border: 1px solid var(--tg-border-strong);
+  box-shadow: var(--tg-shadow-card);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.qt-vp-hint {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--tg-cyan-ink);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qt-card,
+  .qt-vp-pod,
+  .qt-meter-fill {
+    transition-duration: 120ms !important;
+  }
 }
 
 @media (max-width: 720px) {

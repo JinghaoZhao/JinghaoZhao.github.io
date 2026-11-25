@@ -3,13 +3,15 @@
  *
  * Exposes:
  *  - UI helpers: toast, escapeHtml, formatTime, renderGarnetBadge, renderPieceBadge, el, confirm
- *  - mountGame({ config, rules, root, render }): wires GameEngine + Broadcast HUD + VS Nameplate Strip +
- *    Death Match VS Clash Splash + Survivor/Eliminated Garnet Transfer Curtain + Lobby + Rules + Chat
+ *  - mountGame({ config, rules, root, render }): wires GameEngine + Broadcast HUD + Theme/Motion +
+ *    VS Nameplate Strip + Death Match VS Clash + Survivor/Eliminated Verdict + Lobby + Rules + Chat
  */
 
 import { I18n } from '../i18n.js';
 import { SFX } from '../audio/sound-engine.js';
 import { GarnetVault } from '../vault.js';
+import { Theme } from '../theme.js';
+import { Motion } from './motion.js';
 import { GameEngine } from '../net/game-engine.js';
 import {
   normalizeRoomCode,
@@ -19,6 +21,19 @@ import {
 import { showPrivacyCurtain, removePrivacyCurtain } from './privacy-curtain.js';
 
 const NAME_STORAGE_KEY = 'tgm_player_name';
+
+// Crisp 18x18 stroke SVG icon library for smooth Motion.morphIcon transitions
+const ICONS = {
+  sun: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
+  moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  volOn: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`,
+  volOff: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`,
+  waveOn: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h3l2-6 4 12 3-8 2 2h6"/></svg>`,
+  waveOff: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h4l2-3 4 6 2-3h8" opacity="0.55"/></svg>`,
+  copy: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+  check: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`,
+  menu: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>`,
+};
 
 function getSavedName() {
   try {
@@ -46,6 +61,13 @@ function getToastStack() {
   return toastStackEl;
 }
 
+function dismissToast(el) {
+  if (!el || el.dataset.exiting === '1') return;
+  el.dataset.exiting = '1';
+  el.classList.add('is-exiting');
+  setTimeout(() => el.remove(), 190);
+}
+
 export const UI = {
   escapeHtml(str) {
     return String(str ?? '')
@@ -68,22 +90,24 @@ export const UI = {
     return `<span class="tg-garnet ${black ? 'tg-black-garnet' : ''}" title="${black ? 'Black Garnet' : 'Garnets'}"><span class="tg-garnet-gem" aria-hidden="true"></span><span>${Number(count) || 0}</span></span>`;
   },
 
-  // Compatibility alias
   renderPieceBadge(count) {
     return UI.renderGarnetBadge(count);
   },
 
-  toast(message, tone = 'info', durationMs = 2800) {
+  toast(message, tone = 'info', durationMs = 2600) {
     const stack = getToastStack();
+    const active = Array.from(stack.querySelectorAll('.tg-toast:not([data-exiting="1"])'));
+    if (active.length >= 3) {
+      dismissToast(active[0]);
+    }
+    const playFlip = Motion.flipList(stack, '.tg-toast', { duration: 180 });
     const el = document.createElement('div');
     el.className = `tg-toast ${tone === 'error' ? 'is-error' : tone === 'success' ? 'is-success' : ''}`;
+    el.dataset.flipKey = 't_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
     el.textContent = String(message);
     stack.appendChild(el);
-    setTimeout(() => {
-      el.style.opacity = '0';
-      el.style.transition = 'opacity 0.25s';
-      setTimeout(() => el.remove(), 260);
-    }, durationMs);
+    playFlip();
+    setTimeout(() => dismissToast(el), durationMs);
   },
 
   el(tag, attrs = {}, ...children) {
@@ -112,11 +136,12 @@ export const UI = {
 
   confirm(title, body) {
     return new Promise((resolve) => {
+      const prevFocus = document.activeElement;
       const backdrop = document.createElement('div');
       backdrop.className = 'tg-modal-backdrop';
       backdrop.style.zIndex = '106';
       backdrop.innerHTML = `
-        <div class="tg-modal" style="width:min(420px,100%);">
+        <div class="tg-modal" style="width:min(420px,100%);" role="dialog" aria-modal="true">
           <h3 class="tg-modal-title" style="font-size:18px;margin-bottom:8px;">${UI.escapeHtml(title)}</h3>
           <p style="color:var(--tg-ink-muted);margin:0 0 18px;font-size:14px;">${UI.escapeHtml(body)}</p>
           <div style="display:flex;justify-content:flex-end;gap:10px;">
@@ -126,13 +151,32 @@ export const UI = {
         </div>
       `;
       document.body.appendChild(backdrop);
+      Motion.transitionPresence(backdrop, true, { preset: 'modal' });
+
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        document.removeEventListener('keydown', onKey);
+        Motion.transitionPresence(backdrop, false, {
+          preset: 'modal',
+          removeOnExit: true,
+          onAfterExit: () => {
+            if (prevFocus && typeof prevFocus.focus === 'function') prevFocus.focus();
+            resolve(ok);
+          },
+        });
+      };
+      const onKey = (e) => {
+        if (e.key === 'Escape') finish(false);
+      };
+      document.addEventListener('keydown', onKey);
       backdrop.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-ans]');
         if (!btn && e.target !== backdrop) return;
-        const ok = btn?.dataset.ans === 'yes';
-        backdrop.remove();
-        resolve(ok);
+        finish(btn?.dataset.ans === 'yes');
       });
+      backdrop.querySelector('[data-ans="yes"]')?.focus();
     });
   },
 };
@@ -197,74 +241,103 @@ function difficultyLabel(diff, lang) {
 }
 
 function launchVerdictParticles(canvas, isSurvivor) {
-  if (!canvas) return () => {};
+  if (!canvas || Motion.reduced()) return () => {};
   const ctx = canvas.getContext('2d');
   if (!ctx) return () => {};
   let rafId = null;
   let running = true;
+  const startedAt = performance.now();
+  const MAX_DURATION_MS = 6000;
 
+  let w = 0;
+  let h = 0;
   const resize = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
   resize();
   window.addEventListener('resize', resize);
 
-  const count = isSurvivor ? 90 : 65;
+  const count = isSurvivor ? 72 : 52;
   const particles = Array.from({ length: count }, () => ({
-    x: Math.random() * canvas.width,
-    y: isSurvivor ? Math.random() * -canvas.height * 0.6 : canvas.height + Math.random() * 140,
-    vx: (Math.random() - 0.5) * (isSurvivor ? 2.4 : 1.1),
-    vy: isSurvivor ? 1.8 + Math.random() * 3.4 : -(1.1 + Math.random() * 2.6),
-    size: 4 + Math.random() * 7,
+    x: Math.random() * w,
+    y: isSurvivor ? Math.random() * -h * 0.5 : h + Math.random() * 140,
+    vx: (Math.random() - 0.5) * (isSurvivor ? 2.2 : 1.0),
+    vy: isSurvivor ? 1.8 + Math.random() * 3.1 : -(1.1 + Math.random() * 2.4),
+    size: 4 + Math.random() * 6,
     rot: Math.random() * Math.PI * 2,
-    vrot: (Math.random() - 0.5) * 0.14,
-    alpha: 0.75 + Math.random() * 0.25,
+    vrot: (Math.random() - 0.5) * 0.12,
+    alpha: 0.72 + Math.random() * 0.24,
     color: isSurvivor
       ? ['#fff0c2', '#e4b95b', '#ff2e54', '#22d3ee'][Math.floor(Math.random() * 4)]
       : ['#ff2e54', '#d91b3a', '#7a091e', '#ff8598'][Math.floor(Math.random() * 4)],
   }));
 
-  const tick = () => {
+  const tick = (now) => {
     if (!running) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (document.hidden) {
+      rafId = null;
+      return;
+    }
+    const elapsed = now - startedAt;
+    if (elapsed > MAX_DURATION_MS) {
+      ctx.clearRect(0, 0, w, h);
+      running = false;
+      return;
+    }
+    const fadeOut = elapsed > MAX_DURATION_MS - 1200 ? Math.max(0, (MAX_DURATION_MS - elapsed) / 1200) : 1;
+    ctx.clearRect(0, 0, w, h);
+
     for (const p of particles) {
       p.x += p.vx;
       p.y += p.vy;
       p.rot += p.vrot;
-      if (isSurvivor && p.y > canvas.height + 20) {
+      if (isSurvivor && p.y > h + 20) {
         p.y = -16;
-        p.x = Math.random() * canvas.width;
+        p.x = Math.random() * w;
       } else if (!isSurvivor && p.y < -20) {
-        p.y = canvas.height + 16;
-        p.x = Math.random() * canvas.width;
+        p.y = h + 16;
+        p.x = Math.random() * w;
       }
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
-      ctx.globalAlpha = p.alpha;
+      ctx.globalAlpha = p.alpha * fadeOut;
       ctx.fillStyle = p.color;
       ctx.beginPath();
       ctx.moveTo(0, -p.size);
-      ctx.lineTo(p.size * 0.7, 0);
+      ctx.lineTo(p.size * 0.68, 0);
       ctx.lineTo(0, p.size);
-      ctx.lineTo(-p.size * 0.7, 0);
+      ctx.lineTo(-p.size * 0.68, 0);
       ctx.closePath();
       ctx.fill();
       ctx.restore();
     }
     rafId = requestAnimationFrame(tick);
   };
-  tick();
+
+  const onVis = () => {
+    if (!document.hidden && running && rafId == null) {
+      rafId = requestAnimationFrame(tick);
+    }
+  };
+  document.addEventListener('visibilitychange', onVis);
+  rafId = requestAnimationFrame(tick);
 
   return () => {
     running = false;
-    cancelAnimationFrame(rafId);
+    if (rafId != null) cancelAnimationFrame(rafId);
     window.removeEventListener('resize', resize);
+    document.removeEventListener('visibilitychange', onVis);
   };
 }
 
 export function mountGame({ config, rules, root, render }) {
+  Theme.init();
   const container = root || document.getElementById('game-root') || document.body;
   document.body.classList.add('tg-body');
 
@@ -300,6 +373,13 @@ export function mountGame({ config, rules, root, render }) {
   let lastRecordedMatchSeq = null;
   let lastVaultOutcome = null;
   let stopParticles = null;
+  let clashTimerId = null;
+  let roomCopyTimer = null;
+  let currentOverlayKind = null; // 'lobby-entry' | 'lobby-room' | 'verdict' | null
+  let vsRenderedSeatKey = '';
+  let lastThemeIcon = null;
+  let lastMuteIcon = null;
+  let lastAmbIcon = null;
 
   const seasonsBadge = Array.isArray(config.seasons)
     ? config.seasons.join(' · ')
@@ -310,7 +390,7 @@ export function mountGame({ config, rules, root, render }) {
       <header class="tg-hud">
         <div class="tg-hud-left">
           <a class="tg-hud-back" href="../../" id="tg-back-hub">← <span data-i18n-hub>殿堂</span></a>
-          <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)}</span>
+          <span class="tg-badge tg-badge-garnet tg-hud-season-pill">${UI.escapeHtml(seasonsBadge)}</span>
           <span class="tg-hud-title" id="tg-hud-title"></span>
         </div>
         <div class="tg-hud-center">
@@ -323,11 +403,11 @@ export function mountGame({ config, rules, root, render }) {
           <span id="tg-hud-stakes" hidden></span>
           <button type="button" class="tg-room-chip" id="tg-room-chip" hidden title="Copy Invite Link">
             <span id="tg-room-code-label"></span>
-            <span aria-hidden="true">⧉</span>
+            <span class="tg-icon-slot" id="tg-room-copy-icon">${ICONS.copy}</span>
           </button>
           <span class="tg-conn-pill" id="tg-conn-pill">
             <span class="tg-conn-dot"></span>
-            <span id="tg-conn-text">READY</span>
+            <span id="tg-conn-text">就绪</span>
           </span>
         </div>
         <div class="tg-hud-right">
@@ -338,10 +418,11 @@ export function mountGame({ config, rules, root, render }) {
           </button>
           <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost" id="tg-btn-lobby"></button>
           <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost" id="tg-btn-rules">?</button>
-          <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost" id="tg-btn-lang">中/EN</button>
-          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-ambience" title="Tension Heartbeat & Drone">〰</button>
-          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-mute" title="Mute / Unmute SFX">🔊</button>
-          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-sidebar" title="Toggle Roster & Log">☰</button>
+          <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost tg-lang-pill" id="tg-btn-lang"></button>
+          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-theme"><span class="tg-icon-slot" id="tg-icon-theme"></span></button>
+          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-ambience"><span class="tg-icon-slot" id="tg-icon-ambience"></span></button>
+          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-mute"><span class="tg-icon-slot" id="tg-icon-mute"></span></button>
+          <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-btn-sidebar" title="Toggle Roster & Log">${ICONS.menu}</button>
         </div>
       </header>
 
@@ -391,12 +472,23 @@ export function mountGame({ config, rules, root, render }) {
   const hudStakesEl = container.querySelector('#tg-hud-stakes');
   const roomChipEl = container.querySelector('#tg-room-chip');
   const roomCodeLabelEl = container.querySelector('#tg-room-code-label');
+  const roomCopyIconEl = container.querySelector('#tg-room-copy-icon');
   const connPillEl = container.querySelector('#tg-conn-pill');
   const connTextEl = container.querySelector('#tg-conn-text');
   const rosterListEl = container.querySelector('#tg-roster-list');
   const rosterCountEl = container.querySelector('#tg-roster-count');
   const feedListEl = container.querySelector('#tg-feed-list');
   const chatInputEl = container.querySelector('#tg-chat-input');
+
+  const btnLang = container.querySelector('#tg-btn-lang');
+  const btnTheme = container.querySelector('#tg-btn-theme');
+  const iconTheme = container.querySelector('#tg-icon-theme');
+  const btnMute = container.querySelector('#tg-btn-mute');
+  const iconMute = container.querySelector('#tg-icon-mute');
+  const btnAmb = container.querySelector('#tg-btn-ambience');
+  const iconAmb = container.querySelector('#tg-icon-ambience');
+  const btnProfile = container.querySelector('#tg-btn-profile');
+  const profileNameEl = container.querySelector('#tg-profile-name');
 
   function pushFeed(text, kind = 'system', author = null) {
     feedItems.push({ text, kind, author, ts: Date.now() });
@@ -425,36 +517,61 @@ export function mountGame({ config, rules, root, render }) {
     return base.toString();
   }
 
-  async function copyInviteUrl(code) {
+  async function copyInviteUrl(code, triggerBtn = null, iconSlot = null, labelSlot = null) {
     const url = buildInviteUrl(code);
     const displayCode = formatRoomCodeDisplay(code);
+    const isZh = I18n.getLang() === 'zh';
     try {
       await navigator.clipboard.writeText(url);
       SFX.play('garnetClink');
-      UI.toast(
-        I18n.t({
-          zh: `已复制邀请链接（房间 ${displayCode}）`,
-          en: `Invite link copied (${displayCode})`,
-        }),
-        'success'
-      );
+      if (triggerBtn) Motion.pulseConfirm(triggerBtn, { tone: 'emerald' });
+      if (iconSlot) {
+        Motion.morphIcon(iconSlot, ICONS.check, {
+          revertAfterMs: 1800,
+          revertSvgHtml: ICONS.copy,
+        });
+      }
+      if (labelSlot) {
+        clearTimeout(roomCopyTimer);
+        labelSlot.textContent = isZh ? '已复制' : 'Copied';
+        roomCopyTimer = setTimeout(() => {
+          if (engine.roomCode) labelSlot.textContent = formatRoomCodeDisplay(engine.roomCode);
+        }, 1800);
+      }
+      UI.toast(isZh ? '邀请链接已复制' : 'Invite link copied', 'success');
     } catch (_) {
-      window.prompt(I18n.t({ zh: '复制邀请链接：', en: 'Copy invite link:' }), url);
+      UI.toast(`${isZh ? '房间码：' : 'Room: '}${displayCode}`);
     }
   }
 
+  function clearClashSplash(immediate = false) {
+    clearTimeout(clashTimerId);
+    clashTimerId = null;
+    const el = clashRoot.querySelector('#tg-clash-overlay');
+    if (!el) return;
+    if (immediate) {
+      clashRoot.innerHTML = '';
+      return;
+    }
+    el.classList.add('is-exiting');
+    setTimeout(() => {
+      if (clashRoot.contains(el)) clashRoot.innerHTML = '';
+    }, 170);
+  }
+
   function showClashSplash(seats) {
+    clearClashSplash(true);
     const lang = I18n.getLang();
     const p1 = seats[0]?.name || (lang === 'zh' ? '参赛者 1' : 'Player 1');
     const p2 = seats[1]?.name || (lang === 'zh' ? '参赛者 2' : 'Player 2');
     const extra = seats.length > 2 ? ` +${seats.length - 2}` : '';
     clashRoot.innerHTML = `
       <div class="tg-clash-overlay" id="tg-clash-overlay" role="status">
-        <div class="tg-clash-kicker">THE GENIUS · ${UI.escapeHtml(I18n.t(config.title))}</div>
-        <h2 class="tg-clash-heading">${lang === 'zh' ? 'DEATH MATCH · 死亡对决' : 'DEATH MATCH'}</h2>
+        <div class="tg-clash-kicker">THE GENIUS · DEATH MATCH</div>
+        <h2 class="tg-clash-heading">${lang === 'zh' ? '死亡对决' : 'DEATH MATCH'}</h2>
         <div class="tg-clash-row">
           <div class="tg-clash-side is-left">
-            <div style="font-size:11px;color:var(--tg-gold);letter-spacing:0.12em;margin-bottom:4px;">${lang === 'zh' ? '挑战者' : 'CONTESTANT'}</div>
+            <div style="font-size:11px;color:#e4b95b;letter-spacing:0.12em;margin-bottom:4px;">${lang === 'zh' ? '挑战者' : 'CONTESTANT'}</div>
             <div class="tg-clash-pname">${UI.escapeHtml(p1)}</div>
           </div>
           <div class="tg-clash-vs">VS</div>
@@ -466,11 +583,8 @@ export function mountGame({ config, rules, root, render }) {
       </div>
     `;
     const el = clashRoot.querySelector('#tg-clash-overlay');
-    const clear = () => {
-      clashRoot.innerHTML = '';
-    };
-    el?.addEventListener('click', clear);
-    setTimeout(clear, 1950);
+    el?.addEventListener('click', () => clearClashSplash(false));
+    clashTimerId = setTimeout(() => clearClashSplash(false), 1650);
   }
 
   const engine = new GameEngine({
@@ -499,7 +613,7 @@ export function mountGame({ config, rules, root, render }) {
         lastVaultOutcome = null;
         lastRecordedMatchSeq = null;
         SFX.play('clash');
-        pushFeed(I18n.t({ zh: '死亡对决正式打响！', en: 'Death Match has begun!' }), 'alert');
+        pushFeed(I18n.t({ zh: '死亡对决正式开始', en: 'Death Match started' }), 'alert');
         showClashSplash(snap.lobby.seats || []);
       }
 
@@ -510,7 +624,11 @@ export function mountGame({ config, rules, root, render }) {
         const isWin = Boolean(myId && winners.includes(myId));
         const isDraw = winners.length === 0;
 
-        if (!snap.isSpectator && snap.mode !== 'hotseat' && lastRecordedMatchSeq !== snap.roomCode + '_' + engine.seq) {
+        if (
+          !snap.isSpectator &&
+          snap.mode !== 'hotseat' &&
+          lastRecordedMatchSeq !== snap.roomCode + '_' + engine.seq
+        ) {
           lastRecordedMatchSeq = snap.roomCode + '_' + engine.seq;
           const opp = (snap.lobby.seats || []).find((s) => s.seatId !== myId)?.name || 'AI';
           lastVaultOutcome = GarnetVault.recordMatch({
@@ -527,32 +645,91 @@ export function mountGame({ config, rules, root, render }) {
         else if (isDraw) SFX.play('reveal');
         else SFX.play('eliminate');
 
-        pushFeed(
-          I18n.t({ zh: '死亡对决终局！正在宣读最终裁决。', en: 'Death Match concluded. Final verdict!' }),
-          'alert'
-        );
+        pushFeed(I18n.t({ zh: '对决结束，最终裁决已公布', en: 'Match concluded. Final verdict.' }), 'alert');
       }
 
       renderAll();
     },
   });
 
-  // HUD controls
+  // HUD Controls
   container.querySelector('#tg-btn-rules').addEventListener('click', () => {
     SFX.play('click');
     rulesOpen = !rulesOpen;
     renderDrawer();
   });
 
-  container.querySelector('#tg-btn-lang').addEventListener('click', () => {
+  btnLang.addEventListener('click', () => {
     SFX.play('click');
     I18n.toggle();
   });
 
-  const btnMute = container.querySelector('#tg-btn-mute');
-  const btnAmb = container.querySelector('#tg-btn-ambience');
-  const btnProfile = container.querySelector('#tg-btn-profile');
-  const profileNameEl = container.querySelector('#tg-profile-name');
+  btnTheme.addEventListener('click', () => {
+    SFX.play('click');
+    Theme.toggle();
+  });
+
+  function syncThemeAndAudioIcons(animate = false) {
+    const lang = I18n.getLang();
+    const isZh = lang === 'zh';
+    const theme = Theme.get();
+    const nextThemeIcon = theme === 'dark' ? 'sun' : 'moon';
+    btnTheme.setAttribute(
+      'aria-label',
+      theme === 'dark'
+        ? isZh ? '切换浅色模式' : 'Switch to Light Mode'
+        : isZh ? '切换深色模式' : 'Switch to Dark Mode'
+    );
+    btnTheme.title = btnTheme.getAttribute('aria-label');
+    if (lastThemeIcon !== nextThemeIcon) {
+      lastThemeIcon = nextThemeIcon;
+      if (animate) Motion.morphIcon(iconTheme, ICONS[nextThemeIcon]);
+      else iconTheme.innerHTML = ICONS[nextThemeIcon];
+    }
+
+    const muted = SFX.isMuted();
+    const nextMuteIcon = muted ? 'volOff' : 'volOn';
+    btnMute.setAttribute('aria-pressed', String(!muted));
+    btnMute.title = muted
+      ? isZh ? '取消静音' : 'Unmute sound'
+      : isZh ? '静音' : 'Mute sound';
+    if (lastMuteIcon !== nextMuteIcon) {
+      lastMuteIcon = nextMuteIcon;
+      if (animate) Motion.morphIcon(iconMute, ICONS[nextMuteIcon]);
+      else iconMute.innerHTML = ICONS[nextMuteIcon];
+    }
+
+    const ambActive = SFX.isAmbienceOn() && !muted;
+    const nextAmbIcon = ambActive ? 'waveOn' : 'waveOff';
+    btnAmb.setAttribute('aria-pressed', String(ambActive));
+    btnAmb.style.color = ambActive ? 'var(--tg-garnet-bright)' : '';
+    btnAmb.style.borderColor = ambActive ? 'var(--tg-border-garnet)' : '';
+    btnAmb.title = isZh ? '演播室氛围音' : 'Studio ambience';
+    if (lastAmbIcon !== nextAmbIcon) {
+      lastAmbIcon = nextAmbIcon;
+      if (animate) Motion.morphIcon(iconAmb, ICONS[nextAmbIcon]);
+      else iconAmb.innerHTML = ICONS[nextAmbIcon];
+    }
+
+    btnLang.innerHTML = isZh
+      ? `<span class="is-active-lang">中</span><span class="is-inactive-lang">/</span><span class="is-inactive-lang">EN</span>`
+      : `<span class="is-inactive-lang">中</span><span class="is-inactive-lang">/</span><span class="is-active-lang">EN</span>`;
+  }
+
+  btnMute.addEventListener('click', () => {
+    SFX.toggleMute();
+    syncThemeAndAudioIcons(true);
+  });
+
+  btnAmb.addEventListener('click', () => {
+    const on = SFX.toggleAmbience();
+    syncThemeAndAudioIcons(true);
+    UI.toast(
+      on
+        ? I18n.t({ zh: '演播室氛围音已开启', en: 'Studio ambience on' })
+        : I18n.t({ zh: '演播室氛围音已关闭', en: 'Studio ambience off' })
+    );
+  });
 
   function getCurrentDisplayName() {
     const lang = I18n.getLang();
@@ -568,6 +745,7 @@ export function mountGame({ config, rules, root, render }) {
 
   function openRenameModal() {
     document.getElementById('tg-rename-modal')?.remove();
+    const prevFocus = document.activeElement;
     const lang = I18n.getLang();
     const current = getCurrentDisplayName();
     const backdrop = document.createElement('div');
@@ -578,7 +756,7 @@ export function mountGame({ config, rules, root, render }) {
       <div class="tg-modal" style="width:min(420px,100%);" role="dialog" aria-modal="true">
         <div class="tg-modal-header" style="margin-bottom:12px;">
           <div>
-            <span class="tg-badge tg-badge-gold">${lang === 'zh' ? '参赛者身份' : 'CONTESTANT ID'}</span>
+            <span class="tg-badge tg-badge-gold">${lang === 'zh' ? '参赛身份' : 'CONTESTANT ID'}</span>
             <h3 class="tg-modal-title" style="font-size:19px;">${lang === 'zh' ? '修改参赛代号' : 'Edit Player Name'}</h3>
           </div>
           <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-rename-close" aria-label="Close">✕</button>
@@ -589,26 +767,36 @@ export function mountGame({ config, rules, root, render }) {
             ${
               latestSnap && engine.mode === 'online'
                 ? lang === 'zh'
-                  ? '修改后将立即同步给当前对决房间内所有玩家。'
-                  : 'Syncs instantaneously to everyone in the room.'
+                  ? '修改后将实时同步给房间内所有参赛者。'
+                  : 'Syncs immediately to everyone in the room.'
                 : lang === 'zh'
-                ? '将自动保存并在所有《游戏的法则》死亡对决中通用。'
+                ? '将自动保存并在全四季死亡对决中通用。'
                 : 'Saved automatically across all Death Match games.'
             }
           </p>
           <div style="display:flex;justify-content:flex-end;gap:10px;">
             <button type="button" class="tg-btn tg-btn-ghost" id="tg-rename-cancel">${lang === 'zh' ? '取消' : 'Cancel'}</button>
-            <button type="submit" class="tg-btn tg-btn-garnet">${lang === 'zh' ? '保存代号' : 'Save Name'}</button>
+            <button type="submit" class="tg-btn tg-btn-garnet">${lang === 'zh' ? '保存' : 'Save'}</button>
           </div>
         </form>
       </div>
     `;
     document.body.appendChild(backdrop);
+    Motion.transitionPresence(backdrop, true, { preset: 'modal' });
 
     const input = backdrop.querySelector('#tg-rename-input');
+    let closed = false;
     const close = () => {
-      backdrop.remove();
+      if (closed) return;
+      closed = true;
       document.removeEventListener('keydown', onKey);
+      Motion.transitionPresence(backdrop, false, {
+        preset: 'modal',
+        removeOnExit: true,
+        onAfterExit: () => {
+          if (prevFocus && typeof prevFocus.focus === 'function') prevFocus.focus();
+        },
+      });
     };
     const onKey = (e) => {
       if (e.key === 'Escape') close();
@@ -625,6 +813,7 @@ export function mountGame({ config, rules, root, render }) {
       const next = sanitizePlayerName(input.value, '');
       if (!next) {
         SFX.play('error');
+        Motion.nudgeError(input, { intensity: 'subtle' });
         UI.toast(lang === 'zh' ? '代号不能为空' : 'Name cannot be empty', 'error');
         input.focus();
         return;
@@ -638,7 +827,7 @@ export function mountGame({ config, rules, root, render }) {
       if (latestSnap) engine.renameSelf(next);
       else renderAll();
       close();
-      UI.toast(lang === 'zh' ? `代号已更新：${next}` : `Name updated: ${next}`, 'success');
+      UI.toast(lang === 'zh' ? `代号已更新为 ${next}` : `Name updated to ${next}`, 'success');
     });
 
     input?.focus();
@@ -648,28 +837,6 @@ export function mountGame({ config, rules, root, render }) {
   btnProfile?.addEventListener('click', () => {
     SFX.play('click');
     openRenameModal();
-  });
-
-  function syncAudioButtons() {
-    btnMute.textContent = SFX.isMuted() ? '🔇' : '🔊';
-    const ambActive = SFX.isAmbienceOn() && !SFX.isMuted();
-    btnAmb.style.color = ambActive ? 'var(--tg-garnet-bright)' : '';
-    btnAmb.style.borderColor = ambActive ? 'var(--tg-border-garnet)' : '';
-  }
-
-  btnMute.addEventListener('click', () => {
-    SFX.toggleMute();
-    syncAudioButtons();
-  });
-
-  btnAmb.addEventListener('click', () => {
-    const on = SFX.toggleAmbience();
-    syncAudioButtons();
-    UI.toast(
-      on
-        ? I18n.t({ zh: '已开启死亡对决演播室心跳氛围音', en: 'Death Match studio heartbeat ON' })
-        : I18n.t({ zh: '已关闭演播室氛围音', en: 'Studio ambience OFF' })
-    );
   });
 
   const setSidebarCollapsed = (collapsed) => {
@@ -699,10 +866,14 @@ export function mountGame({ config, rules, root, render }) {
     SFX.play('click');
     if (latestSnap?.lobby?.phase === 'playing' || latestSnap?.lobby?.phase === 'ended') {
       const ok = await UI.confirm(
-        I18n.t({ zh: '返回对决大厅？', en: 'Return to Room Lobby?' }),
-        I18n.t({ zh: '当前对局将返回模式选择或房间大厅。', en: 'Current match view will return to the room lobby.' })
+        I18n.t({ zh: '离开当前对局？', en: 'Leave current match?' }),
+        I18n.t({
+          zh: '进度不会保留，将返回房间设置。',
+          en: "Progress won't be saved. You'll return to the room lobby.",
+        })
       );
       if (!ok) return;
+      clearClashSplash(true);
       stopParticles?.();
       stopParticles = null;
       if (engine.isHost && engine.mode === 'online') {
@@ -719,7 +890,7 @@ export function mountGame({ config, rules, root, render }) {
 
   roomChipEl.addEventListener('click', () => {
     if (engine.roomCode && engine.mode === 'online') {
-      copyInviteUrl(engine.roomCode);
+      copyInviteUrl(engine.roomCode, roomChipEl, roomCopyIconEl, roomCodeLabelEl);
     }
   });
 
@@ -731,38 +902,54 @@ export function mountGame({ config, rules, root, render }) {
     engine.sendChat(val);
   });
 
-  // Countdown ticker with progress bar
-  const timerInterval = setInterval(() => {
+  // 60fps requestAnimationFrame countdown bar drain (throttled text + SFX at 1s boundaries)
+  let timerRafId = null;
+  let timerVisible = false;
+  const tickTimerRaf = () => {
     if (!latestSnap || latestSnap.lobby.phase !== 'playing') {
-      hudTimerEl.hidden = true;
+      if (timerVisible) {
+        timerVisible = false;
+        Motion.transitionPresence(hudTimerEl, false, { preset: 'pill' });
+      }
       lastTickedSec = null;
-      return;
-    }
-    const rem = engine.getRemainingTimerMs();
-    if (rem == null) {
-      hudTimerEl.hidden = true;
-      lastTickedSec = null;
-      return;
-    }
-    hudTimerEl.hidden = false;
-    hudTimerTextEl.textContent = UI.formatTime(rem);
-    const dur = Math.max(1000, latestSnap.timer?.durationMs || 30000);
-    const ratio = Math.max(0, Math.min(1, rem / dur));
-    if (hudTimerBarEl) hudTimerBarEl.style.transform = `scaleX(${ratio})`;
+    } else {
+      const rem = engine.getRemainingTimerMs();
+      if (rem == null) {
+        if (timerVisible) {
+          timerVisible = false;
+          Motion.transitionPresence(hudTimerEl, false, { preset: 'pill' });
+        }
+        lastTickedSec = null;
+      } else {
+        if (!timerVisible) {
+          timerVisible = true;
+          Motion.transitionPresence(hudTimerEl, true, { preset: 'pill' });
+        }
+        const dur = Math.max(1000, latestSnap.timer?.durationMs || 30000);
+        const ratio = Math.max(0, Math.min(1, rem / dur));
+        if (hudTimerBarEl) hudTimerBarEl.style.transform = `scaleX(${ratio})`;
 
-    const sec = Math.ceil(rem / 1000);
-    hudTimerEl.classList.toggle('is-warn', sec <= 10 && sec > 5);
-    hudTimerEl.classList.toggle('is-urgent', sec <= 5 && sec > 0);
-    if (sec !== lastTickedSec && sec > 0) {
-      lastTickedSec = sec;
-      if (sec <= 5) SFX.play('tickUrgent');
-      else if (sec <= 10) SFX.play('tick');
+        const sec = Math.ceil(rem / 1000);
+        if (sec !== lastTickedSec) {
+          lastTickedSec = sec;
+          hudTimerTextEl.textContent = UI.formatTime(rem);
+          hudTimerEl.classList.toggle('is-warn', sec <= 10 && sec > 5);
+          hudTimerEl.classList.toggle('is-urgent', sec <= 5 && sec > 0);
+          if (sec > 0 && sec <= 5) SFX.play('tickUrgent');
+          else if (sec > 5 && sec <= 10) SFX.play('tick');
+        }
+      }
     }
-  }, 200);
+    timerRafId = requestAnimationFrame(tickTimerRaf);
+  };
+  timerRafId = requestAnimationFrame(tickTimerRaf);
 
+  // In-place VS Strip patching (zero innerHTML nuke on every turn)
   function renderVsStrip() {
     if (!latestSnap || latestSnap.lobby.phase === 'lobby') {
-      vsStripEl.hidden = true;
+      if (!vsStripEl.hidden) {
+        Motion.transitionPresence(vsStripEl, false, { preset: 'fade', duration: 150 });
+      }
       return;
     }
     const lang = I18n.getLang();
@@ -771,124 +958,135 @@ export function mountGame({ config, rules, root, render }) {
     const turnId = st.currentTurnSeatId || st.activeSeatId || st.turnSeatId || null;
     const myId = latestSnap.activeSeatId || latestSnap.mySeatId;
 
-    vsStripEl.hidden = false;
-    if (seats.length === 2) {
-      const [a, b] = seats;
-      const renderSide = (s) => {
-        const isMe = s.seatId === myId;
-        const isTurn = turnId === s.seatId && latestSnap.lobby.phase === 'playing';
-        const sub = s.isBot
-          ? difficultyLabel(s.difficulty || latestSnap.aiDifficulty, lang)
-          : !s.connected
-          ? lang === 'zh'
-            ? '离线'
-            : 'OFFLINE'
-          : isMe
-          ? lang === 'zh'
-            ? '你 · 在线'
-            : 'YOU · LIVE'
-          : lang === 'zh'
-          ? '对手 · 在线'
-          : 'OPPONENT · LIVE';
-        return `
-          <div class="tg-vs-card ${isMe ? 'is-me' : ''} ${isTurn ? 'is-turn' : ''}">
-            <span class="tg-vs-avatar">${UI.escapeHtml(s.avatar || '♦')}</span>
-            <div class="tg-vs-meta">
-              <span class="tg-vs-name">${UI.escapeHtml(s.name)}</span>
-              <span class="tg-vs-sub">${UI.escapeHtml(sub)}${isTurn ? (lang === 'zh' ? ' · 行动中' : ' · TURN') : ''}</span>
-            </div>
+    if (vsStripEl.hidden) {
+      Motion.transitionPresence(vsStripEl, true, { preset: 'fade', duration: 200 });
+    }
+
+    const seatKey = seats.map((s) => s.seatId).join('|');
+    if (vsRenderedSeatKey !== seatKey) {
+      vsRenderedSeatKey = seatKey;
+      const buildCard = (s, compact) => `
+        <div class="tg-vs-card" data-vs-seat="${UI.escapeHtml(s.seatId)}" ${compact ? 'style="min-width:128px;"' : ''}>
+          <span class="tg-vs-avatar">${UI.escapeHtml(s.avatar || '♦')}</span>
+          <div class="tg-vs-meta">
+            <span class="tg-vs-name"></span>
+            <span class="tg-vs-sub"></span>
           </div>
-        `;
-      };
-      vsStripEl.innerHTML = `${renderSide(a)}<span class="tg-vs-emblem">VS</span>${renderSide(b)}`;
-    } else {
-      vsStripEl.innerHTML = seats
-        .map((s) => {
-          const isMe = s.seatId === myId;
-          const isTurn = turnId === s.seatId && latestSnap.lobby.phase === 'playing';
-          return `
-            <div class="tg-vs-card ${isMe ? 'is-me' : ''} ${isTurn ? 'is-turn' : ''}" style="min-width:128px;">
-              <span class="tg-vs-avatar">${UI.escapeHtml(s.avatar || '♦')}</span>
-              <div class="tg-vs-meta">
-                <span class="tg-vs-name">${UI.escapeHtml(s.name)}</span>
-                <span class="tg-vs-sub">${s.isBot ? 'AI' : isMe ? (lang === 'zh' ? '你' : 'YOU') : 'LIVE'}</span>
-              </div>
-            </div>
-          `;
-        })
-        .join('');
+        </div>
+      `;
+      if (seats.length === 2) {
+        vsStripEl.innerHTML = `${buildCard(seats[0], false)}<span class="tg-vs-emblem">VS</span>${buildCard(seats[1], false)}`;
+      } else {
+        vsStripEl.innerHTML = seats.map((s) => buildCard(s, true)).join('');
+      }
+    }
+
+    for (const s of seats) {
+      const card = vsStripEl.querySelector(`[data-vs-seat="${CSS.escape(s.seatId)}"]`);
+      if (!card) continue;
+      const isMe = s.seatId === myId;
+      const isTurn = turnId === s.seatId && latestSnap.lobby.phase === 'playing';
+      card.classList.toggle('is-me', isMe);
+      card.classList.toggle('is-turn', isTurn);
+      const nameEl = card.querySelector('.tg-vs-name');
+      const subEl = card.querySelector('.tg-vs-sub');
+      if (nameEl) nameEl.textContent = s.name;
+      if (subEl) {
+        if (seats.length === 2) {
+          const base = s.isBot
+            ? difficultyLabel(s.difficulty || latestSnap.aiDifficulty, lang)
+            : !s.connected
+            ? lang === 'zh' ? '已断开' : 'Offline'
+            : isMe
+            ? lang === 'zh' ? '你' : 'You'
+            : lang === 'zh' ? '对手' : 'Rival';
+          subEl.textContent = isTurn ? `${base} · ${lang === 'zh' ? '行动中' : 'Turn'}` : base;
+        } else {
+          subEl.textContent = s.isBot ? 'AI' : isMe ? (lang === 'zh' ? '你' : 'You') : 'Live';
+        }
+      }
     }
   }
 
+  let prevTelemetryVisible = false;
+  let prevStakesVisible = false;
+  let prevRoomChipVisible = false;
+
   function renderHudAndSidebar() {
     const lang = I18n.getLang();
+    const isZh = lang === 'zh';
     hudTitleEl.textContent = I18n.t(config.title);
     if (config.title?.ko) hudTitleEl.title = `${I18n.t(config.title)} (${config.title.ko})`;
     if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
-    container.querySelector('[data-i18n-hub]').textContent = lang === 'zh' ? '殿堂' : 'Arena';
-    container.querySelector('#tg-btn-lobby').textContent = lang === 'zh' ? '房间' : 'Room';
-    container.querySelector('#tg-roster-heading').textContent = lang === 'zh' ? '参赛者席位' : 'CONTESTANTS';
-    container.querySelector('#tg-feed-heading').textContent = lang === 'zh' ? '演播室实况 & 对话' : 'BROADCAST LOG & CHAT';
-    chatInputEl.placeholder = lang === 'zh' ? '发送战局消息...' : 'Send message...';
-    syncAudioButtons();
+    container.querySelector('[data-i18n-hub]').textContent = isZh ? '殿堂' : 'Arena';
+    container.querySelector('#tg-btn-lobby').textContent = isZh ? '房间' : 'Room';
+    container.querySelector('#tg-roster-heading').textContent = isZh ? '参赛者席位' : 'CONTESTANTS';
+    container.querySelector('#tg-feed-heading').textContent = isZh ? '演播室实况 & 对话' : 'BROADCAST LOG & CHAT';
+    chatInputEl.placeholder = isZh ? '发送战局消息...' : 'Send message...';
+    syncThemeAndAudioIcons(false);
 
-    // Telemetry (Round / Phase) + Stakes
+    // Telemetry pill
     const st = latestSnap?.state || {};
     const roundNum = customTelemetry?.round ?? st.round ?? st.turn ?? null;
     const phaseText = customTelemetry?.phase ?? st.phaseLabel ?? null;
-    if (latestSnap?.lobby?.phase === 'playing' && (roundNum != null || phaseText)) {
+    const showTel = Boolean(latestSnap?.lobby?.phase === 'playing' && (roundNum != null || phaseText));
+    if (showTel) {
       const parts = [];
-      if (roundNum != null) parts.push(lang === 'zh' ? `第 ${roundNum} 回合` : `R${roundNum}`);
+      if (roundNum != null) parts.push(isZh ? `第 ${roundNum} 回合` : `R${roundNum}`);
       if (phaseText) parts.push(typeof phaseText === 'object' ? I18n.t(phaseText) : String(phaseText));
       hudTelemetryEl.textContent = parts.join(' · ');
-      hudTelemetryEl.hidden = false;
-    } else {
-      hudTelemetryEl.hidden = true;
+    }
+    if (showTel !== prevTelemetryVisible) {
+      prevTelemetryVisible = showTel;
+      Motion.transitionPresence(hudTelemetryEl, showTel, { preset: 'pill' });
     }
 
+    // Stakes pill
     const stakes = customTelemetry?.stakes ?? config.stakes ?? (latestSnap?.lobby?.phase === 'playing' ? 2 : null);
-    if (stakes != null && latestSnap?.lobby?.phase === 'playing') {
-      hudStakesEl.innerHTML = UI.renderGarnetBadge(stakes);
-      hudStakesEl.hidden = false;
-    } else {
-      hudStakesEl.hidden = true;
+    const showStakes = Boolean(stakes != null && latestSnap?.lobby?.phase === 'playing');
+    if (showStakes) hudStakesEl.innerHTML = UI.renderGarnetBadge(stakes);
+    if (showStakes !== prevStakesVisible) {
+      prevStakesVisible = showStakes;
+      Motion.transitionPresence(hudStakesEl, showStakes, { preset: 'pill' });
     }
 
     // Room code chip
-    if (latestSnap && engine.mode === 'online' && engine.roomCode) {
-      roomChipEl.hidden = false;
+    const showChip = Boolean(latestSnap && engine.mode === 'online' && engine.roomCode);
+    if (showChip && !roomCopyTimer) {
       roomCodeLabelEl.textContent = formatRoomCodeDisplay(engine.roomCode);
-    } else {
-      roomChipEl.hidden = true;
+    }
+    if (showChip !== prevRoomChipVisible) {
+      prevRoomChipVisible = showChip;
+      Motion.transitionPresence(roomChipEl, showChip, { preset: 'pill' });
     }
 
-    // Connection pill
+    // Refined Connection Pill copy (Section 5)
     const tr = latestSnap?.transportStatus || { state: 'idle', transport: 'none' };
     connPillEl.className = 'tg-conn-pill';
     if (!latestSnap) {
-      connTextEl.textContent = lang === 'zh' ? '待命中' : 'STANDBY';
+      connTextEl.textContent = isZh ? '就绪' : 'Ready';
     } else if (engine.mode === 'solo') {
       connPillEl.classList.add('is-live');
       connTextEl.textContent = difficultyLabel(latestSnap.aiDifficulty, lang);
     } else if (engine.mode === 'hotseat') {
       connPillEl.classList.add('is-live');
-      connTextEl.textContent = lang === 'zh' ? '本地传屏' : 'HOTSEAT';
+      connTextEl.textContent = isZh ? '本地同屏' : 'Hotseat';
     } else if (tr.state === 'connected') {
       if (tr.transport === 'peerjs') {
         connPillEl.classList.add('is-live');
-        connTextEl.textContent = 'LIVE · P2P';
+        connTextEl.textContent = isZh ? '联机 · 直连' : 'Live · P2P';
       } else if (tr.transport === 'mqtt') {
         connPillEl.classList.add('is-relay');
-        connTextEl.textContent = 'LIVE · RELAY';
+        connTextEl.textContent = isZh ? '联机 · 中继' : 'Live · Relay';
       } else {
         connPillEl.classList.add('is-live');
-        connTextEl.textContent = 'LIVE · TAB';
+        connTextEl.textContent = isZh ? '联机 · 同浏览器' : 'Live · Tab';
       }
     } else if (tr.state === 'connecting' || tr.state === 'reconnecting') {
       connPillEl.classList.add('is-warn');
-      connTextEl.textContent = lang === 'zh' ? '连接中...' : 'SYNCING...';
+      connTextEl.textContent = isZh ? '连接中' : 'Connecting';
     } else {
-      connTextEl.textContent = lang === 'zh' ? '已断开' : 'OFFLINE';
+      connTextEl.textContent = isZh ? '已断开' : 'Offline';
     }
 
     // Roster
@@ -899,13 +1097,13 @@ export function mountGame({ config, rules, root, render }) {
       .map((s) => {
         const isMe = s.seatId === (latestSnap?.activeSeatId || latestSnap?.mySeatId);
         const statusTag = s.isBot
-          ? `<span style="color:var(--tg-cyan);font-size:11px;">AI</span>`
+          ? `<span style="color:var(--tg-cyan-ink);font-size:11px;">AI</span>`
           : !s.connected
-          ? `<span style="color:var(--tg-amber);font-size:11px;">${lang === 'zh' ? '掉线' : 'OFF'}</span>`
+          ? `<span style="color:var(--tg-amber);font-size:11px;">${isZh ? '离线' : 'Off'}</span>`
           : `<span style="color:var(--tg-emerald);font-size:11px;">●</span>`;
         const renameBtn =
           isMe && !s.isBot
-            ? `<button type="button" class="tg-inline-edit-btn" data-rename-me title="${lang === 'zh' ? '修改代号' : 'Rename'}">✎</button>`
+            ? `<button type="button" class="tg-inline-edit-btn" data-rename-me title="${isZh ? '修改代号' : 'Rename'}">✎</button>`
             : '';
         const takeoverBtn =
           engine.isHost && !s.isBot && !s.connected && latestSnap?.lobby?.phase === 'playing'
@@ -915,7 +1113,7 @@ export function mountGame({ config, rules, root, render }) {
           <div class="tg-roster-row ${isMe ? 'is-me' : ''} ${!s.connected ? 'is-offline' : ''}">
             <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               <span style="color:var(--tg-gold);margin-right:5px;">${UI.escapeHtml(s.avatar || '♦')}</span>
-              ${UI.escapeHtml(s.name)}${isMe ? (lang === 'zh' ? ' (你)' : ' (You)') : ''}
+              ${UI.escapeHtml(s.name)}${isMe ? (isZh ? ' (你)' : ' (You)') : ''}
             </span>
             <span style="display:flex;align-items:center;gap:6px;">${renameBtn}${takeoverBtn}${statusTag}</span>
           </div>
@@ -936,54 +1134,85 @@ export function mountGame({ config, rules, root, render }) {
     renderVsStrip();
   }
 
+  // Interruptible Slide-in Rules Drawer with Escape support
+  let drawerEscapeBound = false;
+  const onDrawerKey = (e) => {
+    if (e.key === 'Escape' && rulesOpen) {
+      rulesOpen = false;
+      renderDrawer();
+    }
+  };
+
   function renderDrawer() {
+    let backdrop = drawerRoot.querySelector('#tg-drawer-backdrop');
     if (!rulesOpen) {
-      drawerRoot.innerHTML = '';
+      if (drawerEscapeBound) {
+        document.removeEventListener('keydown', onDrawerKey);
+        drawerEscapeBound = false;
+      }
+      if (backdrop) {
+        Motion.transitionPresence(backdrop, false, {
+          preset: 'drawer-right',
+          removeOnExit: true,
+        });
+      }
       return;
     }
-    const lang = I18n.getLang();
+
     const md =
       I18n.t(config.rulesSummary) ||
       I18n.t({ zh: '暂无规则说明。', en: 'No rules description provided.' });
-    drawerRoot.innerHTML = `
-      <div class="tg-drawer-backdrop" id="tg-drawer-backdrop">
-        <div class="tg-drawer" role="dialog" aria-modal="true">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
-            <div>
-              <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)} · DEATH MATCH</span>
-              <h2 class="tg-modal-title" style="font-size:20px;">${UI.escapeHtml(I18n.t(config.title))}</h2>
-              ${config.title?.ko ? `<div style="font-size:12px;color:var(--tg-ink-faint);">${UI.escapeHtml(config.title.ko)}</div>` : ''}
+
+    if (!backdrop) {
+      drawerRoot.innerHTML = `
+        <div class="tg-drawer-backdrop" id="tg-drawer-backdrop" hidden>
+          <div class="tg-drawer" role="dialog" aria-modal="true">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+              <div>
+                <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)} · DEATH MATCH</span>
+                <h2 class="tg-modal-title" id="tg-drawer-title" style="font-size:20px;"></h2>
+                ${config.title?.ko ? `<div style="font-size:12px;color:var(--tg-ink-faint);">${UI.escapeHtml(config.title.ko)}</div>` : ''}
+              </div>
+              <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-drawer-close" aria-label="Close">✕</button>
             </div>
-            <button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" id="tg-drawer-close">✕</button>
+            <div class="tg-prose" id="tg-drawer-prose"></div>
           </div>
-          <div class="tg-prose">${renderMiniMarkdown(md)}</div>
         </div>
-      </div>
-    `;
-    drawerRoot.querySelector('#tg-drawer-close')?.addEventListener('click', () => {
-      rulesOpen = false;
-      renderDrawer();
-    });
-    drawerRoot.querySelector('#tg-drawer-backdrop')?.addEventListener('click', (e) => {
-      if (e.target.id === 'tg-drawer-backdrop') {
+      `;
+      backdrop = drawerRoot.querySelector('#tg-drawer-backdrop');
+      backdrop.querySelector('#tg-drawer-close')?.addEventListener('click', () => {
         rulesOpen = false;
         renderDrawer();
-      }
-    });
+      });
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) {
+          rulesOpen = false;
+          renderDrawer();
+        }
+      });
+    }
+
+    backdrop.querySelector('#tg-drawer-title').textContent = I18n.t(config.title);
+    backdrop.querySelector('#tg-drawer-prose').innerHTML = renderMiniMarkdown(md);
+    if (!drawerEscapeBound) {
+      document.addEventListener('keydown', onDrawerKey);
+      drawerEscapeBound = true;
+    }
+    Motion.transitionPresence(backdrop, true, { preset: 'drawer-right' });
   }
 
   function renderDifficultySelector(selected, lang) {
     const items = [
       { id: 'easy', zh: '入门 Easy', en: 'Easy', subZh: '轻松热身', subEn: 'Casual pace' },
       { id: 'genius', zh: '天才 Genius', en: 'Genius', subZh: '节目水准', subEn: 'Broadcast level' },
-      { id: 'grand_final', zh: '总决赛 Grand Final', en: 'Grand Final', subZh: '张东民/洪榛浩级', subEn: 'Champion mind' },
+      { id: 'grand_final', zh: '总决赛 Grand Final', en: 'Grand Final', subZh: '冠军级博弈', subEn: 'Champion mind' },
     ];
     return `
       <div style="margin-bottom:12px;">
         <div style="font-size:12px;color:var(--tg-ink-muted);margin-bottom:6px;">
-          ${lang === 'zh' ? 'AI 智能难度' : 'AI Opponent Difficulty'}
+          ${lang === 'zh' ? 'AI 智能难度' : 'AI Difficulty'}
         </div>
-        <div class="tg-diff-grid">
+        <div class="tg-diff-grid" id="tg-diff-grid">
           ${items
             .map(
               (it) => `
@@ -1048,153 +1277,196 @@ export function mountGame({ config, rules, root, render }) {
     });
   }
 
+  function closeOverlay() {
+    currentOverlayKind = null;
+    stopParticles?.();
+    stopParticles = null;
+    const backdrop = overlayRoot.querySelector('.tg-modal-backdrop');
+    const canvas = overlayRoot.querySelector('.tg-verdict-canvas');
+    if (canvas) canvas.remove();
+    if (backdrop) {
+      Motion.transitionPresence(backdrop, false, {
+        preset: 'modal',
+        removeOnExit: true,
+      });
+    } else {
+      overlayRoot.innerHTML = '';
+    }
+  }
+
+  function ensureModalShell(kind, extraModalClass = '') {
+    let backdrop = overlayRoot.querySelector('.tg-modal-backdrop');
+    let modal = overlayRoot.querySelector('.tg-modal');
+    const freshlyMounted = !backdrop || !modal || currentOverlayKind !== kind;
+    if (freshlyMounted) {
+      overlayRoot.innerHTML = `
+        <div class="tg-modal-backdrop" hidden>
+          <div class="tg-modal ${extraModalClass}" role="dialog" aria-modal="true"></div>
+        </div>
+      `;
+      backdrop = overlayRoot.querySelector('.tg-modal-backdrop');
+      modal = overlayRoot.querySelector('.tg-modal');
+      currentOverlayKind = kind;
+    } else if (extraModalClass) {
+      modal.className = `tg-modal ${extraModalClass}`;
+    }
+    return { backdrop, modal, freshlyMounted };
+  }
+
   function renderLobbyOverlay() {
     const lang = I18n.getLang();
+    const isZh = lang === 'zh';
     const minP = config.minPlayers || 2;
     const maxP = config.maxPlayers || 2;
     const inOnlineLobby =
       lobbyOnlineJoined && latestSnap && engine.mode === 'online' && latestSnap.lobby.phase === 'lobby';
 
     if (inOnlineLobby) {
+      const { backdrop, modal, freshlyMounted } = ensureModalShell('lobby-room');
       const lobby = latestSnap.lobby;
       const mySeat = lobby.seats.find((s) => s.seatId === latestSnap.mySeatId);
       const canStart = engine.isHost && lobby.seats.length >= minP;
-      overlayRoot.innerHTML = `
-        <div class="tg-modal-backdrop">
-          <div class="tg-modal">
-            <div class="tg-modal-header">
-              <div>
-                <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)} · DEATH MATCH</span>
-                <h2 class="tg-modal-title">${UI.escapeHtml(I18n.t(config.title))}</h2>
-              </div>
-              <button type="button" class="tg-room-chip" id="tg-lobby-copy-link" style="font-size:14px;padding:7px 14px;">
-                ${UI.escapeHtml(formatRoomCodeDisplay(engine.roomCode))} ⧉
-              </button>
-            </div>
 
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 12px;border-radius:10px;background:rgba(217,27,58,0.1);border:1px solid var(--tg-border-garnet);margin-bottom:14px;">
-              <span style="font-size:12.5px;color:var(--tg-ink-muted);">
-                ${lang === 'zh' ? '分享邀请链接或房间码给好友，支持 WebRTC P2P 与自动中继联机' : 'Share invite link or room code — zero-install P2P + automatic WSS relay'}
-              </span>
-              <button type="button" class="tg-btn tg-btn-sm tg-btn-gold" id="tg-lobby-share-btn">
-                ${lang === 'zh' ? '复制邀请链接' : 'Copy Invite Link'}
-              </button>
-            </div>
+      modal.innerHTML = `
+        <div class="tg-modal-header">
+          <div>
+            <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)} · DEATH MATCH</span>
+            <h2 class="tg-modal-title">${UI.escapeHtml(I18n.t(config.title))}</h2>
+          </div>
+          <button type="button" class="tg-room-chip" id="tg-lobby-copy-link" style="font-size:14px;padding:7px 14px;">
+            <span id="tg-lobby-code-text">${UI.escapeHtml(formatRoomCodeDisplay(engine.roomCode))}</span>
+            <span class="tg-icon-slot" id="tg-lobby-copy-icon">${ICONS.copy}</span>
+          </button>
+        </div>
 
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:12px;letter-spacing:0.08em;color:var(--tg-gold);font-weight:700;">
-                ${lang === 'zh' ? `参赛席位 (${lobby.seats.length}/${maxP})` : `SEATS (${lobby.seats.length}/${maxP})`}
-              </span>
-              ${
-                engine.isHost && lobby.seats.length < maxP
-                  ? `<button type="button" class="tg-btn tg-btn-sm" id="tg-lobby-add-bot">+ ${lang === 'zh' ? '添加 AI 对手' : 'Add AI Bot'}</button>`
-                  : ''
-              }
-            </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 12px;border-radius:10px;background:var(--tg-garnet-soft);border:1px solid var(--tg-border-garnet);margin-bottom:14px;">
+          <span style="font-size:12.5px;color:var(--tg-ink-muted);">
+            ${isZh ? '发送房间码或链接给好友即可即时开战' : 'Share the room code or link to invite a rival.'}
+          </span>
+          <button type="button" class="tg-btn tg-btn-sm tg-btn-gold" id="tg-lobby-share-btn">
+            ${isZh ? '复制邀请链接' : 'Copy Invite Link'}
+          </button>
+        </div>
 
-            <div class="tg-seat-grid">
-              ${lobby.seats
-                .map((s, idx) => {
-                  const isMine = s.seatId === latestSnap.mySeatId && !s.isBot;
-                  return `
-                    <div class="tg-seat-card ${s.ready ? 'is-ready' : ''} ${s.isBot ? 'is-bot' : ''}">
-                      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        <strong style="color:var(--tg-gold);margin-right:4px;">${UI.escapeHtml(s.avatar || '♦')}</strong>
-                        ${UI.escapeHtml(s.name)}
-                        ${idx === 0 ? `<small style="color:var(--tg-gold);"> ★</small>` : ''}
-                      </span>
-                      <span style="display:flex;align-items:center;gap:6px;">
-                        ${isMine ? `<button type="button" class="tg-inline-edit-btn" id="tg-lobby-rename-me">✎</button>` : ''}
-                        <span style="font-size:11px;color:${s.ready ? 'var(--tg-emerald)' : 'var(--tg-ink-faint)'};">
-                          ${s.isBot ? 'AI' : s.ready ? (lang === 'zh' ? '就绪' : 'READY') : (lang === 'zh' ? '等待' : 'WAIT')}
-                        </span>
-                        ${
-                          engine.isHost && idx > 0
-                            ? `<button type="button" data-rm-seat="${UI.escapeHtml(s.seatId)}" style="color:var(--tg-ink-faint);font-size:12px;">✕</button>`
-                            : ''
-                        }
-                      </span>
-                    </div>
-                  `;
-                })
-                .join('')}
-            </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;letter-spacing:0.08em;color:var(--tg-gold);font-weight:700;">
+            ${isZh ? `参赛席位 (${lobby.seats.length}/${maxP})` : `SEATS (${lobby.seats.length}/${maxP})`}
+          </span>
+          ${
+            engine.isHost && lobby.seats.length < maxP
+              ? `<button type="button" class="tg-btn tg-btn-sm" id="tg-lobby-add-bot">+ ${isZh ? '添加 AI 对手' : 'Add AI Bot'}</button>`
+              : ''
+          }
+        </div>
 
+        <div class="tg-seat-grid">
+          ${lobby.seats
+            .map((s, idx) => {
+              const isMine = s.seatId === latestSnap.mySeatId && !s.isBot;
+              return `
+                <div class="tg-seat-card ${s.ready ? 'is-ready' : ''} ${s.isBot ? 'is-bot' : ''}">
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    <strong style="color:var(--tg-gold);margin-right:4px;">${UI.escapeHtml(s.avatar || '♦')}</strong>
+                    ${UI.escapeHtml(s.name)}
+                    ${idx === 0 ? `<small style="color:var(--tg-gold);"> ★</small>` : ''}
+                  </span>
+                  <span style="display:flex;align-items:center;gap:6px;">
+                    ${isMine ? `<button type="button" class="tg-inline-edit-btn" id="tg-lobby-rename-me">✎</button>` : ''}
+                    <span style="font-size:11px;color:${s.ready ? 'var(--tg-emerald-ink)' : 'var(--tg-ink-faint)'};">
+                      ${s.isBot ? 'AI' : s.ready ? (isZh ? '就绪' : 'Ready') : (isZh ? '等待' : 'Wait')}
+                    </span>
+                    ${
+                      engine.isHost && idx > 0
+                        ? `<button type="button" data-rm-seat="${UI.escapeHtml(s.seatId)}" style="color:var(--tg-ink-faint);font-size:12px;">✕</button>`
+                        : ''
+                    }
+                  </span>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+
+        ${
+          lobby.spectators?.length
+            ? `<div style="font-size:12px;color:var(--tg-ink-muted);margin-bottom:10px;">${isZh ? '观战席' : 'Spectators'}: ${lobby.spectators.map((x) => UI.escapeHtml(x.name)).join(', ')}</div>`
+            : ''
+        }
+
+        ${engine.isHost ? renderDifficultySelector(lobby.aiDifficulty || 'genius', lang) : ''}
+        ${engine.isHost ? renderOptionsFields(lobby.options) : ''}
+
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;">
+          <button type="button" class="tg-btn tg-btn-ghost" id="tg-lobby-leave">
+            ← ${isZh ? '离开房间' : 'Leave Room'}
+          </button>
+          <div style="display:flex;gap:10px;">
             ${
-              lobby.spectators?.length
-                ? `<div style="font-size:12px;color:var(--tg-ink-muted);margin-bottom:10px;">${lang === 'zh' ? '观战席' : 'Spectators'}: ${lobby.spectators.map((x) => UI.escapeHtml(x.name)).join(', ')}</div>`
+              !engine.isHost && mySeat
+                ? `<button type="button" class="tg-btn ${mySeat.ready ? '' : 'tg-btn-gold'}" id="tg-lobby-ready">${
+                    mySeat.ready
+                      ? isZh ? '取消准备' : 'Unready'
+                      : isZh ? '准备就绪' : 'Ready Up'
+                  }</button>`
                 : ''
             }
-
-            ${engine.isHost ? renderDifficultySelector(lobby.aiDifficulty || 'genius', lang) : ''}
-            ${engine.isHost ? renderOptionsFields(lobby.options) : ''}
-
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;">
-              <button type="button" class="tg-btn tg-btn-ghost" id="tg-lobby-leave">
-                ← ${lang === 'zh' ? '离开房间' : 'Leave Room'}
-              </button>
-              <div style="display:flex;gap:10px;">
-                ${
-                  !engine.isHost && mySeat
-                    ? `<button type="button" class="tg-btn ${mySeat.ready ? '' : 'tg-btn-gold'}" id="tg-lobby-ready">${
-                        mySeat.ready
-                          ? lang === 'zh' ? '取消准备' : 'Unready'
-                          : lang === 'zh' ? '点击准备' : 'Ready Up'
-                      }</button>`
-                    : ''
-                }
-                ${
-                  engine.isHost
-                    ? `<button type="button" class="tg-btn tg-btn-garnet" id="tg-lobby-start" ${canStart ? '' : 'disabled'}>${
-                        canStart
-                          ? lang === 'zh' ? '开启死亡对决 →' : 'Start Death Match →'
-                          : lang === 'zh' ? `至少需要 ${minP} 名玩家` : `Need at least ${minP} players`
-                      }</button>`
-                    : `<span style="font-size:12.5px;color:var(--tg-ink-muted);align-self:center;">${
-                        latestSnap.isSpectator
-                          ? lang === 'zh' ? '观战模式 · 等待房主开始...' : 'Spectating · Waiting...'
-                          : lang === 'zh' ? '等待房主开启对决...' : 'Waiting for host...'
-                      }</span>`
-                }
-              </div>
-            </div>
+            ${
+              engine.isHost
+                ? `<button type="button" class="tg-btn tg-btn-garnet" id="tg-lobby-start" ${canStart ? '' : 'disabled'}>${
+                    canStart
+                      ? isZh ? '开始对决' : 'Start Match'
+                      : isZh ? `至少需要 ${minP} 名玩家` : `Need ${minP} players`
+                  }</button>`
+                : `<span style="font-size:12.5px;color:var(--tg-ink-muted);align-self:center;">${
+                    latestSnap.isSpectator
+                      ? isZh ? '观战中 · 等待房主开局' : 'Spectating · Waiting for host'
+                      : isZh ? '等待房主开始对决' : 'Waiting for host to start'
+                  }</span>`
+            }
           </div>
         </div>
       `;
 
-      overlayRoot.querySelector('#tg-lobby-copy-link')?.addEventListener('click', () => copyInviteUrl(engine.roomCode));
-      overlayRoot.querySelector('#tg-lobby-share-btn')?.addEventListener('click', () => copyInviteUrl(engine.roomCode));
-      overlayRoot.querySelector('#tg-lobby-rename-me')?.addEventListener('click', () => {
+      if (freshlyMounted) Motion.transitionPresence(backdrop, true, { preset: 'modal' });
+
+      const copyBtn = modal.querySelector('#tg-lobby-copy-link');
+      const copyIcon = modal.querySelector('#tg-lobby-copy-icon');
+      const copyText = modal.querySelector('#tg-lobby-code-text');
+      copyBtn?.addEventListener('click', () => copyInviteUrl(engine.roomCode, copyBtn, copyIcon, copyText));
+      modal.querySelector('#tg-lobby-share-btn')?.addEventListener('click', (e) =>
+        copyInviteUrl(engine.roomCode, e.currentTarget, copyIcon, copyText)
+      );
+      modal.querySelector('#tg-lobby-rename-me')?.addEventListener('click', () => {
         SFX.play('click');
         openRenameModal();
       });
-      overlayRoot.querySelector('#tg-lobby-add-bot')?.addEventListener('click', () => {
+      modal.querySelector('#tg-lobby-add-bot')?.addEventListener('click', () => {
         SFX.play('click');
         engine.addBot(lang);
       });
-      overlayRoot.querySelectorAll('[data-rm-seat]').forEach((btn) => {
+      modal.querySelectorAll('[data-rm-seat]').forEach((btn) => {
         btn.addEventListener('click', () => {
           SFX.play('click');
           engine.removeSeat(btn.dataset.rmSeat);
         });
       });
-      overlayRoot.querySelectorAll('[data-diff]').forEach((btn) => {
+      modal.querySelectorAll('[data-diff]').forEach((btn) => {
         btn.addEventListener('click', () => {
           SFX.play('click');
           engine.setAiDifficulty(btn.dataset.diff);
         });
       });
-      if (engine.isHost) bindOptionsFields(overlayRoot, lobby.options, (k, v) => engine.setOption(k, v));
-      overlayRoot.querySelector('#tg-lobby-ready')?.addEventListener('click', () => {
+      if (engine.isHost) bindOptionsFields(modal, lobby.options, (k, v) => engine.setOption(k, v));
+      modal.querySelector('#tg-lobby-ready')?.addEventListener('click', () => {
         SFX.play('click');
         engine.setReady(!mySeat.ready);
       });
-      overlayRoot.querySelector('#tg-lobby-start')?.addEventListener('click', () => {
+      modal.querySelector('#tg-lobby-start')?.addEventListener('click', () => {
         SFX.play('click');
         const res = engine.startMatch();
         if (!res.ok) UI.toast(res.reason, 'error');
       });
-      overlayRoot.querySelector('#tg-lobby-leave')?.addEventListener('click', () => {
+      modal.querySelector('#tg-lobby-leave')?.addEventListener('click', () => {
         SFX.play('click');
         engine.destroy();
         lobbyOnlineJoined = false;
@@ -1205,286 +1477,335 @@ export function mountGame({ config, rules, root, render }) {
       return;
     }
 
-    const defaultNick = playerNameInput || (lang === 'zh' ? '挑战者' : 'Challenger');
+    // Entry Mode Selection Modal — preserves outer modal container while patching inner body!
+    const { backdrop, modal, freshlyMounted } = ensureModalShell('lobby-entry');
+    const defaultNick = playerNameInput || (isZh ? '挑战者' : 'Challenger');
     const vault = GarnetVault.get();
-    overlayRoot.innerHTML = `
-      <div class="tg-modal-backdrop">
-        <div class="tg-modal">
-          <div class="tg-modal-header">
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)} · DEATH MATCH</span>
-                ${UI.renderGarnetBadge(vault.garnets)}
-              </div>
-              <h2 class="tg-modal-title">${UI.escapeHtml(I18n.t(config.title))}</h2>
-              ${config.title?.ko ? `<div style="font-size:12px;color:var(--tg-ink-faint);margin-top:2px;">${UI.escapeHtml(config.title.ko)}</div>` : ''}
-            </div>
-            <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost" id="tg-entry-rules">
-              ${lang === 'zh' ? '查看规则' : 'Rules'}
-            </button>
-          </div>
 
-          <div class="tg-mode-tabs" role="tablist">
-            <button type="button" class="tg-mode-tab ${lobbyTab === 'solo' ? 'is-active' : ''}" data-tab="solo">
-              <strong>${lang === 'zh' ? '单人 vs 天才 AI' : 'Solo vs AI'}</strong>
-              <span>${lang === 'zh' ? '即刻开局 · 三档智能' : 'Instant · 3 AI tiers'}</span>
-            </button>
-            <button type="button" class="tg-mode-tab ${lobbyTab === 'online' ? 'is-active' : ''}" data-tab="online">
-              <strong>${lang === 'zh' ? '在线联机对决' : 'Online Room'}</strong>
-              <span>${lang === 'zh' ? '房间码邀请 · 实时同步' : 'Room code · Live sync'}</span>
-            </button>
-            <button type="button" class="tg-mode-tab ${lobbyTab === 'hotseat' ? 'is-active' : ''}" data-tab="hotseat">
-              <strong>${lang === 'zh' ? '本地传屏对战' : 'Pass & Play'}</strong>
-              <span>${lang === 'zh' ? '同设备对战 · 加内特护盾' : 'Same device · Shielded'}</span>
-            </button>
-          </div>
-
-          <div style="margin-bottom:14px;">
-            <label style="display:block;font-size:12px;color:var(--tg-ink-muted);margin-bottom:5px;">
-              ${lang === 'zh' ? '你的参赛代号' : 'Your Contestant Name'}
-            </label>
-            <input class="tg-input" id="tg-name-input" type="text" maxlength="20" value="${UI.escapeHtml(playerNameInput)}" placeholder="${UI.escapeHtml(defaultNick)}" />
-          </div>
-
+    const buildBodyHtml = () => {
+      if (lobbyTab === 'solo') {
+        return `
+          ${renderDifficultySelector(aiDifficulty, lang)}
           ${
-            lobbyTab === 'solo'
+            maxP > minP
               ? `
-                ${renderDifficultySelector(aiDifficulty, lang)}
-                ${
-                  maxP > minP
-                    ? `
-                      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-                        <label style="font-size:13.5px;color:var(--tg-ink-muted);">
-                          ${lang === 'zh' ? `总参赛人数 (${minP}–${maxP} 人)` : `Total Players (${minP}–${maxP})`}
-                        </label>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                          <button type="button" class="tg-btn tg-btn-icon" id="tg-solo-dec">−</button>
-                          <span style="font-family:var(--tg-font-mono);font-size:18px;font-weight:700;min-width:28px;text-align:center;color:var(--tg-gold-bright);">${soloCount}</span>
-                          <button type="button" class="tg-btn tg-btn-icon" id="tg-solo-inc">+</button>
-                        </div>
-                      </div>
-                    `
-                    : ''
-                }
-                ${renderOptionsFields(localOptions)}
-                <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-                  <a class="tg-btn tg-btn-ghost" href="../../">← ${lang === 'zh' ? '返回对决殿堂' : 'Back to Arena'}</a>
-                  <button type="button" class="tg-btn tg-btn-garnet" id="tg-start-solo" style="min-width:200px;min-height:44px;">
-                    ${lang === 'zh' ? '踏入死亡对决 →' : 'Enter Death Match →'}
-                  </button>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+                  <label style="font-size:13.5px;color:var(--tg-ink-muted);">
+                    ${isZh ? `总参赛人数 (${minP}–${maxP} 人)` : `Total Players (${minP}–${maxP})`}
+                  </label>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <button type="button" class="tg-btn tg-btn-icon" id="tg-solo-dec">−</button>
+                    <span style="font-family:var(--tg-font-mono);font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;min-width:28px;text-align:center;color:var(--tg-gold-bright);">${soloCount}</span>
+                    <button type="button" class="tg-btn tg-btn-icon" id="tg-solo-inc">+</button>
+                  </div>
                 </div>
               `
-              : lobbyTab === 'online'
-              ? `
-                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;">
-                  <div style="padding:14px;border-radius:12px;border:1px solid var(--tg-border-garnet);background:rgba(217,27,58,0.08);">
-                    <div style="font-weight:700;margin-bottom:6px;">${lang === 'zh' ? '创建联机对决房' : 'Create Arena Room'}</div>
-                    <p style="font-size:12px;color:var(--tg-ink-muted);margin:0 0 12px;">
-                      ${lang === 'zh' ? '生成 TGM 房间码与邀请链接，支持好友实时对战或观战。' : 'Generate a TGM room code & invite link for live play or spectating.'}
-                    </p>
-                    <button type="button" class="tg-btn tg-btn-garnet" id="tg-create-room" style="width:100%;" ${lobbyBusy ? 'disabled' : ''}>
-                      ${lobbyBusy ? (lang === 'zh' ? '开启中...' : 'Opening...') : (lang === 'zh' ? '创建对决房间' : 'Create Online Room')}
-                    </button>
-                  </div>
-                  <div style="padding:14px;border-radius:12px;border:1px solid var(--tg-border);background:rgba(255,255,255,0.025);">
-                    <div style="font-weight:700;margin-bottom:6px;">${lang === 'zh' ? '输入房间码加入' : 'Join Existing Room'}</div>
-                    <input class="tg-input tg-input-mono" id="tg-join-code" maxlength="10" value="${UI.escapeHtml(roomCodeInput)}" placeholder="TGM-K7M4P" style="margin-bottom:10px;" />
-                    <div style="display:flex;gap:8px;">
-                      <button type="button" class="tg-btn tg-btn-gold" id="tg-join-room" style="flex:1;" ${lobbyBusy ? 'disabled' : ''}>
-                        ${lobbyBusy ? '...' : (lang === 'zh' ? '加入对决' : 'Join')}
-                      </button>
-                      <button type="button" class="tg-btn tg-btn-ghost" id="tg-join-spec" ${lobbyBusy ? 'disabled' : ''}>
-                        ${lang === 'zh' ? '观战' : 'Watch'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                ${
-                  lobbyError
-                    ? `<div style="margin-top:12px;padding:9px 12px;border-radius:8px;background:rgba(217,27,58,0.18);border:1px solid rgba(255,46,84,0.55);color:#ffb3c1;font-size:12.5px;">${UI.escapeHtml(lobbyError)}</div>`
-                    : ''
-                }
-              `
-              : `
-                <div style="margin-bottom:10px;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                    <span style="font-size:12.5px;color:var(--tg-ink-muted);">${lang === 'zh' ? '本地真人参赛者' : 'Local Human Players'}</span>
-                    <div style="display:flex;gap:6px;">
-                      <button type="button" class="tg-btn tg-btn-sm" id="tg-hs-add" ${hotseatNames.length + hotseatBots >= maxP ? 'disabled' : ''}>+ ${lang === 'zh' ? '真人' : 'Human'}</button>
-                      <button type="button" class="tg-btn tg-btn-sm" id="tg-hs-add-bot" ${hotseatNames.length + hotseatBots >= maxP ? 'disabled' : ''}>+ AI (${hotseatBots})</button>
-                    </div>
-                  </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                    ${hotseatNames
-                      .map(
-                        (nm, idx) => `
-                        <div style="display:flex;gap:6px;">
-                          <input class="tg-input" data-hs-idx="${idx}" value="${UI.escapeHtml(nm)}" />
-                          ${idx >= 2 ? `<button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" data-hs-rm="${idx}">✕</button>` : ''}
-                        </div>
-                      `
-                      )
-                      .join('')}
-                  </div>
-                </div>
-                ${renderOptionsFields(localOptions)}
-                <div style="margin-top:18px;display:flex;justify-content:flex-end;">
-                  <button type="button" class="tg-btn tg-btn-garnet" id="tg-start-hotseat" style="min-width:200px;min-height:44px;">
-                    ${lang === 'zh' ? '开始本地传屏对决 →' : 'Start Pass & Play →'}
-                  </button>
-                </div>
-              `
+              : ''
           }
+          ${renderOptionsFields(localOptions)}
+          <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <a class="tg-btn tg-btn-ghost" href="../../">← ${isZh ? '返回殿堂' : 'Back to Arena'}</a>
+            <button type="button" class="tg-btn tg-btn-garnet" id="tg-start-solo" style="min-width:184px;min-height:44px;">
+              ${isZh ? '开始对决' : 'Start Match'}
+            </button>
+          </div>
+        `;
+      }
+      if (lobbyTab === 'online') {
+        return `
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;">
+            <div style="padding:14px;border-radius:12px;border:1px solid var(--tg-border-garnet);background:var(--tg-garnet-soft);">
+              <div style="font-weight:700;margin-bottom:6px;">${isZh ? '创建对决房间' : 'Create Room'}</div>
+              <p style="font-size:12px;color:var(--tg-ink-muted);margin:0 0 12px;">
+                ${isZh ? '生成房间码与邀请链接，好友扫码或点击即可加入。' : 'Generate a room code and invite link for instant play.'}
+              </p>
+              <button type="button" class="tg-btn tg-btn-garnet" id="tg-create-room" style="width:100%;" ${lobbyBusy ? 'disabled' : ''}>
+                ${lobbyBusy ? `<span class="tg-spinner" aria-hidden="true"></span><span>${isZh ? '创建中' : 'Creating'}</span>` : (isZh ? '创建房间' : 'Create Room')}
+              </button>
+            </div>
+            <div style="padding:14px;border-radius:12px;border:1px solid var(--tg-border);background:var(--tg-hover-fill);">
+              <div style="font-weight:700;margin-bottom:6px;">${isZh ? '加入好友房间' : 'Join Room'}</div>
+              <input class="tg-input tg-input-mono" id="tg-join-code" maxlength="10" value="${UI.escapeHtml(roomCodeInput)}" placeholder="TGM-K7M4P" style="margin-bottom:10px;" />
+              <div style="display:flex;gap:8px;">
+                <button type="button" class="tg-btn tg-btn-gold" id="tg-join-room" style="flex:1;" ${lobbyBusy ? 'disabled' : ''}>
+                  ${lobbyBusy ? `<span class="tg-spinner" aria-hidden="true"></span>` : (isZh ? '加入' : 'Join')}
+                </button>
+                <button type="button" class="tg-btn tg-btn-ghost" id="tg-join-spec" ${lobbyBusy ? 'disabled' : ''}>
+                  ${isZh ? '观战' : 'Watch'}
+                </button>
+              </div>
+            </div>
+          </div>
+          ${
+            lobbyError
+              ? `<div style="margin-top:12px;padding:9px 12px;border-radius:8px;background:var(--tg-garnet-soft);border:1px solid var(--tg-border-garnet);color:var(--tg-garnet-ink);font-size:12.5px;">${UI.escapeHtml(lobbyError)}</div>`
+              : ''
+          }
+        `;
+      }
+      return `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12.5px;color:var(--tg-ink-muted);">${isZh ? '本地参赛者' : 'Local Players'}</span>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="tg-btn tg-btn-sm" id="tg-hs-add" ${hotseatNames.length + hotseatBots >= maxP ? 'disabled' : ''}>+ ${isZh ? '真人' : 'Human'}</button>
+              <button type="button" class="tg-btn tg-btn-sm" id="tg-hs-add-bot" ${hotseatNames.length + hotseatBots >= maxP ? 'disabled' : ''}>+ AI (${hotseatBots})</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            ${hotseatNames
+              .map(
+                (nm, idx) => `
+                <div style="display:flex;gap:6px;">
+                  <input class="tg-input" data-hs-idx="${idx}" value="${UI.escapeHtml(nm)}" />
+                  ${idx >= 2 ? `<button type="button" class="tg-btn tg-btn-icon tg-btn-ghost" data-hs-rm="${idx}">✕</button>` : ''}
+                </div>
+              `
+              )
+              .join('')}
+          </div>
         </div>
-      </div>
-    `;
-
-    overlayRoot.querySelector('#tg-entry-rules')?.addEventListener('click', () => {
-      rulesOpen = true;
-      renderDrawer();
-    });
-    overlayRoot.querySelectorAll('[data-tab]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        SFX.play('click');
-        lobbyTab = btn.dataset.tab;
-        lobbyError = '';
-        renderLobbyOverlay();
-      });
-    });
-    overlayRoot.querySelectorAll('[data-diff]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        SFX.play('click');
-        aiDifficulty = btn.dataset.diff;
-        renderLobbyOverlay();
-      });
-    });
-
-    const nameEl = overlayRoot.querySelector('#tg-name-input');
-    nameEl?.addEventListener('input', () => {
-      playerNameInput = nameEl.value;
-      savePlayerName(playerNameInput);
-      if (hotseatNames.length > 0 && playerNameInput.trim()) {
-        hotseatNames[0] = playerNameInput.trim().slice(0, 20);
-      }
-      if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
-    });
-
-    bindOptionsFields(overlayRoot, localOptions, null);
-
-    overlayRoot.querySelector('#tg-solo-dec')?.addEventListener('click', () => {
-      soloCount = Math.max(minP, soloCount - 1);
-      renderLobbyOverlay();
-    });
-    overlayRoot.querySelector('#tg-solo-inc')?.addEventListener('click', () => {
-      soloCount = Math.min(maxP, soloCount + 1);
-      renderLobbyOverlay();
-    });
-    overlayRoot.querySelector('#tg-start-solo')?.addEventListener('click', () => {
-      SFX.play('click');
-      const nick = playerNameInput.trim() || defaultNick;
-      savePlayerName(nick);
-      engine.startSolo({
-        playerName: nick,
-        totalPlayers: soloCount,
-        aiDifficulty,
-        options: localOptions,
-        lang,
-      });
-    });
-
-    const codeEl = overlayRoot.querySelector('#tg-join-code');
-    codeEl?.addEventListener('input', () => {
-      roomCodeInput = codeEl.value.toUpperCase();
-    });
-
-    overlayRoot.querySelector('#tg-create-room')?.addEventListener('click', async () => {
-      SFX.play('click');
-      const nick = playerNameInput.trim() || defaultNick;
-      savePlayerName(nick);
-      lobbyBusy = true;
-      lobbyError = '';
-      renderLobbyOverlay();
-      try {
-        await engine.createOnlineRoom({ playerName: nick, aiDifficulty, transportPref });
-        lobbyOnlineJoined = true;
-      } catch (err) {
-        lobbyError = err?.message || 'Failed to create room';
-      } finally {
-        lobbyBusy = false;
-        renderAll();
-      }
-    });
-
-    const doJoin = async (wantSpectator) => {
-      const code = normalizeRoomCode(roomCodeInput);
-      if (code.length < 4) {
-        lobbyError = lang === 'zh' ? '请输入有效的房间码' : 'Please enter a valid room code';
-        renderLobbyOverlay();
-        return;
-      }
-      SFX.play('click');
-      const nick = playerNameInput.trim() || defaultNick;
-      savePlayerName(nick);
-      lobbyBusy = true;
-      lobbyError = '';
-      renderLobbyOverlay();
-      try {
-        await engine.joinOnlineRoom({ roomCode: code, playerName: nick, wantSpectator, transportPref });
-        lobbyOnlineJoined = true;
-      } catch (err) {
-        lobbyError = err?.message || 'Failed to join room';
-      } finally {
-        lobbyBusy = false;
-        renderAll();
-      }
+        ${renderOptionsFields(localOptions)}
+        <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+          <button type="button" class="tg-btn tg-btn-garnet" id="tg-start-hotseat" style="min-width:190px;min-height:44px;">
+            ${isZh ? '开始本地对战' : 'Start Pass & Play'}
+          </button>
+        </div>
+      `;
     };
 
-    overlayRoot.querySelector('#tg-join-room')?.addEventListener('click', () => doJoin(initialSpectate));
-    overlayRoot.querySelector('#tg-join-spec')?.addEventListener('click', () => doJoin(true));
+    const bindBodyEvents = (bodyEl) => {
+      bodyEl.querySelectorAll('[data-diff]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          SFX.play('click');
+          aiDifficulty = btn.dataset.diff;
+          bodyEl.querySelectorAll('[data-diff]').forEach((b) =>
+            b.classList.toggle('is-active', b.dataset.diff === aiDifficulty)
+          );
+        });
+      });
 
-    overlayRoot.querySelectorAll('[data-hs-idx]').forEach((inp) => {
-      inp.addEventListener('input', () => {
-        const idx = Number(inp.dataset.hsIdx);
-        hotseatNames[idx] = inp.value;
-        if (idx === 0 && inp.value.trim()) {
-          playerNameInput = inp.value;
-          savePlayerName(inp.value);
-          if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
+      bindOptionsFields(bodyEl, localOptions, null);
+
+      bodyEl.querySelector('#tg-solo-dec')?.addEventListener('click', () => {
+        soloCount = Math.max(minP, soloCount - 1);
+        patchTabBody();
+      });
+      bodyEl.querySelector('#tg-solo-inc')?.addEventListener('click', () => {
+        soloCount = Math.min(maxP, soloCount + 1);
+        patchTabBody();
+      });
+      bodyEl.querySelector('#tg-start-solo')?.addEventListener('click', () => {
+        SFX.play('click');
+        const nick = playerNameInput.trim() || defaultNick;
+        savePlayerName(nick);
+        engine.startSolo({
+          playerName: nick,
+          totalPlayers: soloCount,
+          aiDifficulty,
+          options: localOptions,
+          lang,
+        });
+      });
+
+      const codeEl = bodyEl.querySelector('#tg-join-code');
+      codeEl?.addEventListener('input', () => {
+        roomCodeInput = codeEl.value.toUpperCase();
+      });
+
+      bodyEl.querySelector('#tg-create-room')?.addEventListener('click', async () => {
+        SFX.play('click');
+        const nick = playerNameInput.trim() || defaultNick;
+        savePlayerName(nick);
+        lobbyBusy = true;
+        lobbyError = '';
+        patchTabBody();
+        try {
+          await engine.createOnlineRoom({ playerName: nick, aiDifficulty, transportPref });
+          lobbyOnlineJoined = true;
+        } catch (err) {
+          lobbyError = err?.message || 'Failed to create room';
+        } finally {
+          lobbyBusy = false;
+          renderAll();
         }
       });
-    });
-    overlayRoot.querySelectorAll('[data-hs-rm]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        hotseatNames.splice(Number(btn.dataset.hsRm), 1);
-        renderLobbyOverlay();
+
+      const doJoin = async (wantSpectator) => {
+        const code = normalizeRoomCode(roomCodeInput);
+        if (code.length < 4) {
+          SFX.play('error');
+          lobbyError = isZh ? '请输入 5 位房间码' : 'Enter a 5-character room code';
+          patchTabBody();
+          const inp = modal.querySelector('#tg-join-code');
+          if (inp) {
+            Motion.nudgeError(inp, { intensity: 'subtle' });
+            inp.focus();
+          }
+          return;
+        }
+        SFX.play('click');
+        const nick = playerNameInput.trim() || defaultNick;
+        savePlayerName(nick);
+        lobbyBusy = true;
+        lobbyError = '';
+        patchTabBody();
+        try {
+          await engine.joinOnlineRoom({ roomCode: code, playerName: nick, wantSpectator, transportPref });
+          lobbyOnlineJoined = true;
+        } catch (err) {
+          lobbyError = err?.message || 'Failed to join room';
+        } finally {
+          lobbyBusy = false;
+          renderAll();
+        }
+      };
+
+      bodyEl.querySelector('#tg-join-room')?.addEventListener('click', () => doJoin(initialSpectate));
+      bodyEl.querySelector('#tg-join-spec')?.addEventListener('click', () => doJoin(true));
+
+      bodyEl.querySelectorAll('[data-hs-idx]').forEach((inp) => {
+        inp.addEventListener('input', () => {
+          const idx = Number(inp.dataset.hsIdx);
+          hotseatNames[idx] = inp.value;
+          if (idx === 0 && inp.value.trim()) {
+            playerNameInput = inp.value;
+            savePlayerName(inp.value);
+            if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
+          }
+        });
       });
-    });
-    overlayRoot.querySelector('#tg-hs-add')?.addEventListener('click', () => {
-      if (hotseatNames.length + hotseatBots < maxP) {
-        hotseatNames.push(lang === 'zh' ? `玩家 ${hotseatNames.length + 1}` : `Player ${hotseatNames.length + 1}`);
-        renderLobbyOverlay();
-      }
-    });
-    overlayRoot.querySelector('#tg-hs-add-bot')?.addEventListener('click', () => {
-      if (hotseatNames.length + hotseatBots < maxP) {
-        hotseatBots += 1;
-        renderLobbyOverlay();
-      }
-    });
-    overlayRoot.querySelector('#tg-start-hotseat')?.addEventListener('click', () => {
-      SFX.play('click');
-      if (hotseatNames.length + hotseatBots < minP) {
-        UI.toast(lang === 'zh' ? `至少需要 ${minP} 名玩家` : `Need at least ${minP} players`, 'error');
-        return;
-      }
-      engine.startHotseat({
-        playerNames: hotseatNames,
-        botCount: hotseatBots,
-        aiDifficulty,
-        options: localOptions,
-        lang,
+      bodyEl.querySelectorAll('[data-hs-rm]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          hotseatNames.splice(Number(btn.dataset.hsRm), 1);
+          patchTabBody();
+        });
       });
-    });
+      bodyEl.querySelector('#tg-hs-add')?.addEventListener('click', () => {
+        if (hotseatNames.length + hotseatBots < maxP) {
+          hotseatNames.push(isZh ? `玩家 ${hotseatNames.length + 1}` : `Player ${hotseatNames.length + 1}`);
+          patchTabBody();
+        }
+      });
+      bodyEl.querySelector('#tg-hs-add-bot')?.addEventListener('click', () => {
+        if (hotseatNames.length + hotseatBots < maxP) {
+          hotseatBots += 1;
+          patchTabBody();
+        }
+      });
+      bodyEl.querySelector('#tg-start-hotseat')?.addEventListener('click', () => {
+        SFX.play('click');
+        if (hotseatNames.length + hotseatBots < minP) {
+          UI.toast(isZh ? `至少需要 ${minP} 名玩家` : `Need at least ${minP} players`, 'error');
+          return;
+        }
+        engine.startHotseat({
+          playerNames: hotseatNames,
+          botCount: hotseatBots,
+          aiDifficulty,
+          options: localOptions,
+          lang,
+        });
+      });
+    };
+
+    const patchTabBody = (animate = false) => {
+      const bodyEl = modal.querySelector('#tg-lobby-tab-body');
+      if (!bodyEl) return;
+      const mutate = () => {
+        bodyEl.innerHTML = buildBodyHtml();
+        bindBodyEvents(bodyEl);
+      };
+      if (animate) Motion.crossfade(bodyEl, mutate, { duration: 150, shiftPx: 3 });
+      else mutate();
+    };
+
+    if (freshlyMounted || modal.dataset.renderedLang !== lang) {
+      modal.dataset.renderedLang = lang;
+      modal.innerHTML = `
+        <div class="tg-modal-header">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="tg-badge tg-badge-garnet">${UI.escapeHtml(seasonsBadge)} · DEATH MATCH</span>
+              ${UI.renderGarnetBadge(vault.garnets)}
+            </div>
+            <h2 class="tg-modal-title">${UI.escapeHtml(I18n.t(config.title))}</h2>
+            ${config.title?.ko ? `<div style="font-size:12px;color:var(--tg-ink-faint);margin-top:2px;">${UI.escapeHtml(config.title.ko)}</div>` : ''}
+          </div>
+          <button type="button" class="tg-btn tg-btn-sm tg-btn-ghost" id="tg-entry-rules">
+            ${isZh ? '查看规则' : 'Rules'}
+          </button>
+        </div>
+
+        <div class="tg-mode-tabs" id="tg-mode-tabs" role="tablist">
+          <button type="button" class="tg-mode-tab ${lobbyTab === 'solo' ? 'is-active' : ''}" data-tab="solo">
+            <strong>${isZh ? '单人 AI' : 'Solo vs AI'}</strong>
+            <span>${isZh ? '三档天才对手' : '3 AI tiers'}</span>
+          </button>
+          <button type="button" class="tg-mode-tab ${lobbyTab === 'online' ? 'is-active' : ''}" data-tab="online">
+            <strong>${isZh ? '好友联机' : 'Online Room'}</strong>
+            <span>${isZh ? '房间码实时对战' : 'Live room sync'}</span>
+          </button>
+          <button type="button" class="tg-mode-tab ${lobbyTab === 'hotseat' ? 'is-active' : ''}" data-tab="hotseat">
+            <strong>${isZh ? '本地同屏' : 'Pass & Play'}</strong>
+            <span>${isZh ? '隐私护盾保护' : 'Shielded turns'}</span>
+          </button>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:12px;color:var(--tg-ink-muted);margin-bottom:5px;">
+            ${isZh ? '你的参赛代号' : 'Contestant Name'}
+          </label>
+          <input class="tg-input" id="tg-name-input" type="text" maxlength="20" value="${UI.escapeHtml(playerNameInput)}" placeholder="${UI.escapeHtml(defaultNick)}" />
+        </div>
+
+        <div id="tg-lobby-tab-body" style="min-height:210px;"></div>
+      `;
+
+      modal.querySelector('#tg-entry-rules')?.addEventListener('click', () => {
+        rulesOpen = true;
+        renderDrawer();
+      });
+
+      const tabsEl = modal.querySelector('#tg-mode-tabs');
+      modal.querySelectorAll('[data-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (lobbyTab === btn.dataset.tab) return;
+          SFX.play('click');
+          lobbyTab = btn.dataset.tab;
+          lobbyError = '';
+          modal.querySelectorAll('[data-tab]').forEach((b) =>
+            b.classList.toggle('is-active', b.dataset.tab === lobbyTab)
+          );
+          Motion.slideIndicator(tabsEl, btn, { className: 'is-rect' });
+          patchTabBody(true);
+        });
+      });
+
+      const nameEl = modal.querySelector('#tg-name-input');
+      nameEl?.addEventListener('input', () => {
+        playerNameInput = nameEl.value;
+        savePlayerName(playerNameInput);
+        if (hotseatNames.length > 0 && playerNameInput.trim()) {
+          hotseatNames[0] = playerNameInput.trim().slice(0, 20);
+        }
+        if (profileNameEl) profileNameEl.textContent = getCurrentDisplayName();
+      });
+
+      patchTabBody(false);
+
+      if (freshlyMounted) {
+        Motion.transitionPresence(backdrop, true, { preset: 'modal' });
+      }
+      requestAnimationFrame(() => {
+        const activeTab = tabsEl?.querySelector('.tg-mode-tab.is-active');
+        if (tabsEl && activeTab) {
+          Motion.slideIndicator(tabsEl, activeTab, { immediate: true, className: 'is-rect' });
+        }
+      });
+    } else {
+      patchTabBody(false);
+    }
   }
 
   function renderResultOverlay(result) {
@@ -1492,6 +1813,7 @@ export function mountGame({ config, rules, root, render }) {
     stopParticles = null;
 
     const lang = I18n.getLang();
+    const isZh = lang === 'zh';
     const seats = latestSnap?.lobby?.seats || [];
     const nameOf = (sid) => seats.find((s) => s.seatId === sid)?.name || sid;
     const winners = (result.winnerSeatIds || []).map(nameOf);
@@ -1501,11 +1823,16 @@ export function mountGame({ config, rules, root, render }) {
     const isSurvivor = isHotseat ? !isDraw : Boolean(myId && (result.winnerSeatIds || []).includes(myId));
 
     const verdictClass = isDraw ? '' : isSurvivor ? 'is-survivor' : 'is-eliminated';
-    const stampText = isDraw
-      ? lang === 'zh' ? '平局 · DRAW' : 'DRAW'
+    const kickerText = isDraw
+      ? 'DRAW'
       : isSurvivor
-      ? lang === 'zh' ? '幸存者 · SURVIVOR' : 'SURVIVOR'
-      : lang === 'zh' ? '淘汰 · ELIMINATED' : 'ELIMINATED';
+      ? 'SURVIVOR'
+      : 'ELIMINATED';
+    const stampText = isDraw
+      ? isZh ? '平局' : 'DRAW'
+      : isSurvivor
+      ? isZh ? '幸存晋级' : 'SURVIVOR'
+      : isZh ? '本局淘汰' : 'ELIMINATED';
 
     const transferHtml = lastVaultOutcome
       ? `
@@ -1514,22 +1841,20 @@ export function mountGame({ config, rules, root, render }) {
           <span>
             ${
               lastVaultOutcome.delta > 0
-                ? lang === 'zh'
-                  ? `加内特交接：+${lastVaultOutcome.delta} 颗（金库总计 ${lastVaultOutcome.vault.garnets}）`
-                  : `Garnet Transfer: +${lastVaultOutcome.delta} (Vault: ${lastVaultOutcome.vault.garnets})`
+                ? isZh
+                  ? `加内特 +${lastVaultOutcome.delta}（金库 ${lastVaultOutcome.vault.garnets}）`
+                  : `Garnets +${lastVaultOutcome.delta} (Vault: ${lastVaultOutcome.vault.garnets})`
                 : lastVaultOutcome.delta < 0
-                ? lang === 'zh'
-                  ? `加内特流失：${lastVaultOutcome.delta} 颗（金库剩余 ${lastVaultOutcome.vault.garnets}）`
-                  : `Garnet Lost: ${lastVaultOutcome.delta} (Vault: ${lastVaultOutcome.vault.garnets})`
-                : lang === 'zh'
+                ? isZh
+                  ? `加内特 ${lastVaultOutcome.delta}（金库 ${lastVaultOutcome.vault.garnets}）`
+                  : `Garnets ${lastVaultOutcome.delta} (Vault: ${lastVaultOutcome.vault.garnets})`
+                : isZh
                 ? `加内特无变动（金库 ${lastVaultOutcome.vault.garnets}）`
-                : `Garnets Unchanged (Vault: ${lastVaultOutcome.vault.garnets})`
+                : `Garnets unchanged (Vault: ${lastVaultOutcome.vault.garnets})`
             }
             ${
               lastVaultOutcome.earnedBlackGarnet
-                ? lang === 'zh'
-                  ? ' · ✦ 荣获黑加内特！'
-                  : ' · ✦ BLACK GARNET EARNED!'
+                ? isZh ? ' · ✦ 解锁黑加内特' : ' · ✦ Black Garnet unlocked'
                 : ''
             }
           </span>
@@ -1537,53 +1862,56 @@ export function mountGame({ config, rules, root, render }) {
       `
       : '';
 
-    overlayRoot.innerHTML = `
-      <canvas class="tg-verdict-canvas" id="tg-verdict-canvas"></canvas>
-      <div class="tg-modal-backdrop">
-        <div class="tg-modal tg-verdict-modal ${verdictClass}">
-          <span class="tg-badge ${isSurvivor ? 'tg-badge-gold' : 'tg-badge-garnet'}">
-            ${lang === 'zh' ? '死亡对决最终裁决' : 'DEATH MATCH FINAL VERDICT'}
-          </span>
-          <div class="tg-verdict-stamp">${stampText}</div>
-          <div style="font-size:18px;font-weight:700;color:var(--tg-ink);margin-bottom:4px;">
-            ${winners.length ? `♛ ${UI.escapeHtml(winners.join(' & '))}` : ''}
-          </div>
-          ${transferHtml}
-          ${
-            result.summary
-              ? `<p style="color:var(--tg-ink-muted);margin:6px 0 16px;">${UI.escapeHtml(I18n.t(result.summary))}</p>`
-              : ''
-          }
-          ${
-            Array.isArray(result.rankings) && result.rankings.length
-              ? `
-                <div style="display:flex;flex-direction:column;gap:7px;margin:14px 0 22px;text-align:left;">
-                  ${result.rankings
-                    .map(
-                      (r, i) => `
-                      <div class="tg-seat-card ${i === 0 ? 'is-ready' : ''}">
-                        <span><strong style="color:var(--tg-gold);margin-right:8px;">#${i + 1}</strong>${UI.escapeHtml(nameOf(r.seatId))}</span>
-                        <span style="font-family:var(--tg-font-mono);color:var(--tg-gold-bright);">${UI.escapeHtml(r.label ?? r.score ?? '')}</span>
-                      </div>
-                    `
-                    )
-                    .join('')}
-                </div>
-              `
-              : ''
-          }
-          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-            ${
-              engine.isHost
-                ? `<button type="button" class="tg-btn tg-btn-garnet" id="tg-res-rematch">${lang === 'zh' ? '再战一局' : 'Rematch'}</button>`
-                : ''
-            }
-            <button type="button" class="tg-btn" id="tg-res-review">${lang === 'zh' ? '复盘终局' : 'Inspect Board'}</button>
-            <a class="tg-btn tg-btn-ghost" href="../../">${lang === 'zh' ? '返回对决殿堂' : 'Back to Arena'}</a>
-          </div>
-        </div>
+    const { backdrop, modal, freshlyMounted } = ensureModalShell('verdict', `tg-verdict-modal ${verdictClass}`);
+    if (!overlayRoot.querySelector('#tg-verdict-canvas') && !isDraw && !Motion.reduced()) {
+      const c = document.createElement('canvas');
+      c.className = 'tg-verdict-canvas';
+      c.id = 'tg-verdict-canvas';
+      overlayRoot.prepend(c);
+    }
+
+    modal.innerHTML = `
+      <span class="tg-badge ${isSurvivor ? 'tg-badge-gold' : 'tg-badge-garnet'}">${kickerText}</span>
+      <div class="tg-verdict-stamp">${stampText}</div>
+      <div style="font-size:18px;font-weight:700;color:var(--tg-ink);margin-bottom:4px;">
+        ${winners.length ? `♛ ${UI.escapeHtml(winners.join(' & '))}` : ''}
+      </div>
+      ${transferHtml}
+      ${
+        result.summary
+          ? `<p style="color:var(--tg-ink-muted);margin:6px 0 16px;">${UI.escapeHtml(I18n.t(result.summary))}</p>`
+          : ''
+      }
+      ${
+        Array.isArray(result.rankings) && result.rankings.length
+          ? `
+            <div style="display:flex;flex-direction:column;gap:7px;margin:14px 0 22px;text-align:left;">
+              ${result.rankings
+                .map(
+                  (r, i) => `
+                  <div class="tg-seat-card ${i === 0 ? 'is-ready' : ''}">
+                    <span><strong style="color:var(--tg-gold);margin-right:8px;">#${i + 1}</strong>${UI.escapeHtml(nameOf(r.seatId))}</span>
+                    <span style="font-family:var(--tg-font-mono);font-variant-numeric:tabular-nums;color:var(--tg-gold-bright);">${UI.escapeHtml(r.label ?? r.score ?? '')}</span>
+                  </div>
+                `
+                )
+                .join('')}
+            </div>
+          `
+          : ''
+      }
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        ${
+          engine.isHost
+            ? `<button type="button" class="tg-btn tg-btn-garnet" id="tg-res-rematch">${isZh ? '再战一局' : 'Rematch'}</button>`
+            : ''
+        }
+        <button type="button" class="tg-btn" id="tg-res-review">${isZh ? '复盘终局' : 'Inspect Board'}</button>
+        <a class="tg-btn tg-btn-ghost" href="../../">${isZh ? '返回殿堂' : 'Back to Arena'}</a>
       </div>
     `;
+
+    if (freshlyMounted) Motion.transitionPresence(backdrop, true, { preset: 'modal' });
 
     if (!isDraw) {
       stopParticles = launchVerdictParticles(
@@ -1592,23 +1920,21 @@ export function mountGame({ config, rules, root, render }) {
       );
     }
 
-    overlayRoot.querySelector('#tg-res-rematch')?.addEventListener('click', () => {
+    modal.querySelector('#tg-res-rematch')?.addEventListener('click', () => {
       SFX.play('click');
       stopParticles?.();
       stopParticles = null;
       engine.rematch();
     });
-    overlayRoot.querySelector('#tg-res-review')?.addEventListener('click', () => {
+    modal.querySelector('#tg-res-review')?.addEventListener('click', () => {
       SFX.play('click');
-      stopParticles?.();
-      stopParticles = null;
-      overlayRoot.innerHTML = '';
+      closeOverlay();
     });
   }
 
   function renderAll() {
     renderHudAndSidebar();
-    renderDrawer();
+    if (rulesOpen) renderDrawer();
 
     if (!latestSnap || latestSnap.lobby.phase === 'lobby') {
       stopParticles?.();
@@ -1620,10 +1946,8 @@ export function mountGame({ config, rules, root, render }) {
 
     if (latestSnap.lobby.phase === 'ended' && latestSnap.result) {
       renderResultOverlay(latestSnap.result);
-    } else {
-      stopParticles?.();
-      stopParticles = null;
-      overlayRoot.innerHTML = '';
+    } else if (currentOverlayKind !== null) {
+      closeOverlay();
     }
 
     if (latestSnap.state && typeof render === 'function') {
@@ -1643,6 +1967,8 @@ export function mountGame({ config, rules, root, render }) {
           dispatch: (action) => engine.dispatch(action),
           sfx: SFX,
           ui: UI,
+          motion: Motion,
+          theme: Theme,
           vault: GarnetVault,
           log: (text, kind = 'system') => pushFeed(text, kind),
           setTelemetry: (t) => {
@@ -1657,9 +1983,9 @@ export function mountGame({ config, rules, root, render }) {
   }
 
   const unsubLang = I18n.onChange(() => renderAll());
+  const unsubTheme = Theme.onChange(() => syncThemeAndAudioIcons(true));
   renderAll();
 
-  // Support quick-start URL param (?quick=solo) from Hub Quick Duel CTA
   if (initialQuickMode === 'solo' && !initialRoomParam) {
     const lang = I18n.getLang();
     const nick = playerNameInput.trim() || (lang === 'zh' ? '挑战者' : 'Challenger');
@@ -1675,11 +2001,15 @@ export function mountGame({ config, rules, root, render }) {
   return {
     engine,
     destroy() {
-      clearInterval(timerInterval);
+      if (timerRafId != null) cancelAnimationFrame(timerRafId);
+      clearClashSplash(true);
+      clearTimeout(roomCopyTimer);
       stopParticles?.();
       unsubLang();
+      unsubTheme();
+      if (drawerEscapeBound) document.removeEventListener('keydown', onDrawerKey);
       mobileMq?.removeEventListener?.('change', onMqChange);
-      removePrivacyCurtain();
+      removePrivacyCurtain(true);
       engine.destroy();
     },
   };

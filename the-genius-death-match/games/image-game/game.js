@@ -1,4 +1,4 @@
-import { mountGame, SFX, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, UI, Motion } from '../../shared/sdk.js';
 import { GameRules, CARD_BY_ID, CONCEPTS, CONCEPT_MAP, AI_PANELISTS } from './rules.js';
 
 function renderSurrealArtSvg(card) {
@@ -165,12 +165,273 @@ function renderSurrealArtSvg(card) {
   `;
 }
 
-// Local UI draft state
+// Persistent local interaction & animation state
 let selectedCardId = null;
 let selectedConceptId = null;
 let customClueInput = '';
 let selectedVoteSlot = null;
 let lastPhaseKey = '';
+let lastStageSig = '';
+let prevGarnets = {};
+let latestCtx = null;
+let refs = null;
+
+function patchClueComposerInPlace() {
+  if (!refs || !latestCtx?.state) return;
+  const { lang } = latestCtx;
+  const stageBody = refs.stageBody;
+
+  // Toggle .is-selected on art cards in place (140ms spring lift, zero DOM nuke!)
+  stageBody.querySelectorAll('[data-pick-card]').forEach((btn) => {
+    btn.classList.toggle('is-selected', Number(btn.dataset.pickCard) === selectedCardId);
+  });
+
+  const composer = stageBody.querySelector('#ig-composer-box');
+  if (!composer) {
+    // Decoy phase button patch
+    const decoyBtn = stageBody.querySelector('#ig-submit-decoy');
+    if (decoyBtn) decoyBtn.disabled = selectedCardId == null;
+    return;
+  }
+
+  const pickedCard = selectedCardId != null ? CARD_BY_ID[selectedCardId] : null;
+  if (!pickedCard) {
+    composer.hidden = true;
+    return;
+  }
+
+  composer.hidden = false;
+  const heading = composer.querySelector('#ig-composer-head');
+  if (heading) {
+    heading.textContent =
+      lang === 'zh'
+        ? `为「${pickedCard.title.zh}」选择意象提示（建议选次级/隐喻标签避免 5/5 全中）：`
+        : `Choose a semantic clue for "${pickedCard.title.en}" (secondary motifs avoid 5/5 sweeps):`;
+  }
+
+  const promptGrid = composer.querySelector('#ig-prompt-grid');
+  if (promptGrid && promptGrid.dataset.forCard !== String(selectedCardId)) {
+    promptGrid.dataset.forCard = String(selectedCardId);
+    const promptIds = [...pickedCard.tags];
+    for (const c of CONCEPTS) {
+      if (promptIds.length >= 9) break;
+      if (!promptIds.includes(c.id)) promptIds.push(c.id);
+    }
+    promptGrid.innerHTML = promptIds
+      .map((cid, idx) => {
+        const c = CONCEPT_MAP[cid];
+        const tier =
+          idx === 0
+            ? lang === 'zh' ? '高契合（易被看穿）' : 'Direct (Risk 5/5)'
+            : idx === 1
+            ? lang === 'zh' ? '✦ 黄金尺度（推荐）' : '✦ Goldilocks (Ideal)'
+            : idx === 2
+            ? lang === 'zh' ? '微妙隐喻' : 'Subtle Metaphor'
+            : lang === 'zh' ? '高风险发散' : 'Wildcard';
+        return `
+          <button type="button" class="ig-prompt-pill ${selectedConceptId === cid ? 'is-selected' : ''}" data-concept="${cid}">
+            <strong style="font-size:13px;color:var(--tg-ink);">${UI.escapeHtml(c[lang])}</strong>
+            <span style="font-size:10.5px;color:${idx === 1 ? 'var(--tg-gold-bright)' : 'var(--tg-ink-muted)'};">${tier}</span>
+          </button>
+        `;
+      })
+      .join('');
+  } else if (promptGrid) {
+    promptGrid.querySelectorAll('[data-concept]').forEach((p) => {
+      p.classList.toggle('is-selected', p.dataset.concept === selectedConceptId);
+    });
+  }
+
+  const submitBtn = composer.querySelector('#ig-submit-clue');
+  if (submitBtn) submitBtn.disabled = !selectedConceptId;
+}
+
+function patchVoteSelectionInPlace() {
+  if (!refs || !latestCtx) return;
+  const { lang } = latestCtx;
+  refs.stageBody.querySelectorAll('[data-vote-slot]').forEach((btn) => {
+    btn.classList.toggle('is-selected', Number(btn.dataset.voteSlot) === selectedVoteSlot);
+  });
+  const voteBtn = refs.stageBody.querySelector('#ig-submit-vote');
+  if (voteBtn) {
+    voteBtn.disabled = selectedVoteSlot == null;
+    voteBtn.textContent =
+      selectedVoteSlot != null
+        ? lang === 'zh'
+          ? `锁定投票 #${selectedVoteSlot + 1} → 揭晓结果`
+          : `Lock Vote #${selectedVoteSlot + 1} → Reveal`
+        : lang === 'zh'
+        ? '请先点选一幅画卡'
+        : 'Select a gallery card to vote';
+  }
+}
+
+function animateRevealTallyBars() {
+  if (!refs) return;
+  const fills = Array.from(refs.stageBody.querySelectorAll('.ig-tally-fill'));
+  const stagger = Motion.reduced() ? 0 : 60;
+  fills.forEach((bar, i) => {
+    setTimeout(() => {
+      bar.classList.add('is-revealed');
+    }, 50 + i * stagger);
+  });
+}
+
+function mountSkeleton(container) {
+  container.innerHTML = `
+    <div class="ig-arena">
+      <div class="ig-life-bar">
+        <div class="ig-cand-card" id="ig-cand-0">
+          <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+            <strong id="ig-name-0" style="font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></strong>
+            <span class="tg-badge" id="ig-role-0" style="width:fit-content;"></span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div class="ig-gems-row" id="ig-gems-0">
+              ${'<span class="ig-gem-slot is-lit"></span>'.repeat(5)}
+            </div>
+            <span style="font-family:var(--tg-font-mono);font-variant-numeric:tabular-nums;font-size:11px;color:var(--tg-ink-muted);">
+              <span id="ig-gnum-0">5</span> / 5 <span class="ig-glbl"></span>
+            </span>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <span class="tg-badge tg-badge-gold" id="ig-round-badge">ROUND 1</span>
+          <div id="ig-round-sub" style="font-size:11px;color:var(--tg-ink-muted);margin-top:4px;"></div>
+        </div>
+
+        <div class="ig-cand-card is-right" id="ig-cand-1">
+          <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+            <strong id="ig-name-1" style="font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></strong>
+            <span class="tg-badge" id="ig-role-1" style="width:fit-content;align-self:flex-end;"></span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;">
+            <div class="ig-gems-row" id="ig-gems-1">
+              ${'<span class="ig-gem-slot is-lit"></span>'.repeat(5)}
+            </div>
+            <span style="font-family:var(--tg-font-mono);font-variant-numeric:tabular-nums;font-size:11px;color:var(--tg-ink-muted);">
+              <span id="ig-gnum-1">5</span> / 5 <span class="ig-glbl"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ig-panelists-bar" id="ig-panelists-bar">
+        ${AI_PANELISTS.map(
+          (pan, i) => `
+          <div class="ig-panelist-chip" data-pan-idx="${i}">
+            <span class="ig-panelist-orb">${pan.avatar}</span>
+            <div style="min-width:0;">
+              <div class="ig-pan-name" style="font-weight:700;color:var(--tg-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+              <div class="ig-pan-style" style="font-size:10.5px;color:var(--tg-ink-muted);"></div>
+            </div>
+          </div>
+        `
+        ).join('')}
+      </div>
+
+      <div class="ig-stage-body" id="ig-stage-body"></div>
+    </div>
+  `;
+
+  container.dataset.mountedGame = 'image-game';
+
+  refs = {
+    cand0: container.querySelector('#ig-cand-0'),
+    name0: container.querySelector('#ig-name-0'),
+    role0: container.querySelector('#ig-role-0'),
+    gems0: Array.from(container.querySelectorAll('#ig-gems-0 .ig-gem-slot')),
+    gnum0: container.querySelector('#ig-gnum-0'),
+
+    cand1: container.querySelector('#ig-cand-1'),
+    name1: container.querySelector('#ig-name-1'),
+    role1: container.querySelector('#ig-role-1'),
+    gems1: Array.from(container.querySelectorAll('#ig-gems-1 .ig-gem-slot')),
+    gnum1: container.querySelector('#ig-gnum-1'),
+
+    glbls: Array.from(container.querySelectorAll('.ig-glbl')),
+    roundBadge: container.querySelector('#ig-round-badge'),
+    roundSub: container.querySelector('#ig-round-sub'),
+    panelistChips: Array.from(container.querySelectorAll('.ig-panelist-chip')),
+    stageBody: container.querySelector('#ig-stage-body'),
+  };
+
+  // Delegated click & input events inside #ig-stage-body (zero innerHTML nuke on interactive picks!)
+  refs.stageBody.addEventListener('click', (e) => {
+    if (!latestCtx?.state) return;
+    const { state, dispatch } = latestCtx;
+
+    const pickBtn = e.target.closest('[data-pick-card]');
+    if (pickBtn) {
+      SFX.play('cardFlip');
+      selectedCardId = Number(pickBtn.dataset.pickCard);
+      if (state.phase === 'clue') {
+        const c = CARD_BY_ID[selectedCardId];
+        selectedConceptId = c?.tags?.[1] || c?.tags?.[0] || null;
+      }
+      patchClueComposerInPlace();
+      return;
+    }
+
+    const conceptBtn = e.target.closest('[data-concept]');
+    if (conceptBtn) {
+      SFX.play('click');
+      selectedConceptId = conceptBtn.dataset.concept;
+      patchClueComposerInPlace();
+      return;
+    }
+
+    if (e.target.closest('#ig-submit-clue')) {
+      if (selectedCardId == null || !selectedConceptId) return;
+      SFX.play('bid');
+      Motion.pulseConfirm(e.target.closest('#ig-submit-clue'), { tone: 'gold', duration: 180 });
+      dispatch({
+        type: 'SUBMIT_CLUE',
+        payload: {
+          cardId: selectedCardId,
+          conceptId: selectedConceptId,
+          customText: customClueInput.trim(),
+        },
+      });
+      return;
+    }
+
+    if (e.target.closest('#ig-submit-decoy')) {
+      if (selectedCardId == null) return;
+      SFX.play('tilePlace');
+      Motion.pulseConfirm(e.target.closest('#ig-submit-decoy'), { tone: 'gold', duration: 180 });
+      dispatch({ type: 'SUBMIT_DECOY', payload: { cardId: selectedCardId } });
+      return;
+    }
+
+    const voteCard = e.target.closest('[data-vote-slot]');
+    if (voteCard && !voteCard.disabled) {
+      SFX.play('click');
+      selectedVoteSlot = Number(voteCard.dataset.voteSlot);
+      patchVoteSelectionInPlace();
+      return;
+    }
+
+    if (e.target.closest('#ig-submit-vote')) {
+      if (selectedVoteSlot == null) return;
+      SFX.play('bid');
+      dispatch({ type: 'SUBMIT_VOTE', payload: { slotIndex: selectedVoteSlot } });
+      return;
+    }
+
+    if (e.target.closest('#ig-next-round')) {
+      SFX.play('click');
+      dispatch({ type: 'NEXT_ROUND' });
+    }
+  });
+
+  refs.stageBody.addEventListener('input', (e) => {
+    if (e.target?.id === 'ig-custom-clue') {
+      customClueInput = e.target.value;
+    }
+  });
+}
 
 mountGame({
   config: {
@@ -207,8 +468,24 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
   root: document.getElementById('game-root'),
 
   render(container, ctx) {
-    const { state, activeSeatId, seats, isSpectator, lang, dispatch, log } = ctx;
+    latestCtx = ctx;
+    const { state, activeSeatId, seats, isSpectator, lang, log } = ctx;
     if (!state) return;
+
+    if (container.dataset.mountedGame !== 'image-game') {
+      mountSkeleton(container);
+      prevGarnets = {};
+      lastPhaseKey = '';
+      lastStageSig = '';
+    }
+
+    const [s0, s1] = state.seatOrder;
+    const p0 = state.players[s0];
+    const p1 = state.players[s1];
+    const name0 = seats.find((s) => s.seatId === s0)?.name || p0.name;
+    const name1 = seats.find((s) => s.seatId === s1)?.name || p1.name;
+    const testerName = state.testerSeatId === s0 ? name0 : name1;
+    const rivalName = state.rivalSeatId === s0 ? name0 : name1;
 
     const pKey = `${state.round}-${state.phase}-${activeSeatId}`;
     if (pKey !== lastPhaseKey) {
@@ -233,16 +510,61 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
       }
     }
 
-    const draw = () => {
-      const [s0, s1] = state.seatOrder;
-      const p0 = state.players[s0];
-      const p1 = state.players[s1];
-      const name0 = seats.find((s) => s.seatId === s0)?.name || p0.name;
-      const name1 = seats.find((s) => s.seatId === s1)?.name || p1.name;
-      const testerName = state.testerSeatId === s0 ? name0 : name1;
-      const rivalName = state.rivalSeatId === s0 ? name0 : name1;
+    // Patch Garnet Life Bar in-place with Motion.animateNumber + gem shrink/fade + nudgeError!
+    const patchCand = (p, name, idx) => {
+      const cardEl = idx === 0 ? refs.cand0 : refs.cand1;
+      const nameEl = idx === 0 ? refs.name0 : refs.name1;
+      const roleEl = idx === 0 ? refs.role0 : refs.role1;
+      const gemEls = idx === 0 ? refs.gems0 : refs.gems1;
+      const numEl = idx === 0 ? refs.gnum0 : refs.gnum1;
 
-      const myTurn = !isSpectator && activeSeatId && state.currentTurnSeatId === activeSeatId;
+      const isTester = p.seatId === state.testerSeatId;
+      cardEl.classList.toggle('is-tester', isTester);
+      nameEl.textContent = name;
+      roleEl.className = `tg-badge ${isTester ? 'tg-badge-garnet' : 'tg-badge-cyan'}`;
+      roleEl.textContent = isTester
+        ? lang === 'zh' ? '本轮出题者' : 'TESTER'
+        : lang === 'zh' ? '本轮竞猜者' : 'RIVAL';
+
+      gemEls.forEach((g, i) => g.classList.toggle('is-lit', i < p.garnets));
+
+      const prev = prevGarnets[p.seatId];
+      if (prev != null && prev !== p.garnets) {
+        Motion.animateNumber(numEl, prev, p.garnets, { duration: 280, deltaEl: cardEl });
+        if (p.garnets < prev) {
+          Motion.nudgeError(cardEl, { intensity: 'impact' });
+        } else {
+          Motion.pulseConfirm(cardEl, { tone: 'gold' });
+        }
+      } else {
+        numEl.textContent = String(p.garnets);
+      }
+      prevGarnets[p.seatId] = p.garnets;
+    };
+
+    patchCand(p0, name0, 0);
+    patchCand(p1, name1, 1);
+    refs.glbls.forEach((el) => { el.textContent = lang === 'zh' ? '加内特' : 'Garnets'; });
+
+    refs.roundBadge.textContent = `ROUND ${state.round}`;
+    refs.roundSub.textContent = lang === 'zh' ? '5/5 全中或 0/5 全错罚 −2' : '5/5 or 0/5 = −2 Penalty';
+
+    // Patch 4 AI Panelists
+    refs.panelistChips.forEach((chip, i) => {
+      const pan = AI_PANELISTS[i];
+      if (!pan) return;
+      const nm = chip.querySelector('.ig-pan-name');
+      const st = chip.querySelector('.ig-pan-style');
+      if (nm) nm.textContent = pan.name[lang];
+      if (st) st.textContent = pan.style[lang];
+    });
+
+    // Rebuild stage body ONLY on phase/round/turn/lang change — wrapped in Motion.crossfade!
+    const myTurn = !isSpectator && activeSeatId && state.currentTurnSeatId === activeSeatId;
+    const stageSig = `${state.round}|${state.phase}|${myTurn}|${lang}|${activeSeatId}|${state.myHand.join(',')}`;
+    if (stageSig !== lastStageSig) {
+      const prevPhase = lastStageSig.split('|')[1];
+      lastStageSig = stageSig;
 
       const ownerLabel = (ownerId) => {
         if (ownerId === state.testerSeatId) return lang === 'zh' ? `♛ 真卡 · ${testerName}` : `♛ TESTER · ${testerName}`;
@@ -257,27 +579,6 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
         return pan ? pan.name[lang] : vid;
       };
 
-      const renderCand = (p, name, isRight) => {
-        const isTester = p.seatId === state.testerSeatId;
-        const gems = Array.from({ length: 5 }, (_, i) =>
-          `<span class="ig-gem-slot ${i < p.garnets ? 'is-lit' : ''}"></span>`
-        ).join('');
-        return `
-          <div class="ig-cand-card ${isRight ? 'is-right' : ''} ${isTester ? 'is-tester' : ''}">
-            <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
-              <strong style="font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${UI.escapeHtml(name)}</strong>
-              <span class="tg-badge ${isTester ? 'tg-badge-garnet' : 'tg-badge-cyan'}" style="width:fit-content;${isRight ? 'align-self:flex-end;' : ''}">
-                ${isTester ? (lang === 'zh' ? '本轮出题者' : 'TESTER') : (lang === 'zh' ? '本轮竞猜者' : 'RIVAL')}
-              </span>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:${isRight ? 'flex-start' : 'flex-end'};gap:4px;">
-              <div class="ig-gems-row">${gems}</div>
-              <span style="font-family:var(--tg-font-mono);font-size:11px;color:var(--tg-ink-muted);">${p.garnets} / 5 ${lang === 'zh' ? '加内特' : 'Garnets'}</span>
-            </div>
-          </div>
-        `;
-      };
-
       const renderClueText = (clue) => {
         if (!clue) return '';
         const c = CONCEPT_MAP[clue.conceptId];
@@ -285,23 +586,11 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
         return clue.customText ? `“${clue.customText}” · [${base}]` : `“${base}”`;
       };
 
-      // Build main stage section per phase
-      let stageBodyHtml = '';
+      let html = '';
 
       if (state.phase === 'clue') {
         if (myTurn) {
-          const pickedCard = selectedCardId != null ? CARD_BY_ID[selectedCardId] : null;
-          // Build curated 9 prompt options: card's 3 tags + 6 contrasting semantic prompts
-          let promptIds = [];
-          if (pickedCard) {
-            promptIds = [...pickedCard.tags];
-            for (const c of CONCEPTS) {
-              if (promptIds.length >= 9) break;
-              if (!promptIds.includes(c.id)) promptIds.push(c.id);
-            }
-          }
-
-          stageBodyHtml = `
+          html = `
             <div class="ig-clue-banner">
               <span class="tg-badge tg-badge-gold">${lang === 'zh' ? '你的出题回合 · 第 1 步' : 'YOUR CLUE TURN · STEP 1'}</span>
               <div style="font-size:15px;font-weight:700;color:var(--tg-ink);">
@@ -316,9 +605,8 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
               ${state.myHand
                 .map((cid) => {
                   const card = CARD_BY_ID[cid];
-                  const isSel = selectedCardId === cid;
                   return `
-                    <button type="button" class="ig-art-card is-clickable ${isSel ? 'is-selected' : ''}" data-pick-card="${cid}">
+                    <button type="button" class="ig-art-card is-clickable" data-pick-card="${cid}">
                       ${renderSurrealArtSvg(card)}
                       <div class="ig-art-meta">
                         <span class="ig-art-title">${UI.escapeHtml(card.title[lang])}</span>
@@ -332,59 +620,29 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
                 .join('')}
             </div>
 
-            ${
-              pickedCard
-                ? `
-                  <div class="ig-composer">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                      <strong style="color:var(--tg-gold-bright);">
-                        ${lang === 'zh' ? `为「${pickedCard.title.zh}」选择意象提示（建议选次级/隐喻标签避免 5/5 全中）：` : `Choose a semantic clue for "${pickedCard.title.en}" (secondary motifs avoid 5/5 sweeps):`}
-                      </strong>
-                    </div>
-                    <div class="ig-prompt-grid">
-                      ${promptIds
-                        .map((cid, idx) => {
-                          const c = CONCEPT_MAP[cid];
-                          const tier =
-                            idx === 0
-                              ? lang === 'zh' ? '高契合（易被看穿）' : 'Direct (Risk 5/5)'
-                              : idx === 1
-                              ? lang === 'zh' ? '✦ 黄金尺度（推荐）' : '✦ Goldilocks (Ideal)'
-                              : idx === 2
-                              ? lang === 'zh' ? '微妙隐喻' : 'Subtle Metaphor'
-                              : lang === 'zh' ? '高风险发散' : 'Wildcard';
-                          return `
-                            <button type="button" class="ig-prompt-pill ${selectedConceptId === cid ? 'is-selected' : ''}" data-concept="${cid}">
-                              <strong style="font-size:13px;color:var(--tg-ink);">${UI.escapeHtml(c[lang])}</strong>
-                              <span style="font-size:10.5px;color:${idx === 1 ? 'var(--tg-gold)' : 'var(--tg-ink-muted)'};">${tier}</span>
-                            </button>
-                          `;
-                        })
-                        .join('')}
-                    </div>
-                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                      <input class="tg-input" id="ig-custom-clue" style="flex:1;min-width:200px;" maxlength="36" value="${UI.escapeHtml(customClueInput)}" placeholder="${lang === 'zh' ? '可选：附加一句给真人对手看的诗意提示短语...' : 'Optional poetic subtitle shown alongside the clue...'}" />
-                      <button type="button" class="tg-btn tg-btn-garnet" id="ig-submit-clue" ${selectedConceptId ? '' : 'disabled'}>
-                        ${lang === 'zh' ? '发布提示并盖牌 →' : 'Publish Clue & Seal Card →'}
-                      </button>
-                    </div>
-                  </div>
-                `
-                : ''
-            }
+            <div class="ig-composer" id="ig-composer-box" hidden>
+              <strong id="ig-composer-head" style="color:var(--tg-gold-bright);"></strong>
+              <div class="ig-prompt-grid" id="ig-prompt-grid"></div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <input class="tg-input" id="ig-custom-clue" style="flex:1;min-width:200px;" maxlength="36" value="${UI.escapeHtml(customClueInput)}" placeholder="${lang === 'zh' ? '可选：附加一句给真人对手看的诗意提示短语...' : 'Optional poetic subtitle shown alongside the clue...'}" />
+                <button type="button" class="tg-btn tg-btn-garnet" id="ig-submit-clue" disabled>
+                  ${lang === 'zh' ? '发布提示并盖牌 →' : 'Publish Clue & Seal Card →'}
+                </button>
+              </div>
+            </div>
           `;
         } else {
-          stageBodyHtml = `
+          html = `
             <div class="ig-clue-banner">
               <span class="tg-badge tg-badge-cyan">⏳ ${lang === 'zh' ? '等待出题者' : 'WAITING FOR TESTER'}</span>
-              <div style="font-size:16px;font-weight:700;">
+              <div style="font-size:16px;font-weight:700;color:var(--tg-ink);">
                 ${lang === 'zh' ? `${testerName} 正在挑选暗牌与意象提示...` : `${testerName} is selecting a surreal card & clue...`}
               </div>
             </div>
           `;
         }
       } else if (state.phase === 'decoy') {
-        stageBodyHtml = `
+        html = `
           <div class="ig-clue-banner">
             <span class="tg-badge tg-badge-gold">${lang === 'zh' ? `${testerName} 发布的提示词` : `${testerName}'S CLUE`}</span>
             <div class="ig-clue-quote">${UI.escapeHtml(renderClueText(state.currentClue))}</div>
@@ -407,9 +665,8 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
                   ${state.myHand
                     .map((cid) => {
                       const card = CARD_BY_ID[cid];
-                      const isSel = selectedCardId === cid;
                       return `
-                        <button type="button" class="ig-art-card is-clickable ${isSel ? 'is-selected' : ''}" data-pick-card="${cid}">
+                        <button type="button" class="ig-art-card is-clickable" data-pick-card="${cid}">
                           ${renderSurrealArtSvg(card)}
                           <div class="ig-art-meta">
                             <span class="ig-art-title">${UI.escapeHtml(card.title[lang])}</span>
@@ -423,7 +680,7 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
                     .join('')}
                 </div>
                 <div style="display:flex;justify-content:center;">
-                  <button type="button" class="tg-btn tg-btn-garnet" id="ig-submit-decoy" style="min-width:220px;" ${selectedCardId != null ? '' : 'disabled'}>
+                  <button type="button" class="tg-btn tg-btn-garnet" id="ig-submit-decoy" style="min-width:220px;" disabled>
                     ${lang === 'zh' ? '投入干扰画卡 → 开启艺廊投票' : 'Submit Decoy → Open Gallery Vote'}
                   </button>
                 </div>
@@ -432,7 +689,7 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
           }
         `;
       } else if (state.phase === 'vote') {
-        stageBodyHtml = `
+        html = `
           <div class="ig-clue-banner">
             <span class="tg-badge tg-badge-garnet">${lang === 'zh' ? '艺廊公开投票' : 'GALLERY VOTING STAGE'}</span>
             <div class="ig-clue-quote">${UI.escapeHtml(renderClueText(state.currentClue))}</div>
@@ -454,9 +711,8 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
               .map((slot) => {
                 const card = CARD_BY_ID[slot.cardId];
                 const disabled = !myTurn || slot.isMine;
-                const isSel = selectedVoteSlot === slot.slotIndex;
                 return `
-                  <button type="button" class="ig-art-card ${!disabled ? 'is-clickable' : ''} ${slot.isMine ? 'is-mine-locked' : ''} ${isSel ? 'is-selected' : ''}" data-vote-slot="${slot.slotIndex}" ${disabled ? 'disabled' : ''}>
+                  <button type="button" class="ig-art-card ${!disabled ? 'is-clickable' : ''} ${slot.isMine ? 'is-mine-locked' : ''}" data-vote-slot="${slot.slotIndex}" ${disabled ? 'disabled' : ''}>
                     <span class="ig-slot-badge">#${slot.slotIndex + 1}${slot.isMine ? (lang === 'zh' ? ' · 你的卡' : ' · YOURS') : ''}</span>
                     ${renderSurrealArtSvg(card)}
                     <div class="ig-art-meta">
@@ -475,10 +731,8 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
             myTurn
               ? `
                 <div style="display:flex;justify-content:center;">
-                  <button type="button" class="tg-btn tg-btn-gold" id="ig-submit-vote" style="min-width:220px;" ${selectedVoteSlot != null ? '' : 'disabled'}>
-                    ${selectedVoteSlot != null
-                      ? (lang === 'zh' ? `锁定投票 #${selectedVoteSlot + 1} → 揭晓结果` : `Lock Vote #${selectedVoteSlot + 1} → Reveal`)
-                      : (lang === 'zh' ? '请先点选一幅画卡' : 'Select a gallery card to vote')}
+                  <button type="button" class="tg-btn tg-btn-gold" id="ig-submit-vote" style="min-width:220px;" disabled>
+                    ${lang === 'zh' ? '请先点选一幅画卡' : 'Select a gallery card to vote'}
                   </button>
                 </div>
               `
@@ -509,7 +763,6 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
           }
         }
 
-        // Count votes per slot
         const votersBySlot = Array.from({ length: state.gallery.length }, () => []);
         if (state.votes) {
           for (const [vid, sl] of Object.entries(state.votes)) {
@@ -517,10 +770,10 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
           }
         }
 
-        stageBodyHtml = `
+        html = `
           <div class="ig-verdict-box">
             <div>
-              <div style="font-size:12px;color:var(--tg-gold);font-weight:700;letter-spacing:0.08em;">
+              <div style="font-size:12px;color:var(--tg-gold-bright);font-weight:700;letter-spacing:0.08em;">
                 ${lang === 'zh' ? `第 ${state.round} 轮投票揭晓 · 提示 ${renderClueText(state.currentClue)}` : `ROUND ${state.round} TALLY · ${renderClueText(state.currentClue)}`}
               </div>
               <div style="font-size:15px;font-weight:800;color:var(--tg-ink);margin-top:4px;">
@@ -544,7 +797,7 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
                 const card = CARD_BY_ID[slot.cardId];
                 const isTesterCard = slot.ownerId === state.testerSeatId;
                 const slotVoters = votersBySlot[slot.slotIndex] || [];
-                const pct = Math.round((slotVoters.length / 5) * 100);
+                const ratio = (slotVoters.length / 5).toFixed(3);
                 return `
                   <div class="ig-art-card ${isTesterCard ? 'is-tester-card' : ''}">
                     <span class="ig-slot-badge">#${slot.slotIndex + 1}</span>
@@ -555,12 +808,12 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
                         ${UI.escapeHtml(ownerLabel(slot.ownerId))}
                       </div>
                       <div class="ig-vote-tally">
-                        <div style="display:flex;justify-content:space-between;font-family:var(--tg-font-mono);font-size:10px;color:var(--tg-ink-muted);">
+                        <div style="display:flex;justify-content:space-between;font-family:var(--tg-font-mono);font-variant-numeric:tabular-nums;font-size:10px;color:var(--tg-ink-muted);">
                           <span>${lang === 'zh' ? '得票' : 'VOTES'}</span>
                           <span>${slotVoters.length} / 5</span>
                         </div>
                         <div class="ig-tally-track">
-                          <div class="ig-tally-fill" style="width:${pct}%;"></div>
+                          <div class="ig-tally-fill" style="--tally-ratio:${ratio};"></div>
                         </div>
                         <div class="ig-voter-chips">
                           ${slotVoters
@@ -580,105 +833,18 @@ The iconic S1E8 Dixit-inspired psychological duel! Two Death Match candidates jo
         `;
       }
 
-      container.innerHTML = `
-        <div class="ig-arena">
-          <div class="ig-life-bar">
-            ${renderCand(p0, name0, false)}
-            <div style="text-align:center;">
-              <span class="tg-badge tg-badge-gold">ROUND ${state.round}</span>
-              <div style="font-size:11px;color:var(--tg-ink-muted);margin-top:4px;">${lang === 'zh' ? '5/5 全中或 0/5 全错罚 −2' : '5/5 or 0/5 = −2 Penalty'}</div>
-            </div>
-            ${renderCand(p1, name1, true)}
-          </div>
+      const mountStage = () => {
+        refs.stageBody.innerHTML = html;
+        if (state.phase === 'reveal' || state.phase === 'ended') {
+          animateRevealTallyBars();
+        }
+      };
 
-          <div class="ig-panelists-bar">
-            ${AI_PANELISTS.map(
-              (pan) => `
-              <div class="ig-panelist-chip">
-                <span class="ig-panelist-orb">${pan.avatar}</span>
-                <div style="min-width:0;">
-                  <div style="font-weight:700;color:var(--tg-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${UI.escapeHtml(pan.name[lang])}</div>
-                  <div style="font-size:10.5px;color:var(--tg-ink-muted);">${UI.escapeHtml(pan.style[lang])}</div>
-                </div>
-              </div>
-            `
-            ).join('')}
-          </div>
-
-          ${stageBodyHtml}
-        </div>
-      `;
-
-      // Bind card selection (clue & decoy phases)
-      container.querySelectorAll('[data-pick-card]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          SFX.play('cardFlip');
-          selectedCardId = Number(btn.dataset.pickCard);
-          if (state.phase === 'clue') {
-            const c = CARD_BY_ID[selectedCardId];
-            selectedConceptId = c?.tags?.[1] || c?.tags?.[0] || null;
-          }
-          draw();
-        });
-      });
-
-      container.querySelectorAll('[data-concept]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          SFX.play('click');
-          selectedConceptId = btn.dataset.concept;
-          draw();
-        });
-      });
-
-      container.querySelector('#ig-custom-clue')?.addEventListener('input', (e) => {
-        customClueInput = e.target.value;
-      });
-
-      container.querySelector('#ig-submit-clue')?.addEventListener('click', () => {
-        if (selectedCardId == null || !selectedConceptId) return;
-        SFX.play('bid');
-        dispatch({
-          type: 'SUBMIT_CLUE',
-          payload: {
-            cardId: selectedCardId,
-            conceptId: selectedConceptId,
-            customText: customClueInput.trim(),
-          },
-        });
-      });
-
-      container.querySelector('#ig-submit-decoy')?.addEventListener('click', () => {
-        if (selectedCardId == null) return;
-        SFX.play('tilePlace');
-        dispatch({
-          type: 'SUBMIT_DECOY',
-          payload: { cardId: selectedCardId },
-        });
-      });
-
-      container.querySelectorAll('[data-vote-slot]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          SFX.play('click');
-          selectedVoteSlot = Number(btn.dataset.voteSlot);
-          draw();
-        });
-      });
-
-      container.querySelector('#ig-submit-vote')?.addEventListener('click', () => {
-        if (selectedVoteSlot == null) return;
-        SFX.play('bid');
-        dispatch({
-          type: 'SUBMIT_VOTE',
-          payload: { slotIndex: selectedVoteSlot },
-        });
-      });
-
-      container.querySelector('#ig-next-round')?.addEventListener('click', () => {
-        SFX.play('click');
-        dispatch({ type: 'NEXT_ROUND' });
-      });
-    };
-
-    draw();
+      if (prevPhase && prevPhase !== state.phase) {
+        Motion.crossfade(refs.stageBody, mountStage, { duration: 160, shiftPx: 4 });
+      } else {
+        mountStage();
+      }
+    }
   },
 });
