@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-25",
+  "updated_at": "2026-11-26",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -2050,6 +2050,26 @@
       ],
       "excerpt": "Anthropic 第三季度算力及基础设施费用达98.63亿美元，历史年化支出趋势约每年4倍。结合招股书与 Epoch AI 数据，区分研发、客户推理、云服务供应商收入及未来4475亿美元承诺。",
       "reading_minutes": 13
+    },
+    {
+      "id": "2026-11-26-anthropic-rust-api-verification",
+      "sequence": 98,
+      "title": "Claude 的 API 迁移到 Rust：CPU 开销下降 70%，真正难的却是验证",
+      "source_title": "Migrating our Messages API to Rust",
+      "source_author": "Lance Martin, Jake Eaton, Arvin Aminpour, Emma Webb, Bharat Mediratta, Ravi Trivedi",
+      "source_date": "2026-11-25",
+      "source_url": "https://www.anthropic.com/research/migrating-api-to-rust",
+      "delivery_date": "2026-11-26",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-26-anthropic-rust-api-verification.md",
+      "tags": [
+        "软件工程",
+        "AI Agent",
+        "AI Infra",
+        "Rust"
+      ],
+      "excerpt": "从生产影子测试、隐私保护的差异指纹与多层反馈环，理解为何 AI 写代码越快，独立验证与工程判断越重要。"
     }
   ]
 }
