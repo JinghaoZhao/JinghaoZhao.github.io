@@ -1,6 +1,6 @@
 /* ==========================================================================
  * Game 01c: Memory Poker (记忆扑克 / 기억 포커)
- * Netflix / WSOP TV-Broadcast Jumbo-Index Porcelain Playing Cards
+ * Dual-Theme Broadcast Studio · Live 3D rotateY Flips · Jumbo-Index Cards
  * Fits all 3 Community Cards + all 16 (4x4) Grid Cards above the 1440x900 fold
  * ========================================================================== */
 
@@ -21,11 +21,8 @@
   background:
     radial-gradient(ellipse 68% 40% at 50% 10%, rgba(212, 175, 106, 0.16), transparent 62%),
     radial-gradient(ellipse 84% 68% at 50% 60%, rgba(84, 16, 28, 0.42), rgba(10, 12, 19, 0.97) 75%),
-    #0a0c14;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.72),
-    inset 0 0 0 6px rgba(10, 12, 18, 0.62),
-    inset 0 0 0 7px rgba(212, 175, 106, 0.22);
+    var(--dp-bg-obsidian);
+  box-shadow: var(--dp-shadow-card);
   padding: 14px 18px 16px;
   display: flex;
   flex-direction: column;
@@ -36,7 +33,20 @@
   background:
     radial-gradient(ellipse 58% 30% at 50% 12%, rgba(242, 213, 145, 0.24), transparent 60%),
     radial-gradient(ellipse 78% 66% at 50% 64%, rgba(40, 9, 17, 0.44), rgba(6, 7, 12, 0.98) 74%),
-    #06070c;
+    var(--dp-bg-void);
+}
+
+/* Light Porcelain Studio Table (keeps porcelain cards crisp with elevated rim & shadow) */
+:root[data-theme="light"] .mp-table {
+  background:
+    radial-gradient(ellipse 68% 42% at 50% 10%, rgba(180, 134, 48, 0.12), transparent 64%),
+    radial-gradient(ellipse 84% 68% at 50% 62%, rgba(180, 42, 62, 0.07), #f2eee6 76%);
+}
+
+:root[data-theme="light"] .mp-table.is-darkened {
+  background:
+    radial-gradient(ellipse 58% 32% at 50% 12%, rgba(180, 134, 48, 0.18), transparent 62%),
+    radial-gradient(ellipse 78% 66% at 50% 64%, rgba(120, 28, 42, 0.10), #eae5db 76%);
 }
 
 .mp-phase-strip {
@@ -58,28 +68,34 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border: 1px solid var(--dp-border-strong);
-  background: rgba(212, 175, 106, 0.14);
+  background: var(--dp-brass-glow);
   color: var(--dp-brass-bright);
+  font-variant-numeric: tabular-nums;
 }
 
 .mp-phase-pill.is-urgent {
-  border-color: rgba(220, 53, 69, 0.65);
-  background: rgba(220, 53, 69, 0.18);
-  color: #ff98a3;
+  border-color: var(--dp-crimson);
+  background: var(--dp-crimson-glow);
+  color: var(--dp-crimson-bright);
 }
 
 .mp-mem-bar-wrap {
   width: 100%;
   height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--dp-border-subtle);
   overflow: hidden;
 }
 
+/* Pure GPU scaleX progress bar (zero layout thrash) */
 .mp-mem-bar-fill {
+  width: 100%;
   height: 100%;
   background: linear-gradient(90deg, #dc3545, #f59e0b, #f2d591);
-  transition: width 0.25s linear;
+  transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform 110ms linear;
+  will-change: transform;
 }
 
 /* Sleek Horizontal Community Spotlight Strip */
@@ -90,10 +106,8 @@
   gap: 18px;
   padding: 10px 16px;
   border-radius: 15px;
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  background:
-    radial-gradient(ellipse 65% 85% at 50% 50%, rgba(212, 175, 106, 0.1), rgba(8, 10, 17, 0.74));
-  box-shadow: inset 0 0 24px rgba(212, 175, 106, 0.08);
+  border: 1px solid var(--dp-border-strong);
+  background: var(--dp-glass);
   flex-wrap: wrap;
 }
 
@@ -145,14 +159,16 @@
   aspect-ratio: auto;
 }
 
+/* Live 3D Flip powered by persistent keyed DOM nodes via Motion.patchDOM */
 .mp-card {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--dp-dur-flip) var(--dp-ease-apple);
   border-radius: 12px;
   cursor: default;
+  will-change: transform;
 }
 
 .mp-card.is-clickable {
@@ -163,12 +179,20 @@
   transform: translateY(-3px) scale(1.02);
 }
 
+.mp-card.is-clickable:active {
+  transform: scale(0.97);
+}
+
 .mp-card.is-facedown {
   transform: rotateY(180deg);
 }
 
 .mp-card.is-facedown.is-clickable:hover {
   transform: rotateY(180deg) translateY(-4px) scale(1.03);
+}
+
+.mp-card.is-facedown.is-clickable:active {
+  transform: rotateY(180deg) scale(0.97);
 }
 
 .mp-card-face {
@@ -180,19 +204,25 @@
   overflow: hidden;
 }
 
-/* Pure Porcelain-White Broadcast Jumbo-Index Card Front */
+/* Pure Porcelain-White Broadcast Jumbo-Index Card Front (Crisp in BOTH Dark & Light!) */
 .mp-card-front {
-  background:
-    linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
   border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.48),
+    0 8px 22px rgba(0, 0, 0, 0.45),
     0 1px 2px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    inset 0 1px 0 #ffffff;
   color: #12151c;
 }
 
-/* Subtle glossy top sheen */
+:root[data-theme="light"] .mp-card-front {
+  border-color: rgba(20, 23, 31, 0.14);
+  box-shadow:
+    0 8px 20px rgba(20, 23, 31, 0.14),
+    0 1px 3px rgba(20, 23, 31, 0.10),
+    inset 0 1px 0 #ffffff;
+}
+
 .mp-card-front::before {
   content: "";
   position: absolute;
@@ -201,13 +231,12 @@
   pointer-events: none;
 }
 
-/* Razor-thin suit-tinted inner hairline frame */
 .mp-card-front::after {
   content: "";
   position: absolute;
   inset: 4px;
   border-radius: 8px;
-  border: 1px solid rgba(18, 21, 28, 0.1);
+  border: 1px solid rgba(18, 21, 28, 0.10);
   pointer-events: none;
 }
 
@@ -224,10 +253,18 @@
 }
 
 .mp-card-front.is-community-face {
-  border: 1.5px solid #f4d78d;
+  border: 1.5px solid #d4af6a;
   box-shadow:
-    0 0 26px rgba(242, 213, 145, 0.52),
-    0 10px 24px rgba(0, 0, 0, 0.56),
+    0 0 22px rgba(212, 175, 106, 0.42),
+    0 10px 24px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 #ffffff;
+}
+
+:root[data-theme="light"] .mp-card-front.is-community-face {
+  border: 1.5px solid #b5842a;
+  box-shadow:
+    0 10px 24px rgba(154, 110, 31, 0.22),
+    0 2px 6px rgba(20, 23, 31, 0.12),
     inset 0 1px 0 #ffffff;
 }
 
@@ -251,6 +288,7 @@
   line-height: 0.9;
   letter-spacing: -0.055em;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
 }
 
 .mp-card-slot.is-community .mp-jumbo-rank {
@@ -296,7 +334,6 @@
   height: 38px;
 }
 
-/* Ultra-subtle translucent metallic gold filigree watermark for A/K/Q/J only */
 .mp-royal-watermark {
   position: absolute;
   right: 5px;
@@ -309,7 +346,6 @@
   pointer-events: none;
 }
 
-/* Subtle Clean Bottom-Right Coordinate Label */
 .mp-card-coord {
   position: absolute;
   bottom: 4px;
@@ -330,7 +366,7 @@
   background: radial-gradient(circle at 50% 42%, #1d2133 0%, #0d1019 62%, #07090f 100%);
   border: 1.5px solid rgba(212, 175, 106, 0.56);
   box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.62),
+    0 10px 22px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(242, 213, 145, 0.22);
   display: flex;
   align-items: center;
@@ -353,14 +389,12 @@
   border-radius: 8px;
   border: 1px solid rgba(242, 213, 145, 0.65);
   background: linear-gradient(160deg, rgba(22, 26, 40, 0.94), rgba(10, 12, 19, 0.96));
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(212, 175, 106, 0.16);
   font-family: var(--dp-font-mono);
   font-size: 16px;
   font-weight: 800;
   color: #f4d78d;
   text-align: center;
   letter-spacing: 0.05em;
-  text-shadow: 0 0 10px rgba(242, 213, 145, 0.45);
 }
 
 .mp-card-slot.is-community .mp-back-crest {
@@ -372,13 +406,13 @@
 /* Selection & Showdown Highlights */
 .mp-card-slot.is-selected .mp-card-back,
 .mp-card-slot.is-selected .mp-card-front {
-  border: 2.5px solid #f4d78d;
-  box-shadow: 0 0 26px rgba(242, 213, 145, 0.8), 0 8px 22px rgba(0, 0, 0, 0.5);
+  border: 2.5px solid #e6b84d;
+  box-shadow: 0 0 22px rgba(212, 175, 106, 0.62), 0 8px 22px rgba(0, 0, 0, 0.35);
 }
 
 .mp-card-slot.is-optimal .mp-card-front {
-  border: 2.5px solid #38bdf8;
-  box-shadow: 0 0 24px rgba(56, 189, 248, 0.8), 0 8px 22px rgba(0, 0, 0, 0.5);
+  border: 2.5px solid var(--dp-cyan);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.6), 0 8px 22px rgba(0, 0, 0, 0.35);
 }
 
 .mp-pick-tag {
@@ -389,11 +423,15 @@
   border-radius: 999px;
   font-size: 9.5px;
   font-weight: 800;
-  background: var(--dp-brass-bright);
+  background: #f0cf80;
   color: #090b10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   z-index: 5;
   pointer-events: none;
+}
+
+.mp-pick-tag.is-opt {
+  background: var(--dp-cyan);
+  color: #fff;
 }
 
 /* Selection Footer Bar */
@@ -417,9 +455,26 @@
 .mp-panel {
   border-radius: var(--dp-radius-lg);
   border: 1px solid var(--dp-border-strong);
-  background: rgba(14, 17, 26, 0.9);
+  background: var(--dp-surface-card);
   padding: 14px 15px;
   box-shadow: var(--dp-shadow-card);
+}
+
+.mp-stand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--dp-border-subtle);
+  background: var(--dp-surface-row);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mp-stand-row.is-me {
+  border-color: var(--dp-border-strong);
+  background: var(--dp-brass-glow);
 }
 
 .mp-hand-ladder {
@@ -442,16 +497,16 @@
   padding: 9px 11px;
   border-radius: 12px;
   border: 1px solid var(--dp-border-subtle);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--dp-surface-row);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  font-variant-numeric: tabular-nums;
 }
 
 .mp-showdown-row.is-winner {
   border-color: var(--dp-brass-bright);
-  background: rgba(212, 175, 106, 0.12);
-  box-shadow: 0 0 18px rgba(212, 175, 106, 0.16);
+  background: var(--dp-brass-glow);
 }
 
 .mp-showdown-row.is-me {
@@ -470,7 +525,7 @@
   height: 46px;
   padding: 2px 3px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(20, 23, 31, 0.16);
   background: linear-gradient(155deg, #ffffff, #eef1f6);
   display: inline-flex;
   flex-direction: column;
@@ -482,7 +537,8 @@
   font-weight: 900;
   line-height: 0.95;
   letter-spacing: -0.04em;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.44);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+  font-variant-numeric: tabular-nums;
 }
 
 .mp-mini-card.is-suit-red {
@@ -494,8 +550,7 @@
 }
 
 .mp-mini-card.is-picked {
-  border: 2px solid #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
+  border: 2px solid var(--dp-cyan);
 }
 
 .mp-mini-suit {

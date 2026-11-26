@@ -1,9 +1,10 @@
 /**
  * The Devil's Plan Season 3: Dead Again — Day 1 Prison Match 1
  * 沉重13 (Heavy 13 / 무거운 13) — Prison Dungeon Stone Pedestal Renderer
+ * Upgraded with Motion.patchDOM, Motion.delegate, progressive SVG cracks, animateNumber & shake
  */
 
-import { mountGame, SFX, I18n, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, I18n, UI, Motion } from '../../shared/sdk.js';
 import { GameRules, COLORS, CHIP_TYPES, ROCK_VALUES, BUST_LIMIT } from './rules.js';
 
 const COLOR_META = {
@@ -20,6 +21,10 @@ const uiDraft = {
   lastEventSig: '',
   bustShakeUntil: 0,
   bustedColor: null,
+  prevWeights: { red: null, green: null, blue: null },
+  prevPenalties: new Map(),
+  latestCtx: null,
+  latestContainer: null,
 };
 
 function syncDraftKey(state, mySeatId) {
@@ -41,7 +46,7 @@ function handleEventFeedback(lastEvent, sfx, log, lang) {
 
   if (lastEvent.type === 'STAND_BUST') {
     sfx.play('eliminate');
-    uiDraft.bustShakeUntil = Date.now() + 900;
+    uiDraft.bustShakeUntil = Date.now() + 450;
     uiDraft.bustedColor = lastEvent.color;
     log(
       lang === 'zh'
@@ -72,15 +77,174 @@ function handleEventFeedback(lastEvent, sfx, log, lang) {
   }
 }
 
-function renderStressCracksSvg() {
+function renderStressCracksSvg(color) {
   return `
-    <svg class="h13-cracks-svg" viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M 38 298 L 62 246 L 44 212 L 88 168 L 76 124 L 118 82" fill="none" stroke="#ff5868" stroke-width="2.4" stroke-linecap="round" opacity="0.88" />
-      <path d="M 88 168 L 130 152 L 154 128" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-linecap="round" opacity="0.8" />
-      <path d="M 262 298 L 228 242 L 246 196 L 204 156 L 220 108 L 182 68" fill="none" stroke="#ff5868" stroke-width="2.2" stroke-linecap="round" opacity="0.85" />
-      <path d="M 204 156 L 166 172" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" opacity="0.78" />
+    <svg class="h13-cracks-svg" data-motion-key="h13-cracks-${color}" viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M 38 298 L 62 246 L 44 212 L 88 168 L 76 124 L 118 82" fill="none" stroke="var(--dp-crimson-bright)" stroke-width="2.4" stroke-linecap="round" opacity="0.88" />
+      <path d="M 88 168 L 130 152 L 154 128" fill="none" stroke="var(--dp-amber)" stroke-width="1.6" stroke-linecap="round" opacity="0.82" />
+      <path d="M 262 298 L 228 242 L 246 196 L 204 156 L 220 108 L 182 68" fill="none" stroke="var(--dp-crimson-bright)" stroke-width="2.2" stroke-linecap="round" opacity="0.85" />
+      <path d="M 204 156 L 166 172" fill="none" stroke="var(--dp-amber)" stroke-width="1.5" stroke-linecap="round" opacity="0.78" />
     </svg>
   `;
+}
+
+function bindDelegatedEvents(container) {
+  // Hand Rock Selection
+  Motion.delegate(
+    container,
+    'click',
+    '[data-pick-rock]',
+    (e, btn) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx || btn.disabled) return;
+      ctx.sfx.play('click');
+      uiDraft.selectedRock = Number(btn.dataset.pickRock);
+      renderHeavy13(uiDraft.latestContainer, ctx);
+    },
+    'h13-pick-rock'
+  );
+
+  // Hand Chip Selection
+  Motion.delegate(
+    container,
+    'click',
+    '[data-pick-chip]',
+    (e, btn) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx || btn.disabled) return;
+      ctx.sfx.play('click');
+      uiDraft.selectedChip = btn.dataset.pickChip;
+      renderHeavy13(uiDraft.latestContainer, ctx);
+    },
+    'h13-pick-chip'
+  );
+
+  // Submit Play (with Motion.shake if incomplete or invalid!)
+  Motion.delegate(
+    container,
+    'click',
+    '#h13-btn-submit',
+    async (e, btn) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx) return;
+      if (uiDraft.selectedRock === null || uiDraft.selectedChip === null) {
+        ctx.sfx.play('error');
+        const target =
+          uiDraft.selectedRock === null
+            ? container.querySelector('[data-motion-key="h13-rock-cards"]')
+            : container.querySelector('[data-motion-key="h13-chips-grid"]');
+        Motion.shake(target || btn);
+        ctx.ui.toast(
+          ctx.lang === 'zh' ? '请先选择 1 张岩石卡和 1 枚颜色筹码' : 'Select both 1 Rock Card and 1 Color Chip first',
+          'error'
+        );
+        return;
+      }
+      const res = await ctx.dispatch({
+        type: 'SUBMIT_PLAY',
+        payload: { rock: uiDraft.selectedRock, chip: uiDraft.selectedChip },
+      });
+      if (!res.ok) {
+        ctx.sfx.play('error');
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      } else {
+        ctx.sfx.play('cardFlip');
+      }
+    },
+    'h13-submit'
+  );
+
+  // Rainbow Stand Choice (pedestal click or quick button)
+  Motion.delegate(
+    container,
+    'click',
+    '[data-choose-stand]',
+    async (e, el) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx) return;
+      const color = el.dataset.chooseStand;
+      const res = await ctx.dispatch({ type: 'CHOOSE_STAND', payload: { color } });
+      if (!res.ok) {
+        ctx.sfx.play('error');
+        Motion.shake(el);
+        ctx.ui.toast(res.reason, 'error');
+      } else {
+        ctx.sfx.play('tilePlace');
+      }
+    },
+    'h13-choose-stand-click'
+  );
+
+  Motion.delegate(
+    container,
+    'keydown',
+    '[data-choose-stand][role="button"]',
+    (e, el) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      el.click();
+    },
+    'h13-choose-stand-key'
+  );
+
+  // Confirm Place Now
+  Motion.delegate(
+    container,
+    'click',
+    '#h13-btn-confirm-place',
+    async (e, btn) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx) return;
+      const res = await ctx.dispatch({ type: 'CONFIRM_PLACE' });
+      if (!res.ok) {
+        ctx.sfx.play('error');
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      } else {
+        ctx.sfx.play('tilePlace');
+      }
+    },
+    'h13-confirm-place'
+  );
+
+  // Strategic Pass
+  Motion.delegate(
+    container,
+    'click',
+    '#h13-btn-pass',
+    async (e, btn) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx) return;
+      const res = await ctx.dispatch({ type: 'USE_PASS' });
+      if (!res.ok) {
+        ctx.sfx.play('error');
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      } else {
+        ctx.sfx.play('cardFlip');
+      }
+    },
+    'h13-pass'
+  );
+
+  // Next Round
+  Motion.delegate(
+    container,
+    'click',
+    '#h13-btn-next-round',
+    async (e, btn) => {
+      const ctx = uiDraft.latestCtx;
+      if (!ctx) return;
+      ctx.sfx.play('click');
+      const res = await ctx.dispatch({ type: 'NEXT_ROUND' });
+      if (!res.ok) {
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'h13-next-round'
+  );
 }
 
 mountGame({
@@ -152,11 +316,15 @@ Survive **14 rounds** (two 7-round card cycles) across 3 shared stone pedestals 
 });
 
 function renderHeavy13(container, ctx) {
-  const { state, mySeatId, lang, lastEvent, dispatch, sfx, ui, log } = ctx;
+  const { state, mySeatId, lang, lastEvent, sfx, log } = ctx;
   if (!state) return;
+
+  uiDraft.latestCtx = ctx;
+  uiDraft.latestContainer = container;
 
   syncDraftKey(state, mySeatId);
   handleEventFeedback(lastEvent, sfx, log, lang);
+  bindDelegatedEvents(container);
 
   const t = (zh, en) => (lang === 'zh' ? zh : en);
   const me = mySeatId ? state.players[mySeatId] : null;
@@ -169,10 +337,9 @@ function renderHeavy13(container, ctx) {
   const cname = (c) => (lang === 'zh' ? COLOR_META[c]?.zh : COLOR_META[c]?.en) || c;
   const cshort = (c) => (lang === 'zh' ? COLOR_META[c]?.shortZh : COLOR_META[c]?.shortEn) || c;
 
-  // Render the 3 Sculptural Stone Pedestals
   const renderPedestals = () => {
     return `
-      <div class="h13-pedestals-grid">
+      <div class="h13-pedestals-grid" data-motion-key="h13-pedestals-grid">
         ${COLORS.map((color) => {
           const stand = state.stands[color];
           const w = stand.weight;
@@ -181,14 +348,13 @@ function renderHeavy13(container, ctx) {
           const isCritical = w >= 11;
           const isJustBusted = isShaking && uiDraft.bustedColor === color;
 
-          // If it's my Rainbow choice, compute live projection on each pedestal!
           let projHtml = '';
           if (isMyRainbow) {
             const rock = state.decision.rock;
             const proj = w + rock;
             const busts = proj >= BUST_LIMIT;
             projHtml = `
-              <div class="h13-rainbow-proj ${busts ? 'is-bust' : ''}">
+              <div class="h13-rainbow-proj dp-tabular ${busts ? 'is-bust' : ''}" data-motion-key="h13-proj-${color}">
                 ${
                   busts
                     ? `💥 ${w} + ${rock} = ${proj} · ${t(`爆仓 +${cnt + 1} 罚分`, `BUST +${cnt + 1} PEN`)}`
@@ -202,28 +368,31 @@ function renderHeavy13(container, ctx) {
             const on = i < w;
             const hot = i >= 8 && i <= 10;
             const danger = i >= 11;
-            return `<span class="h13-pressure-seg ${on ? 'is-on' : ''} ${hot ? 'is-hot' : ''} ${danger ? 'is-danger' : ''}"></span>`;
+            return `<span class="h13-pressure-seg ${on ? 'is-on' : ''} ${hot ? 'is-hot' : ''} ${danger ? 'is-danger' : ''}" data-motion-key="h13-seg-${color}-${i}"></span>`;
           }).join('');
 
           return `
             <div
               class="h13-pedestal h13-c-${color} ${isWarn ? 'is-warn' : ''} ${isCritical ? 'is-critical' : ''} ${isMyRainbow ? 'is-rainbow-target' : ''} ${isJustBusted ? 'is-just-busted' : ''}"
+              data-motion-key="h13-ped-${color}"
               ${isMyRainbow ? `data-choose-stand="${color}" role="button" tabindex="0"` : ''}
             >
-              ${renderStressCracksSvg()}
-              <div>
+              ${renderStressCracksSvg(color)}
+              <div class="h13-danger-ring" data-motion-key="h13-danger-ring-${color}" aria-hidden="true"></div>
+              <div class="h13-bust-overlay" data-motion-key="h13-bust-overlay-${color}" aria-hidden="true"></div>
+              <div style="position:relative;z-index:3;">
                 <div class="h13-ped-head">
                   <div class="h13-ped-title">
                     <span class="h13-ped-gem"></span>
                     <span>${cname(color)}</span>
                   </div>
-                  <div class="h13-ped-weight-led">
-                    ${String(w).padStart(2, '0')}<span style="font-size:12px;opacity:0.55;">/13</span>
+                  <div class="h13-ped-weight-led dp-tabular">
+                    <span id="h13-weight-${color}" data-dp-num>${String(w).padStart(2, '0')}</span><span style="font-size:12px;opacity:0.55;">/13</span>
                   </div>
                 </div>
                 <div class="h13-pressure-wrap">
-                  <div class="h13-pressure-track">${segments}</div>
-                  <div class="h13-pressure-labels">
+                  <div class="h13-pressure-track" data-motion-key="h13-track-${color}">${segments}</div>
+                  <div class="h13-pressure-labels dp-tabular">
                     <span>${t(`已叠 ${cnt} 块岩石`, `${cnt} rock${cnt === 1 ? '' : 's'} stacked`)}</span>
                     <span>${
                       isCritical
@@ -235,15 +404,15 @@ function renderHeavy13(container, ctx) {
               </div>
 
               <div class="h13-rock-stack-arena">
-                <div class="h13-rock-pile">
+                <div class="h13-rock-pile" data-motion-key="h13-pile-${color}">
                   ${
                     cnt === 0
-                      ? `<span style="font-size:11.5px;color:var(--dp-ink-faint);opacity:0.7;">${t('空底座 · 重量 0', 'Empty Pedestal · Weight 0')}</span>`
+                      ? `<span data-motion-key="h13-empty-${color}" style="font-size:11.5px;color:var(--dp-ink-faint);opacity:0.78;">${t('空底座 · 重量 0', 'Empty Pedestal · Weight 0')}</span>`
                       : stand.rocks
                           .map(
-                            (r) => `
-                              <div class="h13-stone-block ${r.value === 0 ? 'is-zero' : ''} ${r.isRainbow ? 'is-rainbow' : ''}" title="${UI.escapeHtml(r.seatName)} · R${r.round}">
-                                <span class="h13-stone-val">${r.value}</span>
+                            (r, rIdx) => `
+                              <div class="h13-stone-block ${r.value === 0 ? 'is-zero' : ''} ${r.isRainbow ? 'is-rainbow' : ''}" data-motion-key="h13-rock-${color}-${rIdx}-${r.round}-${r.seatId}" title="${UI.escapeHtml(r.seatName)} · R${r.round}">
+                                <span class="h13-stone-val dp-tabular">${r.value}</span>
                                 <span class="h13-stone-owner">${r.isRainbow ? '🌈 ' : ''}${UI.escapeHtml(r.seatName)}</span>
                               </div>
                             `
@@ -262,24 +431,23 @@ function renderHeavy13(container, ctx) {
     `;
   };
 
-  // Render Dramatic Bust Alert or Active Decision Bar
   const renderActionBanner = () => {
     const parts = [];
 
     if (state.lastBust && (state.phase === 'PLACE_DECISION' || state.phase === 'ROUND_END')) {
       const b = state.lastBust;
       parts.push(`
-        <div class="h13-bust-banner">
+        <div class="h13-bust-banner" data-motion-key="h13-bust-${b.round}-${b.color}-${b.victimSeatId}">
           <div>
-            <div style="font-size:11.5px;letter-spacing:0.12em;color:#ff8a96;font-weight:800;">💥 PEDESTAL SHATTERED · WEIGHT ${b.weight} ≥ 13</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;margin-top:2px;">
+            <div class="dp-tabular" style="font-size:11.5px;letter-spacing:0.12em;color:var(--dp-crimson-bright);font-weight:800;">💥 PEDESTAL SHATTERED · WEIGHT ${b.weight} ≥ 13</div>
+            <div style="font-size:15px;font-weight:700;color:var(--dp-ink);margin-top:2px;">
               ${t(
                 `${UI.escapeHtml(b.victimName)} 击碎【${cname(b.color)}】（落岩 ${b.triggerRock}），吃下 +${b.penalty} 罚分！`,
                 `${UI.escapeHtml(b.victimName)} shattered ${cname(b.color)} (rock ${b.triggerRock}) and took +${b.penalty} PENALTY!`
               )}
             </div>
           </div>
-          <div style="font-family:var(--dp-font-mono);font-size:22px;font-weight:900;color:#ff6b7a;">
+          <div class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:22px;font-weight:900;color:var(--dp-crimson-bright);">
             +${b.penalty} PEN
           </div>
         </div>
@@ -289,15 +457,15 @@ function renderHeavy13(container, ctx) {
     if (isMyRainbow) {
       const dec = state.decision;
       parts.push(`
-        <div class="h13-decision-bar">
+        <div class="h13-decision-bar" data-motion-key="h13-dec-rainbow-${state.round}">
           <div>
             <div style="font-size:11.5px;letter-spacing:0.1em;color:var(--dp-brass-bright);font-weight:800;">
               🌈 ${t('彩虹筹码特权 · 优先指定底座', 'RAINBOW CHIP PRIORITY · CHOOSE PEDESTAL')}
             </div>
             <div style="font-size:14px;color:var(--dp-ink);margin-top:2px;">
               ${t(
-                `点击上方【红 / 绿 / 蓝】任意一座底座，放下你的岩石卡 [${dec.rock}]！`,
-                `Click Crimson, Emerald, or Cobalt pedestal above to drop your Rock [${dec.rock}]!`
+                `点击上方【红 / 绿 / 蓝】任意一座底座，放下你的岩石卡 [${dec.rock}]`,
+                `Click Crimson, Emerald, or Cobalt pedestal above to drop Rock [${dec.rock}]`
               )}
             </div>
           </div>
@@ -317,12 +485,12 @@ function renderHeavy13(container, ctx) {
     } else if (isMyPassChoice) {
       const dec = state.decision;
       parts.push(`
-        <div class="h13-decision-bar">
+        <div class="h13-decision-bar" data-motion-key="h13-dec-pass-${state.round}">
           <div>
-            <div style="font-size:11.5px;letter-spacing:0.1em;color:${dec.wouldBust ? '#ff6b7a' : 'var(--dp-brass-bright)'};font-weight:800;">
+            <div style="font-size:11.5px;letter-spacing:0.1em;color:${dec.wouldBust ? 'var(--dp-crimson-bright)' : 'var(--dp-brass-bright)'};font-weight:800;">
               ${dec.wouldBust ? `⚠ ${t('爆仓预警！是否发动战略延迟？', 'BUST WARNING! USE STRATEGIC PASS?')}` : t('轮到你放置岩石 · 可发动本周期战略延迟', 'YOUR PLACEMENT TURN · STRATEGIC PASS AVAILABLE')}
             </div>
-            <div style="font-size:14px;color:var(--dp-ink);margin-top:2px;">
+            <div class="dp-tabular" style="font-size:14px;color:var(--dp-ink);margin-top:2px;">
               ${t(
                 `你的 [${cshort(dec.targetColor)} · ${dec.rock}] 放入【${cname(dec.targetColor)}】后总重将变为 ${dec.projectedWeight}${dec.wouldBust ? `（爆仓吃 +${dec.projectedPenalty} 罚分！）` : '（安全）'}`,
                 `Dropping [${cshort(dec.targetColor)} · ${dec.rock}] onto ${cname(dec.targetColor)} makes weight ${dec.projectedWeight}${dec.wouldBust ? ` (BUST +${dec.projectedPenalty} PEN!)` : ' (SAFE)'}`
@@ -342,7 +510,7 @@ function renderHeavy13(container, ctx) {
     } else if (state.phase === 'PLACE_DECISION' && state.decision) {
       const actor = state.players[state.decision.seatId];
       parts.push(`
-        <div class="h13-decision-bar" style="border-color:rgba(148,163,184,0.35);">
+        <div class="h13-decision-bar" data-motion-key="h13-dec-wait" style="border-color:var(--dp-border);">
           <div style="font-size:13.5px;color:var(--dp-ink-muted);">
             ⏳ ${t(
               `等待 ${UI.escapeHtml(actor?.name || '')} 做出${state.decision.type === 'RAINBOW' ? '彩虹底座选择' : '放置/延迟决策'}（岩石 [${state.decision.rock}]）...`,
@@ -354,7 +522,7 @@ function renderHeavy13(container, ctx) {
     } else if (state.phase === 'ROUND_END') {
       const cycleRefreshNext = state.round === 7;
       parts.push(`
-        <div class="h13-decision-bar" style="border-color:rgba(212,175,106,0.55);">
+        <div class="h13-decision-bar" data-motion-key="h13-round-end-${state.round}">
           <div>
             <div style="font-size:12px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
               ${t(`第 ${state.round} 回合结算完毕`, `ROUND ${state.round} COMPLETE`)}
@@ -362,7 +530,7 @@ function renderHeavy13(container, ctx) {
             <div style="font-size:13.5px;color:var(--dp-ink-muted);margin-top:2px;">
               ${
                 cycleRefreshNext
-                  ? `♻ ${t('下一回合进入下半场（第 8–14 轮），全员回收全部 7 张岩石卡与 7 枚筹码！底座重量保留！', 'Next round begins Cycle 2 (R8–14): all 7 rock cards & 7 chips refresh! Pedestal weights remain!')}`
+                  ? `♻ ${t('下一回合进入下半场（第 8–14 轮），全员回收全部 7 张岩石卡与 7 枚筹码；底座重量保留。', 'Next round begins Cycle 2 (R8–14): all 7 rock cards & 7 chips refresh while pedestal weights remain.')}`
                   : t(
                       `本回合爆仓 ${state.roundBusts.length} 次 · 下回合基准顺位：★ ${UI.escapeHtml(firstPlayer?.name || '')}`,
                       `${state.roundBusts.length} bust(s) this round · Next First Player: ★ ${UI.escapeHtml(firstPlayer?.name || '')}`
@@ -377,10 +545,9 @@ function renderHeavy13(container, ctx) {
       `);
     }
 
-    return parts.join('');
+    return `<div data-motion-key="h13-banners" style="display:flex;flex-direction:column;gap:12px;">${parts.join('')}</div>`;
   };
 
-  // Render Player's Secret Hand & Submission Console
   const renderHandConsole = () => {
     if (!me || state.phase === 'FINISHED') return '';
 
@@ -389,7 +556,7 @@ function renderHeavy13(container, ctx) {
     const rocksAvail = new Set(me.rocksLeft || []);
 
     return `
-      <div class="h13-hand-panel">
+      <div class="h13-hand-panel" data-motion-key="h13-hand-panel">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
           <div>
             <strong style="font-family:var(--dp-font-display);font-size:14px;letter-spacing:0.08em;color:var(--dp-brass-bright);">
@@ -408,17 +575,17 @@ function renderHeavy13(container, ctx) {
           <div style="display:flex;align-items:center;gap:10px;">
             ${
               state.options.allowPass
-                ? `<span style="font-size:12px;color:${me.passLeft > 0 ? 'var(--dp-brass-bright)' : 'var(--dp-ink-faint)'};">⏳ Pass: ${me.passLeft}/1</span>`
+                ? `<span class="dp-tabular" style="font-size:12px;color:${me.passLeft > 0 ? 'var(--dp-brass-bright)' : 'var(--dp-ink-faint)'};">⏳ Pass: ${me.passLeft}/1</span>`
                 : ''
             }
             ${
               canSubmit
                 ? `
-                  <button type="button" class="dp-btn dp-btn-primary" id="h13-btn-submit" ${readyToLock ? '' : 'disabled'}>
+                  <button type="button" class="dp-btn dp-btn-primary" id="h13-btn-submit">
                     🔒 ${
                       readyToLock
                         ? t(`暗牌锁定 [${cshort(uiDraft.selectedChip)} · ${uiDraft.selectedRock}]`, `Lock Play [${cshort(uiDraft.selectedChip)} · ${uiDraft.selectedRock}]`)
-                        : t('请选卡与筹码', 'Select Card & Chip')
+                        : t('锁定出牌', 'Lock Play')
                     }
                   </button>
                 `
@@ -433,7 +600,7 @@ function renderHeavy13(container, ctx) {
               <span>${t('岩石数字卡 (0–6)', 'ROCK CARDS (0–6)')}</span>
               <span>${t('数字越大越先放 · 0 为埋雷卡', 'Higher goes first · 0 = poison')}</span>
             </div>
-            <div class="h13-rock-cards">
+            <div class="h13-rock-cards" data-motion-key="h13-rock-cards">
               ${ROCK_VALUES.map((val) => {
                 const avail = rocksAvail.has(val);
                 const sel = canSubmit && uiDraft.selectedRock === val;
@@ -442,11 +609,12 @@ function renderHeavy13(container, ctx) {
                   <button
                     type="button"
                     class="h13-rock-card ${sel || lockedVal ? 'is-selected' : ''} ${!avail ? 'is-used' : ''}"
+                    data-motion-key="h13-card-${val}"
                     data-rock="${val}"
                     data-pick-rock="${val}"
                     ${canSubmit && avail ? '' : 'disabled'}
                   >
-                    <span class="h13-rock-card-num">${val}</span>
+                    <span class="h13-rock-card-num dp-tabular">${val}</span>
                     <span class="h13-rock-card-tag">${val === 0 ? t('埋雷', 'TRAP') : t('重量', 'WT')}</span>
                   </button>
                 `;
@@ -459,7 +627,7 @@ function renderHeavy13(container, ctx) {
               <span>${t('颜色筹码 (共7枚)', 'COLOR CHIPS (7)')}</span>
               <span>${t('彩虹优先且任选底座', 'Rainbow = 1st + Any Stand')}</span>
             </div>
-            <div class="h13-chips-grid">
+            <div class="h13-chips-grid" data-motion-key="h13-chips-grid">
               ${CHIP_TYPES.map((chip) => {
                 const count = me.chipsLeft?.[chip] || 0;
                 const sel = canSubmit && uiDraft.selectedChip === chip;
@@ -469,6 +637,7 @@ function renderHeavy13(container, ctx) {
                   <button
                     type="button"
                     class="h13-chip-btn ${colorClass} ${sel || lockedChip ? 'is-selected' : ''} ${count <= 0 ? 'is-used' : ''}"
+                    data-motion-key="h13-chip-${chip}"
                     data-pick-chip="${chip}"
                     ${canSubmit && count > 0 ? '' : 'disabled'}
                   >
@@ -476,7 +645,7 @@ function renderHeavy13(container, ctx) {
                       <span class="h13-chip-disc"></span>
                       <span style="font-weight:700;font-size:13px;">${cname(chip)}</span>
                     </span>
-                    <span style="font-family:var(--dp-font-mono);font-weight:800;font-size:13px;color:var(--dp-brass-bright);">×${count}</span>
+                    <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-weight:800;font-size:13px;color:var(--dp-brass-bright);">×${count}</span>
                   </button>
                 `;
               }).join('')}
@@ -487,16 +656,15 @@ function renderHeavy13(container, ctx) {
     `;
   };
 
-  // Render Lower Split: Contestant Penalty Standings + Live Round Placement Queue/Log
   const renderLowerSection = () => {
     return `
-      <div class="h13-lower-grid">
-        <div class="h13-box-panel">
+      <div class="h13-lower-grid" data-motion-key="h13-lower-grid">
+        <div class="h13-box-panel" data-motion-key="h13-standings-panel">
           <div class="h13-sublabel" style="margin-bottom:10px;">
             <span>${t('监狱馆罚分榜 & 已出牌追踪（低分存活）', 'PRISON PENALTY STANDINGS & PLAYED CARD TRACKER')}</span>
             <span>${t('★ = 同数顺位基准', '★ = Tie-Break Lead')}</span>
           </div>
-          <div class="h13-standings-grid">
+          <div class="h13-standings-grid" data-motion-key="h13-standings-grid">
             ${state.seatOrder
               .map((sid) => {
                 const p = state.players[sid];
@@ -513,11 +681,11 @@ function renderHeavy13(container, ctx) {
                       ? `<span style="color:var(--dp-emerald);">✓ ${t('已锁', 'Locked')}</span>`
                       : `<span style="color:var(--dp-amber);">…</span>`
                     : rev
-                    ? `<span style="font-family:var(--dp-font-mono);color:var(--dp-brass-bright);">${cshort(rev.chip)}·${rev.rock}</span>`
+                    ? `<span class="dp-tabular" style="font-family:var(--dp-font-mono);color:var(--dp-brass-bright);">${cshort(rev.chip)}·${rev.rock}</span>`
                     : '';
 
                 return `
-                  <div class="h13-pcard ${isMe ? 'is-me' : ''} ${isFirst ? 'is-first' : ''} ${isActive ? 'is-active' : ''}">
+                  <div class="h13-pcard ${isMe ? 'is-me' : ''} ${isFirst ? 'is-first' : ''} ${isActive ? 'is-active' : ''}" data-motion-key="h13-pcard-${sid}">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
                       <span style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                         ${isFirst ? '<span style="color:var(--dp-brass-bright);">★</span> ' : ''}${UI.escapeHtml(p.name)}
@@ -525,10 +693,11 @@ function renderHeavy13(container, ctx) {
                       ${statusText}
                     </div>
                     <div style="display:flex;align-items:baseline;justify-content:space-between;">
-                      <span class="h13-penalty-num ${p.penalty === 0 ? 'is-clean' : ''}">
-                        ${p.penalty} <small style="font-size:10px;font-weight:600;color:var(--dp-ink-muted);">${t('罚分', 'PEN')}</small>
+                      <span class="h13-penalty-num dp-tabular ${p.penalty === 0 ? 'is-clean' : ''}">
+                        <span data-penalty-seat="${UI.escapeHtml(sid)}" data-dp-num>${p.penalty}</span>
+                        <small style="font-size:10px;font-weight:600;color:var(--dp-ink-muted);">${t('罚分', 'PEN')}</small>
                       </span>
-                      <span style="font-size:11px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
+                      <span class="dp-tabular" style="font-size:11px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
                         💥${p.bustCount}${state.options.allowPass ? ` · ⏳${p.passLeft}` : ''}
                       </span>
                     </div>
@@ -544,39 +713,39 @@ function renderHeavy13(container, ctx) {
           </div>
         </div>
 
-        <div class="h13-box-panel">
+        <div class="h13-box-panel" data-motion-key="h13-queue-panel">
           <div class="h13-sublabel" style="margin-bottom:10px;">
             <span>${t('本回合放置队列与实况', 'ROUND PLACEMENT QUEUE & LOG')}</span>
-            <span>R${state.round}</span>
+            <span class="dp-tabular">R${state.round}</span>
           </div>
-          <div class="h13-queue-list">
+          <div class="h13-queue-list" data-motion-key="h13-queue-list">
             ${
               state.roundLog.length === 0 && state.queue.length === 0
-                ? `<div style="font-size:12px;color:var(--dp-ink-faint);text-align:center;padding:18px 8px;">${t('全员提交暗牌后，将按「彩虹优先 → 数字从大到小 → 顺时针」依次落岩。', 'Once all players lock in, rocks drop in order: Rainbow first → Highest rock → Clockwise.')}</div>`
+                ? `<div data-motion-key="h13-q-empty" style="font-size:12px;color:var(--dp-ink-faint);text-align:center;padding:18px 8px;">${t('全员提交暗牌后，将按「彩虹优先 → 数字从大到小 → 顺时针」依次落岩。', 'Once all players lock in, rocks drop in order: Rainbow first → Highest rock → Clockwise.')}</div>`
                 : ''
             }
             ${state.roundLog
-              .map((entry) => {
+              .map((entry, idx) => {
                 if (entry.type === 'BUST') {
                   return `
-                    <div class="h13-queue-item is-bust">
+                    <div class="h13-queue-item is-bust" data-motion-key="h13-log-${state.round}-${idx}">
                       <span>💥 <strong>${UI.escapeHtml(entry.seatName)}</strong> → ${cshort(entry.color)} [${entry.rock}]</span>
-                      <span style="font-family:var(--dp-font-mono);font-weight:800;">${entry.weightAfter}≥13 · +${entry.penalty}P</span>
+                      <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-weight:800;">${entry.weightAfter}≥13 · +${entry.penalty}P</span>
                     </div>
                   `;
                 }
                 if (entry.type === 'PASS') {
                   return `
-                    <div class="h13-queue-item is-pass">
+                    <div class="h13-queue-item is-pass" data-motion-key="h13-log-${state.round}-${idx}">
                       <span>⏳ <strong>${UI.escapeHtml(entry.seatName)}</strong> (${cshort(entry.chip)} ${entry.rock})</span>
                       <span>PASS → ${t('顺延末位', 'Delayed')}</span>
                     </div>
                   `;
                 }
                 return `
-                  <div class="h13-queue-item">
+                  <div class="h13-queue-item" data-motion-key="h13-log-${state.round}-${idx}">
                     <span>🪨 <strong>${UI.escapeHtml(entry.seatName)}</strong> → ${cshort(entry.color)} [${entry.rock}]</span>
-                    <span style="font-family:var(--dp-font-mono);color:var(--dp-ink-muted);">${entry.weightAfter}/13 (${entry.rockCount}块)</span>
+                    <span class="dp-tabular" style="font-family:var(--dp-font-mono);color:var(--dp-ink-muted);">${entry.weightAfter}/13 (${entry.rockCount}${t('块', 'r')})</span>
                   </div>
                 `;
               })
@@ -584,9 +753,9 @@ function renderHeavy13(container, ctx) {
             ${state.queue
               .map(
                 (q, idx) => `
-                  <div class="h13-queue-item ${idx === 0 ? 'is-next' : ''}">
+                  <div class="h13-queue-item ${idx === 0 ? 'is-next' : ''}" data-motion-key="h13-q-${q.seatId}-${q.hasPassed ? 'p' : 'n'}">
                     <span>${idx === 0 ? '▶ ' : '• '}<strong>${UI.escapeHtml(state.players[q.seatId]?.name || q.seatId)}</strong></span>
-                    <span style="font-family:var(--dp-font-mono);">${cshort(q.chip)} · [${q.rock}]${q.hasPassed ? ' (PASS)' : ''}</span>
+                    <span class="dp-tabular" style="font-family:var(--dp-font-mono);">${cshort(q.chip)} · [${q.rock}]${q.hasPassed ? ' (PASS)' : ''}</span>
                   </div>
                 `
               )
@@ -597,19 +766,19 @@ function renderHeavy13(container, ctx) {
     `;
   };
 
-  container.innerHTML = `
-    <div class="h13-stage ${isShaking ? 'is-bust-shake' : ''}">
-      <div class="h13-header">
+  const html = `
+    <div class="h13-stage ${isShaking ? 'is-bust-shake' : ''}" data-motion-key="h13-stage">
+      <div class="h13-header" data-motion-key="h13-header">
         <div class="h13-round-meta">
-          <span class="h13-round-badge">ROUND ${state.round} / ${state.totalRounds}</span>
-          <span class="h13-cycle-pill">
+          <span class="h13-round-badge dp-tabular">ROUND ${state.round} / ${state.totalRounds}</span>
+          <span class="h13-cycle-pill dp-tabular">
             ${t(`第 ${state.cycle} 周期（${state.cycle === 1 ? 'R1–7' : 'R8–14'}）`, `CYCLE ${state.cycle} (${state.cycle === 1 ? 'R1–7' : 'R8–14'})`)}
           </span>
           <span class="h13-first-pill">
             ★ ${t('基准顺位', 'First')}: ${UI.escapeHtml(firstPlayer?.name || '')}
           </span>
         </div>
-        <div style="font-size:12.5px;color:var(--dp-ink-muted);">
+        <div class="dp-tabular" style="font-size:12.5px;color:var(--dp-ink-muted);">
           ${
             state.phase === 'SUBMIT'
               ? t(`暗牌提交中 · 待提交 ${state.pendingSeatIds.length} 人`, `Hidden Submission · ${state.pendingSeatIds.length} pending`)
@@ -629,71 +798,35 @@ function renderHeavy13(container, ctx) {
     </div>
   `;
 
-  // Bind Hand Rock Selection
-  container.querySelectorAll('[data-pick-rock]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      sfx.play('click');
-      uiDraft.selectedRock = Number(btn.dataset.pickRock);
-      renderHeavy13(container, ctx);
-    });
-  });
+  Motion.patchDOM(container, html);
 
-  // Bind Hand Chip Selection
-  container.querySelectorAll('[data-pick-chip]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      sfx.play('click');
-      uiDraft.selectedChip = btn.dataset.pickChip;
-      renderHeavy13(container, ctx);
-    });
-  });
-
-  // Bind Submit Play
-  container.querySelector('#h13-btn-submit')?.addEventListener('click', async () => {
-    if (uiDraft.selectedRock === null || uiDraft.selectedChip === null) return;
-    sfx.play('cardFlip');
-    const res = await dispatch({
-      type: 'SUBMIT_PLAY',
-      payload: { rock: uiDraft.selectedRock, chip: uiDraft.selectedChip },
-    });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
-
-  // Bind Rainbow Stand Choice (both pedestal click & quick buttons)
-  container.querySelectorAll('[data-choose-stand]').forEach((el) => {
-    const pick = async () => {
-      const color = el.dataset.chooseStand;
-      sfx.play('tilePlace');
-      const res = await dispatch({ type: 'CHOOSE_STAND', payload: { color } });
-      if (!res.ok) ui.toast(res.reason, 'error');
-    };
-    el.addEventListener('click', pick);
-    if (el.getAttribute('role') === 'button') {
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          pick();
-        }
+  // Post-patch Apple Motion Choreography:
+  // 1. Animate pedestal weight LED counters smoothly with tabular-nums
+  for (const color of COLORS) {
+    const w = state.stands[color].weight;
+    const prev = uiDraft.prevWeights[color];
+    const el = container.querySelector(`#h13-weight-${color}`);
+    if (el && prev !== null && prev !== w) {
+      Motion.animateNumber(el, prev, w, {
+        duration: 240,
+        format: (v) => String(Math.round(v)).padStart(2, '0'),
+        flash: false,
       });
     }
-  });
+    uiDraft.prevWeights[color] = w;
+  }
 
-  // Bind Confirm Place / Strategic Pass
-  container.querySelector('#h13-btn-confirm-place')?.addEventListener('click', async () => {
-    sfx.play('tilePlace');
-    const res = await dispatch({ type: 'CONFIRM_PLACE' });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
-
-  container.querySelector('#h13-btn-pass')?.addEventListener('click', async () => {
-    sfx.play('cardFlip');
-    const res = await dispatch({ type: 'USE_PASS' });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
-
-  // Bind Next Round
-  container.querySelector('#h13-btn-next-round')?.addEventListener('click', async () => {
-    sfx.play('click');
-    const res = await dispatch({ type: 'NEXT_ROUND' });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
+  // 2. Animate player penalty scores on Bust!
+  for (const sid of state.seatOrder) {
+    const p = state.players[sid];
+    const prev = uiDraft.prevPenalties.get(sid);
+    const el = container.querySelector(`[data-penalty-seat="${CSS.escape ? CSS.escape(sid) : sid}"]`);
+    if (el && prev !== undefined && prev !== p.penalty) {
+      Motion.animateNumber(el, prev, p.penalty, {
+        duration: 280,
+        flash: true,
+      });
+    }
+    uiDraft.prevPenalties.set(sid, p.penalty);
+  }
 }

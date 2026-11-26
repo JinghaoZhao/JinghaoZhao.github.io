@@ -1,5 +1,6 @@
 /* ==========================================================================
- * Prison Match 2: Russian Roulette — Noir Brushed-Steel Revolver Table
+ * Prison Match 2: Russian Roulette — Dual-Theme Brushed-Steel Revolver Table
+ * Unified Apple-Grade Motion · GPU-Composited · Dark Obsidian & Light Porcelain
  * ========================================================================== */
 
 .rr-arena {
@@ -14,16 +15,15 @@
 }
 
 .rr-arena.is-firing-hit {
-  animation: rrScreenShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  animation: rrScreenShake 280ms var(--dp-ease-out);
 }
 
 @keyframes rrScreenShake {
-  0%, 100% { transform: translate(0, 0); }
-  15% { transform: translate(-7px, 4px); }
-  30% { transform: translate(7px, -5px); }
-  45% { transform: translate(-5px, -3px); }
-  65% { transform: translate(4px, 3px); }
-  80% { transform: translate(-2px, 1px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-5px, 2px, 0); }
+  45% { transform: translate3d(5px, -2px, 0); }
+  70% { transform: translate3d(-3px, 1px, 0); }
+  88% { transform: translate3d(2px, -1px, 0); }
 }
 
 /* Top Telemetry Strip */
@@ -36,14 +36,14 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: var(--dp-radius-md);
-  background: linear-gradient(135deg, rgba(16, 19, 30, 0.92), rgba(24, 14, 18, 0.88));
+  background: var(--dp-surface-card);
   border: 1px solid var(--dp-border);
   box-shadow: var(--dp-shadow-card);
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .rr-banner.is-danger {
-  border-color: rgba(220, 53, 69, 0.65);
-  box-shadow: 0 0 28px rgba(220, 53, 69, 0.28);
+  border-color: var(--dp-crimson);
 }
 
 .rr-banner-phase {
@@ -52,13 +52,14 @@
   gap: 10px;
   font-weight: 700;
   font-size: 14.5px;
+  color: var(--dp-ink);
 }
 
 .rr-metrics {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .rr-pill {
@@ -67,10 +68,11 @@
   gap: 6px;
   padding: 5px 11px;
   border-radius: 999px;
-  background: rgba(8, 10, 16, 0.8);
+  background: var(--dp-surface-input);
   border: 1px solid var(--dp-border-subtle);
   font-size: 12px;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--dp-ink-muted);
 }
 
@@ -80,19 +82,19 @@
 }
 
 .rr-pill.is-crimson {
-  border-color: rgba(220, 53, 69, 0.55);
-  background: rgba(220, 53, 69, 0.14);
-  color: #ffb8c0;
+  border-color: rgba(220, 53, 69, 0.45);
+  background: rgba(220, 53, 69, 0.12);
+  color: var(--dp-crimson-bright);
 }
 
 .rr-pill.is-crimson strong {
-  color: #ff6b7a;
+  color: var(--dp-crimson-bright);
 }
 
 .rr-pill.is-amber {
-  border-color: rgba(245, 158, 11, 0.5);
+  border-color: rgba(245, 158, 11, 0.42);
   background: rgba(245, 158, 11, 0.12);
-  color: #fde68a;
+  color: var(--dp-amber);
 }
 
 /* Centerpiece Revolver Stage */
@@ -100,9 +102,10 @@
   position: relative;
   border-radius: var(--dp-radius-lg);
   background:
-    radial-gradient(circle at 50% 48%, rgba(212, 175, 106, 0.1) 0%, rgba(16, 19, 28, 0.96) 54%, rgba(7, 8, 13, 0.99) 100%);
+    radial-gradient(circle at 50% 48%, var(--dp-brass-glow) 0%, transparent 56%),
+    var(--dp-surface-card);
   border: 1px solid var(--dp-border);
-  box-shadow: var(--dp-shadow-card), inset 0 0 80px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--dp-shadow-card);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -110,41 +113,44 @@
   justify-content: center;
   min-height: 490px;
   overflow: hidden;
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .rr-table-card.is-firing-mode {
   background:
-    radial-gradient(circle at 50% 48%, rgba(220, 53, 69, 0.2) 0%, rgba(15, 10, 14, 0.97) 55%, rgba(5, 4, 7, 0.99) 100%);
-  border-color: rgba(220, 53, 69, 0.55);
+    radial-gradient(circle at 50% 48%, var(--dp-crimson-glow) 0%, transparent 58%),
+    var(--dp-surface-card);
+  border-color: var(--dp-crimson);
 }
 
-/* Dramatic Muzzle Flash Overlay */
+/* Dramatic Muzzle Flash Overlay (GPU opacity + transform only) */
 .rr-muzzle-flash {
   position: absolute;
   inset: 0;
   pointer-events: none;
   opacity: 0;
   z-index: 6;
+  will-change: transform, opacity;
 }
 
 .rr-muzzle-flash.is-bang {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 120, 90, 0.72) 0%, rgba(220, 38, 38, 0.45) 38%, transparent 75%);
-  animation: rrBangFlash 0.65s ease-out forwards;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 120, 90, 0.65) 0%, rgba(220, 38, 38, 0.36) 38%, transparent 75%);
+  animation: rrBangFlash 560ms var(--dp-ease-out) forwards;
 }
 
 .rr-muzzle-flash.is-click {
-  background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.28) 0%, rgba(148, 163, 184, 0.14) 38%, transparent 72%);
-  animation: rrClickFlash 0.42s ease-out forwards;
+  background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.24) 0%, rgba(148, 163, 184, 0.12) 38%, transparent 72%);
+  animation: rrClickFlash 380ms var(--dp-ease-out) forwards;
 }
 
 @keyframes rrBangFlash {
-  0% { opacity: 1; transform: scale(0.92); }
-  25% { opacity: 0.9; transform: scale(1.04); }
-  100% { opacity: 0; transform: scale(1.12); }
+  0% { opacity: 1; transform: scale(0.94); }
+  25% { opacity: 0.88; transform: scale(1.03); }
+  100% { opacity: 0; transform: scale(1.08); }
 }
 
 @keyframes rrClickFlash {
-  0% { opacity: 0.85; }
+  0% { opacity: 0.82; }
   100% { opacity: 0; }
 }
 
@@ -164,57 +170,55 @@
   user-select: none;
 }
 
+/* Persistent keyed cylinder group — unlocks real 480ms smooth spin! */
 .rr-cylinder-group {
   transform-origin: 220px 220px;
-  transition: transform 0.72s cubic-bezier(0.22, 1.15, 0.36, 1);
+  transition: transform 480ms var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .rr-pair-arc {
   fill: none;
-  stroke: rgba(212, 175, 106, 0.25);
+  stroke: var(--dp-border-strong);
   stroke-width: 14;
   stroke-linecap: round;
   cursor: pointer;
-  transition: stroke 0.2s, stroke-width 0.2s, filter 0.2s;
+  opacity: 0.72;
+  transition: stroke var(--dp-dur-fast) var(--dp-ease-apple),
+    stroke-width var(--dp-dur-fast) var(--dp-ease-apple),
+    opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .rr-pair-arc:hover {
-  stroke: rgba(242, 213, 145, 0.72);
-  stroke-width: 18;
-  filter: drop-shadow(0 0 8px rgba(242, 213, 145, 0.65));
+  stroke: var(--dp-brass-bright);
+  stroke-width: 17;
+  opacity: 1;
 }
 
 .rr-pair-arc.is-selected {
-  stroke: #38bdf8;
+  stroke: var(--dp-cyan);
   stroke-width: 18;
-  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.85));
+  opacity: 1;
 }
 
 .rr-pair-arc.is-swap {
-  stroke: #f59e0b;
+  stroke: var(--dp-amber);
   stroke-width: 18;
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.85));
+  opacity: 1;
 }
 
 .rr-chamber-ring {
-  transition: stroke 0.25s, fill 0.25s, filter 0.25s;
-}
-
-.rr-chamber-live-glow {
-  filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.85));
-}
-
-.rr-chamber-safe-glow {
-  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.65));
+  transition: stroke var(--dp-dur-base) var(--dp-ease-apple),
+    fill var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .rr-xray-beam {
-  animation: rrXrayPulse 1.4s ease-in-out infinite;
+  animation: rrXrayPulse 1.4s var(--dp-ease-apple) infinite;
 }
 
 @keyframes rrXrayPulse {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 0.95; }
+  0%, 100% { opacity: 0.42; }
+  50% { opacity: 0.96; }
 }
 
 .rr-seat-node {
@@ -237,25 +241,25 @@
   padding: 7px 16px;
   border-radius: 999px;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   z-index: 7;
   white-space: nowrap;
   backdrop-filter: blur(8px);
 }
 
 .rr-shot-callout.is-live {
-  background: rgba(185, 28, 28, 0.88);
+  background: rgba(185, 28, 28, 0.92);
   border: 1px solid #fca5a5;
-  color: #fff;
-  box-shadow: 0 0 24px rgba(220, 38, 38, 0.65);
+  color: #ffffff;
 }
 
 .rr-shot-callout.is-blank {
-  background: rgba(15, 23, 42, 0.88);
-  border: 1px solid rgba(56, 189, 248, 0.55);
-  color: #bae6fd;
+  background: var(--dp-surface-toast);
+  border: 1px solid var(--dp-cyan);
+  color: var(--dp-cyan);
 }
 
 /* Right Control Dock */
@@ -294,16 +298,18 @@
   gap: 12px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(212, 175, 106, 0.14), rgba(14, 16, 24, 0.9));
+  background: var(--dp-surface-tile);
   border: 1px solid var(--dp-border-strong);
 }
 
 .rr-credit-num {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 30px;
   font-weight: 800;
   line-height: 1;
   color: var(--dp-brass-bright);
+  transition: color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .rr-credit-num.is-zero {
@@ -320,13 +326,16 @@
 .rr-pip {
   height: 7px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  transition: background 0.25s;
+  background: var(--dp-surface-row);
+  border: 1px solid var(--dp-border-subtle);
+  transition: background-color var(--dp-dur-base) var(--dp-ease-apple),
+    border-color var(--dp-dur-base) var(--dp-ease-apple),
+    opacity var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .rr-pip.is-filled {
-  background: linear-gradient(90deg, #e7c87f, #c49746);
-  box-shadow: 0 0 6px rgba(212, 175, 106, 0.4);
+  background: var(--dp-brass);
+  border-color: var(--dp-border-strong);
 }
 
 /* Action Buttons Grid */
@@ -345,27 +354,31 @@
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--dp-border);
-  background: rgba(20, 24, 36, 0.85);
+  background: var(--dp-surface-btn);
   text-align: left;
-  transition: border-color 0.18s, background 0.18s, transform 0.15s, box-shadow 0.18s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-instant) var(--dp-ease-apple);
 }
 
 .rr-action-btn:hover:not(:disabled) {
   border-color: var(--dp-border-strong);
-  background: rgba(30, 36, 54, 0.95);
+  background: var(--dp-surface-btn-hover);
   transform: translateY(-1px);
+}
+
+.rr-action-btn:active:not(:disabled) {
+  transform: scale(0.985);
 }
 
 .rr-action-btn.is-active {
   border-color: var(--dp-cyan);
   background: rgba(56, 189, 248, 0.14);
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.22);
 }
 
 .rr-action-btn.is-manipulate.is-active {
   border-color: var(--dp-amber);
-  background: rgba(245, 158, 11, 0.15);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.24);
+  background: rgba(245, 158, 11, 0.14);
 }
 
 .rr-action-info strong {
@@ -385,9 +398,10 @@
   padding: 4px 9px;
   border-radius: 999px;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   font-weight: 700;
-  background: rgba(212, 175, 106, 0.14);
+  background: var(--dp-brass-glow);
   border: 1px solid var(--dp-border-strong);
   color: var(--dp-brass-bright);
 }
@@ -397,9 +411,9 @@
   margin-top: 10px;
   padding: 12px;
   border-radius: 10px;
-  background: rgba(8, 11, 18, 0.88);
+  background: var(--dp-surface-input);
   border: 1px solid var(--dp-border-strong);
-  animation: rrFadeIn 0.2s ease;
+  animation: rrFadeIn var(--dp-dur-fast) var(--dp-ease-out);
 }
 
 @keyframes rrFadeIn {
@@ -418,28 +432,37 @@
   padding: 7px 6px;
   border-radius: 8px;
   border: 1px solid var(--dp-border);
-  background: rgba(26, 31, 46, 0.85);
+  background: var(--dp-surface-btn);
+  color: var(--dp-ink);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   font-weight: 600;
   text-align: center;
-  transition: all 0.16s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-instant) var(--dp-ease-apple);
 }
 
 .rr-chip:hover:not(:disabled) {
   border-color: var(--dp-brass);
 }
 
+.rr-chip:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
 .rr-chip.is-selected {
   border-color: var(--dp-cyan);
-  background: rgba(56, 189, 248, 0.2);
-  color: #e0f2fe;
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--dp-cyan);
 }
 
 .rr-chip.is-swap.is-selected {
   border-color: var(--dp-amber);
-  background: rgba(245, 158, 11, 0.22);
-  color: #fef3c7;
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--dp-amber);
 }
 
 /* Players Strip */
@@ -457,24 +480,27 @@
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--dp-border-subtle);
-  background: rgba(14, 17, 26, 0.82);
+  background: var(--dp-surface-row);
   font-size: 12.5px;
+  color: var(--dp-ink);
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple),
+    background-color var(--dp-dur-base) var(--dp-ease-apple),
+    opacity var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .rr-player-pill.is-turn {
   border-color: var(--dp-brass-bright);
-  background: rgba(212, 175, 106, 0.13);
-  box-shadow: 0 0 14px rgba(212, 175, 106, 0.22);
+  background: var(--dp-brass-glow);
 }
 
 .rr-player-pill.is-eliminated {
-  border-color: rgba(220, 53, 69, 0.7);
-  background: rgba(220, 53, 69, 0.15);
+  border-color: rgba(220, 53, 69, 0.6);
+  background: rgba(220, 53, 69, 0.12);
   opacity: 0.78;
 }
 
 .rr-player-pill.is-survived {
-  border-color: rgba(34, 197, 94, 0.55);
+  border-color: rgba(34, 197, 94, 0.5);
   background: rgba(34, 197, 94, 0.1);
 }
 
@@ -485,9 +511,10 @@
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  background: rgba(212, 175, 106, 0.18);
+  background: var(--dp-brass-glow);
   color: var(--dp-brass-bright);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
   flex-shrink: 0;
@@ -506,7 +533,7 @@
 .rr-history-row {
   padding: 6px 9px;
   border-radius: 7px;
-  background: rgba(8, 10, 16, 0.72);
+  background: var(--dp-surface-row);
   border-left: 2px solid var(--dp-border-strong);
   color: var(--dp-ink-muted);
 }
@@ -514,19 +541,19 @@
 .rr-history-row.is-alert {
   border-left-color: var(--dp-crimson);
   background: rgba(220, 53, 69, 0.1);
-  color: #fecaca;
+  color: var(--dp-crimson-bright);
 }
 
 .rr-history-row.is-intel {
   border-left-color: var(--dp-cyan);
   background: rgba(56, 189, 248, 0.09);
-  color: #e0f2fe;
+  color: var(--dp-cyan);
 }
 
 .rr-history-row.is-manipulate {
   border-left-color: var(--dp-amber);
   background: rgba(245, 158, 11, 0.1);
-  color: #fef3c7;
+  color: var(--dp-amber);
 }
 
 /* Declassified Ledger at End */
@@ -534,10 +561,42 @@
   margin-top: 10px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(8, 10, 16, 0.86);
+  background: var(--dp-surface-input);
   border: 1px dashed var(--dp-border-strong);
   font-size: 12px;
   color: var(--dp-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Light Porcelain Studio Refinements */
+:root[data-theme="light"] .rr-table-card {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(154, 110, 31, 0.12) 0%, rgba(250, 249, 246, 0.96) 62%, #efede7 100%);
+}
+
+:root[data-theme="light"] .rr-table-card.is-firing-mode {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(196, 35, 52, 0.14) 0%, rgba(255, 248, 248, 0.96) 62%, #f5ecec 100%);
+}
+
+:root[data-theme="light"] .rr-history-row.is-intel {
+  color: #0369a1;
+}
+
+:root[data-theme="light"] .rr-history-row.is-manipulate {
+  color: #92400e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rr-arena.is-firing-hit,
+  .rr-xray-beam,
+  .rr-muzzle-flash.is-bang,
+  .rr-muzzle-flash.is-click {
+    animation: none !important;
+  }
+  .rr-cylinder-group {
+    transition-duration: 120ms;
+  }
 }
 
 @media (max-width: 960px) {

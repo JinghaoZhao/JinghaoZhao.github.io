@@ -1,14 +1,64 @@
 /* ==========================================================================
  * Exile Match 3: Secret Code (秘密密码 / 비밀 코드)
- * Ancient Temple Decryption Desk · 26 A-Z Glyph Cards · Brass Tumbler Lock
+ * Dual-Theme: Dark Obsidian Temple & Light Carved Sandstone/Porcelain Temple
+ * GPU-Composited Sliding Filter Indicators · Explicit transitions
  * ========================================================================== */
+
+:root,
+:root[data-theme="dark"] {
+  --sc-bg-top: rgba(245, 158, 11, 0.14);
+  --sc-bg-bl: rgba(217, 119, 6, 0.10);
+  --sc-bg-br: rgba(220, 53, 69, 0.12);
+  --sc-temple-surface: linear-gradient(135deg, rgba(35, 25, 16, 0.94), rgba(16, 13, 11, 0.96));
+  --sc-racer-bg: rgba(12, 10, 9, 0.74);
+  --sc-racer-survived: rgba(16, 36, 24, 0.48);
+  --sc-racer-elim: rgba(42, 14, 18, 0.48);
+  --sc-card-bg: linear-gradient(160deg, #211a14, #130f0b);
+  --sc-card-star-bg: linear-gradient(160deg, #322411, #191208);
+  --sc-card-letter: #f8ecd1;
+  --sc-card-num-bg: rgba(0, 0, 0, 0.55);
+  --sc-clue-bg: rgba(11, 9, 8, 0.78);
+  --sc-tumbler-bg: linear-gradient(180deg, #0d0a08 0%, #1c150f 50%, #0d0a08 100%);
+  --sc-tumbler-val: #fde68a;
+  --sc-lockout-bg: rgba(45, 10, 14, 0.88);
+  --sc-lockout-ink: #fecaca;
+  --sc-reveal-bg: linear-gradient(135deg, rgba(20, 52, 32, 0.88), rgba(14, 28, 19, 0.94));
+  --sc-reveal-ink: #bbf7d0;
+  --sc-reveal-letters: #fde68a;
+  --sc-frieze-ink: rgba(212, 175, 106, 0.18);
+  --sc-track-bg: rgba(10, 8, 7, 0.65);
+}
+
+:root[data-theme="light"] {
+  --sc-bg-top: rgba(180, 122, 30, 0.10);
+  --sc-bg-bl: rgba(180, 122, 30, 0.06);
+  --sc-bg-br: rgba(196, 35, 52, 0.05);
+  --sc-temple-surface: linear-gradient(135deg, #fffdf9 0%, #f5efe4 100%);
+  --sc-racer-bg: rgba(255, 255, 255, 0.82);
+  --sc-racer-survived: rgba(21, 128, 61, 0.10);
+  --sc-racer-elim: rgba(196, 35, 52, 0.10);
+  --sc-card-bg: linear-gradient(160deg, #ffffff 0%, #f6f0e4 100%);
+  --sc-card-star-bg: linear-gradient(160deg, #fef9e7 0%, #f8e8b8 100%);
+  --sc-card-letter: #1a1612;
+  --sc-card-num-bg: rgba(148, 108, 36, 0.10);
+  --sc-clue-bg: rgba(255, 253, 248, 0.88);
+  --sc-tumbler-bg: linear-gradient(180deg, #ebe3d3 0%, #ffffff 50%, #ebe3d3 100%);
+  --sc-tumbler-val: #7a5410;
+  --sc-lockout-bg: rgba(255, 241, 242, 0.95);
+  --sc-lockout-ink: #991b1b;
+  --sc-reveal-bg: linear-gradient(135deg, rgba(21, 128, 61, 0.12), rgba(240, 253, 244, 0.96));
+  --sc-reveal-ink: #14532d;
+  --sc-reveal-letters: #15803d;
+  --sc-frieze-ink: rgba(148, 108, 36, 0.20);
+  --sc-track-bg: rgba(148, 108, 36, 0.08);
+}
 
 body.exile-temple-body {
   background:
-    radial-gradient(ellipse 65% 42% at 50% 0%, rgba(245, 158, 11, 0.16), transparent 65%),
-    radial-gradient(ellipse 45% 45% at 10% 88%, rgba(217, 119, 6, 0.11), transparent 60%),
-    radial-gradient(ellipse 45% 45% at 90% 88%, rgba(220, 53, 69, 0.13), transparent 60%),
-    #0a0807;
+    radial-gradient(ellipse 65% 42% at 50% 0%, var(--sc-bg-top), transparent 65%),
+    radial-gradient(ellipse 45% 45% at 10% 88%, var(--sc-bg-bl), transparent 60%),
+    radial-gradient(ellipse 45% 45% at 90% 88%, var(--sc-bg-br), transparent 60%),
+    var(--dp-bg-void);
 }
 
 .sc-root {
@@ -25,9 +75,9 @@ body.exile-temple-body {
   position: relative;
   padding: 12px 16px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(35, 25, 16, 0.92), rgba(16, 13, 11, 0.95));
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  box-shadow: inset 0 1px 0 rgba(255, 219, 148, 0.12), 0 12px 30px rgba(0, 0, 0, 0.55);
+  background: var(--sc-temple-surface);
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   overflow: hidden;
 }
 
@@ -40,7 +90,7 @@ body.exile-temple-body {
   text-align: center;
   font-size: 9px;
   letter-spacing: 0.45em;
-  color: rgba(212, 175, 106, 0.16);
+  color: var(--sc-frieze-ink);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -71,14 +121,14 @@ body.exile-temple-body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f59e0b;
-  box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.6);
-  animation: sc-flicker 2.2s ease-in-out infinite;
+  background: var(--dp-amber);
+  box-shadow: 0 0 10px var(--dp-amber);
+  animation: sc-flicker 2.2s var(--dp-ease-apple) infinite;
 }
 
 @keyframes sc-flicker {
   0%, 100% { opacity: 1; }
-  45% { opacity: 0.68; }
+  45% { opacity: 0.65; }
 }
 
 .sc-race-grid {
@@ -90,26 +140,26 @@ body.exile-temple-body {
 .sc-racer-card {
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(12, 10, 9, 0.72);
-  border: 1px solid rgba(212, 175, 106, 0.18);
+  background: var(--sc-racer-bg);
+  border: 1px solid var(--dp-border);
   display: flex;
   flex-direction: column;
   gap: 5px;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .sc-racer-card.is-me {
-  border-color: rgba(245, 185, 86, 0.55);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.14);
+  border-color: var(--dp-border-strong);
 }
 
 .sc-racer-card.is-survived {
-  border-color: rgba(34, 197, 94, 0.55);
-  background: rgba(16, 36, 24, 0.45);
+  border-color: var(--dp-emerald);
+  background: var(--sc-racer-survived);
 }
 
 .sc-racer-card.is-eliminated {
-  border-color: rgba(220, 53, 69, 0.55);
-  background: rgba(42, 14, 18, 0.45);
+  border-color: var(--dp-crimson);
+  background: var(--sc-racer-elim);
 }
 
 .sc-racer-top {
@@ -122,6 +172,7 @@ body.exile-temple-body {
 
 .sc-racer-stat {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--dp-brass-bright);
   flex-shrink: 0;
@@ -130,15 +181,19 @@ body.exile-temple-body {
 .sc-bar-track {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--dp-border-subtle);
   overflow: hidden;
 }
 
 .sc-bar-fill {
+  width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #b45309, #f59e0b, #fde68a);
-  transition: width 0.35s var(--dp-ease);
+  background: linear-gradient(90deg, #b45309, #f59e0b, #fbbf24);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--dp-dur-base) var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .sc-racer-card.is-survived .sc-bar-fill {
@@ -149,9 +204,9 @@ body.exile-temple-body {
 .sc-matrix-panel {
   padding: 14px 16px;
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(28, 22, 16, 0.94), rgba(14, 11, 9, 0.96));
-  border: 1.5px solid rgba(212, 175, 106, 0.34);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.58);
+  background: var(--dp-surface-card);
+  border: 1.5px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .sc-matrix-toolbar {
@@ -164,32 +219,39 @@ body.exile-temple-body {
 }
 
 .sc-filter-group {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--sc-track-bg);
+  border: 1px solid var(--dp-border);
 }
 
 .sc-filter-pill {
-  padding: 4px 9px;
+  position: relative;
+  z-index: 1;
+  padding: 4px 10px;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 600;
-  border: 1px solid rgba(212, 175, 106, 0.25);
-  background: rgba(15, 12, 10, 0.8);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--dp-ink-muted);
-  transition: all 0.16s;
+  transition: color var(--dp-dur-fast) var(--dp-ease-apple), transform var(--dp-dur-instant) var(--dp-ease-apple);
 }
 
 .sc-filter-pill:hover {
-  border-color: var(--dp-brass);
   color: var(--dp-ink);
 }
 
+.sc-filter-pill:active {
+  transform: scale(0.96);
+}
+
 .sc-filter-pill.is-active {
-  border-color: #fde68a;
-  background: rgba(245, 158, 11, 0.22);
-  color: #fde68a;
+  color: var(--dp-brass-bright);
 }
 
 .sc-card-grid {
@@ -202,32 +264,34 @@ body.exile-temple-body {
   position: relative;
   border-radius: 10px;
   padding: 7px 4px 6px;
-  background: linear-gradient(160deg, #211a14, #130f0b);
-  border: 1.5px solid rgba(212, 175, 106, 0.3);
+  background: var(--sc-card-bg);
+  border: 1.5px solid var(--dp-border);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
   cursor: pointer;
   user-select: none;
-  transition: transform 0.15s var(--dp-ease), border-color 0.15s, opacity 0.18s, box-shadow 0.15s;
+  transition: transform var(--dp-dur-fast) var(--dp-ease-apple), border-color var(--dp-dur-fast) var(--dp-ease-apple), opacity var(--dp-dur-fast) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .sc-glyph-card:hover {
   transform: translateY(-2px);
-  border-color: var(--dp-brass-bright);
+  border-color: var(--dp-brass);
   z-index: 2;
 }
 
+.sc-glyph-card:active {
+  transform: scale(0.96);
+}
+
 .sc-glyph-card.is-starred {
-  border-color: #fde68a;
-  box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.6), 0 0 16px rgba(245, 158, 11, 0.35);
-  background: linear-gradient(160deg, #322411, #191208);
+  border-color: var(--dp-amber);
+  background: var(--sc-card-star-bg);
 }
 
 .sc-glyph-card.is-eliminated {
-  opacity: 0.24;
-  filter: grayscale(0.75);
+  opacity: 0.25;
 }
 
 .sc-glyph-card.is-eliminated::after {
@@ -239,7 +303,7 @@ body.exile-temple-body {
   justify-content: center;
   font-size: 24px;
   font-weight: 800;
-  color: rgba(239, 68, 68, 0.78);
+  color: var(--dp-crimson-bright);
   pointer-events: none;
 }
 
@@ -248,14 +312,15 @@ body.exile-temple-body {
 }
 
 .sc-glyph-card.is-in-code {
-  box-shadow: 0 0 0 2px #38bdf8, 0 0 14px rgba(56, 189, 248, 0.35);
+  border-color: var(--dp-cyan);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.32);
 }
 
 .sc-card-letter {
   font-family: var(--dp-font-display);
   font-size: 16px;
   font-weight: 800;
-  color: #f8ecd1;
+  color: var(--sc-card-letter);
   line-height: 1;
 }
 
@@ -267,13 +332,14 @@ body.exile-temple-body {
 
 .sc-card-num {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11.5px;
   font-weight: 800;
   padding: 1px 5px;
   border-radius: 5px;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--sc-card-num-bg);
   color: var(--dp-brass-bright);
-  border: 1px solid rgba(212, 175, 106, 0.22);
+  border: 1px solid var(--dp-border);
 }
 
 .sc-star-tag {
@@ -281,7 +347,7 @@ body.exile-temple-body {
   top: 2px;
   right: 3px;
   font-size: 9px;
-  color: #fde68a;
+  color: var(--dp-amber);
 }
 
 /* Lower Two-Column Deduction Desk */
@@ -295,11 +361,9 @@ body.exile-temple-body {
 .sc-clues-panel {
   padding: 16px;
   border-radius: 16px;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(245, 158, 11, 0.08), transparent 60%),
-    linear-gradient(160deg, #211912, #130e0a);
-  border: 1.5px solid rgba(212, 175, 106, 0.36);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+  background: var(--dp-surface-card);
+  border: 1.5px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .sc-panel-title {
@@ -327,32 +391,38 @@ body.exile-temple-body {
   gap: 10px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(11, 9, 8, 0.78);
-  border: 1px solid rgba(212, 175, 106, 0.24);
+  background: var(--sc-clue-bg);
+  border: 1px solid var(--dp-border);
   cursor: pointer;
-  transition: border-color 0.18s, opacity 0.18s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), opacity var(--dp-dur-fast) var(--dp-ease-apple), transform var(--dp-dur-instant) var(--dp-ease-apple);
   font-size: 13.5px;
   line-height: 1.45;
+  color: var(--dp-ink);
 }
 
 .sc-clue-item:hover {
   border-color: var(--dp-brass);
 }
 
+.sc-clue-item:active {
+  transform: scale(0.99);
+}
+
 .sc-clue-item.is-checked {
-  opacity: 0.5;
+  opacity: 0.48;
   text-decoration: line-through;
-  border-color: rgba(34, 197, 94, 0.35);
+  border-color: var(--dp-emerald);
 }
 
 .sc-clue-idx {
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  background: rgba(212, 175, 106, 0.16);
-  border: 1px solid rgba(212, 175, 106, 0.45);
+  background: var(--dp-brass-glow);
+  border: 1px solid var(--dp-border-strong);
   color: var(--dp-brass-bright);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
   display: inline-flex;
@@ -367,9 +437,9 @@ body.exile-temple-body {
   position: relative;
   padding: 16px;
   border-radius: 16px;
-  background: linear-gradient(160deg, #221814, #120d0b);
-  border: 1.5px solid rgba(212, 175, 106, 0.38);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  background: var(--dp-surface-card);
+  border: 1.5px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -385,8 +455,8 @@ body.exile-temple-body {
   position: relative;
   border-radius: 12px;
   padding: 10px 6px;
-  background: linear-gradient(180deg, #0d0a08 0%, #1c150f 50%, #0d0a08 100%);
-  border: 2px solid rgba(212, 175, 106, 0.32);
+  background: var(--sc-tumbler-bg);
+  border: 2px solid var(--dp-border);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -394,16 +464,21 @@ body.exile-temple-body {
   cursor: pointer;
   min-height: 82px;
   justify-content: center;
-  transition: border-color 0.16s, box-shadow 0.16s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), transform var(--dp-dur-instant) var(--dp-ease-apple);
+}
+
+.sc-tumbler:active {
+  transform: scale(0.97);
 }
 
 .sc-tumbler.is-active {
-  border-color: #fde68a;
-  box-shadow: 0 0 0 2px rgba(253, 230, 138, 0.35), 0 0 22px rgba(245, 158, 11, 0.3);
+  border-color: var(--dp-amber);
+  box-shadow: 0 0 0 2px var(--dp-brass-glow);
 }
 
 .sc-tumbler-pos {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10px;
   color: var(--dp-ink-faint);
   letter-spacing: 0.08em;
@@ -413,14 +488,18 @@ body.exile-temple-body {
   font-family: var(--dp-font-display);
   font-size: 28px;
   font-weight: 800;
-  color: #fde68a;
+  color: var(--sc-tumbler-val);
   line-height: 1;
 }
 
 .sc-tumbler-sub {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10.5px;
   color: var(--dp-ink-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 /* Dramatic Crimson Buzzer */
@@ -437,39 +516,35 @@ body.exile-temple-body {
   color: #fff;
   border: 2px solid rgba(254, 202, 202, 0.55);
   box-shadow:
-    0 6px 0 #450a0a,
-    0 12px 28px rgba(220, 38, 38, 0.42),
+    0 5px 0 #450a0a,
+    0 10px 24px rgba(220, 38, 38, 0.34),
     inset 0 2px 0 rgba(255, 255, 255, 0.25);
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition: transform var(--dp-dur-instant) var(--dp-ease-apple), opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .sc-buzzer-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow:
-    0 7px 0 #450a0a,
-    0 16px 34px rgba(220, 38, 38, 0.55),
-    inset 0 2px 0 rgba(255, 255, 255, 0.32);
 }
 
 .sc-buzzer-btn:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #450a0a, 0 6px 14px rgba(220, 38, 38, 0.35);
+  transform: translateY(2px) scale(0.985);
 }
 
 .sc-lockout-box {
   padding: 12px;
   border-radius: 12px;
-  background: rgba(45, 10, 14, 0.85);
-  border: 1.5px solid rgba(239, 68, 68, 0.7);
+  background: var(--sc-lockout-bg);
+  border: 1.5px solid var(--dp-crimson);
   text-align: center;
-  color: #fecaca;
+  color: var(--sc-lockout-ink);
 }
 
 .sc-lockout-timer {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 28px;
   font-weight: 800;
-  color: #ff5868;
+  color: var(--dp-crimson-bright);
 }
 
 .sc-attempt-list {
@@ -486,19 +561,20 @@ body.exile-temple-body {
   justify-content: space-between;
   padding: 6px 10px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--dp-surface-row);
+  border: 1px solid var(--dp-border-subtle);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
 }
 
 .sc-reveal-code {
   padding: 14px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(20, 52, 32, 0.85), rgba(14, 28, 19, 0.92));
-  border: 1.5px solid rgba(74, 222, 128, 0.6);
+  background: var(--sc-reveal-bg);
+  border: 1.5px solid var(--dp-emerald);
   text-align: center;
-  color: #bbf7d0;
+  color: var(--sc-reveal-ink);
 }
 
 .sc-reveal-letters {
@@ -506,8 +582,14 @@ body.exile-temple-body {
   font-size: 26px;
   font-weight: 800;
   letter-spacing: 0.25em;
-  color: #fde68a;
+  color: var(--sc-reveal-letters);
   margin-top: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-torch-dot {
+    animation: none;
+  }
 }
 
 @media (max-width: 1024px) {

@@ -1,14 +1,72 @@
 /* ==========================================================================
  * Exile Match 1: Piece Puzzle (碎片拼图 / 피스 퍼즐)
- * Ancient Temple Sandstone & Dark Basalt + Flickering Torchlight Aesthetic
+ * Dual-Theme: Dark Obsidian Temple & Light Carved Sandstone/Porcelain Temple
+ * GPU-Composited Apple Motion · Explicit transitions · GPU keyframes only
  * ========================================================================== */
+
+:root,
+:root[data-theme="dark"] {
+  --pp-bg-top: rgba(245, 158, 11, 0.14);
+  --pp-bg-bl: rgba(217, 119, 6, 0.10);
+  --pp-bg-br: rgba(220, 53, 69, 0.11);
+  --pp-temple-surface: linear-gradient(135deg, rgba(35, 25, 16, 0.94), rgba(16, 13, 11, 0.96));
+  --pp-chamber-surface: linear-gradient(160deg, #1e1813 0%, #120f0d 100%);
+  --pp-well-surface: linear-gradient(180deg, #0d0b09, #15110d);
+  --pp-slot-bg: rgba(15, 12, 9, 0.88);
+  --pp-slot-hover: rgba(245, 158, 11, 0.10);
+  --pp-tray-card-bg: rgba(11, 9, 8, 0.85);
+  --pp-racer-bg: rgba(12, 10, 9, 0.74);
+  --pp-racer-survived: rgba(16, 36, 24, 0.48);
+  --pp-racer-elim: rgba(42, 14, 18, 0.48);
+  --pp-solved-bg: linear-gradient(135deg, rgba(20, 52, 32, 0.88), rgba(14, 28, 19, 0.94));
+  --pp-solved-ink: #bbf7d0;
+  --pp-lockout-bg: rgba(28, 6, 9, 0.88);
+  --pp-lockout-ink: #fca5a5;
+  --pp-lockout-sub: #fecaca;
+  --pp-frieze-ink: rgba(212, 175, 106, 0.18);
+  --pp-piece-grad-a: #3a2d1b;
+  --pp-piece-grad-a-locked: #4e3c1b;
+  --pp-piece-grad-b: #211912;
+  --pp-piece-grad-c: #130f0b;
+  --pp-piece-ink: #f3d692;
+  --pp-piece-sub: rgba(212, 175, 106, 0.80);
+  --pp-piece-hollow: #14110e;
+}
+
+:root[data-theme="light"] {
+  --pp-bg-top: rgba(180, 122, 30, 0.10);
+  --pp-bg-bl: rgba(180, 122, 30, 0.06);
+  --pp-bg-br: rgba(196, 35, 52, 0.05);
+  --pp-temple-surface: linear-gradient(135deg, #fffdf9 0%, #f5efe4 100%);
+  --pp-chamber-surface: linear-gradient(160deg, #ffffff 0%, #f4ede0 100%);
+  --pp-well-surface: linear-gradient(180deg, #eae2d3 0%, #e3d9c7 100%);
+  --pp-slot-bg: rgba(255, 253, 248, 0.86);
+  --pp-slot-hover: rgba(180, 122, 30, 0.12);
+  --pp-tray-card-bg: #fbf8f2;
+  --pp-racer-bg: rgba(255, 255, 255, 0.82);
+  --pp-racer-survived: rgba(21, 128, 61, 0.10);
+  --pp-racer-elim: rgba(196, 35, 52, 0.10);
+  --pp-solved-bg: linear-gradient(135deg, rgba(21, 128, 61, 0.12), rgba(240, 253, 244, 0.96));
+  --pp-solved-ink: #14532d;
+  --pp-lockout-bg: rgba(255, 245, 246, 0.94);
+  --pp-lockout-ink: #991b1b;
+  --pp-lockout-sub: #b91c1c;
+  --pp-frieze-ink: rgba(148, 108, 36, 0.20);
+  --pp-piece-grad-a: #f3e4c3;
+  --pp-piece-grad-a-locked: #f8e5a8;
+  --pp-piece-grad-b: #e2caa0;
+  --pp-piece-grad-c: #cfa970;
+  --pp-piece-ink: #3c2608;
+  --pp-piece-sub: rgba(74, 48, 12, 0.82);
+  --pp-piece-hollow: #faf5ea;
+}
 
 body.exile-temple-body {
   background:
-    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(245, 158, 11, 0.16), transparent 65%),
-    radial-gradient(ellipse 45% 45% at 10% 85%, rgba(217, 119, 6, 0.12), transparent 60%),
-    radial-gradient(ellipse 45% 45% at 90% 85%, rgba(220, 53, 69, 0.12), transparent 60%),
-    #0a0807;
+    radial-gradient(ellipse 65% 40% at 50% 0%, var(--pp-bg-top), transparent 65%),
+    radial-gradient(ellipse 45% 45% at 10% 85%, var(--pp-bg-bl), transparent 60%),
+    radial-gradient(ellipse 45% 45% at 90% 85%, var(--pp-bg-br), transparent 60%),
+    var(--dp-bg-void);
 }
 
 .pp-root {
@@ -25,12 +83,9 @@ body.exile-temple-body {
   position: relative;
   padding: 12px 16px;
   border-radius: 14px;
-  background:
-    linear-gradient(135deg, rgba(35, 25, 16, 0.92), rgba(16, 13, 11, 0.95));
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 219, 148, 0.12),
-    0 12px 30px rgba(0, 0, 0, 0.55);
+  background: var(--pp-temple-surface);
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   overflow: hidden;
 }
 
@@ -43,7 +98,7 @@ body.exile-temple-body {
   text-align: center;
   font-size: 9px;
   letter-spacing: 0.45em;
-  color: rgba(212, 175, 106, 0.16);
+  color: var(--pp-frieze-ink);
   pointer-events: none;
   white-space: nowrap;
   overflow: hidden;
@@ -75,15 +130,15 @@ body.exile-temple-body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f59e0b;
-  box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.6);
-  animation: pp-torch-flicker 2.2s ease-in-out infinite;
+  background: var(--dp-amber);
+  box-shadow: 0 0 10px var(--dp-amber);
+  animation: pp-torch-flicker 2.2s var(--dp-ease-apple) infinite;
 }
 
 @keyframes pp-torch-flicker {
   0%, 100% { opacity: 1; transform: scale(1); }
-  35% { opacity: 0.72; transform: scale(0.9); }
-  65% { opacity: 0.95; transform: scale(1.1); }
+  40% { opacity: 0.65; transform: scale(0.88); }
+  70% { opacity: 0.96; transform: scale(1.08); }
 }
 
 .pp-survival-note {
@@ -100,27 +155,26 @@ body.exile-temple-body {
 .pp-racer-card {
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(12, 10, 9, 0.72);
-  border: 1px solid rgba(212, 175, 106, 0.18);
+  background: var(--pp-racer-bg);
+  border: 1px solid var(--dp-border);
   display: flex;
   flex-direction: column;
   gap: 5px;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .pp-racer-card.is-me {
-  border-color: rgba(245, 185, 86, 0.55);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.14);
+  border-color: var(--dp-border-strong);
 }
 
 .pp-racer-card.is-survived {
-  border-color: rgba(34, 197, 94, 0.55);
-  background: rgba(16, 36, 24, 0.45);
+  border-color: var(--dp-emerald);
+  background: var(--pp-racer-survived);
 }
 
 .pp-racer-card.is-eliminated {
-  border-color: rgba(220, 53, 69, 0.55);
-  background: rgba(42, 14, 18, 0.45);
+  border-color: var(--dp-crimson);
+  background: var(--pp-racer-elim);
 }
 
 .pp-racer-top {
@@ -133,6 +187,7 @@ body.exile-temple-body {
 
 .pp-racer-name {
   font-weight: 600;
+  color: var(--dp-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -140,6 +195,7 @@ body.exile-temple-body {
 
 .pp-racer-stat {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--dp-brass-bright);
   flex-shrink: 0;
@@ -148,15 +204,19 @@ body.exile-temple-body {
 .pp-bar-track {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--dp-border-subtle);
   overflow: hidden;
 }
 
 .pp-bar-fill {
+  width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #b45309, #f59e0b, #fde68a);
-  transition: width 0.35s var(--dp-ease);
+  background: linear-gradient(90deg, #b45309, #f59e0b, #fbbf24);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--dp-dur-base) var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .pp-racer-card.is-survived .pp-bar-fill {
@@ -176,13 +236,9 @@ body.exile-temple-body {
   position: relative;
   padding: 18px;
   border-radius: 16px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.09), transparent 65%),
-    linear-gradient(160deg, #1e1813 0%, #120f0d 100%);
-  border: 2px solid rgba(196, 154, 78, 0.36);
-  box-shadow:
-    inset 0 0 36px rgba(0, 0, 0, 0.72),
-    0 18px 40px rgba(0, 0, 0, 0.65);
+  background: var(--pp-chamber-surface);
+  border: 2px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .pp-chamber-top {
@@ -200,17 +256,18 @@ body.exile-temple-body {
   gap: 8px;
   padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(12, 10, 8, 0.8);
-  border: 1px solid rgba(212, 175, 106, 0.32);
+  background: var(--dp-surface-input);
+  border: 1px solid var(--dp-border);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
   color: var(--dp-brass-bright);
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .pp-seam-meter.is-complete {
-  border-color: rgba(34, 197, 94, 0.65);
-  color: #86efac;
-  box-shadow: 0 0 18px rgba(34, 197, 94, 0.25);
+  border-color: var(--dp-emerald);
+  color: var(--dp-emerald);
 }
 
 .pp-board-wrap {
@@ -220,11 +277,9 @@ body.exile-temple-body {
   margin: 0 auto;
   padding: 14px;
   border-radius: 12px;
-  background:
-    repeating-linear-gradient(45deg, rgba(212, 175, 106, 0.025) 0 4px, transparent 4px 12px),
-    linear-gradient(180deg, #0d0b09, #15110d);
-  border: 2px solid rgba(168, 129, 62, 0.45);
-  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.88);
+  background: var(--pp-well-surface);
+  border: 2px solid var(--dp-border-strong);
+  box-shadow: inset 0 4px 16px rgba(0, 0, 0, 0.22);
 }
 
 .pp-board-grid {
@@ -238,60 +293,61 @@ body.exile-temple-body {
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(212, 175, 106, 0.05), rgba(7, 6, 5, 0.88));
-  border: 1.5px dashed rgba(196, 154, 78, 0.26);
+  background: var(--pp-slot-bg);
+  border: 1.5px dashed var(--dp-border);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s, background 0.18s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), transform var(--dp-dur-instant) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple);
   user-select: none;
   padding: 2px;
 }
 
 .pp-slot:hover {
-  border-color: rgba(245, 185, 86, 0.65);
-  background: rgba(245, 158, 11, 0.08);
+  border-color: var(--dp-brass);
+  background: var(--pp-slot-hover);
+}
+
+.pp-slot:active {
+  transform: scale(0.975);
 }
 
 .pp-slot.is-drop-target {
   border-style: solid;
   border-color: var(--dp-brass-bright);
-  box-shadow: 0 0 18px rgba(245, 158, 11, 0.35), inset 0 0 14px rgba(245, 158, 11, 0.2);
+  transform: scale(1.02);
 }
 
 .pp-slot.has-piece {
   border-style: solid;
-  border-color: rgba(212, 175, 106, 0.28);
-  background: rgba(15, 12, 9, 0.92);
+  border-color: var(--dp-border);
 }
 
 .pp-slot.is-selected {
-  border-color: #fde68a;
-  box-shadow: 0 0 0 2px rgba(253, 230, 138, 0.5), 0 0 24px rgba(245, 158, 11, 0.45);
+  border-color: var(--dp-amber);
+  box-shadow: 0 0 0 2px var(--dp-brass-glow);
   z-index: 3;
 }
 
 .pp-slot.is-all-matched {
-  border-color: rgba(250, 204, 21, 0.72);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.28);
+  border-color: var(--dp-emerald);
 }
 
 .pp-slot.has-mismatch {
-  border-color: rgba(239, 68, 68, 0.72);
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.28);
+  border-color: var(--dp-crimson);
 }
 
 .pp-slot-index {
   position: absolute;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
-  color: rgba(212, 175, 106, 0.26);
+  color: var(--dp-ink-faint);
   pointer-events: none;
 }
 
-/* Seam glow badges on slot edges */
+/* Seam glow badges on slot edges (GPU opacity only) */
 .pp-seam-glow {
   position: absolute;
   pointer-events: none;
@@ -314,33 +370,41 @@ body.exile-temple-body {
 }
 
 .pp-seam-glow.is-ok {
-  background: linear-gradient(180deg, #fef08a, #f59e0b, #fef08a);
-  box-shadow: 0 0 10px #f59e0b, 0 0 18px rgba(250, 204, 21, 0.7);
-  animation: pp-seam-pulse 1.6s ease-in-out infinite;
+  background: linear-gradient(180deg, #fde047, #f59e0b, #fde047);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.72);
+  animation: pp-seam-pulse 1.8s var(--dp-ease-apple) infinite;
 }
 
 .pp-seam-glow.is-bad {
-  background: #ef4444;
-  box-shadow: 0 0 10px #ef4444;
+  background: var(--dp-crimson);
+  box-shadow: 0 0 8px var(--dp-crimson-glow);
 }
 
 @keyframes pp-seam-pulse {
-  0%, 100% { opacity: 0.75; }
+  0%, 100% { opacity: 0.72; }
   50% { opacity: 1; }
 }
 
-/* Piece SVG Wrapper */
+/* Piece SVG Wrapper — smooth monotonic 90deg clockwise spring rotation! */
+.pp-piece-rotator {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--dp-dur-fast) var(--dp-ease-spring);
+  will-change: transform;
+}
+
 .pp-piece-svg {
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.65));
-  transition: transform 0.22s var(--dp-ease);
 }
 
-.pp-slot.is-selected .pp-piece-svg,
-.pp-tray-card.is-selected .pp-piece-svg {
-  filter: drop-shadow(0 0 12px rgba(245, 185, 86, 0.7));
+.pp-piece-label-upright {
+  transform-origin: 60px 60px;
+  transition: transform var(--dp-dur-fast) var(--dp-ease-spring);
 }
 
 /* Controls Row */
@@ -364,9 +428,9 @@ body.exile-temple-body {
 .pp-tray-panel {
   padding: 16px;
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(28, 22, 16, 0.92), rgba(14, 11, 9, 0.96));
-  border: 1px solid rgba(212, 175, 106, 0.3);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+  background: var(--dp-surface-card);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -393,25 +457,28 @@ body.exile-temple-body {
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background: rgba(11, 9, 8, 0.85);
-  border: 1.5px solid rgba(212, 175, 106, 0.24);
+  background: var(--pp-tray-card-bg);
+  border: 1.5px solid var(--dp-border);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 3px;
   cursor: pointer;
-  transition: transform 0.16s var(--dp-ease), border-color 0.16s, box-shadow 0.16s;
+  transition: transform var(--dp-dur-fast) var(--dp-ease-apple), border-color var(--dp-dur-fast) var(--dp-ease-apple), opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .pp-tray-card:hover:not(.is-placed) {
   transform: translateY(-2px);
-  border-color: var(--dp-brass-bright);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  border-color: var(--dp-brass);
+}
+
+.pp-tray-card:active:not(.is-placed) {
+  transform: scale(0.96);
 }
 
 .pp-tray-card.is-selected {
-  border-color: #fde68a;
-  box-shadow: 0 0 0 2px rgba(253, 230, 138, 0.45), 0 0 20px rgba(245, 158, 11, 0.35);
+  border-color: var(--dp-amber);
+  box-shadow: 0 0 0 2px var(--dp-brass-glow);
 }
 
 .pp-tray-card.is-placed {
@@ -423,8 +490,8 @@ body.exile-temple-body {
 .pp-legend {
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(8, 7, 6, 0.72);
-  border: 1px solid rgba(212, 175, 106, 0.16);
+  background: var(--dp-surface-row);
+  border: 1px solid var(--dp-border-subtle);
   font-size: 12px;
   color: var(--dp-ink-muted);
   display: flex;
@@ -460,8 +527,9 @@ body.exile-temple-body {
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  background: rgba(28, 6, 9, 0.84);
+  background: var(--pp-lockout-bg);
   backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -470,29 +538,30 @@ body.exile-temple-body {
   gap: 8px;
   text-align: center;
   padding: 20px;
-  border: 2px solid rgba(239, 68, 68, 0.75);
+  border: 2px solid var(--dp-crimson);
 }
 
 .pp-lockout-mask strong {
   font-family: var(--dp-font-display);
   font-size: 22px;
-  color: #fca5a5;
+  color: var(--pp-lockout-ink);
   letter-spacing: 0.06em;
 }
 
 .pp-lockout-timer {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 32px;
   font-weight: 800;
-  color: #ff5868;
+  color: var(--dp-crimson-bright);
 }
 
 .pp-solved-banner {
   padding: 14px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(20, 52, 32, 0.85), rgba(14, 28, 19, 0.92));
-  border: 1.5px solid rgba(74, 222, 128, 0.6);
-  color: #bbf7d0;
+  background: var(--pp-solved-bg);
+  border: 1.5px solid var(--dp-emerald);
+  color: var(--pp-solved-ink);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -503,8 +572,19 @@ body.exile-temple-body {
 .pp-frame-hint {
   text-align: center;
   font-size: 11.5px;
-  color: rgba(212, 175, 106, 0.72);
+  color: var(--dp-ink-muted);
   margin-top: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-torch-dot,
+  .pp-seam-glow.is-ok {
+    animation: none;
+  }
+  .pp-piece-rotator,
+  .pp-piece-label-upright {
+    transition-duration: 1ms;
+  }
 }
 
 @media (max-width: 900px) {

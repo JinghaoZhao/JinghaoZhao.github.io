@@ -1,4 +1,4 @@
-import { mountGame, SFX, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, UI, Motion } from '../../shared/sdk.js';
 import {
   GameRules,
   BOARD_ROWS,
@@ -9,19 +9,25 @@ import {
 } from './rules.js';
 
 const ui = {
-  rot: 0,
+  rotDeg: 0, // Monotonic cumulative rotation angle (never wraps 270 -> 0 backwards!)
   hoverR: -1,
   hoverC: -1,
   lastTurnSig: '',
   lastEvSig: '',
+  lastCtx: null,
+  delegated: false,
 };
+
+function currentRotStep() {
+  return ((Math.round(ui.rotDeg / 90) % 4) + 4) % 4;
+}
 
 function renderMiniPolyHtml(tileId, rot = 0) {
   const cells = rotateTileCells(tileId, rot);
   const maxR = Math.max(...cells.map(([r]) => r));
   const maxC = Math.max(...cells.map(([, c]) => c));
   const set = new Set(cells.map(([r, c]) => `${r},${c}`));
-  let html = `<div class="ltg-mini-poly" style="grid-template-columns:repeat(${maxC + 1},11px);">`;
+  let html = `<div class="ltg-mini-poly" style="grid-template-columns:repeat(${maxC + 1},10px);">`;
   for (let r = 0; r <= maxR; r++) {
     for (let c = 0; c <= maxC; c++) {
       html += `<span class="ltg-mini-sq ${set.has(`${r},${c}`) ? '' : 'is-empty'}"></span>`;
@@ -83,10 +89,11 @@ mountGame({
 
   render(container, ctx) {
     const { state, mySeatId, lang, dispatch, sfx, lastEvent } = ctx;
+    ui.lastCtx = ctx;
 
     const turnSig = `${state.round}-${state.phase}-${state.currentTurnSeatId}`;
     if (turnSig !== ui.lastTurnSig) {
-      ui.rot = 0;
+      ui.rotDeg = 0;
       ui.hoverR = -1;
       ui.hoverC = -1;
       ui.lastTurnSig = turnSig;
@@ -103,13 +110,12 @@ mountGame({
     const nameOf = (sid) => state.seats.find((s) => s.seatId === sid)?.name || sid;
     const isMyTurn = Boolean(mySeatId && state.currentTurnSeatId === mySeatId);
     const totalClaimed = Object.values(state.chosenTiles).reduce((a, b) => a + b, 0);
-    const capPct = Math.min(100, Math.round((totalClaimed / 114) * 100));
+    const capRatio = Math.min(1, totalClaimed / 114);
     const overbooked = totalClaimed > 114;
 
     const myChosenTile = mySeatId ? state.chosenTiles[mySeatId] : null;
     const activeTile = state.phase === 'place' && state.currentTurnSeatId ? state.chosenTiles[state.currentTurnSeatId] : null;
 
-    // Count placed turf cells
     let filledCells = 0;
     for (let r = 0; r < BOARD_ROWS; r++) {
       for (let c = 0; c < BOARD_COLS; c++) {
@@ -117,7 +123,6 @@ mountGame({
       }
     }
 
-    // Build initials map for placed tiles
     const initials = {};
     state.seats.forEach((s, idx) => {
       initials[s.seatId] = `P${idx + 1}`;
@@ -125,12 +130,12 @@ mountGame({
 
     const orderList = state.phase === 'draft' ? state.draftOrder : state.placeOrder;
 
-    container.innerHTML = `
-      <div class="ltg-layout">
-        <section class="ltg-park-card">
+    const html = `
+      <div class="ltg-layout" data-motion-key="ltg-layout">
+        <section class="ltg-park-card" data-motion-key="ltg-park-card">
           <div class="ltg-park-header">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <span class="dp-badge" style="border-color:rgba(52,211,153,0.5);background:rgba(16,185,129,0.16);color:#6ee7b7;">
+              <span class="dp-badge ltg-phase-badge dp-tabular">
                 ${lang === 'zh' ? `第 ${state.round}/${state.totalRounds} 轮` : `ROUND ${state.round}/${state.totalRounds}`}
                 · ${
                   state.phase === 'draft'
@@ -144,13 +149,13 @@ mountGame({
                 state.currentTurnSeatId
                   ? `<span style="font-size:13px;color:var(--dp-ink);">
                       ${lang === 'zh' ? '当前行动：' : 'Turn: '}
-                      <strong style="color:#6ee7b7;">${UI.escapeHtml(nameOf(state.currentTurnSeatId))}</strong>
+                      <strong style="color:var(--dp-emerald);">${UI.escapeHtml(nameOf(state.currentTurnSeatId))}</strong>
                       ${isMyTurn ? (lang === 'zh' ? ' (轮到你！)' : ' (YOUR TURN!)') : ''}
                      </span>`
                   : ''
               }
             </div>
-            <span style="font-family:var(--dp-font-mono);font-size:12px;color:var(--dp-ink-muted);">
+            <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:12px;color:var(--dp-ink-muted);">
               ${filledCells}/114 ${lang === 'zh' ? '已铺' : 'FILLED'}
             </span>
           </div>
@@ -160,22 +165,42 @@ mountGame({
               ${lang === 'zh' ? '总选砖面积 / 114格' : 'Claimed / 114 Cells'}
             </span>
             <div class="ltg-cap-track">
-              <div class="ltg-cap-fill ${overbooked ? 'is-over' : ''}" style="width:${capPct}%;"></div>
+              <div class="ltg-cap-fill ${overbooked ? 'is-over' : ''}" id="ltg-cap-fill" data-motion-key="ltg-cap-fill"></div>
             </div>
-            <strong style="font-family:var(--dp-font-mono);color:${overbooked ? '#ff8e99' : '#6ee7b7'};white-space:nowrap;">
+            <strong class="dp-tabular" style="font-family:var(--dp-font-mono);color:${overbooked ? 'var(--dp-crimson-bright)' : 'var(--dp-emerald)'};white-space:nowrap;">
               ${totalClaimed} / 114 ${overbooked ? (lang === 'zh' ? '⚠ 超载!' : '⚠ OVERBOOKED!') : ''}
             </strong>
           </div>
 
           <div class="ltg-board-wrap">
+            <div class="ltg-board" id="ltg-board" data-motion-key="ltg-board">
+              ${Array.from({ length: BOARD_ROWS }, (_, r) =>
+                Array.from({ length: BOARD_COLS }, (_, c) => {
+                  const val = state.board[r][c];
+                  if (val === 'OBSTACLE') {
+                    return `<div class="ltg-cell is-obstacle" data-motion-key="ltg-c-${r}-${c}" data-r="${r}" data-c="${c}" title="Sculpture">❖</div>`;
+                  }
+                  if (val) {
+                    const col = state.colorMap[val] || '#10b981';
+                    return `<div class="ltg-cell is-placed" data-motion-key="ltg-c-${r}-${c}" data-r="${r}" data-c="${c}" style="background:${col};">${UI.escapeHtml(initials[val] || '■')}</div>`;
+                  }
+                  return `<div class="ltg-cell" data-motion-key="ltg-c-${r}-${c}" data-r="${r}" data-c="${c}"></div>`;
+                }).join('')
+              ).join('')}
+            </div>
+
             ${
               state.phase === 'place' && isMyTurn && activeTile != null
                 ? `
-                  <div class="ltg-place-toolbar">
+                  <div class="ltg-place-toolbar" data-motion-key="ltg-place-toolbar">
                     <div style="display:flex;align-items:center;gap:12px;">
-                      <div id="ltg-active-preview">${renderMiniPolyHtml(activeTile, ui.rot)}</div>
+                      <div class="ltg-rot-stage">
+                        <div class="ltg-rot-spinner" id="ltg-active-preview" data-motion-key="ltg-prev-${activeTile}" style="transform:rotate(${ui.rotDeg}deg);">
+                          ${renderMiniPolyHtml(activeTile, 0)}
+                        </div>
+                      </div>
                       <div>
-                        <div style="font-size:14px;font-weight:700;color:#6ee7b7;">
+                        <div class="dp-tabular" style="font-size:14px;font-weight:700;color:var(--dp-emerald);">
                           ${lang === 'zh' ? `正在铺设 ${activeTile} 号草坪砖 (+${activeTile} 分)` : `Placing Tile #${activeTile} (+${activeTile} pts)`}
                         </div>
                         <div style="font-size:11.5px;color:var(--dp-ink-muted);">
@@ -201,45 +226,25 @@ mountGame({
                     </div>
                   </div>
                 `
-                : ''
-            }
-
-            <div class="ltg-board" id="ltg-board">
-              ${Array.from({ length: BOARD_ROWS }, (_, r) =>
-                Array.from({ length: BOARD_COLS }, (_, c) => {
-                  const val = state.board[r][c];
-                  if (val === 'OBSTACLE') {
-                    return `<div class="ltg-cell is-obstacle" data-r="${r}" data-c="${c}" title="Sculpture">❖</div>`;
-                  }
-                  if (val) {
-                    const col = state.colorMap[val] || '#10b981';
-                    return `<div class="ltg-cell is-placed" data-r="${r}" data-c="${c}" style="background:${col};">${UI.escapeHtml(initials[val] || '■')}</div>`;
-                  }
-                  return `<div class="ltg-cell" data-r="${r}" data-c="${c}"></div>`;
-                }).join('')
-              ).join('')}
-            </div>
-
-            ${
-              state.phase === 'draft'
+                : state.phase === 'draft'
                 ? `
-                  <div style="width:min(100%,660px);display:flex;align-items:center;justify-content:space-between;">
+                  <div style="width:min(100%,660px);display:flex;align-items:center;justify-content:space-between;" data-motion-key="ltg-draft-head">
                     <span style="font-size:12px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
                       ${isMyTurn
                         ? (lang === 'zh' ? '✦ 轮到你选砖！点击下方任意一块草坪砖（允许重选）' : '✦ YOUR PICK! Select 1 Polyomino Tile (Duplicates Allowed)')
                         : (lang === 'zh' ? `等待 ${UI.escapeHtml(nameOf(state.currentTurnSeatId))} 选择草坪砖...` : `Waiting for ${UI.escapeHtml(nameOf(state.currentTurnSeatId))} to draft...`)}
                     </span>
                   </div>
-                  <div class="ltg-catalog">
+                  <div class="ltg-catalog" data-motion-key="ltg-catalog">
                     ${TILE_IDS.map((tid) => {
                       const pickedBy = Object.entries(state.chosenTiles)
                         .filter(([, v]) => v === tid)
                         .map(([sid]) => initials[sid]);
                       return `
-                        <button type="button" class="ltg-tile-btn ${myChosenTile === tid ? 'is-picked-by-me' : ''}" data-draft="${tid}" ${isMyTurn ? '' : 'disabled'}>
+                        <button type="button" class="ltg-tile-btn ${myChosenTile === tid ? 'is-picked-by-me' : ''}" data-motion-key="ltg-tile-${tid}" data-draft="${tid}" ${isMyTurn ? '' : 'disabled'}>
                           <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
-                            <strong style="font-family:var(--dp-font-mono);font-size:18px;color:var(--dp-brass-bright);">#${tid}</strong>
-                            <span style="font-size:11px;color:#6ee7b7;font-family:var(--dp-font-mono);">+${tid}pt</span>
+                            <strong class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:18px;color:var(--dp-brass-bright);">#${tid}</strong>
+                            <span class="dp-tabular" style="font-size:11px;color:var(--dp-emerald);font-family:var(--dp-font-mono);">+${tid}pt</span>
                           </div>
                           ${renderMiniPolyHtml(tid, 0)}
                           <span style="font-size:10.5px;color:var(--dp-ink-muted);min-height:14px;">
@@ -261,14 +266,14 @@ mountGame({
           </div>
         </section>
 
-        <aside class="ltg-side">
+        <aside class="ltg-side" data-motion-key="ltg-side">
           <div class="ltg-panel">
             <div style="font-size:11.5px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
               ${state.phase === 'draft'
                 ? (lang === 'zh' ? '选砖顺位（低分优先）' : 'DRAFT ORDER (LOWEST FIRST)')
                 : (lang === 'zh' ? '铺设顺位（小砖优先）' : 'PLACEMENT ORDER (SMALLEST FIRST)')}
             </div>
-            <div class="ltg-order-list">
+            <div class="ltg-order-list" id="ltg-order-list">
               ${orderList
                 .map((sid, idx) => {
                   const s = state.seats.find((x) => x.seatId === sid);
@@ -290,7 +295,7 @@ mountGame({
                       ? (lang === 'zh' ? `铺 #${chosen}` : `LAY #${chosen}`)
                       : `#${chosen}`;
                   return `
-                    <div class="ltg-order-row ${isAct ? 'is-active' : ''} ${st === 'blocked' ? 'is-blocked' : ''}">
+                    <div class="ltg-order-row ${isAct ? 'is-active' : ''} ${st === 'blocked' ? 'is-blocked' : ''}" data-motion-key="ltg-ord-${UI.escapeHtml(sid)}">
                       <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                         <span class="ltg-swatch" style="background:${state.colorMap[sid]};"></span>
                         <strong style="color:var(--dp-ink-muted);margin-right:4px;">${idx + 1}.</strong>
@@ -298,7 +303,7 @@ mountGame({
                         <small style="color:var(--dp-ink-faint);">(P#${state.priorityRank[sid]})</small>
                       </span>
                       <span style="display:flex;align-items:center;gap:8px;font-family:var(--dp-font-mono);">
-                        <span style="font-size:11.5px;color:${st === 'placed' ? '#6ee7b7' : st === 'blocked' ? '#ff8e99' : 'var(--dp-brass-bright)'};">${statusLabel}</span>
+                        <span style="font-size:11.5px;color:${st === 'placed' ? 'var(--dp-emerald)' : st === 'blocked' ? 'var(--dp-crimson-bright)' : 'var(--dp-brass-bright)'};">${statusLabel}</span>
                         <strong style="min-width:38px;text-align:right;">${state.scores[sid] || 0}pt</strong>
                       </span>
                     </div>
@@ -311,128 +316,157 @@ mountGame({
       </div>
     `;
 
-    // Bind draft picks
-    container.querySelectorAll('[data-draft]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        sfx.play('bid');
-        dispatch({ type: 'DRAFT_TILE', payload: { tileId: Number(btn.dataset.draft) } });
-      });
-    });
+    const ordBefore = container.querySelector('#ltg-order-list');
+    const prevOrdRects = ordBefore ? Motion.captureFlip(ordBefore) : null;
 
-    container.querySelector('#ltg-next-round')?.addEventListener('click', () => {
-      sfx.play('click');
-      dispatch({ type: 'NEXT_ROUND' });
-    });
+    Motion.patchDOM(container, html);
 
-    container.querySelector('#ltg-forfeit-btn')?.addEventListener('click', () => {
-      sfx.play('eliminate');
-      dispatch({ type: 'FORFEIT_PLACE' });
-    });
+    const ordAfter = container.querySelector('#ltg-order-list');
+    if (ordAfter && prevOrdRects && prevOrdRects.size > 0) {
+      Motion.playFlip(ordAfter, prevOrdRects);
+    }
 
-    // Interactive board hover preview + 90° rotation + placement
-    const boardEl = container.querySelector('#ltg-board');
-    const confirmTapBtn = container.querySelector('#ltg-confirm-tap');
+    // Pure GPU scaleX capacity bar
+    const capEl = container.querySelector('#ltg-cap-fill');
+    if (capEl) Motion.setProgress(capEl, capRatio);
 
-    const updateGhostPreview = () => {
-      if (!boardEl) return;
-      boardEl.querySelectorAll('.is-ghost-ok, .is-ghost-bad').forEach((el) => {
-        el.classList.remove('is-ghost-ok', 'is-ghost-bad');
-      });
-      if (state.phase !== 'place' || !isMyTurn || activeTile == null || ui.hoverR < 0 || ui.hoverC < 0) return;
+    if (!ui.delegated) {
+      ui.delegated = true;
 
-      const cells = rotateTileCells(activeTile, ui.rot);
-      const valid = canPlaceTile(state.board, activeTile, ui.hoverR, ui.hoverC, ui.rot);
-      const cls = valid ? 'is-ghost-ok' : 'is-ghost-bad';
-      for (const [dr, dc] of cells) {
-        const rr = ui.hoverR + dr;
-        const cc = ui.hoverC + dc;
-        if (rr >= 0 && rr < BOARD_ROWS && cc >= 0 && cc < BOARD_COLS) {
-          const cellEl = boardEl.querySelector(`[data-r="${rr}"][data-c="${cc}"]`);
-          cellEl?.classList.add(cls);
+      const updateGhostPreview = () => {
+        const c = ui.lastCtx;
+        const boardEl = container.querySelector('#ltg-board');
+        if (!c || !boardEl) return;
+        boardEl.querySelectorAll('.is-ghost-ok, .is-ghost-bad').forEach((el) => {
+          el.classList.remove('is-ghost-ok', 'is-ghost-bad');
+        });
+        const myTurn = Boolean(c.mySeatId && c.state.currentTurnSeatId === c.mySeatId);
+        const aTile = c.state.phase === 'place' && myTurn ? c.state.chosenTiles[c.mySeatId] : null;
+        if (!aTile || ui.hoverR < 0 || ui.hoverC < 0) return;
+
+        const rot = currentRotStep();
+        const cells = rotateTileCells(aTile, rot);
+        const valid = canPlaceTile(c.state.board, aTile, ui.hoverR, ui.hoverC, rot);
+        const cls = valid ? 'is-ghost-ok' : 'is-ghost-bad';
+        for (const [dr, dc] of cells) {
+          const rr = ui.hoverR + dr;
+          const cc = ui.hoverC + dc;
+          if (rr >= 0 && rr < BOARD_ROWS && cc >= 0 && cc < BOARD_COLS) {
+            boardEl.querySelector(`[data-r="${rr}"][data-c="${cc}"]`)?.classList.add(cls);
+          }
         }
-      }
-      if (confirmTapBtn && window.matchMedia('(pointer: coarse)').matches) {
-        confirmTapBtn.style.display = valid ? 'inline-flex' : 'none';
-      }
-    };
+        const confirmTapBtn = container.querySelector('#ltg-confirm-tap');
+        if (confirmTapBtn && window.matchMedia('(pointer: coarse)').matches) {
+          confirmTapBtn.style.display = valid ? 'inline-flex' : 'none';
+        }
+      };
 
-    const doRotate = () => {
-      if (state.phase !== 'place' || !isMyTurn || activeTile == null) return;
-      ui.rot = (ui.rot + 1) % 4;
-      sfx.play('click');
-      const prevEl = container.querySelector('#ltg-active-preview');
-      if (prevEl) prevEl.innerHTML = renderMiniPolyHtml(activeTile, ui.rot);
-      updateGhostPreview();
-    };
+      const doRotate = () => {
+        const c = ui.lastCtx;
+        if (!c || c.state.phase !== 'place' || c.state.currentTurnSeatId !== c.mySeatId) return;
+        ui.rotDeg += 90; // Monotonic cumulative angle -> smooth clockwise spin!
+        c.sfx.play('click');
+        const prevEl = container.querySelector('#ltg-active-preview');
+        if (prevEl) prevEl.style.transform = `rotate(${ui.rotDeg}deg)`;
+        updateGhostPreview();
+      };
 
-    container.querySelector('#ltg-rot-btn')?.addEventListener('click', doRotate);
+      const tryPlaceAt = async (r, col) => {
+        const c = ui.lastCtx;
+        if (!c || c.state.phase !== 'place' || c.state.currentTurnSeatId !== c.mySeatId) return;
+        const aTile = c.state.chosenTiles[c.mySeatId];
+        const rot = currentRotStep();
+        if (!canPlaceTile(c.state.board, aTile, r, col, rot)) {
+          c.sfx.play('error');
+          Motion.shake(container.querySelector('#ltg-board'));
+          UI.toast(c.lang === 'zh' ? '此处无法放置（越界或重叠）' : 'Invalid placement (overlap or out of bounds)', 'error');
+          return;
+        }
+        const res = await c.dispatch({ type: 'PLACE_TILE', payload: { r, c: col, rot } });
+        if (!res.ok) {
+          Motion.shake(container.querySelector('#ltg-board'));
+          if (res.reason) UI.toast(res.reason, 'error');
+        }
+      };
 
-    const tryPlaceAt = async (r, c) => {
-      if (state.phase !== 'place' || !isMyTurn || activeTile == null) return;
-      if (!canPlaceTile(state.board, activeTile, r, c, ui.rot)) {
-        sfx.play('error');
-        UI.toast(lang === 'zh' ? '此处无法放置（越界或重叠）' : 'Invalid placement (overlap or out of bounds)', 'error');
-        return;
-      }
-      const res = await dispatch({ type: 'PLACE_TILE', payload: { r, c, rot: ui.rot } });
-      if (!res.ok && res.reason) UI.toast(res.reason, 'error');
-    };
+      Motion.delegate(container, 'click', '[data-draft]', (e, btn) => {
+        ui.lastCtx?.sfx.play('bid');
+        ui.lastCtx?.dispatch({ type: 'DRAFT_TILE', payload: { tileId: Number(btn.dataset.draft) } });
+      }, 'ltg-draft');
 
-    confirmTapBtn?.addEventListener('click', () => {
-      if (ui.hoverR >= 0 && ui.hoverC >= 0) tryPlaceAt(ui.hoverR, ui.hoverC);
-    });
+      Motion.delegate(container, 'click', '#ltg-next-round', () => {
+        ui.lastCtx?.sfx.play('click');
+        ui.lastCtx?.dispatch({ type: 'NEXT_ROUND' });
+      }, 'ltg-next');
 
-    if (boardEl && state.phase === 'place' && isMyTurn && activeTile != null && state.currentCanPlace) {
-      boardEl.addEventListener('pointermove', (e) => {
+      Motion.delegate(container, 'click', '#ltg-forfeit-btn', () => {
+        ui.lastCtx?.sfx.play('eliminate');
+        ui.lastCtx?.dispatch({ type: 'FORFEIT_PLACE' });
+      }, 'ltg-forfeit');
+
+      Motion.delegate(container, 'click', '#ltg-rot-btn', () => doRotate(), 'ltg-rot');
+      Motion.delegate(container, 'click', '#ltg-confirm-tap', () => {
+        if (ui.hoverR >= 0 && ui.hoverC >= 0) tryPlaceAt(ui.hoverR, ui.hoverC);
+      }, 'ltg-tap');
+
+      Motion.delegate(container, 'pointermove', '#ltg-board', (e) => {
+        const c = ui.lastCtx;
+        if (!c || c.state.phase !== 'place' || c.state.currentTurnSeatId !== c.mySeatId || !c.state.currentCanPlace) return;
         const cell = e.target.closest?.('.ltg-cell');
         if (!cell) return;
         const r = Number(cell.dataset.r);
-        const c = Number(cell.dataset.c);
-        if (r !== ui.hoverR || c !== ui.hoverC) {
+        const col = Number(cell.dataset.c);
+        if (r !== ui.hoverR || col !== ui.hoverC) {
           ui.hoverR = r;
-          ui.hoverC = c;
+          ui.hoverC = col;
           updateGhostPreview();
         }
-      });
+      }, 'ltg-pm');
 
-      boardEl.addEventListener('pointerleave', () => {
+      Motion.delegate(container, 'pointerleave', '#ltg-board', () => {
         if (!window.matchMedia('(pointer: coarse)').matches) {
           ui.hoverR = -1;
           ui.hoverC = -1;
           updateGhostPreview();
         }
-      });
+      }, 'ltg-pl');
 
-      boardEl.addEventListener('click', (e) => {
+      Motion.delegate(container, 'click', '#ltg-board', (e) => {
+        const c = ui.lastCtx;
+        if (!c || c.state.phase !== 'place' || c.state.currentTurnSeatId !== c.mySeatId || !c.state.currentCanPlace) return;
         const cell = e.target.closest?.('.ltg-cell');
         if (!cell) return;
         const r = Number(cell.dataset.r);
-        const c = Number(cell.dataset.c);
-        if (window.matchMedia('(pointer: coarse)').matches && (r !== ui.hoverR || c !== ui.hoverC)) {
+        const col = Number(cell.dataset.c);
+        if (window.matchMedia('(pointer: coarse)').matches && (r !== ui.hoverR || col !== ui.hoverC)) {
           ui.hoverR = r;
-          ui.hoverC = c;
+          ui.hoverC = col;
           updateGhostPreview();
           return;
         }
-        tryPlaceAt(r, c);
-      });
+        tryPlaceAt(r, col);
+      }, 'ltg-click');
 
-      boardEl.addEventListener('contextmenu', (e) => {
+      Motion.delegate(container, 'contextmenu', '#ltg-board', (e) => {
+        const c = ui.lastCtx;
+        if (!c || c.state.phase !== 'place' || c.state.currentTurnSeatId !== c.mySeatId) return;
         e.preventDefault();
         doRotate();
-      });
-    }
+      }, 'ltg-ctx');
 
-    if (window._ltgKeyHandler) window.removeEventListener('keydown', window._ltgKeyHandler);
-    window._ltgKeyHandler = (e) => {
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (e.key === 'r' || e.key === 'R' || e.key === ' ') {
-        if (state.phase === 'place' && isMyTurn && activeTile != null) {
-          e.preventDefault();
-          doRotate();
+      if (window._ltgKeyHandler) window.removeEventListener('keydown', window._ltgKeyHandler);
+      window._ltgKeyHandler = (e) => {
+        const c = ui.lastCtx;
+        if (!c) return;
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        if (e.key === 'r' || e.key === 'R' || e.key === ' ') {
+          if (c.state.phase === 'place' && c.state.currentTurnSeatId === c.mySeatId) {
+            e.preventDefault();
+            doRotate();
+          }
         }
-      }
-    };
-    window.addEventListener('keydown', window._ltgKeyHandler);
+      };
+      window.addEventListener('keydown', window._ltgKeyHandler);
+    }
   },
 });

@@ -1,14 +1,108 @@
 /* ==========================================================================
  * Living Quarters Secret Safe (生活馆秘密金库)
- * Luxury Walnut & Warm Gold Suite · Ultraviolet ? · Brass Vault · Curse Barrier
+ * Dual-Theme: Dark Walnut & Brass Suite & Light Porcelain Gallery Suite
+ * GPU-Composited Apple Motion Language · Zero Layout/Paint Thrash
  * ========================================================================== */
 
+:root,
+:root[data-theme="dark"] {
+  --ss-top-bg: linear-gradient(135deg, rgba(32, 22, 16, 0.92), rgba(14, 13, 18, 0.94));
+  --ss-step-bg: rgba(15, 14, 19, 0.72);
+  --ss-step-done-bg: rgba(34, 197, 94, 0.10);
+  --ss-step-done-ink: #86efac;
+  --ss-stat-bg: rgba(24, 19, 14, 0.88);
+  --ss-cursed-bg: rgba(153, 27, 27, 0.34);
+  --ss-cursed-ink: #fca5a5;
+  --ss-prize-bg: rgba(6, 95, 70, 0.32);
+  --ss-prize-ink: #6ee7b7;
+
+  --ss-stage-bg: linear-gradient(160deg, #1b130e 0%, #100e14 100%);
+  --ss-panel-bg: linear-gradient(160deg, rgba(26, 20, 17, 0.94), rgba(12, 13, 20, 0.95));
+  --ss-outlet-box-bg: radial-gradient(circle at 50% 0%, rgba(212, 175, 106, 0.12), rgba(10, 10, 14, 0.92));
+  --ss-outlet-plate-bg: linear-gradient(155deg, #272529, #151418);
+  --ss-outlet-cavity-bg: radial-gradient(circle, #181410 0%, #09080c 100%);
+  --ss-uv-box-bg: rgba(76, 29, 149, 0.16);
+  --ss-uv-ink: #e9d5ff;
+
+  --ss-vault-bg:
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 106, 0.12), rgba(14, 12, 16, 0.96) 68%),
+    #0c0b10;
+  --ss-piece-bg: linear-gradient(155deg, rgba(35, 28, 20, 0.92), rgba(16, 15, 22, 0.94));
+  --ss-piece-sel-bg: rgba(212, 175, 106, 0.18);
+  --ss-selected-bar-bg: rgba(212, 175, 106, 0.10);
+  --ss-fb-err-bg: rgba(153, 27, 27, 0.28);
+  --ss-fb-ok-bg: rgba(6, 95, 70, 0.24);
+  --ss-fb-info-bg: rgba(14, 116, 144, 0.22);
+
+  --ss-sanctum-bg:
+    radial-gradient(ellipse 65% 55% at 50% 20%, rgba(220, 38, 38, 0.22), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 50% 45%, rgba(245, 180, 65, 0.16), transparent 60%),
+    linear-gradient(180deg, #130b0e 0%, #07070c 100%);
+  --ss-keeper-bg:
+    radial-gradient(ellipse 65% 50% at 50% 15%, rgba(212, 175, 106, 0.18), transparent 65%),
+    linear-gradient(180deg, #14110e 0%, #07080d 100%);
+  --ss-door-bg: linear-gradient(180deg, #1a1512, #0d0b0f);
+  --ss-pedestal-bg: rgba(14, 8, 12, 0.82);
+  --ss-dome-bg: radial-gradient(circle, rgba(220, 38, 38, 0.34), rgba(245, 158, 11, 0.14) 55%, rgba(12, 8, 12, 0.86) 100%);
+  --ss-covenant-bg: rgba(12, 13, 20, 0.86);
+  --ss-covenant-curse-bg: rgba(127, 29, 29, 0.24);
+  --ss-covenant-curse-ink: #fecaca;
+  --ss-sanctum-title-ink: #fef08a;
+  --ss-curse-brand-bg: rgba(153, 27, 27, 0.44);
+  --ss-curse-brand-ink: #fecaca;
+  --ss-discovery-bg: rgba(12, 13, 19, 0.84);
+}
+
+:root[data-theme="light"] {
+  --ss-top-bg: var(--dp-surface-card);
+  --ss-step-bg: var(--dp-bg-slate);
+  --ss-step-done-bg: rgba(21, 128, 61, 0.10);
+  --ss-step-done-ink: #15803d;
+  --ss-stat-bg: #ffffff;
+  --ss-cursed-bg: #fee2e2;
+  --ss-cursed-ink: #991b1b;
+  --ss-prize-bg: #d1fae5;
+  --ss-prize-ink: #065f46;
+
+  --ss-stage-bg: linear-gradient(160deg, #f9f6ef 0%, #efe9dc 100%);
+  --ss-panel-bg: var(--dp-surface-card);
+  --ss-outlet-box-bg: #f6f3eb;
+  --ss-outlet-plate-bg: linear-gradient(155deg, #ffffff, #ebe5d8);
+  --ss-outlet-cavity-bg: radial-gradient(circle, #f3e7ce 0%, #e4d4b0 100%);
+  --ss-uv-box-bg: rgba(109, 40, 217, 0.08);
+  --ss-uv-ink: #5b21b6;
+
+  --ss-vault-bg:
+    radial-gradient(circle at 50% 50%, rgba(180, 134, 48, 0.10), #f7f4ec 70%),
+    #f5f2ea;
+  --ss-piece-bg: linear-gradient(155deg, #ffffff, #f3eee3);
+  --ss-piece-sel-bg: #fef3c7;
+  --ss-selected-bar-bg: rgba(154, 110, 31, 0.09);
+  --ss-fb-err-bg: #fee2e2;
+  --ss-fb-ok-bg: #dcfce7;
+  --ss-fb-info-bg: #e0f2fe;
+
+  --ss-sanctum-bg:
+    radial-gradient(ellipse 65% 55% at 50% 18%, rgba(196, 35, 52, 0.11), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 50% 45%, rgba(180, 134, 48, 0.10), transparent 60%),
+    linear-gradient(180deg, #fdfbf7 0%, #f4efe6 100%);
+  --ss-keeper-bg:
+    radial-gradient(ellipse 65% 50% at 50% 15%, rgba(154, 110, 31, 0.10), transparent 65%),
+    linear-gradient(180deg, #ffffff 0%, #f4f1ea 100%);
+  --ss-door-bg: linear-gradient(180deg, #ffffff, #efeae0);
+  --ss-pedestal-bg: rgba(255, 255, 255, 0.88);
+  --ss-dome-bg: radial-gradient(circle, rgba(220, 38, 38, 0.16), rgba(217, 119, 6, 0.14) 55%, rgba(254, 243, 199, 0.65) 100%);
+  --ss-covenant-bg: #ffffff;
+  --ss-covenant-curse-bg: #fef2f2;
+  --ss-covenant-curse-ink: #991b1b;
+  --ss-sanctum-title-ink: #7a5410;
+  --ss-curse-brand-bg: #fee2e2;
+  --ss-curse-brand-ink: #991b1b;
+  --ss-discovery-bg: var(--dp-surface-card);
+}
+
 .ss-body {
-  background:
-    radial-gradient(ellipse 75% 48% at 50% -5%, rgba(232, 186, 98, 0.16), transparent 65%),
-    radial-gradient(ellipse 50% 42% at 88% 92%, rgba(220, 38, 38, 0.14), transparent 60%),
-    radial-gradient(ellipse 50% 42% at 12% 88%, rgba(124, 58, 237, 0.10), transparent 60%),
-    #080709;
+  background-color: var(--dp-bg-void);
 }
 
 .ss-root {
@@ -19,6 +113,22 @@
   flex-direction: column;
   gap: 14px;
   position: relative;
+}
+
+/* Smooth Act I -> II -> III -> IV -> V Crossfade (180ms --dp-ease-apple) */
+.ss-act-stage {
+  animation: ssActFade 180ms var(--dp-ease-apple) both;
+}
+
+@keyframes ssActFade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 /* ==========================================================================
@@ -33,9 +143,9 @@
   flex-wrap: wrap;
   padding: 12px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(212, 175, 106, 0.28);
-  background: linear-gradient(135deg, rgba(32, 22, 16, 0.92), rgba(14, 13, 18, 0.94));
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--dp-border);
+  background: var(--ss-top-bg);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .ss-stepper {
@@ -53,22 +163,25 @@
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 14, 19, 0.72);
+  border: 1px solid var(--dp-border-subtle);
+  background: var(--ss-step-bg);
   color: var(--dp-ink-faint);
+  transition:
+    background-color var(--dp-dur-base) var(--dp-ease-apple),
+    border-color var(--dp-dur-base) var(--dp-ease-apple),
+    color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .ss-step-pill.is-done {
-  border-color: rgba(34, 197, 94, 0.42);
-  color: #86efac;
-  background: rgba(34, 197, 94, 0.09);
+  border-color: color-mix(in srgb, var(--dp-emerald) 45%, transparent);
+  color: var(--ss-step-done-ink);
+  background: var(--ss-step-done-bg);
 }
 
 .ss-step-pill.is-active {
   border-color: var(--dp-brass-bright);
   color: var(--dp-brass-bright);
-  background: rgba(212, 175, 106, 0.16);
-  box-shadow: 0 0 14px rgba(212, 175, 106, 0.25);
+  background: var(--dp-brass-glow);
 }
 
 .ss-pouch {
@@ -84,25 +197,30 @@
   gap: 7px;
   padding: 6px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  background: rgba(24, 19, 14, 0.85);
+  border: 1px solid var(--dp-border-strong);
+  background: var(--ss-stat-bg);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
   font-weight: 700;
   color: var(--dp-brass-bright);
 }
 
 .ss-stat-chip.is-cursed {
-  border-color: rgba(239, 68, 68, 0.75);
-  background: rgba(153, 27, 27, 0.32);
-  color: #fca5a5;
-  box-shadow: 0 0 18px rgba(220, 38, 38, 0.38);
+  border-color: var(--dp-crimson);
+  background: var(--ss-cursed-bg);
+  color: var(--ss-cursed-ink);
 }
 
 .ss-stat-chip.is-prize {
-  border-color: rgba(52, 211, 153, 0.65);
-  background: rgba(6, 95, 70, 0.3);
-  color: #6ee7b7;
+  border-color: var(--dp-emerald);
+  background: var(--ss-prize-bg);
+  color: var(--ss-prize-ink);
+}
+
+.ss-stat-chip.is-tool {
+  border-color: var(--dp-cyan);
+  color: var(--dp-cyan);
 }
 
 /* ==========================================================================
@@ -119,10 +237,10 @@
 .ss-scene-stage {
   position: relative;
   border-radius: 20px;
-  border: 1px solid rgba(212, 175, 106, 0.3);
-  background: linear-gradient(160deg, #1b130e 0%, #100e14 100%);
+  border: 1px solid var(--dp-border-strong);
+  background: var(--ss-stage-bg);
   overflow: hidden;
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.68), inset 0 1px 0 rgba(255, 224, 150, 0.1);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .ss-scene-svg {
@@ -132,24 +250,25 @@
   user-select: none;
 }
 
+/* GPU-only hover feedback (zero filter transition!) */
 .ss-hotspot {
   cursor: pointer;
-  transition: filter 0.2s, opacity 0.2s;
+  transition: opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .ss-hotspot:hover {
-  filter: drop-shadow(0 0 10px rgba(242, 213, 145, 0.75));
+  opacity: 0.88;
 }
 
 .ss-side-panel {
   border-radius: 18px;
-  border: 1px solid rgba(212, 175, 106, 0.24);
-  background: linear-gradient(160deg, rgba(26, 20, 17, 0.94), rgba(12, 13, 20, 0.95));
+  border: 1px solid var(--dp-border);
+  background: var(--ss-panel-bg);
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .ss-panel-heading {
@@ -171,8 +290,8 @@
 .ss-outlet-box {
   padding: 14px;
   border-radius: 14px;
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 106, 0.12), rgba(10, 10, 14, 0.92));
+  border: 1px solid var(--dp-border-strong);
+  background: var(--ss-outlet-box-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -183,9 +302,9 @@
   width: 176px;
   min-height: 176px;
   border-radius: 14px;
-  border: 2px solid rgba(212, 175, 106, 0.45);
-  background: linear-gradient(155deg, #272529, #151418);
-  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.08), 0 12px 24px rgba(0, 0, 0, 0.55);
+  border: 2px solid var(--dp-border-strong);
+  background: var(--ss-outlet-plate-bg);
+  box-shadow: var(--dp-shadow-card);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -196,34 +315,45 @@
 }
 
 .ss-outlet-plate.is-cavity {
-  background: radial-gradient(circle, #181410 0%, #09080c 100%);
-  border-color: #fbbf24;
-  box-shadow: inset 0 0 28px rgba(245, 158, 11, 0.25), 0 0 24px rgba(245, 158, 11, 0.2);
+  background: var(--ss-outlet-cavity-bg);
+  border-color: var(--dp-amber);
 }
 
 .ss-screw-btn {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: 1.5px solid #d4af6a;
+  border: 1.5px solid var(--dp-brass);
   background: radial-gradient(circle at 35% 35%, #f5d896, #7a5c28);
   color: #241807;
   font-size: 12px;
   font-weight: 800;
   display: grid;
   place-items: center;
-  transition: transform 0.25s, opacity 0.25s;
+  transition:
+    transform var(--dp-dur-base) var(--dp-ease-spring),
+    opacity var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .ss-screw-btn:hover:not(:disabled) {
   transform: rotate(90deg) scale(1.1);
 }
 
+.ss-screw-btn:active:not(:disabled) {
+  transform: rotate(180deg) scale(0.95);
+}
+
 .ss-screw-btn.is-removed {
-  opacity: 0.2;
+  opacity: 0.22;
   border-style: dashed;
   background: transparent;
   color: var(--dp-ink-faint);
+}
+
+.ss-hex-slot-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
 }
 
 .ss-hex-slot {
@@ -231,46 +361,73 @@
   height: 82px;
   clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
   border: none;
-  background: linear-gradient(145deg, rgba(212, 175, 106, 0.22), rgba(20, 16, 12, 0.95));
+  background: linear-gradient(145deg, rgba(212, 175, 106, 0.28), rgba(20, 16, 12, 0.92));
   display: grid;
   place-items: center;
   font-size: 26px;
-  color: var(--dp-brass-bright);
+  color: #fde68a;
   cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
-  box-shadow: inset 0 0 18px rgba(251, 191, 36, 0.35);
+  transition: transform var(--dp-dur-fast) var(--dp-ease-spring);
 }
 
-.ss-hex-slot:hover {
+.ss-hex-slot:hover:not(:disabled) {
   transform: scale(1.06);
-  filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.7));
+}
+
+.ss-hex-slot:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .ss-hex-slot.is-filled {
   background: linear-gradient(145deg, #fef08a, #b47c2b);
   color: #1c1204;
-  animation: ssGoldPulse 2s ease-in-out infinite;
 }
 
-@keyframes ssGoldPulse {
-  0%, 100% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.55)); }
-  50% { filter: drop-shadow(0 0 22px rgba(254, 240, 138, 0.95)); }
+/* GPU opacity ring pulse (replaces filter ssGoldPulse!) */
+.ss-hex-slot-wrap.is-filled::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--dp-amber);
+  pointer-events: none;
+  animation: ssPulseOpacity 2s var(--dp-ease-apple) infinite;
+}
+
+@keyframes ssPulseOpacity {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
 }
 
 /* Act 2 UV Controls */
 .ss-uv-control {
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(167, 139, 250, 0.35);
-  background: rgba(76, 29, 149, 0.14);
+  border: 1px solid color-mix(in srgb, var(--dp-violet) 42%, transparent);
+  background: var(--ss-uv-box-bg);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+.ss-uv-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ss-uv-ink);
+}
+
 .ss-uv-slider {
   width: 100%;
-  accent-color: #a78bfa;
+  accent-color: var(--dp-violet);
 }
 
 /* ==========================================================================
@@ -287,20 +444,18 @@
 .ss-vault-wheel-card {
   position: relative;
   border-radius: 20px;
-  border: 1px solid rgba(212, 175, 106, 0.36);
-  background:
-    radial-gradient(circle at 50% 50%, rgba(212, 175, 106, 0.12), rgba(14, 12, 16, 0.96) 68%),
-    #0c0b10;
+  border: 1px solid var(--dp-border-strong);
+  background: var(--ss-vault-bg);
   padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--dp-shadow-card);
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .ss-vault-wheel-card.is-unlocked {
-  border-color: #fde68a;
-  box-shadow: 0 0 60px rgba(251, 191, 36, 0.35);
+  border-color: var(--dp-amber);
 }
 
 .ss-vault-svg {
@@ -309,22 +464,29 @@
   display: block;
 }
 
+/* Hero Smooth Brass Gear Rotation (preserved by Motion.patchDOM via data-motion-key="ss-vault-gear") */
+.ss-vault-gear {
+  transform-origin: 260px 260px;
+  transition: transform 420ms var(--dp-ease-apple);
+}
+
 .ss-socket-group {
   cursor: pointer;
-  transition: filter 0.2s;
+  transition: opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .ss-socket-group:hover {
-  filter: drop-shadow(0 0 10px rgba(242, 213, 145, 0.75));
+  opacity: 0.88;
 }
 
-.ss-socket-group.is-hinted {
-  animation: ssHintGlow 1.2s ease-in-out infinite;
+/* GPU opacity hint halo inside SVG (replaces filter ssHintGlow!) */
+.ss-hint-ring {
+  animation: ssHintOpacity 1.2s var(--dp-ease-apple) infinite;
 }
 
-@keyframes ssHintGlow {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.65)); }
-  50% { filter: drop-shadow(0 0 18px rgba(56, 189, 248, 1)); }
+@keyframes ssHintOpacity {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.95; }
 }
 
 .ss-piece-tray {
@@ -336,34 +498,40 @@
 .ss-piece-card {
   padding: 10px 8px;
   border-radius: 12px;
-  border: 1px solid rgba(212, 175, 106, 0.26);
-  background: linear-gradient(155deg, rgba(35, 28, 20, 0.9), rgba(16, 15, 22, 0.92));
+  border: 1px solid var(--dp-border);
+  background: var(--ss-piece-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   cursor: pointer;
-  transition: transform 0.16s var(--dp-ease), border-color 0.18s, box-shadow 0.18s, opacity 0.2s;
+  transition:
+    transform var(--dp-dur-fast) var(--dp-ease-out),
+    border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    opacity var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .ss-piece-card:hover:not(:disabled) {
   border-color: var(--dp-brass-bright);
-  transform: translateY(-2px);
+  transform: translate3d(0, -2px, 0);
+}
+
+.ss-piece-card:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .ss-piece-card.is-selected {
-  border: 2px solid #fde68a;
-  background: rgba(212, 175, 106, 0.18);
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+  border: 2px solid var(--dp-brass-bright);
+  background: var(--ss-piece-sel-bg);
 }
 
 .ss-piece-card.is-hinted {
-  border-color: #38bdf8;
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+  border: 2px solid var(--dp-cyan);
 }
 
 .ss-piece-card.is-locked {
-  opacity: 0.34;
+  opacity: 0.36;
   border-style: dashed;
   cursor: default;
 }
@@ -371,11 +539,12 @@
 .ss-piece-glyph {
   width: 48px;
   height: 48px;
-  transition: transform 0.25s var(--dp-ease);
+  transition: transform 220ms var(--dp-ease-spring);
 }
 
 .ss-piece-code {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   font-weight: 700;
   color: var(--dp-brass-bright);
@@ -386,6 +555,42 @@
   color: var(--dp-ink-muted);
 }
 
+.ss-selected-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--ss-selected-bar-bg);
+  border: 1px solid var(--dp-border-strong);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ss-feedback-banner {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--dp-ink);
+  border: 1px solid var(--dp-border);
+  background: var(--ss-fb-info-bg);
+}
+
+.ss-feedback-banner.is-error {
+  border-color: var(--dp-crimson);
+  background: var(--ss-fb-err-bg);
+}
+
+.ss-feedback-banner.is-success {
+  border-color: var(--dp-emerald);
+  background: var(--ss-fb-ok-bg);
+}
+
+.ss-feedback-banner.is-info {
+  border-color: var(--dp-cyan);
+  background: var(--ss-fb-info-bg);
+}
+
 /* ==========================================================================
  * ACT 4 & 5: HIDDEN ELEVATOR, TALISMAN SEAL & CURSE BARRIER SANCTUM
  * ========================================================================== */
@@ -393,22 +598,24 @@
 .ss-sanctum-stage {
   position: relative;
   border-radius: 22px;
-  border: 1px solid rgba(220, 53, 69, 0.42);
-  background:
-    radial-gradient(ellipse 65% 55% at 50% 20%, rgba(220, 38, 38, 0.22), transparent 65%),
-    radial-gradient(ellipse 50% 45% at 50% 45%, rgba(245, 180, 65, 0.16), transparent 60%),
-    linear-gradient(180deg, #130b0e 0%, #07070c 100%);
+  border: 1px solid color-mix(in srgb, var(--dp-crimson) 48%, transparent);
+  background: var(--ss-sanctum-bg);
   padding: 28px 22px;
   overflow: hidden;
   text-align: center;
-  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(220, 38, 38, 0.12);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .ss-sanctum-stage.is-keeper {
-  border-color: rgba(212, 175, 106, 0.45);
-  background:
-    radial-gradient(ellipse 65% 50% at 50% 15%, rgba(212, 175, 106, 0.18), transparent 65%),
-    linear-gradient(180deg, #14110e 0%, #07080d 100%);
+  border-color: var(--dp-border-strong);
+  background: var(--ss-keeper-bg);
+}
+
+.ss-sanctum-title {
+  font-family: var(--dp-font-display);
+  font-size: clamp(24px, 3.6vw, 34px);
+  margin: 10px 0 14px;
+  color: var(--ss-sanctum-title-ink);
 }
 
 .ss-shatter-canvas {
@@ -425,10 +632,10 @@
   margin: 14px auto;
   padding: 36px 24px;
   border-radius: 18px;
-  border: 2px solid rgba(212, 175, 106, 0.42);
-  background: linear-gradient(180deg, #1a1512, #0d0b0f);
+  border: 2px solid var(--dp-border-strong);
+  background: var(--ss-door-bg);
   position: relative;
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
+  box-shadow: var(--dp-shadow-card);
 }
 
 .ss-talisman-strip {
@@ -439,17 +646,19 @@
   padding: 18px 26px;
   border-radius: 8px;
   border: 2px solid #fbbf24;
-  background: linear-gradient(180deg, #7f1d1d, #450a0a);
+  background: linear-gradient(180deg, #991b1b, #450a0a);
   color: #fef08a;
   font-family: var(--dp-font-display);
   cursor: pointer;
-  box-shadow: 0 0 32px rgba(220, 38, 38, 0.45);
-  transition: transform 0.25s var(--dp-ease), box-shadow 0.25s;
+  transition: transform var(--dp-dur-base) var(--dp-ease-spring);
 }
 
 .ss-talisman-strip:hover {
   transform: scale(1.05) rotate(-1deg);
-  box-shadow: 0 0 46px rgba(251, 191, 36, 0.65);
+}
+
+.ss-talisman-strip:active {
+  transform: scale(0.97);
 }
 
 .ss-pedestal-wrap {
@@ -458,37 +667,39 @@
   margin: 0 auto 20px;
   padding: 26px 18px;
   border-radius: 20px;
-  border: 1px solid rgba(248, 113, 113, 0.48);
-  background: rgba(14, 8, 12, 0.8);
-  box-shadow: 0 0 50px rgba(220, 38, 38, 0.28), inset 0 0 36px rgba(245, 158, 11, 0.14);
+  border: 1px solid color-mix(in srgb, var(--dp-crimson) 48%, transparent);
+  background: var(--ss-pedestal-bg);
+  box-shadow: var(--dp-shadow-card);
 }
 
+/* GPU-composited barrier dome pulse (replaces box-shadow ssBarrierCrack!) */
 .ss-barrier-dome {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 24px;
   padding: 24px 36px;
   border-radius: 999px;
-  border: 2px solid rgba(251, 191, 36, 0.72);
-  background:
-    radial-gradient(circle, rgba(220, 38, 38, 0.34), rgba(245, 158, 11, 0.14) 55%, rgba(12, 8, 12, 0.85) 100%);
-  box-shadow:
-    0 0 40px rgba(220, 38, 38, 0.55),
-    inset 0 0 28px rgba(251, 191, 36, 0.45);
-  animation: ssBarrierCrack 2.6s ease-in-out infinite;
+  border: 2px solid var(--dp-amber);
+  background: var(--ss-dome-bg);
   margin-bottom: 16px;
+  animation: ssDomeFloat 2.8s var(--dp-ease-apple) infinite;
 }
 
-@keyframes ssBarrierCrack {
-  0%, 100% {
-    box-shadow: 0 0 36px rgba(220, 38, 38, 0.5), inset 0 0 24px rgba(251, 191, 36, 0.4);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 60px rgba(248, 113, 113, 0.8), inset 0 0 36px rgba(254, 240, 138, 0.65);
-    transform: scale(1.025);
-  }
+.ss-barrier-dome::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid var(--dp-crimson-bright);
+  pointer-events: none;
+  animation: ssPulseOpacity 2.4s var(--dp-ease-apple) infinite;
+}
+
+@keyframes ssDomeFloat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.022); }
 }
 
 .ss-prize-token {
@@ -503,8 +714,8 @@
   align-items: center;
   justify-content: center;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 800;
-  box-shadow: 0 0 26px rgba(251, 191, 36, 0.75);
 }
 
 .ss-covenant-grid {
@@ -519,17 +730,24 @@
 .ss-covenant-box {
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(12, 13, 20, 0.85);
+  border: 1px solid var(--dp-border);
+  background: var(--ss-covenant-bg);
 }
 
 .ss-covenant-box.is-reward {
-  border-color: rgba(52, 211, 153, 0.42);
+  border-color: color-mix(in srgb, var(--dp-emerald) 48%, transparent);
 }
 
 .ss-covenant-box.is-curse {
-  border-color: rgba(248, 113, 113, 0.55);
-  background: rgba(127, 29, 29, 0.2);
+  border-color: color-mix(in srgb, var(--dp-crimson) 55%, transparent);
+  background: var(--ss-covenant-curse-bg);
+}
+
+.ss-covenant-curse-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ss-covenant-curse-ink);
+  line-height: 1.55;
 }
 
 .ss-curse-brand {
@@ -538,21 +756,20 @@
   gap: 10px;
   padding: 10px 22px;
   border-radius: 999px;
-  border: 2px solid #f87171;
-  background: rgba(153, 27, 27, 0.42);
-  color: #fecaca;
+  border: 2px solid var(--dp-crimson);
+  background: var(--ss-curse-brand-bg);
+  color: var(--ss-curse-brand-ink);
   font-family: var(--dp-font-display);
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  box-shadow: 0 0 36px rgba(220, 38, 38, 0.65);
   margin-bottom: 14px;
 }
 
 .ss-discovery-log {
   border-radius: 14px;
-  border: 1px solid rgba(212, 175, 106, 0.18);
-  background: rgba(12, 13, 19, 0.82);
+  border: 1px solid var(--dp-border);
+  background: var(--ss-discovery-bg);
   padding: 10px 14px;
 }
 
@@ -560,7 +777,7 @@
   font-size: 12.5px;
   color: var(--dp-ink-muted);
   padding: 4px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--dp-border-subtle);
 }
 
 .ss-discovery-item:last-child {
@@ -568,8 +785,21 @@
 }
 
 /* ==========================================================================
- * RESPONSIVE (Mobile 390×844 & Tablet)
+ * REDUCED MOTION & RESPONSIVE
  * ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-hex-slot-wrap.is-filled::after,
+  .ss-hint-ring,
+  .ss-barrier-dome,
+  .ss-barrier-dome::after {
+    animation: none;
+  }
+
+  .ss-act-stage {
+    animation: dp-reduced-fade var(--dp-dur-fast) ease both;
+  }
+}
 
 @media (max-width: 920px) {
   .ss-scene-grid,

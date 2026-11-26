@@ -1,7 +1,7 @@
 /* ==========================================================================
  * Game 01: Either/Or (二选一 / 양자택일) — Day 1 Main Match 1
- * Dueling Cold-Gold (A) vs Crimson (B) light pillars · 3D flipping vote cards
- * Prize Token vault tracker · Alliance Token rescue · 4 embedded mini-games
+ * Dual-Theme Obsidian/Porcelain Broadcast Arena · Live 3D Flipping Vote Cards
+ * GPU scaleX Split Meter · FLIP Standings · 4 Embedded Mini-Games
  * ========================================================================== */
 
 .eo-shell {
@@ -17,7 +17,7 @@
 .eo-top-strip {
   border-radius: 18px;
   border: 1px solid var(--dp-border-strong);
-  background: linear-gradient(180deg, rgba(16, 20, 32, 0.94), rgba(10, 12, 20, 0.96));
+  background: var(--dp-surface-card);
   padding: 12px 18px;
   display: flex;
   align-items: center;
@@ -41,26 +41,35 @@
   font-size: 10.5px;
   font-weight: 700;
   border: 1px solid var(--dp-border-subtle);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--dp-surface-row);
   color: var(--dp-ink-faint);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-fast) var(--dp-ease-spring);
 }
 
 .eo-pip.is-mini {
-  border-color: rgba(56, 189, 248, 0.25);
-  color: rgba(125, 211, 252, 0.65);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: var(--dp-cyan);
+  opacity: 0.72;
 }
 
 .eo-pip.is-done {
-  background: rgba(212, 175, 106, 0.14);
-  border-color: rgba(212, 175, 106, 0.4);
-  color: var(--dp-brass);
+  background: var(--dp-brass-glow);
+  border-color: var(--dp-border-strong);
+  color: var(--dp-brass-bright);
+  opacity: 1;
 }
 
 .eo-pip.is-current {
   background: linear-gradient(135deg, #f0d08a, #c49746);
-  border-color: #fff3d1;
+  border-color: #d4af6a;
   color: #090b10;
-  box-shadow: 0 0 14px rgba(240, 208, 138, 0.5);
+  opacity: 1;
+  transform: scale(1.06);
 }
 
 .eo-prize-vault {
@@ -69,29 +78,32 @@
   gap: 10px;
   padding: 6px 13px;
   border-radius: 999px;
-  border: 1px solid rgba(212, 175, 106, 0.45);
-  background: rgba(212, 175, 106, 0.09);
+  border: 1px solid var(--dp-border-strong);
+  background: var(--dp-brass-glow);
+  font-variant-numeric: tabular-nums;
 }
 
 .eo-token-socket {
   width: 22px;
   height: 22px;
   clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(212, 175, 106, 0.3);
+  background: var(--dp-surface-row);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
   color: transparent;
-  transition: all 0.35s var(--dp-ease);
+  transition:
+    transform var(--dp-dur-base) var(--dp-ease-spring),
+    background-color var(--dp-dur-base) var(--dp-ease-apple),
+    color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .eo-token-socket.is-lit {
   background: linear-gradient(145deg, #fff1c2, #d4af6a 55%, #8a6428);
   color: #0b0d14;
   font-weight: 900;
-  box-shadow: 0 0 18px rgba(242, 213, 145, 0.85);
+  transform: scale(1.08);
 }
 
 /* Main Arena Grid */
@@ -108,15 +120,22 @@
   border-radius: 24px;
   border: 1px solid var(--dp-border-strong);
   background:
-    radial-gradient(ellipse 46% 85% at 14% 50%, rgba(212, 175, 106, 0.16), transparent 68%),
-    radial-gradient(ellipse 46% 85% at 86% 50%, rgba(220, 53, 69, 0.18), transparent 68%),
-    linear-gradient(180deg, #0d1019 0%, #07080d 100%);
-  box-shadow: 0 28px 68px rgba(0, 0, 0, 0.72);
+    radial-gradient(ellipse 46% 85% at 14% 50%, rgba(212, 175, 106, 0.14), transparent 68%),
+    radial-gradient(ellipse 46% 85% at 86% 50%, rgba(220, 53, 69, 0.15), transparent 68%),
+    var(--dp-surface-card);
+  box-shadow: var(--dp-shadow-card);
   padding: 22px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+:root[data-theme="light"] .eo-arena {
+  background:
+    radial-gradient(ellipse 46% 85% at 14% 50%, rgba(180, 134, 48, 0.10), transparent 68%),
+    radial-gradient(ellipse 46% 85% at 86% 50%, rgba(196, 35, 52, 0.08), transparent 68%),
+    var(--dp-surface-card);
 }
 
 .eo-arena::before,
@@ -125,20 +144,18 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 6px;
+  width: 5px;
   pointer-events: none;
 }
 
 .eo-arena::before {
   left: 0;
   background: linear-gradient(180deg, transparent, #f2d591 25%, #d4af6a 75%, transparent);
-  box-shadow: 0 0 28px rgba(242, 213, 145, 0.65);
 }
 
 .eo-arena::after {
   right: 0;
   background: linear-gradient(180deg, transparent, #ff5868 25%, #dc3545 75%, transparent);
-  box-shadow: 0 0 28px rgba(220, 53, 69, 0.72);
 }
 
 .eo-dilemma-head {
@@ -179,38 +196,49 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: transform 0.2s var(--dp-ease), box-shadow 0.2s, border-color 0.2s;
+  transition:
+    transform var(--dp-dur-fast) var(--dp-ease-apple),
+    border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple);
   overflow: hidden;
 }
 
 .eo-pillar-a {
-  border: 1.5px solid rgba(212, 175, 106, 0.45);
+  border: 1.5px solid var(--dp-border-strong);
   background:
-    radial-gradient(circle at 50% 0%, rgba(242, 213, 145, 0.18), transparent 62%),
-    linear-gradient(180deg, rgba(28, 25, 18, 0.85), rgba(12, 13, 20, 0.95));
+    radial-gradient(circle at 50% 0%, var(--dp-brass-glow), transparent 62%),
+    var(--dp-surface-tile);
 }
 
 .eo-pillar-b {
-  border: 1.5px solid rgba(220, 53, 69, 0.48);
+  border: 1.5px solid rgba(220, 53, 69, 0.45);
   background:
-    radial-gradient(circle at 50% 0%, rgba(220, 53, 69, 0.2), transparent 62%),
-    linear-gradient(180deg, rgba(34, 16, 22, 0.85), rgba(12, 13, 20, 0.95));
+    radial-gradient(circle at 50% 0%, var(--dp-crimson-glow), transparent 62%),
+    var(--dp-surface-tile);
 }
 
 .eo-pillar.is-clickable:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
+}
+
+.eo-pillar.is-clickable:active {
+  transform: scale(0.985);
 }
 
 .eo-pillar-a.is-clickable:hover,
 .eo-pillar-a.is-chosen {
-  border-color: #f7dfa0;
-  box-shadow: 0 0 34px rgba(212, 175, 106, 0.38), inset 0 0 24px rgba(242, 213, 145, 0.12);
+  border-color: var(--dp-brass-bright);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 106, 0.24), transparent 68%),
+    var(--dp-surface-tile);
 }
 
 .eo-pillar-b.is-clickable:hover,
 .eo-pillar-b.is-chosen {
-  border-color: #ff6b7a;
-  box-shadow: 0 0 34px rgba(220, 53, 69, 0.42), inset 0 0 24px rgba(220, 53, 69, 0.14);
+  border-color: var(--dp-crimson-bright);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(220, 53, 69, 0.24), transparent 68%),
+    var(--dp-surface-tile);
 }
 
 .eo-pillar-letter {
@@ -221,13 +249,11 @@
 }
 
 .eo-pillar-a .eo-pillar-letter {
-  color: #f5d88e;
-  text-shadow: 0 0 18px rgba(212, 175, 106, 0.65);
+  color: var(--dp-brass-bright);
 }
 
 .eo-pillar-b .eo-pillar-letter {
-  color: #ff6b7a;
-  text-shadow: 0 0 18px rgba(220, 53, 69, 0.7);
+  color: var(--dp-crimson-bright);
 }
 
 .eo-pillar-name {
@@ -242,36 +268,45 @@
   line-height: 1.5;
 }
 
-/* Split Meter during Reveal */
+/* Split Meter during Reveal (100% GPU scaleX left + right anchored!) */
 .eo-split-meter {
   display: flex;
   flex-direction: column;
   gap: 7px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(8, 10, 16, 0.78);
+  background: var(--dp-bg-slate);
   border: 1px solid var(--dp-border);
+  font-variant-numeric: tabular-nums;
 }
 
 .eo-split-bar {
+  position: relative;
   height: 14px;
   border-radius: 999px;
   overflow: hidden;
-  display: flex;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--dp-border-subtle);
+}
+
+.eo-split-a,
+.eo-split-b {
+  position: absolute;
+  inset: 0;
+  transition: transform var(--dp-dur-flip) var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .eo-split-a {
   background: linear-gradient(90deg, #b88c3a, #f2d591);
-  transition: width 0.6s var(--dp-ease);
+  transform-origin: left center;
 }
 
 .eo-split-b {
   background: linear-gradient(90deg, #ff5868, #b91c2c);
-  transition: width 0.6s var(--dp-ease);
+  transform-origin: right center;
 }
 
-/* 3D-Flipping Contestant Vote Cards */
+/* 3D-Flipping Contestant Vote Cards (live rotateY via Motion.patchDOM!) */
 .eo-vote-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
@@ -288,7 +323,8 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--dp-dur-flip) var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .eo-vote-card.is-flipped {
@@ -307,16 +343,16 @@
   align-items: center;
   justify-content: space-between;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .eo-vc-front {
   border: 1px solid var(--dp-border);
-  background: linear-gradient(160deg, #1a1f30, #0d1018);
+  background: var(--dp-surface-tile);
 }
 
 .eo-vc-front.is-voted {
-  border-color: rgba(34, 197, 94, 0.55);
-  box-shadow: inset 0 0 14px rgba(34, 197, 94, 0.14);
+  border-color: var(--dp-emerald);
 }
 
 .eo-vc-back {
@@ -324,22 +360,24 @@
 }
 
 .eo-vc-back.is-camp-a {
-  border: 1.5px solid #f2d591;
-  background: linear-gradient(160deg, rgba(64, 52, 24, 0.94), rgba(20, 17, 12, 0.96));
-  box-shadow: 0 0 18px rgba(212, 175, 106, 0.3);
+  border: 1.5px solid var(--dp-brass-bright);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 106, 0.24), transparent 75%),
+    var(--dp-surface-tile);
 }
 
 .eo-vc-back.is-camp-b {
-  border: 1.5px solid #ff5868;
-  background: linear-gradient(160deg, rgba(72, 18, 28, 0.94), rgba(22, 10, 14, 0.96));
-  box-shadow: 0 0 18px rgba(220, 53, 69, 0.34);
+  border: 1.5px solid var(--dp-crimson-bright);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(220, 53, 69, 0.24), transparent 75%),
+    var(--dp-surface-tile);
 }
 
 /* Integrated Mini-Game Embedded Stage */
 .eo-mini-stage {
   border-radius: 16px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(8, 11, 18, 0.85);
+  border: 1px solid var(--dp-border-strong);
+  background: var(--dp-bg-obsidian);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -354,7 +392,7 @@
   display: block;
   border-radius: 14px;
   border: 1px solid var(--dp-border);
-  background: radial-gradient(ellipse 70% 55% at 50% 30%, rgba(212, 175, 106, 0.12), #06080f 80%);
+  background: var(--dp-bg-slate);
 }
 
 .eo-mini-rect-grid {
@@ -366,23 +404,25 @@
   gap: 6px;
   padding: 10px;
   border-radius: 14px;
-  border: 1px solid rgba(245, 158, 11, 0.45);
-  background: #06080f;
+  border: 1px solid var(--dp-border-strong);
+  background: var(--dp-bg-slate);
 }
 
 .eo-mini-rect-cell {
   border-radius: 8px;
-  border: 1px solid rgba(212, 175, 106, 0.25);
-  background: linear-gradient(155deg, #1d2335, #0f131f);
+  border: 1px solid var(--dp-border);
+  background: var(--dp-surface-tile);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--dp-font-mono);
   font-size: 22px;
   font-weight: 700;
-  color: #fde68a;
+  color: var(--dp-brass-bright);
+  font-variant-numeric: tabular-nums;
 }
 
+/* Embedded Memory Poker — Jumbo-Index Porcelain Playing Cards */
 .eo-mini-poker-comm {
   display: flex;
   justify-content: center;
@@ -401,8 +441,8 @@
   justify-content: center;
   overflow: hidden;
   background: linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
-  border: 1.5px solid #f4d78d;
-  box-shadow: 0 0 22px rgba(242, 213, 145, 0.45), 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 #ffffff;
+  border: 1.5px solid #d4af6a;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32), inset 0 1px 0 #ffffff;
 }
 
 .eo-mini-comm-card::after,
@@ -411,7 +451,7 @@
   position: absolute;
   inset: 3px;
   border-radius: 7px;
-  border: 1px solid rgba(18, 21, 28, 0.1);
+  border: 1px solid rgba(18, 21, 28, 0.10);
   pointer-events: none;
 }
 
@@ -428,7 +468,7 @@
 .eo-mini-comm-card.is-hidden {
   background: radial-gradient(circle at 50% 42%, #1d2133 0%, #0d1019 62%, #07090f 100%);
   border: 1.5px solid rgba(212, 175, 106, 0.54);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
 .eo-mini-poker-grid {
@@ -443,15 +483,25 @@
   position: relative;
   aspect-ratio: 4 / 4.75;
   border-radius: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(20, 23, 31, 0.14);
   background: linear-gradient(155deg, #ffffff 0%, #f9fafc 58%, #eef1f6 100%);
-  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.48), inset 0 1px 0 #ffffff;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), inset 0 1px 0 #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   overflow: hidden;
-  transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
+  transition:
+    transform var(--dp-dur-fast) var(--dp-ease-apple),
+    border-color var(--dp-dur-fast) var(--dp-ease-apple);
+}
+
+.eo-mini-pcard:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.eo-mini-pcard:not(:disabled):active {
+  transform: scale(0.96);
 }
 
 .eo-mini-pcard:disabled {
@@ -473,12 +523,11 @@
 .eo-mini-pcard.is-hidden {
   background: radial-gradient(circle at 50% 42%, #1d2133 0%, #0d1019 62%, #07090f 100%);
   border: 1.5px solid rgba(212, 175, 106, 0.54);
-  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(242, 213, 145, 0.2);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(242, 213, 145, 0.2);
 }
 
 .eo-mini-pcard.is-sel {
-  border: 2.5px solid #f4d78d;
-  box-shadow: 0 0 22px rgba(242, 213, 145, 0.78);
+  border: 2.5px solid #e6b84d;
   transform: translateY(-2px);
 }
 
@@ -500,6 +549,7 @@
   font-weight: 900;
   line-height: 0.92;
   letter-spacing: -0.055em;
+  font-variant-numeric: tabular-nums;
 }
 
 .eo-mini-comm-card .eo-pc-rank {
@@ -569,20 +619,20 @@
   gap: 2px;
   padding: 2px 7px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(20, 23, 31, 0.16);
   background: linear-gradient(155deg, #ffffff, #eef1f6);
   font-family: "Space Grotesk", sans-serif;
   font-size: 13px;
   font-weight: 900;
   line-height: 1.1;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  font-variant-numeric: tabular-nums;
 }
 
 .eo-mini-chip.is-picked {
-  border: 1.5px solid #38bdf8;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+  border: 1.5px solid var(--dp-cyan);
 }
 
+/* Embedded Lay the Grass Board */
 .eo-mini-grass-board {
   width: min(100%, 540px);
   aspect-ratio: 12 / 10;
@@ -594,13 +644,13 @@
   padding: 8px;
   border-radius: 14px;
   border: 1.5px solid rgba(52, 211, 153, 0.4);
-  background: #080d12;
+  background: var(--dp-bg-slate);
 }
 
 .eo-mg-cell {
   border-radius: 4px;
   background: rgba(20, 32, 32, 0.85);
-  border: 1px solid rgba(52, 211, 153, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.16);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -608,29 +658,41 @@
   font-family: var(--dp-font-mono);
   font-weight: 700;
   color: #fff;
+  transition: background-color var(--dp-dur-instant) var(--dp-ease-apple), border-color var(--dp-dur-instant) var(--dp-ease-apple);
+}
+
+:root[data-theme="light"] .eo-mg-cell {
+  background: #f6f4ec;
+  border-color: rgba(21, 128, 61, 0.2);
 }
 
 .eo-mg-cell.is-obs {
   background: #332919;
   border-color: rgba(212, 175, 106, 0.5);
-  color: var(--dp-brass);
+  color: #f2d591;
+}
+
+:root[data-theme="light"] .eo-mg-cell.is-obs {
+  background: #c8ae74;
+  border-color: #8a6a2a;
+  color: #fff8e6;
 }
 
 .eo-mg-cell.is-ok {
-  background: rgba(52, 211, 153, 0.6) !important;
-  border-color: #a7f3d0 !important;
+  background: rgba(52, 211, 153, 0.58) !important;
+  border-color: #059669 !important;
 }
 
 .eo-mg-cell.is-bad {
   background: rgba(239, 68, 68, 0.55) !important;
-  border-color: #fca5a5 !important;
+  border-color: #dc2626 !important;
 }
 
 /* Right Standings & Zone Sidebar */
 .eo-standings {
   border-radius: 20px;
   border: 1px solid var(--dp-border-strong);
-  background: rgba(13, 16, 25, 0.92);
+  background: var(--dp-surface-card);
   padding: 15px 16px;
   box-shadow: var(--dp-shadow-card);
   display: flex;
@@ -646,26 +708,27 @@
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--dp-border-subtle);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--dp-surface-row);
   font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
 }
 
 .eo-zone-row.is-living {
-  border-left: 3px solid #38bdf8;
+  border-left: 3px solid var(--dp-cyan);
 }
 
 .eo-zone-row.is-prison {
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--dp-amber);
 }
 
 .eo-zone-row.is-elim {
-  border-left: 3px solid #dc3545;
-  background: rgba(220, 53, 69, 0.08);
+  border-left: 3px solid var(--dp-crimson);
+  background: var(--dp-crimson-glow);
 }
 
 .eo-zone-row.is-me {
   border-color: var(--dp-border-strong);
-  background: rgba(212, 175, 106, 0.11);
+  background: var(--dp-brass-glow);
 }
 
 .eo-zone-tag {
@@ -676,9 +739,9 @@
   border-radius: 999px;
 }
 
-.eo-zone-tag.is-living { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; }
-.eo-zone-tag.is-prison { background: rgba(245, 158, 11, 0.16); color: #fde68a; }
-.eo-zone-tag.is-elim   { background: rgba(220, 53, 69, 0.22); color: #ff9ca6; }
+.eo-zone-tag.is-living { background: rgba(56, 189, 248, 0.16); color: var(--dp-cyan); }
+.eo-zone-tag.is-prison { background: rgba(245, 158, 11, 0.16); color: var(--dp-amber); }
+.eo-zone-tag.is-elim   { background: var(--dp-crimson-glow); color: var(--dp-crimson-bright); }
 
 /* Alliance Token Rescue Ceremony */
 .eo-rescue-grid {
@@ -690,19 +753,24 @@
 .eo-rescue-card {
   padding: 14px;
   border-radius: 14px;
-  border: 1.5px solid rgba(245, 158, 11, 0.45);
-  background: rgba(245, 158, 11, 0.08);
+  border: 1.5px solid var(--dp-border-strong);
+  background: var(--dp-surface-tile);
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
+  transition:
+    transform var(--dp-dur-fast) var(--dp-ease-apple),
+    border-color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .eo-rescue-card:hover {
-  border-color: #f2d591;
+  border-color: var(--dp-brass-bright);
   transform: translateY(-2px);
-  box-shadow: 0 0 24px rgba(212, 175, 106, 0.35);
+}
+
+.eo-rescue-card:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 960px) {

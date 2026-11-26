@@ -1,14 +1,54 @@
 /* ==========================================================================
  * Exile Match 2: Spot the Difference (找不同 / 달라진 그림 찾기)
- * Ancient Temple Murals · Memorize Original -> Alteration Hunt
+ * Dual-Theme: Dark Obsidian Temple & Light Carved Sandstone/Porcelain Temple
+ * GPU-Composited Ripples & Progress · Explicit transitions · GPU keyframes only
  * ========================================================================== */
+
+:root,
+:root[data-theme="dark"] {
+  --sd-bg-top: rgba(245, 158, 11, 0.14);
+  --sd-bg-bl: rgba(217, 119, 6, 0.10);
+  --sd-bg-br: rgba(220, 53, 69, 0.11);
+  --sd-temple-surface: linear-gradient(135deg, rgba(35, 25, 16, 0.94), rgba(16, 13, 11, 0.96));
+  --sd-frame-surface: linear-gradient(160deg, #211912, #110d0a);
+  --sd-phase-surface: rgba(24, 18, 13, 0.92);
+  --sd-racer-bg: rgba(12, 10, 9, 0.74);
+  --sd-racer-survived: rgba(16, 36, 24, 0.48);
+  --sd-racer-elim: rgba(42, 14, 18, 0.48);
+  --sd-solved-bg: linear-gradient(135deg, rgba(20, 52, 32, 0.88), rgba(14, 28, 19, 0.94));
+  --sd-solved-ink: #bbf7d0;
+  --sd-lockout-bg: rgba(30, 6, 9, 0.84);
+  --sd-lockout-ink: #fca5a5;
+  --sd-frieze-ink: rgba(212, 175, 106, 0.18);
+  --sd-svg-bg: #14100d;
+  --sd-vignette: rgba(12, 7, 3, 0.52);
+}
+
+:root[data-theme="light"] {
+  --sd-bg-top: rgba(180, 122, 30, 0.10);
+  --sd-bg-bl: rgba(180, 122, 30, 0.06);
+  --sd-bg-br: rgba(196, 35, 52, 0.05);
+  --sd-temple-surface: linear-gradient(135deg, #fffdf9 0%, #f5efe4 100%);
+  --sd-frame-surface: linear-gradient(160deg, #ffffff 0%, #f3ece0 100%);
+  --sd-phase-surface: rgba(255, 253, 248, 0.95);
+  --sd-racer-bg: rgba(255, 255, 255, 0.82);
+  --sd-racer-survived: rgba(21, 128, 61, 0.10);
+  --sd-racer-elim: rgba(196, 35, 52, 0.10);
+  --sd-solved-bg: linear-gradient(135deg, rgba(21, 128, 61, 0.12), rgba(240, 253, 244, 0.96));
+  --sd-solved-ink: #14532d;
+  --sd-lockout-bg: rgba(255, 245, 246, 0.92);
+  --sd-lockout-ink: #991b1b;
+  --sd-frieze-ink: rgba(148, 108, 36, 0.20);
+  --sd-svg-bg: #1c150f;
+  --sd-vignette: rgba(42, 28, 12, 0.34);
+}
 
 body.exile-temple-body {
   background:
-    radial-gradient(ellipse 65% 42% at 50% 0%, rgba(245, 158, 11, 0.16), transparent 65%),
-    radial-gradient(ellipse 50% 45% at 12% 90%, rgba(217, 119, 6, 0.11), transparent 60%),
-    radial-gradient(ellipse 50% 45% at 88% 90%, rgba(220, 53, 69, 0.12), transparent 60%),
-    #0a0807;
+    radial-gradient(ellipse 65% 42% at 50% 0%, var(--sd-bg-top), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 12% 90%, var(--sd-bg-bl), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 88% 90%, var(--sd-bg-br), transparent 60%),
+    var(--dp-bg-void);
 }
 
 .sd-root {
@@ -24,9 +64,9 @@ body.exile-temple-body {
   position: relative;
   padding: 12px 16px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(35, 25, 16, 0.92), rgba(16, 13, 11, 0.95));
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  box-shadow: inset 0 1px 0 rgba(255, 219, 148, 0.12), 0 12px 30px rgba(0, 0, 0, 0.55);
+  background: var(--sd-temple-surface);
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   overflow: hidden;
 }
 
@@ -39,7 +79,7 @@ body.exile-temple-body {
   text-align: center;
   font-size: 9px;
   letter-spacing: 0.45em;
-  color: rgba(212, 175, 106, 0.16);
+  color: var(--sd-frieze-ink);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -70,15 +110,15 @@ body.exile-temple-body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f59e0b;
-  box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.6);
-  animation: sd-flicker 2.1s ease-in-out infinite;
+  background: var(--dp-amber);
+  box-shadow: 0 0 10px var(--dp-amber);
+  animation: sd-flicker 2.1s var(--dp-ease-apple) infinite;
 }
 
 @keyframes sd-flicker {
   0%, 100% { opacity: 1; transform: scale(1); }
-  45% { opacity: 0.7; transform: scale(0.9); }
-  75% { opacity: 0.95; transform: scale(1.12); }
+  45% { opacity: 0.68; transform: scale(0.9); }
+  75% { opacity: 0.96; transform: scale(1.1); }
 }
 
 .sd-race-grid {
@@ -90,26 +130,26 @@ body.exile-temple-body {
 .sd-racer-card {
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(12, 10, 9, 0.72);
-  border: 1px solid rgba(212, 175, 106, 0.18);
+  background: var(--sd-racer-bg);
+  border: 1px solid var(--dp-border);
   display: flex;
   flex-direction: column;
   gap: 5px;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .sd-racer-card.is-me {
-  border-color: rgba(245, 185, 86, 0.55);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.14);
+  border-color: var(--dp-border-strong);
 }
 
 .sd-racer-card.is-survived {
-  border-color: rgba(34, 197, 94, 0.55);
-  background: rgba(16, 36, 24, 0.45);
+  border-color: var(--dp-emerald);
+  background: var(--sd-racer-survived);
 }
 
 .sd-racer-card.is-eliminated {
-  border-color: rgba(220, 53, 69, 0.55);
-  background: rgba(42, 14, 18, 0.45);
+  border-color: var(--dp-crimson);
+  background: var(--sd-racer-elim);
 }
 
 .sd-racer-top {
@@ -122,6 +162,7 @@ body.exile-temple-body {
 
 .sd-racer-stat {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--dp-brass-bright);
   flex-shrink: 0;
@@ -130,15 +171,19 @@ body.exile-temple-body {
 .sd-bar-track {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--dp-border-subtle);
   overflow: hidden;
 }
 
 .sd-bar-fill {
+  width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #b45309, #f59e0b, #fde68a);
-  transition: width 0.35s var(--dp-ease);
+  background: linear-gradient(90deg, #b45309, #f59e0b, #fbbf24);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--dp-dur-base) var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .sd-racer-card.is-survived .sd-bar-fill {
@@ -153,18 +198,19 @@ body.exile-temple-body {
   gap: 12px;
   padding: 12px 16px;
   border-radius: 12px;
-  background: rgba(24, 18, 13, 0.9);
-  border: 1px solid rgba(212, 175, 106, 0.32);
+  background: var(--sd-phase-surface);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
   flex-wrap: wrap;
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .sd-phase-bar.is-memorize {
-  border-color: rgba(245, 158, 11, 0.65);
-  box-shadow: 0 0 24px rgba(245, 158, 11, 0.16);
+  border-color: var(--dp-amber);
 }
 
 .sd-phase-bar.is-hunt {
-  border-color: rgba(220, 53, 69, 0.55);
+  border-color: var(--dp-crimson);
 }
 
 .sd-phase-left {
@@ -193,26 +239,27 @@ body.exile-temple-body {
 }
 
 .sd-pip {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 1.5px solid rgba(212, 175, 106, 0.4);
-  background: rgba(12, 10, 8, 0.85);
+  border: 1.5px solid var(--dp-border-strong);
+  background: var(--dp-surface-input);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
   color: var(--dp-ink-faint);
-  transition: all 0.25s;
+  transition: transform var(--dp-dur-fast) var(--dp-ease-spring), opacity var(--dp-dur-fast) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple), border-color var(--dp-dur-fast) var(--dp-ease-apple), color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .sd-pip.is-found {
-  border-color: #fde68a;
-  background: radial-gradient(circle, #f59e0b, #92400e);
+  border-color: #f59e0b;
+  background: #f59e0b;
   color: #140c03;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.65);
+  transform: scale(1.08);
 }
 
 /* Mural Frame */
@@ -230,11 +277,9 @@ body.exile-temple-body {
   position: relative;
   border-radius: 16px;
   padding: 12px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.1), transparent 65%),
-    linear-gradient(160deg, #211912, #110d0a);
-  border: 2px solid rgba(196, 154, 78, 0.42);
-  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.72), 0 18px 40px rgba(0, 0, 0, 0.65);
+  background: var(--sd-frame-surface);
+  border: 2px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   overflow: hidden;
 }
 
@@ -257,8 +302,8 @@ body.exile-temple-body {
   aspect-ratio: 800 / 500;
   border-radius: 10px;
   overflow: hidden;
-  border: 1.5px solid rgba(212, 175, 106, 0.34);
-  background: #14100d;
+  border: 1.5px solid var(--dp-border-strong);
+  background: var(--sd-svg-bg);
   user-select: none;
 }
 
@@ -272,16 +317,19 @@ body.exile-temple-body {
   display: block;
 }
 
-/* Hit ripple & Miss burst animations inside SVG */
+/* GPU-composited Hit Ripple & Miss Pop (transform + opacity ONLY!) */
 @keyframes sd-ripple {
-  0% { r: 8; opacity: 1; stroke-width: 5; }
-  100% { r: 44; opacity: 0; stroke-width: 1; }
+  0% { transform: scale(0.3); opacity: 1; }
+  100% { transform: scale(1.9); opacity: 0; }
 }
 
 .sd-hit-ripple {
   fill: none;
   stroke: #fde68a;
-  animation: sd-ripple 1s ease-out forwards;
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sd-ripple 0.9s var(--dp-ease-out) forwards;
 }
 
 @keyframes sd-miss-pop {
@@ -293,15 +341,16 @@ body.exile-temple-body {
   pointer-events: none;
   transform-box: fill-box;
   transform-origin: center;
-  animation: sd-miss-pop 0.9s ease-out forwards;
+  animation: sd-miss-pop 0.85s var(--dp-ease-out) forwards;
 }
 
 /* Lockout Overlay */
 .sd-lockout-mask {
   position: absolute;
   inset: 0;
-  background: rgba(30, 6, 9, 0.8);
+  background: var(--sd-lockout-bg);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 15;
   display: flex;
   flex-direction: column;
@@ -310,20 +359,21 @@ body.exile-temple-body {
   gap: 6px;
   text-align: center;
   border-radius: 10px;
-  border: 2px solid rgba(239, 68, 68, 0.72);
+  border: 2px solid var(--dp-crimson);
 }
 
 .sd-lockout-mask strong {
   font-family: var(--dp-font-display);
   font-size: 20px;
-  color: #fca5a5;
+  color: var(--sd-lockout-ink);
 }
 
 .sd-lockout-sec {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 32px;
   font-weight: 800;
-  color: #ff5868;
+  color: var(--dp-crimson-bright);
 }
 
 /* Memorize Torchlight Vignette */
@@ -331,8 +381,7 @@ body.exile-temple-body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse 68% 68% at 50% 50%, transparent 55%, rgba(12, 7, 3, 0.52) 100%);
-  box-shadow: inset 0 0 36px rgba(245, 158, 11, 0.16);
+  background: radial-gradient(ellipse 68% 68% at 50% 50%, transparent 55%, var(--sd-vignette) 100%);
 }
 
 /* Post-round Diff Log */
@@ -345,9 +394,10 @@ body.exile-temple-body {
 .sd-diff-chip {
   padding: 9px 12px;
   border-radius: 10px;
-  background: rgba(18, 14, 11, 0.88);
-  border: 1px solid rgba(212, 175, 106, 0.3);
+  background: var(--dp-surface-row);
+  border: 1px solid var(--dp-border);
   font-size: 12.5px;
+  color: var(--dp-ink);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -360,6 +410,7 @@ body.exile-temple-body {
   background: linear-gradient(135deg, #f59e0b, #b45309);
   color: #140c03;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 800;
   display: inline-flex;
@@ -371,14 +422,22 @@ body.exile-temple-body {
 .sd-solved-banner {
   padding: 13px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(20, 52, 32, 0.85), rgba(14, 28, 19, 0.92));
-  border: 1.5px solid rgba(74, 222, 128, 0.6);
-  color: #bbf7d0;
+  background: var(--sd-solved-bg);
+  border: 1.5px solid var(--dp-emerald);
+  color: var(--sd-solved-ink);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-torch-dot,
+  .sd-hit-ripple,
+  .sd-miss-mark {
+    animation: none;
+  }
 }
 
 @media (max-width: 860px) {

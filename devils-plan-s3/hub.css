@@ -1,6 +1,6 @@
 /* ==========================================================================
  * Collection Hub — The Devil's Plan Season 3: Dead Again
- * Space-coded cinema-grade broadcast gallery
+ * Dual-Theme (Dark Obsidian Studio & Light Porcelain Studio) · 60fps GPU-only
  * ========================================================================== */
 
 .hub-body {
@@ -36,6 +36,19 @@
   filter: blur(22px);
 }
 
+:root[data-theme="light"] .hub-lightshaft {
+  background:
+    conic-gradient(
+      from 165deg at 50% -15%,
+      transparent 0deg,
+      rgba(180, 134, 48, 0.09) 18deg,
+      transparent 42deg,
+      rgba(196, 35, 52, 0.05) 62deg,
+      transparent 90deg
+    ),
+    radial-gradient(ellipse 60% 35% at 50% 102%, rgba(109, 40, 217, 0.045), transparent 70%);
+}
+
 .hub-container {
   position: relative;
   z-index: 2;
@@ -48,7 +61,7 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(8, 10, 16, 0.86);
+  background: var(--dp-glass-strong);
   border-bottom: 1px solid var(--dp-border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -73,7 +86,7 @@
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--dp-ink);
-  transition: color 0.16s;
+  transition: color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .hub-home-link:hover {
@@ -95,26 +108,12 @@
 .hub-topbar-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .hub-profile-pill {
   max-width: 170px;
-}
-
-@media (max-width: 520px) {
-  .hub-brand-title {
-    display: none;
-  }
-
-  .hub-divider {
-    display: none;
-  }
-
-  .hub-profile-pill {
-    max-width: 126px;
-  }
 }
 
 /* Hero Stage */
@@ -123,7 +122,7 @@
 }
 
 .hub-hero {
-  padding: clamp(38px, 6.5vh, 72px) 0 32px;
+  padding: clamp(36px, 6vh, 68px) 0 32px;
   text-align: center;
 }
 
@@ -134,7 +133,7 @@
   padding: 5px 14px;
   border-radius: 999px;
   border: 1px solid var(--dp-border-strong);
-  background: rgba(212, 175, 106, 0.09);
+  background: var(--dp-brass-glow);
   color: var(--dp-brass-bright);
   font-family: var(--dp-font-mono);
   font-size: 11px;
@@ -158,7 +157,13 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 12px 32px rgba(212, 175, 106, 0.24));
+}
+
+:root[data-theme="light"] .hub-title-main {
+  background: linear-gradient(180deg, #1b1e28 0%, #5c4314 58%, #9a6e1f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .hub-title-sub {
@@ -168,15 +173,18 @@
   font-weight: 700;
   letter-spacing: 0.34em;
   color: var(--dp-crimson-bright);
+}
+
+:root[data-theme="dark"] .hub-title-sub {
   text-shadow: 0 0 28px var(--dp-crimson-glow);
 }
 
 .hub-lead {
-  max-width: 670px;
+  max-width: 660px;
   margin: 18px auto 0;
   font-size: 15.5px;
   color: var(--dp-ink-muted);
-  line-height: 1.7;
+  line-height: 1.68;
 }
 
 .hub-pillars {
@@ -193,7 +201,7 @@
   gap: 7px;
   padding: 6px 13px;
   border-radius: 999px;
-  background: rgba(20, 24, 36, 0.78);
+  background: var(--dp-bg-elevated);
   border: 1px solid var(--dp-border-subtle);
   font-size: 12.5px;
   color: var(--dp-ink);
@@ -204,7 +212,6 @@
   height: 6px;
   border-radius: 50%;
   background: var(--dp-brass);
-  box-shadow: 0 0 8px var(--dp-brass);
 }
 
 /* Quick Join Bar */
@@ -256,6 +263,7 @@
   font-family: var(--dp-font-display);
   font-size: 24px;
   letter-spacing: 0.06em;
+  color: var(--dp-ink);
 }
 
 .hub-section-sub {
@@ -264,33 +272,43 @@
   color: var(--dp-ink-muted);
 }
 
+/* Persistent Filter Bar with GPU Sliding Indicator */
 .hub-filters {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--dp-bg-slate);
+  border: 1px solid var(--dp-border-subtle);
 }
 
 .hub-filter-btn {
-  padding: 7px 14px;
+  position: relative;
+  z-index: 1;
+  padding: 6px 13px;
   border-radius: 999px;
   font-size: 12.5px;
   font-weight: 600;
-  border: 1px solid var(--dp-border-subtle);
-  background: rgba(20, 24, 36, 0.72);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--dp-ink-muted);
-  transition: all 0.18s var(--dp-ease);
+  transition:
+    color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-instant) var(--dp-ease-apple);
 }
 
 .hub-filter-btn:hover {
   color: var(--dp-ink);
-  border-color: var(--dp-border-strong);
+}
+
+.hub-filter-btn:active {
+  transform: scale(0.97);
 }
 
 .hub-filter-btn.is-active {
-  background: rgba(212, 175, 106, 0.18);
-  border-color: var(--dp-brass);
   color: var(--dp-brass-bright);
-  box-shadow: 0 0 18px rgba(212, 175, 106, 0.16);
 }
 
 /* Game Card Grid */
@@ -304,16 +322,18 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 292px;
   padding: 20px 20px 18px;
   border-radius: var(--dp-radius-md);
   background:
-    radial-gradient(circle at 92% 10%, var(--card-glow, rgba(212, 175, 106, 0.14)), transparent 52%),
-    linear-gradient(165deg, rgba(24, 29, 44, 0.9) 0%, rgba(11, 13, 21, 0.96) 100%);
+    radial-gradient(circle at 92% 10%, var(--card-glow, var(--dp-brass-glow)), transparent 52%),
+    var(--dp-surface-card);
   border: 1px solid var(--dp-border);
   box-shadow: var(--dp-shadow-card);
   overflow: hidden;
-  transition: transform 0.25s var(--dp-ease), border-color 0.25s var(--dp-ease),
-    box-shadow 0.25s var(--dp-ease);
+  transition:
+    transform var(--dp-dur-base) var(--dp-ease-apple),
+    border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .hub-card::before {
@@ -327,13 +347,46 @@
   opacity: 0.85;
 }
 
+/* GPU-only hover aura (replaces box-shadow transition!) */
+.hub-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at 85% 0%, var(--card-glow, var(--dp-brass-glow)), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--dp-dur-base) var(--dp-ease-apple);
+}
+
 .hub-card:hover {
-  transform: translateY(-4px);
+  transform: translate3d(0, -3px, 0);
   border-color: var(--card-accent, var(--dp-brass));
-  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.72), 0 0 32px var(--card-glow, rgba(212, 175, 106, 0.18));
+}
+
+.hub-card:hover::after {
+  opacity: 1;
+}
+
+.hub-card.is-stagger-in {
+  animation: hub-card-enter var(--dp-dur-base) var(--dp-ease-out) both;
+  animation-delay: calc(var(--stagger-i, 0) * 16ms);
+}
+
+@keyframes hub-card-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .hub-card-top {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -349,6 +402,8 @@
 }
 
 .hub-card-head {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -362,10 +417,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(8, 10, 16, 0.72);
+  background: var(--dp-bg-slate);
   border: 1px solid color-mix(in srgb, var(--card-accent, #d4af6a) 42%, transparent);
   color: var(--card-accent, var(--dp-brass));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 20px var(--card-glow, rgba(212, 175, 106, 0.14));
 }
 
 .hub-card-emblem svg {
@@ -386,10 +440,11 @@
   color: var(--card-accent, var(--dp-brass));
   margin-top: 3px;
   letter-spacing: 0.02em;
-  opacity: 0.92;
 }
 
 .hub-card-tagline {
+  position: relative;
+  z-index: 1;
   margin: 12px 0 16px;
   font-size: 13.5px;
   color: var(--dp-ink-muted);
@@ -398,6 +453,8 @@
 }
 
 .hub-card-meta {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
@@ -410,55 +467,70 @@
 .hub-meta-pill {
   padding: 3px 8px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--dp-surface-row);
   border: 1px solid var(--dp-border-subtle);
 }
 
 .hub-card-actions {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-/* Space Badges */
-.dp-badge-amber {
-  background: rgba(245, 158, 11, 0.14);
-  border-color: rgba(245, 158, 11, 0.45);
-  color: #fcd34d;
+.hub-card-cta-arrow {
+  display: inline-block;
+  transition: transform var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
-.dp-badge-violet {
-  background: rgba(167, 139, 250, 0.15);
-  border-color: rgba(167, 139, 250, 0.46);
-  color: #ddd6fe;
+.hub-card:hover .hub-card-cta-arrow {
+  transform: translate3d(3px, 0, 0);
+}
+
+/* Initial Skeleton Shimmer (CLS = 0.00) */
+.hub-skeleton-card {
+  min-height: 292px;
+  border-radius: var(--dp-radius-md);
+  border: 1px solid var(--dp-border-subtle);
+  background: var(--dp-surface-card);
+  opacity: 0.55;
+  animation: hub-skel-pulse 1.3s var(--dp-ease-apple) infinite alternate;
+}
+
+@keyframes hub-skel-pulse {
+  from { opacity: 0.35; }
+  to { opacity: 0.65; }
 }
 
 /* TBA Finale Teaser Card */
 .hub-card-tba {
   border-style: dashed;
-  border-color: rgba(212, 175, 106, 0.32);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(220, 53, 69, 0.12), transparent 60%),
-    linear-gradient(165deg, rgba(16, 18, 28, 0.72), rgba(8, 10, 16, 0.88));
+  border-color: var(--dp-border-strong);
   cursor: default;
 }
 
 .hub-card-tba:hover {
   transform: none;
-  border-color: rgba(212, 175, 106, 0.42);
-  box-shadow: var(--dp-shadow-card);
+  border-color: var(--dp-border-strong);
+}
+
+.hub-card-tba::after {
+  display: none;
 }
 
 .hub-tba-pill {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-height: 40px;
   border-radius: var(--dp-radius-sm);
-  border: 1px dashed rgba(212, 175, 106, 0.34);
-  background: rgba(212, 175, 106, 0.06);
+  border: 1px dashed var(--dp-border-strong);
+  background: var(--dp-surface-row);
   color: var(--dp-ink-muted);
   font-family: var(--dp-font-mono);
   font-size: 12px;
@@ -471,13 +543,13 @@
   text-align: center;
   border-radius: var(--dp-radius-md);
   border: 1px dashed var(--dp-border-strong);
-  background: rgba(16, 19, 30, 0.52);
+  background: var(--dp-glass);
 }
 
 /* Footer */
 .hub-footer {
   border-top: 1px solid var(--dp-border);
-  background: rgba(8, 10, 16, 0.85);
+  background: var(--dp-glass-strong);
   padding: 18px 0;
   font-size: 12.5px;
   color: var(--dp-ink-faint);
@@ -502,5 +574,32 @@
 
   .hub-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hub-filters {
+    border-radius: var(--dp-radius-md);
+  }
+}
+
+@media (max-width: 520px) {
+  .hub-brand-title,
+  .hub-divider {
+    display: none;
+  }
+
+  .hub-profile-pill {
+    max-width: 112px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-card:hover,
+  .hub-card:hover .hub-card-cta-arrow {
+    transform: none !important;
+  }
+
+  .hub-card.is-stagger-in,
+  .hub-skeleton-card {
+    animation: none !important;
   }
 }

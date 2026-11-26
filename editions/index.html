@@ -663,23 +663,61 @@
             </a>
           </div>
 
-          <a
-            href="../devils-plan-s3/"
-            style="margin-top:28px;padding:24px 28px;border-radius:16px;background:radial-gradient(ellipse 75% 100% at 95% 0%,rgba(220,53,69,0.22),transparent 60%),linear-gradient(135deg,#0b0d14,#161b29);border:1px solid rgba(212,175,106,0.42);color:#f4f1ea;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;box-shadow:0 16px 38px rgba(19,34,56,0.14);"
-          >
+          <style>
+            .dp-entry-card {
+              margin-top: 28px;
+              padding: 24px 28px;
+              border-radius: 16px;
+              background:
+                radial-gradient(ellipse 72% 95% at 96% 0%, rgba(196, 35, 52, 0.08), transparent 56%),
+                linear-gradient(135deg, #ffffff 0%, #f8f5ee 100%);
+              border: 1px solid rgba(148, 108, 36, 0.28);
+              color: #14171f;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 18px;
+              box-shadow: 0 10px 26px rgba(19, 34, 56, 0.06);
+              transition:
+                transform 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-card:hover { transform: translate3d(0, -2px, 0); border-color: rgba(148, 108, 36, 0.54); }
+            .dp-entry-card:active { transform: scale(0.99); transition-duration: 90ms; }
+            .dp-entry-card:focus-visible { outline: 2px solid #8e6416; outline-offset: 3px; }
+            .dp-entry-cta {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              padding: 11px 20px;
+              border-radius: 10px;
+              background: linear-gradient(135deg, #b5872e 0%, #8e6416 100%);
+              color: #ffffff;
+              font-weight: 700;
+              font-size: 13.5px;
+              white-space: nowrap;
+            }
+            .dp-entry-arrow { display: inline-block; transition: transform 160ms cubic-bezier(0.25, 0.1, 0.25, 1); }
+            .dp-entry-card:hover .dp-entry-arrow { transform: translate3d(3px, 0, 0); }
+            @media (prefers-reduced-motion: reduce) {
+              .dp-entry-card:hover, .dp-entry-card:active, .dp-entry-card:hover .dp-entry-arrow { transform: none !important; }
+            }
+          </style>
+          <a class="dp-entry-card" id="devils-plan-s3" href="../devils-plan-s3/">
             <div style="max-width:660px;">
-              <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;color:#f2d591;margin-bottom:6px;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;color:#8e6416;margin-bottom:6px;">
                 ◆ INTERACTIVE COLLECTION · ONLINE MULTIPLAYER + AI
               </div>
-              <h2 style="margin:0 0 6px;font-size:22px;color:#fff8e7;">
+              <h2 style="margin:0 0 6px;font-size:22px;color:#14171f;">
                 The Devil’s Plan Season 3: Dead Again — 19 Playable Mind Games
               </h2>
-              <p style="margin:0;font-size:14px;color:#b2b8c9;">
+              <p style="margin:0;font-size:14px;color:#52596b;">
                 Main Matches, Mini-Games, Prison Matches, Exile Trials &amp; Hidden Stages from Episodes 1–10 — instant browser rooms with zero server setup.
               </p>
             </div>
-            <span style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;background:linear-gradient(135deg,#f0d08a,#c49746);color:#0b0d14;font-weight:700;font-size:13.5px;white-space:nowrap;">
-              Enter Game Hub <span aria-hidden="true">↗</span>
+            <span class="dp-entry-cta">
+              Enter Game Hub <span class="dp-entry-arrow" aria-hidden="true">↗</span>
             </span>
           </a>
 

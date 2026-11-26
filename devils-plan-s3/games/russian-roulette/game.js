@@ -1,4 +1,4 @@
-import { mountGame, SFX, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, UI, Motion, Theme } from '../../shared/sdk.js';
 import { GameRules } from './rules.js';
 
 // Bespoke Web Audio cues for tactile revolver mechanics (respects SFX.isMuted())
@@ -52,7 +52,6 @@ function playGunshot() {
   const ac = getAudio();
   if (!ac) return;
   const now = ac.currentTime;
-  // White noise blast
   const len = Math.floor(ac.sampleRate * 0.48);
   const buf = ac.createBuffer(1, len, ac.sampleRate);
   const data = buf.getChannelData(0);
@@ -69,7 +68,6 @@ function playGunshot() {
   src.connect(filt).connect(ng).connect(ac.destination);
   src.start(now);
 
-  // Sub-bass shockwave
   const sub = ac.createOscillator();
   const sg = ac.createGain();
   sub.type = 'sawtooth';
@@ -82,16 +80,20 @@ function playGunshot() {
   sub.stop(now + 0.46);
 }
 
-// Local UI selection state across renders
+// Local UI selection state & live refs for idempotent delegation
 const uiState = {
   selectedAction: null, // 'PUBLIC_PEEK' | 'PRIVATE_PEEK' | 'MANIPULATE_CONTRIBUTE' | null
   selectedPair: 0,
   manipulateAmount: 2,
   lastEventKey: '',
   lastShotCount: 0,
+  prevCredits: null,
   flashMode: null, // 'bang' | 'click' | null
   flashTimer: null,
 };
+
+let latestContainer = null;
+let latestCtx = null;
 
 function polar(cx, cy, r, deg) {
   const rad = ((deg - 90) * Math.PI) / 180;
@@ -106,6 +108,7 @@ function describeArc(cx, cy, r, startDeg, endDeg) {
 }
 
 function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode) {
+  const isLight = Theme.get() === 'light';
   const C = state.numChambers;
   const cx = 220;
   const cy = 220;
@@ -122,7 +125,7 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
       ? state.firedShots[state.firedShots.length - 1].pos
       : null;
 
-  // Clickable adjacent pair arcs (in static seat frame so Chamber #1..#C stay at fixed seat angles)
+  // Clickable adjacent pair arcs
   let pairArcsSvg = '';
   if (interactivePairMode) {
     for (let p = 0; p < C; p++) {
@@ -132,6 +135,7 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
       const cls = `rr-pair-arc ${isSel ? (isSwapMode ? 'is-swap' : 'is-selected') : ''}`;
       pairArcsSvg += `
         <path
+          data-motion-key="rr-arc-${p}"
           d="${describeArc(cx, cy, 134, a1, a2)}"
           class="${cls}"
           data-select-pair="${p}"
@@ -142,27 +146,27 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
     }
   }
 
-  // Scan X-ray beams for last public/private/swap highlight
+  // Scan X-ray beams
   let xraySvg = '';
   if (state.scanHighlight && state.phase === 'action') {
     const color =
       state.scanHighlight.type === 'private'
-        ? '#38bdf8'
+        ? isLight ? '#0369a1' : '#38bdf8'
         : state.scanHighlight.type === 'swap'
-        ? '#f59e0b'
-        : '#d4af6a';
+        ? isLight ? '#b45309' : '#f59e0b'
+        : isLight ? '#9a6e1f' : '#d4af6a';
     for (const pos of state.scanHighlight.positions) {
       const pt = polar(cx, cy, 94, pos * stepDeg);
       xraySvg += `
-        <line x1="${cx}" y1="${cy}" x2="${pt.x.toFixed(1)}" y2="${pt.y.toFixed(1)}"
+        <line data-motion-key="rr-xl-${pos}" x1="${cx}" y1="${cy}" x2="${pt.x.toFixed(1)}" y2="${pt.y.toFixed(1)}"
           stroke="${color}" stroke-width="2.5" stroke-dasharray="5 4" class="rr-xray-beam" />
-        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="33"
+        <circle data-motion-key="rr-xc-${pos}" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="33"
           fill="none" stroke="${color}" stroke-width="2" stroke-dasharray="6 4" class="rr-xray-beam" />
       `;
     }
   }
 
-  // Rotating brushed-steel cylinder body (flutes + mechanical notches rotate smoothly!)
+  // Rotating brushed-steel cylinder body flutes
   let flutesSvg = '';
   for (let i = 0; i < C; i++) {
     const midDeg = (i + 0.5) * stepDeg;
@@ -170,12 +174,14 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
     const p2 = polar(cx, cy, 52, midDeg);
     flutesSvg += `
       <line x1="${p2.x.toFixed(1)}" y1="${p2.y.toFixed(1)}" x2="${p1.x.toFixed(1)}" y2="${p1.y.toFixed(1)}"
-        stroke="rgba(0,0,0,0.52)" stroke-width="6" stroke-linecap="round" />
-      <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="10" fill="#090b10" stroke="rgba(212,175,106,0.22)" stroke-width="1.2" />
+        stroke="${isLight ? 'rgba(20,23,31,0.22)' : 'rgba(0,0,0,0.52)'}" stroke-width="6" stroke-linecap="round" />
+      <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="10"
+        fill="${isLight ? '#e8e4da' : '#090b10'}"
+        stroke="${isLight ? 'rgba(148,108,36,0.38)' : 'rgba(212,175,106,0.22)'}" stroke-width="1.2" />
     `;
   }
 
-  // Chambers rendered at their current seat positions (0..C-1)
+  // Chambers rendered at current seat positions
   let chambersSvg = '';
   for (let pos = 0; pos < C; pos++) {
     const ch = state.chambers[pos];
@@ -189,65 +195,64 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
     const isBarrelHere = activeBarrelPos === pos && (state.phase === 'firing' || state.phase === 'firing_done');
 
     let fill = 'url(#rrChamberDark)';
-    let stroke = 'rgba(212,175,106,0.45)';
-    let extraClass = '';
-    let innerSvg = `<text x="${pt.x.toFixed(1)}" y="${(pt.y + 5).toFixed(1)}" text-anchor="middle" fill="#64748b" font-family="var(--dp-font-mono)" font-size="16" font-weight="700">?</text>`;
+    let stroke = isLight ? 'rgba(148,108,36,0.55)' : 'rgba(212,175,106,0.45)';
+    let innerSvg = `<text x="${pt.x.toFixed(1)}" y="${(pt.y + 5).toFixed(1)}" text-anchor="middle" fill="${isLight ? '#94a3b8' : '#64748b'}" font-family="var(--dp-font-mono)" font-size="16" font-weight="700">?</text>`;
 
     if (intel) {
       if (intel.isLive) {
         fill = intel.stale ? 'url(#rrBulletStale)' : 'url(#rrBulletLive)';
-        stroke = intel.stale ? '#f59e0b' : '#ff4d5e';
-        extraClass = intel.stale ? '' : 'rr-chamber-live-glow';
+        stroke = intel.stale ? '#f59e0b' : '#dc2626';
         innerSvg = `
           <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="15" fill="url(#rrBrassPrimer)" stroke="#7c2d12" stroke-width="1.5" />
           <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="6" fill="#dc2626" />
           ${intel.stale ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y + 4).toFixed(1)}" text-anchor="middle" fill="#fef08a" font-size="12" font-weight="800">?</text>` : ''}
         `;
       } else {
-        fill = intel.stale ? 'rgba(30,41,59,0.85)' : 'rgba(14,25,38,0.94)';
-        stroke = intel.stale ? '#f59e0b' : '#38bdf8';
-        extraClass = intel.stale ? '' : 'rr-chamber-safe-glow';
+        fill = isLight
+          ? intel.stale ? '#fef3c7' : '#e0f2fe'
+          : intel.stale ? 'rgba(30,41,59,0.85)' : 'rgba(14,25,38,0.94)';
+        stroke = intel.stale ? '#d97706' : isLight ? '#0284c7' : '#38bdf8';
         innerSvg = `
-          <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11" fill="none" stroke="${intel.stale ? '#f59e0b' : '#38bdf8'}" stroke-width="2" stroke-dasharray="${intel.stale ? '3 3' : 'none'}" />
-          <text x="${pt.x.toFixed(1)}" y="${(pt.y + 4).toFixed(1)}" text-anchor="middle" fill="${intel.stale ? '#fde68a' : '#bae6fd'}" font-family="var(--dp-font-mono)" font-size="10" font-weight="700">${intel.stale ? '0?' : 'OK'}</text>
+          <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11" fill="none" stroke="${stroke}" stroke-width="2" stroke-dasharray="${intel.stale ? '3 3' : 'none'}" />
+          <text x="${pt.x.toFixed(1)}" y="${(pt.y + 4).toFixed(1)}" text-anchor="middle" fill="${intel.stale ? (isLight ? '#92400e' : '#fde68a') : (isLight ? '#0369a1' : '#bae6fd')}" font-family="var(--dp-font-mono)" font-size="10" font-weight="700">${intel.stale ? '0?' : 'OK'}</text>
         `;
       }
     }
 
     if (isHighlightedPair) {
-      stroke = isSwapMode ? '#f59e0b' : '#38bdf8';
+      stroke = isSwapMode ? '#f59e0b' : isLight ? '#0284c7' : '#38bdf8';
     }
     if (isBarrelHere) {
-      stroke = fired?.isLive ? '#ff3b4f' : '#f2d591';
+      stroke = fired?.isLive ? '#dc2626' : '#d4af6a';
     }
 
     const badgeColor =
       intel?.source === 'private'
-        ? '#38bdf8'
+        ? isLight ? '#0284c7' : '#38bdf8'
         : intel?.source === 'public'
-        ? '#d4af6a'
+        ? isLight ? '#9a6e1f' : '#d4af6a'
         : intel?.source === 'fired'
         ? fired?.isLive
-          ? '#ef4444'
-          : '#22c55e'
+          ? '#dc2626'
+          : '#16a34a'
         : null;
 
     chambersSvg += `
-      <g class="rr-chamber-node" data-chamber-pos="${pos}" style="${interactivePairMode ? 'cursor:pointer;' : ''}">
-        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="29" fill="#05060a" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
-        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="25" fill="${fill}" stroke="${stroke}" stroke-width="${isHighlightedPair || isBarrelHere ? 3.2 : 2}" class="rr-chamber-ring ${extraClass}" />
+      <g data-motion-key="rr-ch-${pos}" class="rr-chamber-node" data-chamber-pos="${pos}" style="${interactivePairMode ? 'cursor:pointer;' : ''}">
+        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="29" fill="${isLight ? '#cbd5e1' : '#05060a'}" stroke="${isLight ? 'rgba(20,23,31,0.16)' : 'rgba(255,255,255,0.1)'}" stroke-width="2" />
+        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="25" fill="${fill}" stroke="${stroke}" stroke-width="${isHighlightedPair || isBarrelHere ? 3.2 : 2}" class="rr-chamber-ring" />
         ${innerSvg}
-        <text x="${pt.x.toFixed(1)}" y="${(pt.y - 31).toFixed(1)}" text-anchor="middle" fill="#cbd5e1" font-family="var(--dp-font-mono)" font-size="10.5" font-weight="700">#${pos + 1}</text>
+        <text x="${pt.x.toFixed(1)}" y="${(pt.y - 31).toFixed(1)}" text-anchor="middle" fill="${isLight ? '#334155' : '#cbd5e1'}" font-family="var(--dp-font-mono)" font-size="10.5" font-weight="700">#${pos + 1}</text>
         ${
           badgeColor
-            ? `<circle cx="${(pt.x + 19).toFixed(1)}" cy="${(pt.y - 19).toFixed(1)}" r="5.5" fill="${badgeColor}" stroke="#090b10" stroke-width="1.5" />`
+            ? `<circle cx="${(pt.x + 19).toFixed(1)}" cy="${(pt.y - 19).toFixed(1)}" r="5.5" fill="${badgeColor}" stroke="${isLight ? '#ffffff' : '#090b10'}" stroke-width="1.5" />`
             : ''
         }
       </g>
     `;
   }
 
-  // Player seat badges arranged around outer perimeter of the table
+  // Player seat badges arranged around outer perimeter
   let seatsSvg = '';
   for (let pos = 0; pos < C; pos++) {
     const ch = state.chambers[pos];
@@ -261,16 +266,26 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
     const isMe = owner.seatId === mySeatId;
     const shortName = owner.name.length > 7 ? `${owner.name.slice(0, 6)}…` : owner.name;
 
-    let pillFill = 'rgba(13, 16, 25, 0.94)';
-    let pillStroke = 'rgba(212, 175, 106, 0.28)';
+    let pillFill = isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(13, 16, 25, 0.94)';
+    let pillStroke = isLight ? 'rgba(148, 108, 36, 0.34)' : 'rgba(212, 175, 106, 0.28)';
+    let nameFill = isLight ? '#14171f' : '#f4f1ea';
+    let subFill = isLight ? '#52596b' : '#94a3b8';
+
     if (owner.eliminated) {
-      pillFill = 'rgba(127, 29, 29, 0.9)';
-      pillStroke = '#ef4444';
+      pillFill = isLight ? '#fee2e2' : 'rgba(127, 29, 29, 0.9)';
+      pillStroke = '#dc2626';
+      nameFill = isLight ? '#991b1b' : '#fecaca';
+      subFill = isLight ? '#b91c1c' : '#fca5a5';
     } else if (isTurn) {
-      pillFill = 'rgba(42, 33, 14, 0.95)';
-      pillStroke = '#f2d591';
+      pillFill = isLight ? '#fef3c7' : 'rgba(42, 33, 14, 0.95)';
+      pillStroke = isLight ? '#9a6e1f' : '#f2d591';
+      nameFill = isLight ? '#78350f' : '#f2d591';
     } else if (isMe) {
-      pillStroke = '#38bdf8';
+      pillStroke = isLight ? '#0369a1' : '#38bdf8';
+      subFill = isLight ? '#0369a1' : '#7dd3fc';
+    }
+    if (!owner.eliminated && owner.isZero) {
+      subFill = isLight ? '#b91c2c' : '#ff6b7a';
     }
 
     const creditTag =
@@ -281,15 +296,13 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
         : '?? CR';
 
     seatsSvg += `
-      <g class="rr-seat-node">
+      <g data-motion-key="rr-seat-${pos}" class="rr-seat-node">
         <rect x="${(pt.x - 46).toFixed(1)}" y="${(pt.y - 19).toFixed(1)}" width="92" height="38" rx="10"
           fill="${pillFill}" stroke="${pillStroke}" stroke-width="${isTurn ? 2.2 : 1.3}" />
         <text x="${pt.x.toFixed(1)}" y="${(pt.y - 3).toFixed(1)}" text-anchor="middle"
-          fill="${owner.eliminated ? '#fecaca' : isTurn ? '#f2d591' : '#f4f1ea'}"
-          font-size="11" font-weight="700">${UI.escapeHtml(shortName)}</text>
+          fill="${nameFill}" font-size="11" font-weight="700">${UI.escapeHtml(shortName)}</text>
         <text x="${pt.x.toFixed(1)}" y="${(pt.y + 12).toFixed(1)}" text-anchor="middle"
-          fill="${owner.eliminated ? '#fca5a5' : owner.isZero ? '#ff6b7a' : isMe ? '#7dd3fc' : '#94a3b8'}"
-          font-family="var(--dp-font-mono)" font-size="10" font-weight="600">${owner.eliminated ? '💀 OUT' : creditTag}</text>
+          fill="${subFill}" font-family="var(--dp-font-mono)" font-size="10" font-weight="600">${owner.eliminated ? '💀 OUT' : creditTag}</text>
       </g>
     `;
   }
@@ -301,12 +314,11 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
     const tip = polar(cx, cy, 144, pDeg);
     const base = polar(cx, cy, 42, pDeg);
     pointerSvg = `
-      <line x1="${base.x.toFixed(1)}" y1="${base.y.toFixed(1)}" x2="${tip.x.toFixed(1)}" y2="${tip.y.toFixed(1)}"
-        stroke="#ff4d5e" stroke-width="4" stroke-linecap="round" filter="drop-shadow(0 0 10px #ef4444)" />
+      <line data-motion-key="rr-barrel-ptr" x1="${base.x.toFixed(1)}" y1="${base.y.toFixed(1)}" x2="${tip.x.toFixed(1)}" y2="${tip.y.toFixed(1)}"
+        stroke="#dc2626" stroke-width="4" stroke-linecap="round" />
     `;
   }
 
-  // Center spindle hub
   const centerLabel =
     state.phase === 'firing'
       ? lang === 'zh'
@@ -319,13 +331,13 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
       : `${state.numBullets}/${C}`;
 
   return `
-    <svg class="rr-revolver-svg" viewBox="0 0 440 440" role="img" aria-label="Revolver Cylinder">
+    <svg data-motion-key="rr-svg" class="rr-revolver-svg" viewBox="0 0 440 440" role="img" aria-label="Revolver Cylinder">
       <defs>
         <radialGradient id="rrSteelDrum" cx="42%" cy="35%" r="68%">
-          <stop offset="0%" stop-color="#3c4559" />
-          <stop offset="45%" stop-color="#1e2432" />
-          <stop offset="85%" stop-color="#111520" />
-          <stop offset="100%" stop-color="#090b10" />
+          <stop offset="0%" stop-color="${isLight ? '#94a3b8' : '#3c4559'}" />
+          <stop offset="45%" stop-color="${isLight ? '#64748b' : '#1e2432'}" />
+          <stop offset="85%" stop-color="${isLight ? '#475569' : '#111520'}" />
+          <stop offset="100%" stop-color="${isLight ? '#334155' : '#090b10'}" />
         </radialGradient>
         <radialGradient id="rrBrassHub" cx="35%" cy="30%" r="70%">
           <stop offset="0%" stop-color="#f5dc99" />
@@ -333,8 +345,8 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
           <stop offset="100%" stop-color="#5d441b" />
         </radialGradient>
         <radialGradient id="rrChamberDark" cx="40%" cy="35%" r="65%">
-          <stop offset="0%" stop-color="#1c2233" />
-          <stop offset="100%" stop-color="#06080d" />
+          <stop offset="0%" stop-color="${isLight ? '#334155' : '#1c2233'}" />
+          <stop offset="100%" stop-color="${isLight ? '#1e293b' : '#06080d'}" />
         </radialGradient>
         <radialGradient id="rrBulletLive" cx="40%" cy="35%" r="68%">
           <stop offset="0%" stop-color="#991b1b" />
@@ -342,8 +354,8 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
           <stop offset="100%" stop-color="#1a0505" />
         </radialGradient>
         <radialGradient id="rrBulletStale" cx="40%" cy="35%" r="68%">
-          <stop offset="0%" stop-color="#78350f" />
-          <stop offset="100%" stop-color="#1c1108" />
+          <stop offset="0%" stop-color="#92400e" />
+          <stop offset="100%" stop-color="#291507" />
         </radialGradient>
         <radialGradient id="rrBrassPrimer" cx="35%" cy="30%" r="70%">
           <stop offset="0%" stop-color="#fde68a" />
@@ -353,30 +365,539 @@ function buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isSwapMode
       </defs>
 
       <!-- Outer Table Engraved Ring -->
-      <circle cx="${cx}" cy="${cy}" r="154" fill="none" stroke="rgba(212,175,106,0.16)" stroke-width="1.5" stroke-dasharray="4 6" />
+      <circle cx="${cx}" cy="${cy}" r="154" fill="none" stroke="${isLight ? 'rgba(148,108,36,0.28)' : 'rgba(212,175,106,0.18)'}" stroke-width="1.5" stroke-dasharray="4 6" />
 
-      <!-- Rotating Brushed-Steel Cylinder Body -->
-      <g class="rr-cylinder-group" style="transform: rotate(${visualAngle}deg);">
-        <circle cx="${cx}" cy="${cy}" r="144" fill="url(#rrSteelDrum)" stroke="rgba(212,175,106,0.42)" stroke-width="2.5" />
-        <circle cx="${cx}" cy="${cy}" r="136" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1" />
+      <!-- Persistent Keyed Rotating Brushed-Steel Cylinder Body -->
+      <g data-motion-key="rr-cylinder" class="rr-cylinder-group" style="transform: rotate(${visualAngle}deg);">
+        <circle cx="${cx}" cy="${cy}" r="144" fill="url(#rrSteelDrum)" stroke="${isLight ? 'rgba(148,108,36,0.65)' : 'rgba(212,175,106,0.42)'}" stroke-width="2.5" />
+        <circle cx="${cx}" cy="${cy}" r="136" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
         ${flutesSvg}
       </g>
 
-      ${pairArcsSvg}
-      ${xraySvg}
-      ${pointerSvg}
-      ${chambersSvg}
+      <g data-motion-key="rr-arcs-layer">${pairArcsSvg}</g>
+      <g data-motion-key="rr-xray-layer">${xraySvg}</g>
+      <g data-motion-key="rr-ptr-layer">${pointerSvg}</g>
+      <g data-motion-key="rr-chambers-layer">${chambersSvg}</g>
 
       <!-- Center Brass Ratchet Spindle -->
-      <circle cx="${cx}" cy="${cy}" r="36" fill="#090b10" stroke="rgba(212,175,106,0.5)" stroke-width="2" />
+      <circle cx="${cx}" cy="${cy}" r="36" fill="${isLight ? '#1e293b' : '#090b10'}" stroke="rgba(212,175,106,0.55)" stroke-width="2" />
       <circle cx="${cx}" cy="${cy}" r="28" fill="url(#rrBrassHub)" stroke="#3d2c10" stroke-width="1.5" />
-      <circle cx="${cx}" cy="${cy}" r="22" fill="#0d1018" />
+      <circle cx="${cx}" cy="${cy}" r="22" fill="${isLight ? '#1e293b' : '#0d1018'}" />
       <text x="${cx}" y="${cy + 4}" text-anchor="middle" fill="#f2d591" font-family="var(--dp-font-mono)" font-size="11.5" font-weight="800">${centerLabel}</text>
 
-      ${seatsSvg}
+      <g data-motion-key="rr-seats-layer">${seatsSvg}</g>
     </svg>
   `;
 }
+
+function bindDelegatesOnce(container) {
+  Motion.delegate(container, 'click', '[data-select-pair]', (e, el) => {
+    if (!latestCtx) return;
+    latestCtx.sfx.play('click');
+    uiState.selectedPair = Number(el.dataset.selectPair);
+    renderGame(container, latestCtx);
+  }, 'rr-select-pair');
+
+  Motion.delegate(container, 'click', '[data-chamber-pos]', (e, el) => {
+    if (!latestCtx) return;
+    const st = latestCtx.state;
+    const isMyTurn = st.phase === 'action' && latestCtx.mySeatId && st.currentTurnSeatId === latestCtx.mySeatId;
+    const isMySwap = st.phase === 'manipulate_swap' && latestCtx.mySeatId && st.manipulatorSeatId === latestCtx.mySeatId;
+    const interactive = isMySwap || (isMyTurn && (uiState.selectedAction === 'PUBLIC_PEEK' || uiState.selectedAction === 'PRIVATE_PEEK'));
+    if (!interactive) return;
+    latestCtx.sfx.play('click');
+    uiState.selectedPair = Number(el.dataset.chamberPos);
+    renderGame(container, latestCtx);
+  }, 'rr-chamber-pos');
+
+  Motion.delegate(container, 'click', '[data-pick-action]', (e, btn) => {
+    if (!latestCtx || btn.disabled) return;
+    latestCtx.sfx.play('click');
+    const act = btn.dataset.pickAction;
+    uiState.selectedAction = uiState.selectedAction === act ? null : act;
+    renderGame(container, latestCtx);
+  }, 'rr-pick-action');
+
+  Motion.delegate(container, 'click', '[data-direct-action]', async (e, btn) => {
+    if (!latestCtx || btn.disabled) return;
+    const res = await latestCtx.dispatch({ type: btn.dataset.directAction });
+    if (!res.ok) {
+      Motion.shake(btn);
+      latestCtx.ui.toast(res.reason, 'error');
+    }
+  }, 'rr-direct-action');
+
+  Motion.delegate(container, 'click', '#rr-confirm-peek', async (e, btn) => {
+    if (!latestCtx) return;
+    const type = uiState.selectedAction;
+    uiState.selectedAction = null;
+    const res = await latestCtx.dispatch({ type, payload: { pairIndex: uiState.selectedPair } });
+    if (!res.ok) {
+      Motion.shake(btn);
+      latestCtx.ui.toast(res.reason, 'error');
+    }
+  }, 'rr-confirm-peek');
+
+  Motion.delegate(container, 'click', '[data-manip-amt]', (e, btn) => {
+    if (!latestCtx || btn.disabled) return;
+    latestCtx.sfx.play('click');
+    uiState.manipulateAmount = Number(btn.dataset.manipAmt);
+    renderGame(container, latestCtx);
+  }, 'rr-manip-amt');
+
+  Motion.delegate(container, 'click', '#rr-confirm-manip', async (e, btn) => {
+    if (!latestCtx) return;
+    uiState.selectedAction = null;
+    const res = await latestCtx.dispatch({
+      type: 'MANIPULATE_CONTRIBUTE',
+      payload: { amount: uiState.manipulateAmount },
+    });
+    if (!res.ok) {
+      Motion.shake(btn);
+      latestCtx.ui.toast(res.reason, 'error');
+    }
+  }, 'rr-confirm-manip');
+
+  Motion.delegate(container, 'click', '#rr-confirm-swap', async (e, btn) => {
+    if (!latestCtx) return;
+    const res = await latestCtx.dispatch({
+      type: 'MANIPULATE_SWAP',
+      payload: { pairIndex: uiState.selectedPair },
+    });
+    if (!res.ok) {
+      Motion.shake(btn);
+      latestCtx.ui.toast(res.reason, 'error');
+    }
+  }, 'rr-confirm-swap');
+
+  Motion.delegate(container, 'click', '#rr-pull-now', () => {
+    if (!latestCtx) return;
+    latestCtx.dispatch({ type: 'ADVANCE_FIRE' });
+  }, 'rr-pull-now');
+}
+
+function renderGame(container, ctx) {
+  latestContainer = container;
+  latestCtx = ctx;
+  bindDelegatesOnce(container);
+
+  const { state, mySeatId, lang, lastEvent, sfx } = ctx;
+  const isZh = lang === 'zh';
+
+  // Trigger bespoke SFX once per event
+  const eventKey = `${state.turnNumber}-${state.phase}-${state.firingStep}-${state.visualRotationSteps}-${state.manipulateTriggerCount}-${state.firedShots.length}`;
+  if (eventKey !== uiState.lastEventKey) {
+    uiState.lastEventKey = eventKey;
+    if (lastEvent?.type === 'ROTATE_1') playRatchet(1);
+    else if (lastEvent?.type === 'ROTATE_2') playRatchet(2);
+    else if (lastEvent?.type === 'PUBLIC_PEEK' || lastEvent?.type === 'PRIVATE_PEEK') sfx.play('cardFlip');
+    else if (lastEvent?.type === 'MANIPULATE_CONTRIBUTE') sfx.play('bid');
+    else if (lastEvent?.type === 'MANIPULATE_TRIGGERED') sfx.play('reveal');
+    else if (lastEvent?.type === 'MANIPULATE_SWAP') sfx.play('tilePlace');
+    else if (lastEvent?.type === 'FIRING_TRIGGERED') sfx.play('eliminate');
+
+    if (state.firedShots.length > uiState.lastShotCount) {
+      const latestShot = state.firedShots[state.firedShots.length - 1];
+      uiState.lastShotCount = state.firedShots.length;
+      clearTimeout(uiState.flashTimer);
+      if (latestShot.isLive) {
+        playGunshot();
+        uiState.flashMode = 'bang';
+      } else {
+        playDryClick();
+        uiState.flashMode = 'click';
+      }
+      uiState.flashTimer = setTimeout(() => {
+        uiState.flashMode = null;
+        if (latestContainer && latestCtx) renderGame(latestContainer, latestCtx);
+      }, 620);
+    } else if (state.firedShots.length === 0) {
+      uiState.lastShotCount = 0;
+    }
+  }
+
+  const me = state.players.find((p) => p.seatId === mySeatId) || null;
+  const currentActor = state.players.find(
+    (p) => p.seatId === (state.phase === 'manipulate_swap' ? state.manipulatorSeatId : state.currentTurnSeatId)
+  );
+  const isMyTurn = state.phase === 'action' && mySeatId && state.currentTurnSeatId === mySeatId;
+  const isMySwap = state.phase === 'manipulate_swap' && mySeatId && state.manipulatorSeatId === mySeatId;
+
+  if (!isMyTurn) uiState.selectedAction = null;
+  if (me && uiState.selectedAction === 'PRIVATE_PEEK' && me.credits < 2) uiState.selectedAction = null;
+  if (me && uiState.manipulateAmount > me.credits) uiState.manipulateAmount = Math.max(1, Math.min(3, me.credits));
+
+  const interactivePairMode =
+    isMySwap || (isMyTurn && (uiState.selectedAction === 'PUBLIC_PEEK' || uiState.selectedAction === 'PRIVATE_PEEK'));
+
+  const latestShot = state.firedShots.length ? state.firedShots[state.firedShots.length - 1] : null;
+  const dangerClose = state.zeroCreditCount >= state.triggerZeroCount - 1 || state.phase === 'firing';
+
+  let phaseHeadline = '';
+  if (state.phase === 'firing' || state.phase === 'firing_done') {
+    phaseHeadline = isZh
+      ? `🔫 连发处决中 — 第 ${Math.min(state.firingStep + 1, state.numChambers)} / ${state.numChambers} 枪`
+      : `🔫 FIRING SEQUENCE — Shot ${Math.min(state.firingStep + 1, state.numChambers)} / ${state.numChambers}`;
+  } else if (state.phase === 'ended') {
+    phaseHeadline = isZh ? '🏁 处决结束 · 全部机密已解封' : '🏁 Firing Complete · All Secrets Declassified';
+  } else if (state.phase === 'manipulate_swap') {
+    phaseHeadline = isMySwap
+      ? isZh
+        ? '⚡ 你触发了暗箱操控！请秘密选择相邻 2 弹仓互换'
+        : '⚡ MANIPULATE KEY YOURS! Secretly choose 2 adjacent chambers to swap'
+      : isZh
+      ? `⚡ ${currentActor?.name || ''} 触发了 6 点暗箱操控，正在秘密互换弹仓...`
+      : `⚡ ${currentActor?.name || ''} triggered Manipulate and is secretly swapping...`;
+  } else {
+    phaseHeadline = isMyTurn
+      ? isZh
+        ? '🎯 轮到你行动 — 选择查验、旋转或暗箱投点'
+        : '🎯 YOUR TURN — Inspect, Rotate, or Fund Manipulate'
+      : isZh
+      ? `⏳ 等待 ${currentActor?.name || ''} 行动...`
+      : `⏳ Waiting for ${currentActor?.name || ''}...`;
+  }
+
+  const pairChipsHtml = Array.from({ length: state.numChambers }, (_, p) => {
+    const q = (p + 1) % state.numChambers;
+    const sel = uiState.selectedPair === p;
+    return `
+      <button type="button" data-motion-key="rr-pair-chip-${p}" class="rr-chip ${isMySwap ? 'is-swap' : ''} ${sel ? 'is-selected' : ''}" data-select-pair="${p}">
+        #${p + 1} ↔ #${q + 1}
+      </button>
+    `;
+  }).join('');
+
+  const myCredits = me?.credits ?? null;
+  const creditPipsHtml =
+    myCredits !== null
+      ? Array.from({ length: state.startingCredits }, (_, i) => `<span data-motion-key="rr-pip-${i}" class="rr-pip ${i < myCredits ? 'is-filled' : ''}"></span>`).join('')
+      : '';
+
+  const html = `
+    <div data-motion-key="rr-arena" class="rr-arena ${uiState.flashMode === 'bang' ? 'is-firing-hit' : ''}">
+      <div data-motion-key="rr-banner" class="rr-banner ${dangerClose ? 'is-danger' : ''}">
+        <div class="rr-banner-phase">${UI.escapeHtml(phaseHeadline)}</div>
+        <div class="rr-metrics">
+          <span class="rr-pill">${isZh ? '回合' : 'TURN'} <strong>#${state.turnNumber}</strong></span>
+          <span class="rr-pill is-crimson">${isZh ? '归零触发' : 'ZERO TRIGGER'} <strong>${state.zeroCreditCount}/${state.triggerZeroCount}</strong></span>
+          <span class="rr-pill is-amber">${isZh ? '暗箱注资' : 'POOL DEPOSITS'} <strong>${state.manipulateDepositsSinceTrigger}</strong></span>
+          <span class="rr-pill">${isZh ? '实弹' : 'BULLETS'} <strong>${state.numBullets}/${state.numChambers}</strong></span>
+        </div>
+      </div>
+
+      <!-- Centerpiece Revolver Table -->
+      <section data-motion-key="rr-table-card" class="rr-table-card ${state.phase === 'firing' || state.phase === 'firing_done' ? 'is-firing-mode' : ''}">
+        <div data-motion-key="rr-muzzle-flash" class="rr-muzzle-flash ${uiState.flashMode === 'bang' ? 'is-bang' : uiState.flashMode === 'click' ? 'is-click' : ''}"></div>
+
+        <div data-motion-key="rr-svg-wrap" class="rr-svg-wrap">
+          ${buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isMySwap)}
+        </div>
+
+        ${
+          latestShot && (state.phase === 'firing' || state.phase === 'firing_done')
+            ? `
+              <div data-motion-key="rr-shot-callout" class="rr-shot-callout ${latestShot.isLive ? 'is-live' : 'is-blank'}">
+                ${
+                  latestShot.isLive
+                    ? isZh
+                      ? `💥 BANG! #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} 中弹！`
+                      : `💥 BANG! #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} HIT!`
+                    : isZh
+                    ? `CLICK — #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} 安全`
+                    : `CLICK — #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} SAFE`
+                }
+              </div>
+            `
+            : ''
+        }
+
+        <div class="rr-table-caption">
+          ${
+            interactivePairMode
+              ? isZh
+                ? '💡 可直接点击左轮外圈弧线或右侧按钮选择相邻弹仓对'
+                : '💡 Click an arc on the cylinder rim or a pair chip on the right'
+              : state.lastActionSummary
+              ? UI.escapeHtml(isZh ? state.lastActionSummary.zh : state.lastActionSummary.en)
+              : isZh
+              ? '蓝点=私密情报 · 金点=公开情报 · 橙色虚线=暗箱后待复核'
+              : 'Blue dot = Private Intel · Gold dot = Public Intel · Amber dashed = Unverified after swap'
+          }
+        </div>
+
+        ${
+          state.phase === 'firing'
+            ? `
+              <div style="margin-top:12px;">
+                <button type="button" class="dp-btn dp-btn-crimson dp-btn-sm" id="rr-pull-now">
+                  ${isZh ? '立即扣动下一枪 →' : 'Pull Next Trigger Now →'}
+                </button>
+              </div>
+            `
+            : ''
+        }
+      </section>
+
+      <!-- Right Control & Telemetry Column -->
+      <aside data-motion-key="rr-controls-col" class="rr-controls-col">
+        ${
+          me
+            ? `
+              <div data-motion-key="rr-vault-card" class="rr-card">
+                <div class="rr-card-title">
+                  <span>${isZh ? '我的机密点数库' : 'MY SECRET CREDITS'}</span>
+                  <span style="color:var(--dp-cyan);font-size:10.5px;">${isZh ? '仅自己可见' : 'PRIVATE ONLY'}</span>
+                </div>
+                <div class="rr-credit-vault">
+                  <div>
+                    <div id="rr-credit-num" data-dp-num class="rr-credit-num ${myCredits === 0 ? 'is-zero' : ''}">${myCredits}</div>
+                    <div style="font-size:11px;color:var(--dp-ink-muted);margin-top:3px;">
+                      ${isZh ? `初始 ${state.startingCredits} 点 · 归零自动 Pass` : `of ${state.startingCredits} · Auto-Pass at 0`}
+                    </div>
+                  </div>
+                  <div style="text-align:right;font-size:12px;color:var(--dp-ink-muted);">
+                    <div>${isZh ? '我的座位' : 'MY SEAT'}</div>
+                    <strong style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">#${me.seatIndex + 1} ${UI.escapeHtml(me.name)}</strong>
+                  </div>
+                </div>
+                <div class="rr-credit-pips">${creditPipsHtml}</div>
+              </div>
+            `
+            : ''
+        }
+
+        <!-- Action Panel -->
+        <div data-motion-key="rr-actions-card" class="rr-card">
+          <div class="rr-card-title">
+            <span>${isMySwap ? (isZh ? '⚡ 暗箱秘密互换' : '⚡ SECRET MANIPULATE SWAP') : isZh ? '战术行动面板' : 'TACTICAL ACTIONS'}</span>
+            ${isMyTurn ? `<span class="dp-badge">${isZh ? '你的回合' : 'YOUR TURN'}</span>` : ''}
+          </div>
+
+          ${
+            isMySwap
+              ? `
+                <p style="font-size:12.5px;color:var(--dp-amber);margin:0 0 8px;">
+                  ${isZh ? '选择任意相邻的 2 个弹仓并秘密互换其内部弹药（他人不知位置）：' : 'Choose any 2 adjacent chambers to secretly swap their contents:'}
+                </p>
+                <div class="rr-pair-chips">${pairChipsHtml}</div>
+                <button type="button" class="dp-btn dp-btn-primary" id="rr-confirm-swap" style="width:100%;">
+                  ${isZh ? `确认秘密互换 #${uiState.selectedPair + 1} ↔ #${((uiState.selectedPair + 1) % state.numChambers) + 1}` : `Confirm Secret Swap #${uiState.selectedPair + 1} ↔ #${((uiState.selectedPair + 1) % state.numChambers) + 1}`}
+                </button>
+              `
+              : state.phase === 'action'
+              ? `
+                <div class="rr-action-list">
+                  <button type="button" data-motion-key="rr-act-pub" class="rr-action-btn ${uiState.selectedAction === 'PUBLIC_PEEK' ? 'is-active' : ''}" data-pick-action="PUBLIC_PEEK" ${!isMyTurn || myCredits < 1 ? 'disabled' : ''}>
+                    <div class="rr-action-info">
+                      <strong>👁 ${isZh ? '公开调查 (Public Peek)' : 'Public Peek'}</strong>
+                      <span>${isZh ? '公开查验相邻 2 格实弹/空弹' : 'Reveal 2 adjacent chambers to everyone'}</span>
+                    </div>
+                    <span class="rr-cost-tag">1 CR</span>
+                  </button>
+
+                  <button type="button" data-motion-key="rr-act-priv" class="rr-action-btn ${uiState.selectedAction === 'PRIVATE_PEEK' ? 'is-active' : ''}" data-pick-action="PRIVATE_PEEK" ${!isMyTurn || myCredits < 2 ? 'disabled' : ''}>
+                    <div class="rr-action-info">
+                      <strong>🕶 ${isZh ? '私密调查 (Private Peek)' : 'Private Peek'}</strong>
+                      <span>${isZh ? '激光透视相邻 2 格（仅你可见）' : 'X-ray 2 adjacent chambers (you only)'}</span>
+                    </div>
+                    <span class="rr-cost-tag">2 CR</span>
+                  </button>
+
+                  <button type="button" data-motion-key="rr-act-rot1" class="rr-action-btn" data-direct-action="ROTATE_1" ${!isMyTurn || myCredits < 3 ? 'disabled' : ''}>
+                    <div class="rr-action-info">
+                      <strong>↻ ${isZh ? '旋转 +1 格 (Rotate +1)' : 'Rotate +1 Slot'}</strong>
+                      <span>${isZh ? '弹仓顺时针旋转 1 格' : 'Rotate cylinder clockwise 1 slot'}</span>
+                    </div>
+                    <span class="rr-cost-tag">3 CR</span>
+                  </button>
+
+                  <button type="button" data-motion-key="rr-act-rot2" class="rr-action-btn" data-direct-action="ROTATE_2" ${!isMyTurn || myCredits < 4 ? 'disabled' : ''}>
+                    <div class="rr-action-info">
+                      <strong>⟳ ${isZh ? '旋转 +2 格 (Rotate +2)' : 'Rotate +2 Slots'}</strong>
+                      <span>${isZh ? '弹仓顺时针旋转 2 格' : 'Rotate cylinder clockwise 2 slots'}</span>
+                    </div>
+                    <span class="rr-cost-tag">4 CR</span>
+                  </button>
+
+                  <button type="button" data-motion-key="rr-act-manip" class="rr-action-btn is-manipulate ${uiState.selectedAction === 'MANIPULATE_CONTRIBUTE' ? 'is-active' : ''}" data-pick-action="MANIPULATE_CONTRIBUTE" ${!isMyTurn || myCredits < 1 ? 'disabled' : ''}>
+                    <div class="rr-action-info">
+                      <strong>⚡ ${isZh ? '暗箱操控 (Manipulate)' : 'Secret Manipulate'}</strong>
+                      <span>${isZh ? '秘密投 1–3 点，池满 6 点立刻暗换' : 'Secretly fund 1–3 CR; ≥6 triggers swap'}</span>
+                    </div>
+                    <span class="rr-cost-tag">1–3 CR</span>
+                  </button>
+                </div>
+
+                ${
+                  isMyTurn && (uiState.selectedAction === 'PUBLIC_PEEK' || uiState.selectedAction === 'PRIVATE_PEEK')
+                    ? `
+                      <div data-motion-key="rr-sub-peek" class="rr-subpanel">
+                        <div style="font-size:12px;color:var(--dp-cyan);font-weight:600;">
+                          ${
+                            uiState.selectedAction === 'PRIVATE_PEEK'
+                              ? isZh
+                                ? '选择要私密透视的相邻 2 个弹仓：'
+                                : 'Choose 2 adjacent chambers to privately X-ray:'
+                              : isZh
+                              ? '选择要公开查验的相邻 2 个弹仓：'
+                              : 'Choose 2 adjacent chambers to reveal publicly:'
+                          }
+                        </div>
+                        <div class="rr-pair-chips">${pairChipsHtml}</div>
+                        <button type="button" class="dp-btn dp-btn-primary" id="rr-confirm-peek" style="width:100%;">
+                          ${isZh ? `确认查验 #${uiState.selectedPair + 1} & #${((uiState.selectedPair + 1) % state.numChambers) + 1}` : `Confirm Peek #${uiState.selectedPair + 1} & #${((uiState.selectedPair + 1) % state.numChambers) + 1}`}
+                        </button>
+                      </div>
+                    `
+                    : ''
+                }
+
+                ${
+                  isMyTurn && uiState.selectedAction === 'MANIPULATE_CONTRIBUTE'
+                    ? `
+                      <div data-motion-key="rr-sub-manip" class="rr-subpanel">
+                        <div style="font-size:12px;color:var(--dp-amber);font-weight:600;margin-bottom:8px;">
+                          ${isZh ? '秘密投入暗箱能量池（满 6 点触发，溢出作废）：' : 'Secretly contribute to Manipulate Pool (triggers at ≥6):'}
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+                          ${[1, 2, 3]
+                            .map(
+                              (amt) => `
+                              <button type="button" class="rr-chip is-swap ${uiState.manipulateAmount === amt ? 'is-selected' : ''}" data-manip-amt="${amt}" ${myCredits < amt ? 'disabled' : ''}>
+                                ${amt} CR
+                              </button>
+                            `
+                            )
+                            .join('')}
+                        </div>
+                        <button type="button" class="dp-btn dp-btn-primary" id="rr-confirm-manip" style="width:100%;">
+                          ${isZh ? `秘密投入 ${uiState.manipulateAmount} 点` : `Secretly Fund ${uiState.manipulateAmount} CR`}
+                        </button>
+                      </div>
+                    `
+                    : ''
+                }
+              `
+              : `
+                <div style="font-size:13px;color:var(--dp-ink-muted);padding:6px 0;">
+                  ${
+                    state.phase === 'ended'
+                      ? isZh
+                        ? '本局已结算。可查看下方解封的暗箱注资与互换档案。'
+                        : 'Match concluded. Inspect the declassified ledger below.'
+                      : isZh
+                      ? '正在逐格扣动扳机，所有行动已锁定...'
+                      : 'Trigger pulls underway — all actions locked...'
+                  }
+                </div>
+              `
+          }
+        </div>
+
+        <!-- Seat Status & Recent Broadcast Feed -->
+        <div data-motion-key="rr-status-card" class="rr-card">
+          <div class="rr-card-title">
+            <span>${isZh ? '囚徒席位状态' : 'PRISONER SEATS'}</span>
+          </div>
+          <div class="rr-players-grid">
+            ${state.players
+              .map((p) => {
+                const turn =
+                  (state.phase === 'action' && state.currentTurnSeatId === p.seatId) ||
+                  (state.phase === 'manipulate_swap' && state.manipulatorSeatId === p.seatId);
+                const cls = p.eliminated
+                  ? 'is-eliminated'
+                  : state.phase === 'ended'
+                  ? 'is-survived'
+                  : turn
+                  ? 'is-turn'
+                  : '';
+                const crText =
+                  p.credits !== null
+                    ? `${p.credits} CR`
+                    : p.isZero
+                    ? '0 CR'
+                    : '•• CR';
+                return `
+                  <div data-motion-key="rr-player-${UI.escapeHtml(p.seatId)}" class="rr-player-pill ${cls}">
+                    <span style="display:flex;align-items:center;gap:6px;overflow:hidden;">
+                      <span class="rr-seat-idx">${p.seatIndex + 1}</span>
+                      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${UI.escapeHtml(p.name)}</span>
+                    </span>
+                    <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:11.5px;color:${p.eliminated ? 'var(--dp-crimson-bright)' : p.isZero ? 'var(--dp-crimson-bright)' : 'var(--dp-brass-bright)'};">
+                      ${p.eliminated ? '💀' : crText}
+                    </span>
+                  </div>
+                `;
+              })
+              .join('')}
+          </div>
+
+          ${
+            state.phase === 'ended' && state.manipulateLedger
+              ? `
+                <div class="rr-ledger">
+                  <strong style="color:var(--dp-brass-bright);display:block;margin-bottom:5px;">
+                    ${isZh ? '📂 解封档案：暗箱操控记录' : '📂 DECLASSIFIED: MANIPULATE LEDGER'}
+                  </strong>
+                  ${
+                    state.manipulateLedger.length
+                      ? state.manipulateLedger
+                          .map((e) => `<div>T${e.turn} · ${UI.escapeHtml(e.playerName)}: <strong>+${e.amount} CR</strong></div>`)
+                          .join('')
+                      : `<div>${isZh ? '本局无人向暗箱池注资。' : 'No Manipulate deposits occurred.'}</div>`
+                  }
+                  ${
+                    state.swapHistory?.length
+                      ? `<div style="margin-top:6px;color:var(--dp-amber);">${state.swapHistory
+                          .map((s) => `⚡ T${s.turn} ${UI.escapeHtml(s.playerName)}: #${s.posA + 1} ↔ #${s.posB + 1}`)
+                          .join(' | ')}</div>`
+                      : ''
+                  }
+                </div>
+              `
+              : ''
+          }
+
+          <div class="rr-card-title" style="margin-top:14px;">
+            <span>${isZh ? '弹仓实况记录' : 'CHAMBER LOG'}</span>
+          </div>
+          <div class="rr-history">
+            ${state.history
+              .slice()
+              .reverse()
+              .map(
+                (h, idx) => `
+                <div data-motion-key="rr-hist-${state.history.length - idx}" class="rr-history-row ${h.tone === 'alert' ? 'is-alert' : h.tone === 'intel' ? 'is-intel' : h.tone === 'manipulate' ? 'is-manipulate' : ''}">
+                  ${UI.escapeHtml(isZh ? h.zh : h.en)}
+                </div>
+              `
+              )
+              .join('')}
+          </div>
+        </div>
+      </aside>
+    </div>
+  `;
+
+  Motion.patchDOM(container, html);
+
+  // Smooth tabular counter animation whenever my secret credits change
+  if (myCredits !== null) {
+    const creditEl = container.querySelector('#rr-credit-num');
+    if (creditEl && uiState.prevCredits !== null && uiState.prevCredits !== myCredits) {
+      Motion.animateNumber(creditEl, uiState.prevCredits, myCredits, { duration: 260, flash: true });
+    }
+    uiState.prevCredits = myCredits;
+  } else {
+    uiState.prevCredits = null;
+  }
+}
+
+Theme.onChange(() => {
+  if (latestContainer && latestCtx) renderGame(latestContainer, latestCtx);
+});
 
 mountGame({
   config: {
@@ -422,484 +943,5 @@ Survive the **6-chamber, 2-live-bullet** Prison Match revolver! Every player beg
   },
   rules: GameRules,
   root: document.getElementById('game-root'),
-
-  render: function renderGame(container, ctx) {
-    const { state, mySeatId, lang, lastEvent, dispatch, sfx, ui } = ctx;
-    const isZh = lang === 'zh';
-
-    // Trigger bespoke SFX once per event
-    const eventKey = `${state.turnNumber}-${state.phase}-${state.firingStep}-${state.visualRotationSteps}-${state.manipulateTriggerCount}-${state.firedShots.length}`;
-    if (eventKey !== uiState.lastEventKey) {
-      uiState.lastEventKey = eventKey;
-      if (lastEvent?.type === 'ROTATE_1') playRatchet(1);
-      else if (lastEvent?.type === 'ROTATE_2') playRatchet(2);
-      else if (lastEvent?.type === 'PUBLIC_PEEK' || lastEvent?.type === 'PRIVATE_PEEK') sfx.play('cardFlip');
-      else if (lastEvent?.type === 'MANIPULATE_CONTRIBUTE') sfx.play('bid');
-      else if (lastEvent?.type === 'MANIPULATE_TRIGGERED') sfx.play('reveal');
-      else if (lastEvent?.type === 'MANIPULATE_SWAP') sfx.play('tilePlace');
-      else if (lastEvent?.type === 'FIRING_TRIGGERED') sfx.play('eliminate');
-
-      if (state.firedShots.length > uiState.lastShotCount) {
-        const latestShot = state.firedShots[state.firedShots.length - 1];
-        uiState.lastShotCount = state.firedShots.length;
-        clearTimeout(uiState.flashTimer);
-        if (latestShot.isLive) {
-          playGunshot();
-          uiState.flashMode = 'bang';
-        } else {
-          playDryClick();
-          uiState.flashMode = 'click';
-        }
-        uiState.flashTimer = setTimeout(() => {
-          uiState.flashMode = null;
-        }, 700);
-      } else if (state.firedShots.length === 0) {
-        uiState.lastShotCount = 0;
-      }
-    }
-
-    const me = state.players.find((p) => p.seatId === mySeatId) || null;
-    const currentActor = state.players.find(
-      (p) => p.seatId === (state.phase === 'manipulate_swap' ? state.manipulatorSeatId : state.currentTurnSeatId)
-    );
-    const isMyTurn = state.phase === 'action' && mySeatId && state.currentTurnSeatId === mySeatId;
-    const isMySwap = state.phase === 'manipulate_swap' && mySeatId && state.manipulatorSeatId === mySeatId;
-
-    // Reset invalid action selections
-    if (!isMyTurn) uiState.selectedAction = null;
-    if (me && uiState.selectedAction === 'PRIVATE_PEEK' && me.credits < 2) uiState.selectedAction = null;
-    if (me && uiState.manipulateAmount > me.credits) uiState.manipulateAmount = Math.max(1, Math.min(3, me.credits));
-
-    const interactivePairMode =
-      isMySwap || (isMyTurn && (uiState.selectedAction === 'PUBLIC_PEEK' || uiState.selectedAction === 'PRIVATE_PEEK'));
-
-    const latestShot = state.firedShots.length ? state.firedShots[state.firedShots.length - 1] : null;
-    const dangerClose = state.zeroCreditCount >= state.triggerZeroCount - 1 || state.phase === 'firing';
-
-    // Phase Banner Headline
-    let phaseHeadline = '';
-    if (state.phase === 'firing' || state.phase === 'firing_done') {
-      phaseHeadline = isZh
-        ? `🔫 连发处决中 — 第 ${Math.min(state.firingStep + 1, state.numChambers)} / ${state.numChambers} 枪`
-        : `🔫 FIRING SEQUENCE — Shot ${Math.min(state.firingStep + 1, state.numChambers)} / ${state.numChambers}`;
-    } else if (state.phase === 'ended') {
-      phaseHeadline = isZh ? '🏁 处决结束 · 全部机密已解封' : '🏁 Firing Complete · All Secrets Declassified';
-    } else if (state.phase === 'manipulate_swap') {
-      phaseHeadline = isMySwap
-        ? isZh
-          ? '⚡ 你触发了暗箱操控！请秘密选择相邻 2 弹仓互换'
-          : '⚡ MANIPULATE KEY YOURS! Secretly choose 2 adjacent chambers to swap'
-        : isZh
-        ? `⚡ ${currentActor?.name || ''} 触发了 6 点暗箱操控，正在秘密互换弹仓...`
-        : `⚡ ${currentActor?.name || ''} triggered Manipulate and is secretly swapping...`;
-    } else {
-      phaseHeadline = isMyTurn
-        ? isZh
-          ? '🎯 轮到你行动 — 选择查验、旋转或暗箱投点'
-          : '🎯 YOUR TURN — Inspect, Rotate, or Fund Manipulate'
-        : isZh
-        ? `⏳ 等待 ${currentActor?.name || ''} 行动...`
-        : `⏳ Waiting for ${currentActor?.name || ''}...`;
-    }
-
-    const pairChipsHtml = Array.from({ length: state.numChambers }, (_, p) => {
-      const q = (p + 1) % state.numChambers;
-      const sel = uiState.selectedPair === p;
-      return `
-        <button type="button" class="rr-chip ${isMySwap ? 'is-swap' : ''} ${sel ? 'is-selected' : ''}" data-select-pair="${p}">
-          #${p + 1} ↔ #${q + 1}
-        </button>
-      `;
-    }).join('');
-
-    const myCredits = me?.credits ?? null;
-    const creditPipsHtml =
-      myCredits !== null
-        ? Array.from({ length: state.startingCredits }, (_, i) => `<span class="rr-pip ${i < myCredits ? 'is-filled' : ''}"></span>`).join('')
-        : '';
-
-    container.innerHTML = `
-      <div class="rr-arena ${uiState.flashMode === 'bang' ? 'is-firing-hit' : ''}">
-        <div class="rr-banner ${dangerClose ? 'is-danger' : ''}">
-          <div class="rr-banner-phase">${UI.escapeHtml(phaseHeadline)}</div>
-          <div class="rr-metrics">
-            <span class="rr-pill">${isZh ? '回合' : 'TURN'} <strong>#${state.turnNumber}</strong></span>
-            <span class="rr-pill is-crimson">${isZh ? '归零触发' : 'ZERO TRIGGER'} <strong>${state.zeroCreditCount}/${state.triggerZeroCount}</strong></span>
-            <span class="rr-pill is-amber">${isZh ? '暗箱注资次数' : 'POOL DEPOSITS'} <strong>${state.manipulateDepositsSinceTrigger}</strong></span>
-            <span class="rr-pill">${isZh ? '实弹' : 'BULLETS'} <strong>${state.numBullets}/${state.numChambers}</strong></span>
-          </div>
-        </div>
-
-        <!-- Centerpiece Noir Revolver Table -->
-        <section class="rr-table-card ${state.phase === 'firing' || state.phase === 'firing_done' ? 'is-firing-mode' : ''}">
-          <div class="rr-muzzle-flash ${uiState.flashMode === 'bang' ? 'is-bang' : uiState.flashMode === 'click' ? 'is-click' : ''}"></div>
-
-          <div class="rr-svg-wrap">
-            ${buildRevolverSvg(state, mySeatId, lang, interactivePairMode, isMySwap)}
-          </div>
-
-          ${
-            latestShot && (state.phase === 'firing' || state.phase === 'firing_done')
-              ? `
-                <div class="rr-shot-callout ${latestShot.isLive ? 'is-live' : 'is-blank'}">
-                  ${
-                    latestShot.isLive
-                      ? isZh
-                        ? `💥 BANG! #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} 中弹！`
-                        : `💥 BANG! #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} HIT!`
-                      : isZh
-                      ? `CLICK — #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} 安全`
-                      : `CLICK — #${latestShot.pos + 1} ${UI.escapeHtml(latestShot.playerName)} SAFE`
-                  }
-                </div>
-              `
-              : ''
-          }
-
-          <div class="rr-table-caption">
-            ${
-              interactivePairMode
-                ? isZh
-                  ? '💡 可直接点击左轮外圈弧线或右侧按钮选择相邻弹仓对'
-                  : '💡 Click an arc on the cylinder rim or a pair chip on the right'
-                : state.lastActionSummary
-                ? UI.escapeHtml(isZh ? state.lastActionSummary.zh : state.lastActionSummary.en)
-                : isZh
-                ? '蓝点=私密情报 · 金点=公开情报 · 橙色虚线=暗箱后待复核'
-                : 'Blue dot = Private Intel · Gold dot = Public Intel · Amber dashed = Unverified after swap'
-            }
-          </div>
-
-          ${
-            state.phase === 'firing'
-              ? `
-                <div style="margin-top:12px;">
-                  <button type="button" class="dp-btn dp-btn-crimson dp-btn-sm" id="rr-pull-now">
-                    ${isZh ? '立即扣动下一枪 →' : 'Pull Next Trigger Now →'}
-                  </button>
-                </div>
-              `
-              : ''
-          }
-        </section>
-
-        <!-- Right Control & Telemetry Column -->
-        <aside class="rr-controls-col">
-          ${
-            me
-              ? `
-                <div class="rr-card">
-                  <div class="rr-card-title">
-                    <span>${isZh ? '我的机密点数库' : 'MY SECRET CREDITS'}</span>
-                    <span style="color:var(--dp-cyan);font-size:10.5px;">${isZh ? '仅自己可见' : 'PRIVATE ONLY'}</span>
-                  </div>
-                  <div class="rr-credit-vault">
-                    <div>
-                      <div class="rr-credit-num ${myCredits === 0 ? 'is-zero' : ''}">${myCredits}</div>
-                      <div style="font-size:11px;color:var(--dp-ink-muted);margin-top:3px;">
-                        ${isZh ? `初始 ${state.startingCredits} 点 · 归零自动 Pass` : `of ${state.startingCredits} · Auto-Pass at 0`}
-                      </div>
-                    </div>
-                    <div style="text-align:right;font-size:12px;color:var(--dp-ink-muted);">
-                      <div>${isZh ? '我的座位' : 'MY SEAT'}</div>
-                      <strong style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">#${me.seatIndex + 1} ${UI.escapeHtml(me.name)}</strong>
-                    </div>
-                  </div>
-                  <div class="rr-credit-pips">${creditPipsHtml}</div>
-                </div>
-              `
-              : ''
-          }
-
-          <!-- Action Panel -->
-          <div class="rr-card">
-            <div class="rr-card-title">
-              <span>${isMySwap ? (isZh ? '⚡ 暗箱秘密互换' : '⚡ SECRET MANIPULATE SWAP') : isZh ? '战术行动面板' : 'TACTICAL ACTIONS'}</span>
-              ${isMyTurn ? `<span class="dp-badge">${isZh ? '你的回合' : 'YOUR TURN'}</span>` : ''}
-            </div>
-
-            ${
-              isMySwap
-                ? `
-                  <p style="font-size:12.5px;color:#fde68a;margin:0 0 8px;">
-                    ${isZh ? '选择任意相邻的 2 个弹仓并秘密互换其内部弹药（他人不知位置）：' : 'Choose any 2 adjacent chambers to secretly swap their contents:'}
-                  </p>
-                  <div class="rr-pair-chips">${pairChipsHtml}</div>
-                  <button type="button" class="dp-btn dp-btn-primary" id="rr-confirm-swap" style="width:100%;">
-                    ${isZh ? `确认秘密互换 #${uiState.selectedPair + 1} ↔ #${((uiState.selectedPair + 1) % state.numChambers) + 1}` : `Confirm Secret Swap #${uiState.selectedPair + 1} ↔ #${((uiState.selectedPair + 1) % state.numChambers) + 1}`}
-                  </button>
-                `
-                : state.phase === 'action'
-                ? `
-                  <div class="rr-action-list">
-                    <button type="button" class="rr-action-btn ${uiState.selectedAction === 'PUBLIC_PEEK' ? 'is-active' : ''}" data-pick-action="PUBLIC_PEEK" ${!isMyTurn || myCredits < 1 ? 'disabled' : ''}>
-                      <div class="rr-action-info">
-                        <strong>👁 ${isZh ? '公开调查 (Public Peek)' : 'Public Peek'}</strong>
-                        <span>${isZh ? '公开查验相邻 2 格实弹/空弹' : 'Reveal 2 adjacent chambers to everyone'}</span>
-                      </div>
-                      <span class="rr-cost-tag">1 CR</span>
-                    </button>
-
-                    <button type="button" class="rr-action-btn ${uiState.selectedAction === 'PRIVATE_PEEK' ? 'is-active' : ''}" data-pick-action="PRIVATE_PEEK" ${!isMyTurn || myCredits < 2 ? 'disabled' : ''}>
-                      <div class="rr-action-info">
-                        <strong>🕶 ${isZh ? '私密调查 (Private Peek)' : 'Private Peek'}</strong>
-                        <span>${isZh ? '激光透视相邻 2 格（仅你可见）' : 'X-ray 2 adjacent chambers (you only)'}</span>
-                      </div>
-                      <span class="rr-cost-tag">2 CR</span>
-                    </button>
-
-                    <button type="button" class="rr-action-btn" data-direct-action="ROTATE_1" ${!isMyTurn || myCredits < 3 ? 'disabled' : ''}>
-                      <div class="rr-action-info">
-                        <strong>↻ ${isZh ? '旋转 +1 格 (Rotate +1)' : 'Rotate +1 Slot'}</strong>
-                        <span>${isZh ? '弹仓顺时针旋转 1 格' : 'Rotate cylinder clockwise 1 slot'}</span>
-                      </div>
-                      <span class="rr-cost-tag">3 CR</span>
-                    </button>
-
-                    <button type="button" class="rr-action-btn" data-direct-action="ROTATE_2" ${!isMyTurn || myCredits < 4 ? 'disabled' : ''}>
-                      <div class="rr-action-info">
-                        <strong>⟳ ${isZh ? '旋转 +2 格 (Rotate +2)' : 'Rotate +2 Slots'}</strong>
-                        <span>${isZh ? '弹仓顺时针旋转 2 格' : 'Rotate cylinder clockwise 2 slots'}</span>
-                      </div>
-                      <span class="rr-cost-tag">4 CR</span>
-                    </button>
-
-                    <button type="button" class="rr-action-btn is-manipulate ${uiState.selectedAction === 'MANIPULATE_CONTRIBUTE' ? 'is-active' : ''}" data-pick-action="MANIPULATE_CONTRIBUTE" ${!isMyTurn || myCredits < 1 ? 'disabled' : ''}>
-                      <div class="rr-action-info">
-                        <strong>⚡ ${isZh ? '暗箱操控 (Manipulate)' : 'Secret Manipulate'}</strong>
-                        <span>${isZh ? '秘密投 1–3 点，池满 6 点立刻暗换' : 'Secretly fund 1–3 CR; ≥6 triggers swap'}</span>
-                      </div>
-                      <span class="rr-cost-tag">1–3 CR</span>
-                    </button>
-                  </div>
-
-                  ${
-                    isMyTurn && (uiState.selectedAction === 'PUBLIC_PEEK' || uiState.selectedAction === 'PRIVATE_PEEK')
-                      ? `
-                        <div class="rr-subpanel">
-                          <div style="font-size:12px;color:var(--dp-cyan);font-weight:600;">
-                            ${
-                              uiState.selectedAction === 'PRIVATE_PEEK'
-                                ? isZh
-                                  ? '选择要私密透视的相邻 2 个弹仓：'
-                                  : 'Choose 2 adjacent chambers to privately X-ray:'
-                                : isZh
-                                ? '选择要公开查验的相邻 2 个弹仓：'
-                                : 'Choose 2 adjacent chambers to reveal publicly:'
-                            }
-                          </div>
-                          <div class="rr-pair-chips">${pairChipsHtml}</div>
-                          <button type="button" class="dp-btn dp-btn-primary" id="rr-confirm-peek" style="width:100%;">
-                            ${isZh ? `确认查验 #${uiState.selectedPair + 1} & #${((uiState.selectedPair + 1) % state.numChambers) + 1}` : `Confirm Peek #${uiState.selectedPair + 1} & #${((uiState.selectedPair + 1) % state.numChambers) + 1}`}
-                          </button>
-                        </div>
-                      `
-                      : ''
-                  }
-
-                  ${
-                    isMyTurn && uiState.selectedAction === 'MANIPULATE_CONTRIBUTE'
-                      ? `
-                        <div class="rr-subpanel">
-                          <div style="font-size:12px;color:#fde68a;font-weight:600;margin-bottom:8px;">
-                            ${isZh ? '秘密投入暗箱能量池（满 6 点触发，溢出作废）：' : 'Secretly contribute to Manipulate Pool (triggers at ≥6):'}
-                          </div>
-                          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
-                            ${[1, 2, 3]
-                              .map(
-                                (amt) => `
-                                <button type="button" class="rr-chip is-swap ${uiState.manipulateAmount === amt ? 'is-selected' : ''}" data-manip-amt="${amt}" ${myCredits < amt ? 'disabled' : ''}>
-                                  ${amt} CR
-                                </button>
-                              `
-                              )
-                              .join('')}
-                          </div>
-                          <button type="button" class="dp-btn dp-btn-primary" id="rr-confirm-manip" style="width:100%;">
-                            ${isZh ? `秘密投入 ${uiState.manipulateAmount} 点` : `Secretly Fund ${uiState.manipulateAmount} CR`}
-                          </button>
-                        </div>
-                      `
-                      : ''
-                  }
-                `
-                : `
-                  <div style="font-size:13px;color:var(--dp-ink-muted);padding:6px 0;">
-                    ${
-                      state.phase === 'ended'
-                        ? isZh
-                          ? '本局已结算。可查看下方解封的暗箱注资与互换档案。'
-                          : 'Match concluded. Inspect the declassified ledger below.'
-                        : isZh
-                        ? '正在逐格扣动扳机，所有行动已锁定...'
-                        : 'Trigger pulls underway — all actions locked...'
-                    }
-                  </div>
-                `
-            }
-          </div>
-
-          <!-- Seat Status & Recent Broadcast Feed -->
-          <div class="rr-card">
-            <div class="rr-card-title">
-              <span>${isZh ? '囚徒席位状态' : 'PRISONER SEATS'}</span>
-            </div>
-            <div class="rr-players-grid">
-              ${state.players
-                .map((p) => {
-                  const turn =
-                    (state.phase === 'action' && state.currentTurnSeatId === p.seatId) ||
-                    (state.phase === 'manipulate_swap' && state.manipulatorSeatId === p.seatId);
-                  const cls = p.eliminated
-                    ? 'is-eliminated'
-                    : state.phase === 'ended'
-                    ? 'is-survived'
-                    : turn
-                    ? 'is-turn'
-                    : '';
-                  const crText =
-                    p.credits !== null
-                      ? `${p.credits} CR`
-                      : p.isZero
-                      ? '0 CR'
-                      : '•• CR';
-                  return `
-                    <div class="rr-player-pill ${cls}">
-                      <span style="display:flex;align-items:center;gap:6px;overflow:hidden;">
-                        <span class="rr-seat-idx">${p.seatIndex + 1}</span>
-                        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${UI.escapeHtml(p.name)}</span>
-                      </span>
-                      <span style="font-family:var(--dp-font-mono);font-size:11.5px;color:${p.eliminated ? '#fca5a5' : p.isZero ? '#ff6b7a' : 'var(--dp-brass-bright)'};">
-                        ${p.eliminated ? '💀' : crText}
-                      </span>
-                    </div>
-                  `;
-                })
-                .join('')}
-            </div>
-
-            ${
-              state.phase === 'ended' && state.manipulateLedger
-                ? `
-                  <div class="rr-ledger">
-                    <strong style="color:var(--dp-brass-bright);display:block;margin-bottom:5px;">
-                      ${isZh ? '📂 解封档案：暗箱操控记录' : '📂 DECLASSIFIED: MANIPULATE LEDGER'}
-                    </strong>
-                    ${
-                      state.manipulateLedger.length
-                        ? state.manipulateLedger
-                            .map((e) => `<div>T${e.turn} · ${UI.escapeHtml(e.playerName)}: <strong>+${e.amount} CR</strong></div>`)
-                            .join('')
-                        : `<div>${isZh ? '本局无人向暗箱池注资。' : 'No Manipulate deposits occurred.'}</div>`
-                    }
-                    ${
-                      state.swapHistory?.length
-                        ? `<div style="margin-top:6px;color:#fde68a;">${state.swapHistory
-                            .map((s) => `⚡ T${s.turn} ${UI.escapeHtml(s.playerName)}: #${s.posA + 1} ↔ #${s.posB + 1}`)
-                            .join(' | ')}</div>`
-                        : ''
-                    }
-                  </div>
-                `
-                : ''
-            }
-
-            <div class="rr-card-title" style="margin-top:14px;">
-              <span>${isZh ? '弹仓实况记录' : 'CHAMBER LOG'}</span>
-            </div>
-            <div class="rr-history">
-              ${state.history
-                .slice()
-                .reverse()
-                .map(
-                  (h) => `
-                  <div class="rr-history-row ${h.tone === 'alert' ? 'is-alert' : h.tone === 'intel' ? 'is-intel' : h.tone === 'manipulate' ? 'is-manipulate' : ''}">
-                    ${UI.escapeHtml(isZh ? h.zh : h.en)}
-                  </div>
-                `
-                )
-                .join('')}
-            </div>
-          </div>
-        </aside>
-      </div>
-    `;
-
-    // Bind pair selection (SVG arcs, SVG chambers, and chips)
-    container.querySelectorAll('[data-select-pair]').forEach((el) => {
-      el.addEventListener('click', () => {
-        sfx.play('click');
-        uiState.selectedPair = Number(el.dataset.selectPair);
-        renderGame(container, ctx);
-      });
-    });
-
-    if (interactivePairMode) {
-      container.querySelectorAll('[data-chamber-pos]').forEach((el) => {
-        el.addEventListener('click', () => {
-          sfx.play('click');
-          uiState.selectedPair = Number(el.dataset.chamberPos);
-          renderGame(container, ctx);
-        });
-      });
-    }
-
-    // Action toggles
-    container.querySelectorAll('[data-pick-action]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        sfx.play('click');
-        const act = btn.dataset.pickAction;
-        uiState.selectedAction = uiState.selectedAction === act ? null : act;
-        renderGame(container, ctx);
-      });
-    });
-
-    // Direct rotate actions
-    container.querySelectorAll('[data-direct-action]').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const res = await dispatch({ type: btn.dataset.directAction });
-        if (!res.ok) ui.toast(res.reason, 'error');
-      });
-    });
-
-    // Confirm Peek
-    container.querySelector('#rr-confirm-peek')?.addEventListener('click', async () => {
-      const type = uiState.selectedAction;
-      uiState.selectedAction = null;
-      const res = await dispatch({ type, payload: { pairIndex: uiState.selectedPair } });
-      if (!res.ok) ui.toast(res.reason, 'error');
-    });
-
-    // Manipulate amount & confirm
-    container.querySelectorAll('[data-manip-amt]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        sfx.play('click');
-        uiState.manipulateAmount = Number(btn.dataset.manipAmt);
-        renderGame(container, ctx);
-      });
-    });
-
-    container.querySelector('#rr-confirm-manip')?.addEventListener('click', async () => {
-      uiState.selectedAction = null;
-      const res = await dispatch({
-        type: 'MANIPULATE_CONTRIBUTE',
-        payload: { amount: uiState.manipulateAmount },
-      });
-      if (!res.ok) ui.toast(res.reason, 'error');
-    });
-
-    // Confirm Secret Swap
-    container.querySelector('#rr-confirm-swap')?.addEventListener('click', async () => {
-      const res = await dispatch({
-        type: 'MANIPULATE_SWAP',
-        payload: { pairIndex: uiState.selectedPair },
-      });
-      if (!res.ok) ui.toast(res.reason, 'error');
-    });
-
-    // Pull next trigger immediately
-    container.querySelector('#rr-pull-now')?.addEventListener('click', () => {
-      dispatch({ type: 'ADVANCE_FIRE' });
-    });
-  },
+  render: renderGame,
 });

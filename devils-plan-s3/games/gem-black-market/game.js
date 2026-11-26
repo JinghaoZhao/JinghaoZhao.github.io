@@ -1,9 +1,10 @@
 /**
  * Gem Black Market (宝石黑市 / 보석 암시장) — Interactive Underground Vault UI
  * Day 3 Main Match · The Devil's Plan Season 3: Dead Again
+ * Wave 2: Motion.patchDOM + Motion.delegate + Real 380ms 3D Card Flips + animateNumber + Dual-Theme
  */
 
-import { mountGame, SFX, I18n, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, I18n, UI, Motion, Theme } from '../../shared/sdk.js';
 import { GameRules, GEM_META, BOMB_BAIT_BONUS } from './rules.js';
 
 const RULES_SUMMARY = {
@@ -59,13 +60,30 @@ Outwit rival traders across **3 underground rounds** of forced blind swaps, bomb
 
 const uiState = {
   peekMode: false,
-  manitoRevealed: true, // toggleable privacy shield for hotseat
+  manitoRevealed: true,
   lastSwapSeqSeen: 0,
   lastPhaseSeen: '',
   lastRoundSeen: 0,
+  finaleAnimated: false,
+  prevScores: {},
+  prevMyScore: null,
   lastContainer: null,
   lastCtx: null,
+  delegatedRoot: null,
 };
+
+const LIGHT_GEM_INK = {
+  diamond: '#0369a1',
+  gold: '#925b00',
+  silver: '#475569',
+  bronze: '#9a3412',
+  bomb: '#b91c2c',
+};
+
+function fmtSigned(v) {
+  const n = Math.round(v);
+  return `${n >= 0 ? '+' : ''}${n}`;
+}
 
 /**
  * Render faceted SVG gemstone or pulsing Obsidian Bomb artwork.
@@ -142,7 +160,6 @@ function renderGemArtwork(type) {
       </svg>
     `;
   }
-  // Obsidian Bomb with pulsing red fuse spark!
   return `
     <svg class="gbm-gem-svg" viewBox="0 0 64 64" aria-hidden="true">
       <defs>
@@ -167,24 +184,30 @@ function renderGemArtwork(type) {
 }
 
 /**
- * Render a 3D flippable Gem/Bomb card.
+ * Render a keyed 3D flippable Gem/Bomb card.
+ * Keeping data-motion-key on both .gbm-card and .gbm-card-inner enables live 380ms 3D flips!
  */
-function renderCardHtml(card, { faceUp = false, size = 'normal', lang = 'zh', privateBadge = false, dirty = false } = {}) {
+function renderCardHtml(
+  card,
+  { motionKey, faceUp = false, size = 'normal', lang = 'zh', privateBadge = false, dirty = false } = {}
+) {
   const sizeCls = size === 'large' ? 'is-large' : size === 'compact' ? 'is-compact' : '';
   const meta = card ? GEM_META[card.type] : null;
   const frontCls = meta ? `is-${meta.id}` : '';
   const valStr = card ? (card.value > 0 ? `+${card.value}` : String(card.value)) : '?';
   const typeLabel = meta ? (lang === 'en' ? meta.name.en : meta.name.zh) : '';
+  const keyAttr = motionKey ? `data-motion-key="${UI.escapeHtml(motionKey)}"` : '';
+  const innerKeyAttr = motionKey ? `data-motion-key="inner-${UI.escapeHtml(motionKey)}"` : '';
 
   return `
-    <div class="gbm-card ${sizeCls} ${faceUp && card ? '' : 'is-face-down'}">
+    <div class="gbm-card ${sizeCls} ${faceUp && card ? '' : 'is-face-down'}" ${keyAttr}>
       ${privateBadge ? `<span class="gbm-private-tag">${lang === 'zh' ? '密查' : 'PEEK'}</span>` : ''}
-      <div class="gbm-card-inner">
+      <div class="gbm-card-inner" ${innerKeyAttr}>
         <div class="gbm-card-face gbm-card-front ${frontCls}">
           ${
             card
               ? `
-                <div class="gbm-card-val" style="color:${meta.accent};">${valStr}</div>
+                <div class="gbm-card-val dp-tabular" style="color:${meta.accent};">${valStr}</div>
                 ${renderGemArtwork(card.type)}
                 <div class="gbm-card-type" style="color:${meta.accent};">
                   ${UI.escapeHtml(typeLabel)}${card.type === 'diamond' ? ' ◆' : ''}
@@ -203,7 +226,6 @@ function renderCardHtml(card, { faceUp = false, size = 'normal', lang = 'zh', pr
 
 /**
  * Compute circular seat coordinates (% of table container, 0..100).
- * Viewer's own seat is placed cleanly at bottom-center (angle = +90 deg).
  */
 function computeSeatPositions(players, mySeatId) {
   const n = players.length;
@@ -221,9 +243,6 @@ function computeSeatPositions(players, mySeatId) {
   return map;
 }
 
-/**
- * Get center coordinate (%) for a Buyer/Trash slot for swap-arc animation.
- */
 function slotCoordsPct(kind, index) {
   if (kind === 'trash') return { x: 61, y: 50 };
   if (kind === 'buyer') {
@@ -233,9 +252,6 @@ function slotCoordsPct(kind, index) {
   return { x: 50, y: 50 };
 }
 
-/**
- * Build curved quadratic Bézier SVG path between two percentage points (viewBox 0 0 1000 660).
- */
 function curvedArcPath(p1, p2, bend = 0.16) {
   const x1 = p1.x * 10;
   const y1 = p1.y * 6.6;
@@ -250,20 +266,249 @@ function curvedArcPath(p1, p2, bend = 0.16) {
   return `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
 }
 
+function bindDelegatedEvents(container) {
+  if (uiState.delegatedRoot === container) return;
+  uiState.delegatedRoot = container;
+
+  const getCtx = () => uiState.lastCtx;
+  const rerender = () => {
+    if (uiState.lastContainer && uiState.lastCtx) {
+      renderVault(uiState.lastContainer, uiState.lastCtx);
+    }
+  };
+
+  // Toggle Secret Manito dossier privacy shield
+  Motion.delegate(
+    container,
+    'click',
+    '#gbm-toggle-manito',
+    () => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('click');
+      uiState.manitoRevealed = !uiState.manitoRevealed;
+      rerender();
+    },
+    'gbm-toggle-manito'
+  );
+
+  // Confirm initial deal peek
+  Motion.delegate(
+    container,
+    'click',
+    '#gbm-confirm-peek',
+    async (_e, btn) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('click');
+      const res = await ctx.dispatch({ type: 'CONFIRM_PEEK', payload: {} });
+      if (!res.ok) {
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-confirm-peek'
+  );
+
+  // Toggle Piece Peek mode
+  Motion.delegate(
+    container,
+    'click',
+    '#gbm-toggle-peek',
+    () => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('click');
+      uiState.peekMode = !uiState.peekMode;
+      rerender();
+    },
+    'gbm-toggle-peek'
+  );
+
+  // Tactile rejection feedback when clicking a Bomb-forbidden Buyer/Trash slot
+  Motion.delegate(
+    container,
+    'click',
+    '.gbm-slot.is-forbidden',
+    (_e, el) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('error');
+      Motion.shake(el);
+      ctx.ui.toast(
+        ctx.lang === 'zh'
+          ? '💣 炸弹铁律：不能放入买家或垃圾桶，必须换给另一名玩家！'
+          : '💣 BOMB RULE: Must swap a Bomb with another player, never Buyer or Trash!',
+        'error'
+      );
+    },
+    'gbm-forbidden-slot'
+  );
+
+  // Swap with another player
+  Motion.delegate(
+    container,
+    'click',
+    '[data-swap-player]',
+    async (_e, el) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      const targetId = el.dataset.swapPlayer;
+      ctx.sfx.play('cardFlip');
+      const res = await ctx.dispatch({ type: 'SWAP', payload: { kind: 'player', seatId: targetId } });
+      if (!res.ok) {
+        Motion.shake(el);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-swap-player'
+  );
+
+  // Swap with Buyer slot
+  Motion.delegate(
+    container,
+    'click',
+    '[data-swap-buyer]',
+    async (_e, el) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      const index = Number(el.dataset.swapBuyer);
+      ctx.sfx.play('cardFlip');
+      const res = await ctx.dispatch({ type: 'SWAP', payload: { kind: 'buyer', index } });
+      if (!res.ok) {
+        Motion.shake(el);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-swap-buyer'
+  );
+
+  // Swap with Trash slot
+  Motion.delegate(
+    container,
+    'click',
+    '[data-swap-trash]',
+    async (_e, el) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('cardFlip');
+      const res = await ctx.dispatch({ type: 'SWAP', payload: { kind: 'trash' } });
+      if (!res.ok) {
+        Motion.shake(el);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-swap-trash'
+  );
+
+  // Piece Peek Buyer slot
+  Motion.delegate(
+    container,
+    'click',
+    '[data-peek-buyer]',
+    async (_e, el) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      const index = Number(el.dataset.peekBuyer);
+      const res = await ctx.dispatch({ type: 'PEEK_SLOT', payload: { kind: 'buyer', index } });
+      if (res.ok) {
+        uiState.peekMode = false;
+        ctx.sfx.play('pieceGain');
+        ctx.ui.toast(
+          ctx.lang === 'zh'
+            ? `◆1 密查成功！仅你可见【买家 ${index + 1}】底牌！`
+            : `◆1 Intel Peek! Buyer ${index + 1} privately revealed to you!`,
+          'success'
+        );
+      } else {
+        Motion.shake(el);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-peek-buyer'
+  );
+
+  // Piece Peek Trash slot
+  Motion.delegate(
+    container,
+    'click',
+    '[data-peek-trash]',
+    async (_e, el) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      const res = await ctx.dispatch({ type: 'PEEK_SLOT', payload: { kind: 'trash' } });
+      if (res.ok) {
+        uiState.peekMode = false;
+        ctx.sfx.play('pieceGain');
+        ctx.ui.toast(
+          ctx.lang === 'zh'
+            ? '◆1 密查成功！仅你可见【垃圾桶】底牌！'
+            : '◆1 Intel Peek! Trash card privately revealed to you!',
+          'success'
+        );
+      } else {
+        Motion.shake(el);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-peek-trash'
+  );
+
+  // Advance after Round Showdown
+  Motion.delegate(
+    container,
+    'click',
+    '#gbm-advance-round',
+    async (_e, btn) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('bid');
+      const res = await ctx.dispatch({ type: 'ADVANCE_ROUND', payload: {} });
+      if (!res.ok) {
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-advance-round'
+  );
+
+  // Conclude Match from Finale
+  Motion.delegate(
+    container,
+    'click',
+    '#gbm-conclude-btn',
+    async (_e, btn) => {
+      const ctx = getCtx();
+      if (!ctx) return;
+      ctx.sfx.play('victory');
+      const res = await ctx.dispatch({ type: 'CONCLUDE_MATCH', payload: {} });
+      if (!res.ok) {
+        Motion.shake(btn);
+        ctx.ui.toast(res.reason, 'error');
+      }
+    },
+    'gbm-conclude'
+  );
+}
+
 function renderVault(container, ctx) {
-  const { state, mySeatId, lang, dispatch, sfx, ui, log } = ctx;
+  const { state, mySeatId, lang, sfx, log } = ctx;
   uiState.lastContainer = container;
   uiState.lastCtx = ctx;
+  bindDelegatedEvents(container);
 
   // Reset UI trackers on fresh rematch
   if (state.round === 1 && state.phase === 'deal_peek' && uiState.lastRoundSeen > 1) {
     uiState.lastSwapSeqSeen = 0;
     uiState.lastPhaseSeen = '';
     uiState.peekMode = false;
+    uiState.finaleAnimated = false;
+    uiState.prevScores = {};
+    uiState.prevMyScore = null;
   }
   uiState.lastRoundSeen = state.round;
 
-  // Trigger contextual SFX on swap & phase transitions
+  // Contextual SFX on swap & phase transitions
   if (state.lastSwap && state.lastSwap.seq > uiState.lastSwapSeqSeen) {
     uiState.lastSwapSeqSeen = state.lastSwap.seq;
     sfx.play('cardFlip');
@@ -298,13 +543,14 @@ function renderVault(container, ctx) {
   const mustSwapPlayer = Boolean(isMyTurn && state.mustSwapWithPlayer);
   const canPiecePeek = Boolean(isMyTurn && me && !me.usedPiecePeek && me.pieces >= 1);
   const isFinale = state.phase === 'finale' || state.phase === 'ended';
+  const isLight = Theme.get() === 'light';
 
   if (!isMyTurn) uiState.peekMode = false;
 
   const nameOf = (sid) => state.players.find((p) => p.seatId === sid)?.name || sid;
   const seatPos = computeSeatPositions(state.players, mySeatId);
 
-  // Determine phase headline & instruction
+  // Phase headline & instruction
   let phaseTitle = '';
   let phaseSub = '';
   if (state.phase === 'deal_peek') {
@@ -349,114 +595,128 @@ function renderVault(container, ctx) {
       : 'Final Score = Own Score × Manito Score! Witness Negative × Negative reversals!';
   }
 
-  // Projected Manito synergy for viewer's dossier
   const projectedFinal = me && myManito ? me.score * myManito.score : 0;
   const negPactAlert = Boolean(me && myManito && myManito.score < 0);
 
-  // Build SVG Overlay (directional swap arc during play, or full circular Manito laser beams during finale!)
+  // SVG Overlay (directional swap arc during play, or full circular Manito laser beams during finale!)
   let svgOverlayInner = '';
   if (isFinale && state.manitoCycle && state.manitoOf) {
-    const beams = state.manitoCycle.map((fromId, idx) => {
-      const toId = state.manitoOf[fromId];
-      const p1 = seatPos[fromId];
-      const p2 = seatPos[toId];
-      if (!p1 || !p2) return '';
-      const entry = state.finaleEntries?.find((e) => e.seatId === fromId);
-      const color = entry?.isNegNegReversal
-        ? '#34d399'
-        : entry?.isBetrayalCrash
-        ? '#f43f5e'
-        : '#f2d591';
-      const d = curvedArcPath(p1, p2, 0.22);
-      return `<path class="gbm-manito-beam" d="${d}" stroke="${color}" marker-end="url(#gbmArrowGold)" style="animation-delay:${idx * 110}ms;" />`;
-    }).join('');
-    svgOverlayInner = beams;
+    svgOverlayInner = state.manitoCycle
+      .map((fromId, idx) => {
+        const toId = state.manitoOf[fromId];
+        const p1 = seatPos[fromId];
+        const p2 = seatPos[toId];
+        if (!p1 || !p2) return '';
+        const entry = state.finaleEntries?.find((e) => e.seatId === fromId);
+        const color = entry?.isNegNegReversal
+          ? isLight ? '#047857' : '#34d399'
+          : entry?.isBetrayalCrash
+          ? isLight ? '#be123c' : '#f43f5e'
+          : isLight ? '#9a6e1f' : '#f2d591';
+        const d = curvedArcPath(p1, p2, 0.22);
+        return `<path class="gbm-manito-beam" data-motion-key="beam-${fromId}" d="${d}" stroke="${color}" marker-end="url(#gbmArrowGold)" style="animation-delay:${idx * 100}ms;" />`;
+      })
+      .join('');
   } else if (state.lastSwap && isSwapPhase) {
     const sw = state.lastSwap;
     const p1 = seatPos[sw.actorSeatId];
-    const p2 = sw.targetKind === 'player'
-      ? seatPos[sw.targetSeatId]
-      : slotCoordsPct(sw.targetKind, sw.targetSlotKey ? Number(sw.targetSlotKey.split('-')[1]) : 0);
+    const p2 =
+      sw.targetKind === 'player'
+        ? seatPos[sw.targetSeatId]
+        : slotCoordsPct(sw.targetKind, sw.targetSlotKey ? Number(sw.targetSlotKey.split('-')[1]) : 0);
     if (p1 && p2) {
       const d = curvedArcPath(p1, p2, 0.18);
-      const arcColor = sw.targetKind === 'player' ? '#f59e0b' : '#38bdf8';
-      svgOverlayInner = `<path class="gbm-swap-arc" d="${d}" stroke="${arcColor}" marker-end="url(#gbmArrowSwap)" />`;
+      const arcColor =
+        sw.targetKind === 'player'
+          ? isLight ? '#b45309' : '#f59e0b'
+          : isLight ? '#0284c7' : '#38bdf8';
+      svgOverlayInner = `<path class="gbm-swap-arc" data-motion-key="swap-arc-${sw.seq}" d="${d}" stroke="${arcColor}" marker-end="url(#gbmArrowSwap)" />`;
     }
   }
 
-  // Build Player Nodes around circular ring
-  const seatsHtml = state.players.map((p) => {
-    const pos = seatPos[p.seatId] || { x: 50, y: 50 };
-    const isMe = p.seatId === mySeatId;
-    const canSwapTarget = Boolean(isMyTurn && !uiState.peekMode && !isMe);
-    const showFaceUp = Boolean(p.card);
-    const isManitoHighlight = Boolean(uiState.manitoRevealed && p.isMyManito);
+  // Player Nodes around circular ring (keyed for live 3D flips & score animations)
+  const seatsHtml = state.players
+    .map((p) => {
+      const pos = seatPos[p.seatId] || { x: 50, y: 50 };
+      const isMe = p.seatId === mySeatId;
+      const canSwapTarget = Boolean(isMyTurn && !uiState.peekMode && !isMe);
+      const showFaceUp = Boolean(p.card);
+      const isManitoHighlight = Boolean(uiState.manitoRevealed && p.isMyManito);
 
-    const cls = [
-      'gbm-seat-node',
-      isMe ? 'is-me' : '',
-      p.isCurrentTurn ? 'is-turn' : '',
-      isManitoHighlight ? 'is-manito-glow' : '',
-      canSwapTarget ? (mustSwapPlayer ? 'is-bomb-target is-targetable' : 'is-targetable') : '',
-    ].filter(Boolean).join(' ');
+      const cls = [
+        'gbm-seat-node',
+        isMe ? 'is-me' : '',
+        p.isCurrentTurn ? 'is-turn' : '',
+        isManitoHighlight ? 'is-manito-glow' : '',
+        canSwapTarget ? (mustSwapPlayer ? 'is-bomb-target is-targetable' : 'is-targetable') : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
 
-    const scoreCls = p.score > 0 ? 'is-pos' : p.score < 0 ? 'is-neg' : '';
+      const scoreCls = p.score > 0 ? 'is-pos' : p.score < 0 ? 'is-neg' : '';
 
-    return `
-      <div class="${cls}" style="left:${pos.x.toFixed(1)}%;top:${pos.y.toFixed(1)}%;" ${
-        canSwapTarget ? `data-swap-player="${UI.escapeHtml(p.seatId)}"` : ''
-      }>
-        <div class="gbm-seat-top">
-          <span class="gbm-seat-name">
-            <span style="color:var(--dp-brass);">${UI.escapeHtml(p.avatar)}</span>
-            ${UI.escapeHtml(p.name)}
-          </span>
-          <span class="gbm-seat-score ${scoreCls}">${p.score >= 0 ? '+' : ''}${p.score}</span>
+      return `
+        <div class="${cls}" data-motion-key="seat-${UI.escapeHtml(p.seatId)}" style="left:${pos.x.toFixed(1)}%;top:${pos.y.toFixed(1)}%;" ${
+          canSwapTarget ? `data-swap-player="${UI.escapeHtml(p.seatId)}"` : ''
+        }>
+          <div class="gbm-seat-top">
+            <span class="gbm-seat-name">
+              <span style="color:var(--dp-brass);">${UI.escapeHtml(p.avatar)}</span>
+              ${UI.escapeHtml(p.name)}
+            </span>
+            <span class="gbm-seat-score ${scoreCls}" id="gbm-score-${UI.escapeHtml(p.seatId)}">${fmtSigned(p.score)}</span>
+          </div>
+          ${renderCardHtml(p.card, {
+            motionKey: `card-seat-${p.seatId}`,
+            faceUp: showFaceUp,
+            size: 'compact',
+            lang,
+            dirty: p.cardDirty,
+          })}
+          <div class="gbm-seat-badges">
+            ${p.isFirstPlayer ? `<span class="gbm-mini-pill is-first">★ ${lang === 'zh' ? '先手' : '1ST'}</span>` : ''}
+            ${isManitoHighlight ? `<span class="gbm-mini-pill is-manito">♥ MANITO</span>` : ''}
+            ${p.cardDirty && !showFaceUp ? `<span class="gbm-mini-pill is-swapped">⇄</span>` : ''}
+            <span class="gbm-mini-pill">◆${p.pieces}</span>
+          </div>
         </div>
-        ${renderCardHtml(p.card, {
-          faceUp: showFaceUp,
-          size: 'compact',
-          lang,
-          dirty: p.cardDirty,
-        })}
-        <div class="gbm-seat-badges">
-          ${p.isFirstPlayer ? `<span class="gbm-mini-pill is-first">★ ${lang === 'zh' ? '先手' : '1ST'}</span>` : ''}
-          ${isManitoHighlight ? `<span class="gbm-mini-pill is-manito">♥ MANITO</span>` : ''}
-          ${p.cardDirty && !showFaceUp ? `<span class="gbm-mini-pill is-swapped">⇄</span>` : ''}
-          <span class="gbm-mini-pill">◆${p.pieces}</span>
+      `;
+    })
+    .join('');
+
+  // Center Pedestals (3 Buyers + 1 Trash) — keyed for real 380ms 3D flips!
+  const buyersHtml = state.buyers
+    .map((b) => {
+      const canSwapSlot = Boolean(isMyTurn && !uiState.peekMode && !mustSwapPlayer);
+      const canPeekSlot = Boolean(isMyTurn && uiState.peekMode && !b.revealed);
+      const forbidden = Boolean(isMyTurn && !uiState.peekMode && mustSwapPlayer);
+      const slotCls = [
+        'gbm-slot',
+        canPeekSlot ? 'is-peek-target' : canSwapSlot ? 'is-clickable' : '',
+        forbidden ? 'is-forbidden' : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      const attr = canPeekSlot
+        ? `data-peek-buyer="${b.index}"`
+        : canSwapSlot
+        ? `data-swap-buyer="${b.index}"`
+        : '';
+
+      return `
+        <div class="${slotCls}" data-motion-key="slot-buyer-${b.index}" ${attr}>
+          <span class="gbm-slot-tag">${lang === 'zh' ? `买家 ${b.index + 1}` : `BUYER ${b.index + 1}`}</span>
+          ${renderCardHtml(b.card, {
+            motionKey: `card-buyer-${b.index}`,
+            faceUp: b.revealed,
+            size: 'normal',
+            lang,
+            privateBadge: b.source === 'private',
+          })}
         </div>
-      </div>
-    `;
-  }).join('');
-
-  // Build Center Pedestals (3 Buyers + 1 Trash)
-  const buyersHtml = state.buyers.map((b) => {
-    const canSwapSlot = Boolean(isMyTurn && !uiState.peekMode && !mustSwapPlayer);
-    const canPeekSlot = Boolean(isMyTurn && uiState.peekMode && !b.revealed);
-    const forbidden = Boolean(isMyTurn && !uiState.peekMode && mustSwapPlayer);
-    const slotCls = [
-      'gbm-slot',
-      canPeekSlot ? 'is-peek-target' : canSwapSlot ? 'is-clickable' : '',
-      forbidden ? 'is-forbidden' : '',
-    ].filter(Boolean).join(' ');
-    const attr = canPeekSlot
-      ? `data-peek-buyer="${b.index}"`
-      : canSwapSlot
-      ? `data-swap-buyer="${b.index}"`
-      : '';
-
-    return `
-      <div class="${slotCls}" ${attr}>
-        <span class="gbm-slot-tag">${lang === 'zh' ? `买家 ${b.index + 1}` : `BUYER ${b.index + 1}`}</span>
-        ${renderCardHtml(b.card, {
-          faceUp: b.revealed,
-          size: 'normal',
-          lang,
-          privateBadge: b.source === 'private',
-        })}
-      </div>
-    `;
-  }).join('');
+      `;
+    })
+    .join('');
 
   const trashCanSwap = Boolean(isMyTurn && !uiState.peekMode && !mustSwapPlayer);
   const trashCanPeek = Boolean(isMyTurn && uiState.peekMode && !state.trash.revealed);
@@ -465,13 +725,16 @@ function renderVault(container, ctx) {
     'gbm-slot is-trash',
     trashCanPeek ? 'is-peek-target' : trashCanSwap ? 'is-clickable' : '',
     trashForbidden ? 'is-forbidden' : '',
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
   const trashAttr = trashCanPeek ? 'data-peek-trash="1"' : trashCanSwap ? 'data-swap-trash="1"' : '';
 
   const trashHtml = `
-    <div class="${trashCls}" ${trashAttr}>
+    <div class="${trashCls}" data-motion-key="slot-trash" ${trashAttr}>
       <span class="gbm-slot-tag">🗑 ${lang === 'zh' ? '垃圾桶' : 'TRASH'}</span>
       ${renderCardHtml(state.trash.card, {
+        motionKey: 'card-trash',
         faceUp: state.trash.revealed,
         size: 'normal',
         lang,
@@ -486,7 +749,7 @@ function renderVault(container, ctx) {
     const sum = state.roundSummary;
     const myPendingAdvance = Boolean(mySeatId && state.pendingSeatIds.includes(mySeatId));
     showdownPanelHtml = `
-      <section class="gbm-showdown-panel">
+      <section class="gbm-showdown-panel" data-motion-key="gbm-showdown-r${sum.round}">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div>
             <span class="dp-badge">${lang === 'zh' ? `第 ${sum.round} 回合亮牌清单` : `ROUND ${sum.round} SHOWDOWN`}</span>
@@ -497,7 +760,7 @@ function renderVault(container, ctx) {
               ${lang === 'zh' ? '下回合先手' : 'Next Round First Player'}: <strong style="color:var(--dp-brass-bright);">★ ${UI.escapeHtml(nameOf(sum.nextFirstSeatId))}</strong>
               ${
                 sum.traps.length
-                  ? ` · <span style="color:#fb7185;">💣 ${sum.traps.length} ${lang === 'zh' ? '次成功甩锅诱杀 (+3分)!' : 'Bomb Bait traps triggered (+3 pts)!'}</span>`
+                  ? ` · <span style="color:var(--gbm-neg);">💣 ${sum.traps.length} ${lang === 'zh' ? '次成功甩锅诱杀 (+3分)!' : 'Bomb Bait traps triggered (+3 pts)!'}</span>`
                   : ''
               }
             </div>
@@ -532,27 +795,27 @@ function renderVault(container, ctx) {
                   ? `💣 ${bd.card.value}`
                   : `${lang === 'en' ? meta.name.en : meta.name.zh} ${bd.card.value} × ${bd.matchCount} = +${bd.cardScore}`;
               return `
-                <div class="gbm-score-row">
+                <div class="gbm-score-row" data-motion-key="bd-${UI.escapeHtml(p.seatId)}">
                   <div style="display:flex;justify-content:space-between;align-items:center;">
                     <strong>${UI.escapeHtml(p.name)}</strong>
-                    <span style="font-family:var(--dp-font-mono);font-weight:800;color:${
-                      bd.roundTotal > 0 ? '#34d399' : bd.roundTotal < 0 ? '#fb7185' : 'var(--dp-ink-muted)'
+                    <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-weight:800;color:${
+                      bd.roundTotal > 0 ? 'var(--gbm-pos)' : bd.roundTotal < 0 ? 'var(--gbm-neg)' : 'var(--dp-ink-muted)'
                     };">
-                      ${bd.roundTotal >= 0 ? '+' : ''}${bd.roundTotal}
+                      ${fmtSigned(bd.roundTotal)}
                     </span>
                   </div>
-                  <div style="font-family:var(--dp-font-mono);font-size:11.5px;color:${meta.accent};">${formula}</div>
+                  <div class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:11.5px;font-weight:600;color:${isLight ? (LIGHT_GEM_INK[bd.card.type] || '#334155') : meta.accent};">${formula}</div>
                   ${
                     bd.baitPoints > 0
-                      ? `<div style="font-size:11px;color:#fbbf24;">⚡ ${lang === 'zh' ? '炸弹甩锅奖励' : 'Bomb Bait'}: +${bd.baitPoints}</div>`
+                      ? `<div style="font-size:11px;color:var(--gbm-warn-ink);">⚡ ${lang === 'zh' ? '炸弹甩锅奖励' : 'Bomb Bait'}: +${bd.baitPoints}</div>`
                       : ''
                   }
                   ${
                     bd.pieceGained > 0
-                      ? `<div style="font-size:11px;color:#38bdf8;">💎 ${lang === 'zh' ? '钻石特权' : 'Diamond Bonus'}: +1 ◆</div>`
+                      ? `<div style="font-size:11px;color:var(--gbm-info-ink);">💎 ${lang === 'zh' ? '钻石特权' : 'Diamond Bonus'}: +1 ◆</div>`
                       : ''
                   }
-                  <div style="font-size:11px;color:var(--dp-ink-faint);">
+                  <div class="dp-tabular" style="font-size:11px;color:var(--dp-ink-faint);">
                     ${lang === 'zh' ? '累计个人分' : 'Cumulative'}: <strong style="color:var(--dp-ink);">${bd.cumulativeScore}</strong>
                   </div>
                 </div>
@@ -564,11 +827,11 @@ function renderVault(container, ctx) {
     `;
   }
 
-  // Unforgettable Finale Multiplier Reveal Panel
+  // Finale Multiplier Reveal Panel
   let finalePanelHtml = '';
   if (isFinale && state.finaleEntries) {
     finalePanelHtml = `
-      <section class="gbm-showdown-panel">
+      <section class="gbm-showdown-panel" data-motion-key="gbm-finale-panel">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div>
             <span class="dp-badge">${lang === 'zh' ? '闭环链已点亮 · 乘法终局审判' : 'MANITO LOOP IGNITED · MULTIPLIER FINALE'}</span>
@@ -595,10 +858,13 @@ function renderVault(container, ctx) {
                 'gbm-mult-card',
                 idx === 0 ? 'is-winner' : '',
                 e.isNegNegReversal ? 'is-reversal' : e.isBetrayalCrash ? 'is-crash' : '',
-              ].filter(Boolean).join(' ');
-              const finalColor = e.finalScore > 0 ? '#34d399' : e.finalScore < 0 ? '#fb7185' : 'var(--dp-ink-muted)';
+              ]
+                .filter(Boolean)
+                .join(' ');
+              const finalColor =
+                e.finalScore > 0 ? 'var(--gbm-pos)' : e.finalScore < 0 ? 'var(--gbm-neg)' : 'var(--dp-ink-muted)';
               return `
-                <div class="${cardCls}" style="animation-delay:${idx * 100}ms;">
+                <div class="${cardCls}" data-motion-key="finale-${UI.escapeHtml(e.seatId)}" style="animation-delay:${idx * 90}ms;">
                   <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
                     <span style="font-weight:700;font-size:14.5px;">
                       <span style="color:var(--dp-brass);margin-right:6px;">#${idx + 1}</span>
@@ -615,16 +881,16 @@ function renderVault(container, ctx) {
                     }
                   </div>
                   <div style="font-size:12px;color:var(--dp-ink-muted);">
-                    ♥ Manito: <strong style="color:#e9d5ff;">${UI.escapeHtml(e.manitoName)}</strong>
+                    ♥ Manito: <strong style="color:var(--gbm-manito-ink);">${UI.escapeHtml(e.manitoName)}</strong>
                   </div>
                   <div class="gbm-equation">
                     <span>
-                      <strong style="color:${e.ownScore < 0 ? '#fb7185' : '#34d399'};">(${e.ownScore})</strong>
+                      <strong style="color:${e.ownScore < 0 ? 'var(--gbm-neg)' : 'var(--gbm-pos)'};">(${e.ownScore})</strong>
                       ×
-                      <strong style="color:${e.manitoScore < 0 ? '#fb7185' : '#34d399'};">(${e.manitoScore})</strong>
+                      <strong style="color:${e.manitoScore < 0 ? 'var(--gbm-neg)' : 'var(--gbm-pos)'};">(${e.manitoScore})</strong>
                     </span>
-                    <span class="gbm-eq-final" style="color:${finalColor};">
-                      = ${e.finalScore >= 0 ? '+' : ''}${e.finalScore}
+                    <span class="gbm-eq-final dp-tabular" id="gbm-finale-val-${UI.escapeHtml(e.seatId)}" style="color:${finalColor};">
+                      = ${fmtSigned(e.finalScore)}
                     </span>
                   </div>
                 </div>
@@ -641,7 +907,7 @@ function renderVault(container, ctx) {
     .map((sid, idx) => {
       const done = isSwapPhase && idx < state.turnCursor;
       const now = isSwapPhase && idx === state.turnCursor;
-      return `<span class="gbm-order-chip ${done ? 'is-done' : ''} ${now ? 'is-now' : ''}">
+      return `<span class="gbm-order-chip ${done ? 'is-done' : ''} ${now ? 'is-now' : ''}" data-motion-key="ord-${idx}-${UI.escapeHtml(sid)}">
         ${idx + 1}. ${UI.escapeHtml(nameOf(sid))}
       </span>`;
     })
@@ -664,11 +930,11 @@ function renderVault(container, ctx) {
               : lang === 'zh'
               ? '垃圾桶'
               : 'Trash';
-          return `<div class="gbm-swap-item">
+          return `<div class="gbm-swap-item" data-motion-key="log-${sw.seq}">
             <strong style="color:var(--dp-ink);">${UI.escapeHtml(actor)}</strong>
             ⇄
-            <strong style="color:${sw.targetKind === 'player' ? 'var(--dp-brass-bright)' : '#7dd3fc'};">${UI.escapeHtml(target)}</strong>
-            <span style="float:right;font-size:10px;opacity:0.65;">P${sw.pass + 1}</span>
+            <strong style="color:${sw.targetKind === 'player' ? 'var(--dp-brass-bright)' : 'var(--gbm-info-ink)'};">${UI.escapeHtml(target)}</strong>
+            <span class="dp-tabular" style="float:right;font-size:10px;opacity:0.65;">P${sw.pass + 1}</span>
           </div>`;
         })
         .join('')
@@ -676,24 +942,22 @@ function renderVault(container, ctx) {
         lang === 'zh' ? '尚无换牌记录。' : 'No swaps yet this round.'
       }</div>`;
 
-  container.innerHTML = `
-    <div class="gbm-vault">
-      <div class="gbm-header-bar">
-        <div class="gbm-banner-card ${mustSwapPlayer ? 'is-bomb-alert' : ''}">
+  const html = `
+    <div class="gbm-vault" data-motion-key="gbm-root">
+      <div class="gbm-header-bar" data-motion-key="gbm-header">
+        <div class="gbm-banner-card ${mustSwapPlayer ? 'is-bomb-alert' : ''}" data-motion-key="gbm-phase-card">
           <div class="gbm-phase-title">${UI.escapeHtml(phaseTitle)}</div>
           <div class="gbm-phase-sub">${UI.escapeHtml(phaseSub)}</div>
         </div>
 
-        <div class="gbm-banner-card">
+        <div class="gbm-banner-card" data-motion-key="gbm-standing-card">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <span class="gbm-dossier-seal">${lang === 'zh' ? '我的黑市资产' : 'MY VAULT STANDING'}</span>
             ${me ? UI.renderPieceBadge(me.pieces) : ''}
           </div>
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
-            <span style="font-family:var(--dp-font-mono);font-size:22px;font-weight:800;color:${
-              me && me.score < 0 ? '#fb7185' : '#34d399'
-            };">
-              ${me ? `${me.score >= 0 ? '+' : ''}${me.score} ${lang === 'zh' ? '分' : 'pts'}` : '—'}
+            <span class="gbm-my-score ${me && me.score < 0 ? 'is-neg' : 'is-pos'}" id="gbm-my-score">
+              ${me ? `${fmtSigned(me.score)} ${lang === 'zh' ? '分' : 'pts'}` : '—'}
             </span>
             <span style="font-size:11.5px;color:var(--dp-ink-muted);">
               ${
@@ -713,7 +977,7 @@ function renderVault(container, ctx) {
           </div>
         </div>
 
-        <div class="gbm-manito-dossier ${negPactAlert && uiState.manitoRevealed ? 'is-neg-pact' : ''}" id="gbm-toggle-manito" title="${
+        <div class="gbm-manito-dossier ${negPactAlert && uiState.manitoRevealed ? 'is-neg-pact' : ''}" id="gbm-toggle-manito" data-motion-key="gbm-manito-card" title="${
           lang === 'zh' ? '点击切换显示/隐藏你的秘密伙伴档案' : 'Click to toggle Secret Manito visibility'
         }">
           <div>
@@ -723,11 +987,11 @@ function renderVault(container, ctx) {
                 ? `<div class="gbm-dossier-hidden">${lang === 'zh' ? '观战保密中' : 'CLASSIFIED'}</div>`
                 : uiState.manitoRevealed
                 ? `<div class="gbm-dossier-name">${UI.escapeHtml(myManito.name)}
-                    <span style="font-family:var(--dp-font-mono);font-size:13px;margin-left:6px;color:${
-                      myManito.score < 0 ? '#fb7185' : '#34d399'
-                    };">(${myManito.score >= 0 ? '+' : ''}${myManito.score})</span>
+                    <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:13px;margin-left:6px;color:${
+                      myManito.score < 0 ? 'var(--gbm-neg)' : 'var(--gbm-pos)'
+                    };">(${fmtSigned(myManito.score)})</span>
                   </div>
-                  <div style="font-size:11px;color:${negPactAlert ? '#d8b4fe' : 'var(--dp-ink-muted)'};">
+                  <div class="dp-tabular" style="font-size:11px;color:${negPactAlert ? 'var(--gbm-manito-ink)' : 'var(--dp-ink-muted)'};">
                     ${
                       negPactAlert
                         ? lang === 'zh'
@@ -748,42 +1012,42 @@ function renderVault(container, ctx) {
       ${finalePanelHtml}
       ${showdownPanelHtml}
 
-      <div class="gbm-stage-grid">
-        <div class="gbm-table-wrap">
-          <div class="gbm-table-ring"></div>
+      <div class="gbm-stage-grid" data-motion-key="gbm-stage-grid">
+        <div class="gbm-table-wrap" data-motion-key="gbm-table">
+          <div class="gbm-table-ring" data-motion-key="gbm-ring"></div>
 
-          <svg class="gbm-arc-svg" viewBox="0 0 1000 660" preserveAspectRatio="none" aria-hidden="true">
+          <svg class="gbm-arc-svg" data-motion-key="gbm-arc-svg" viewBox="0 0 1000 660" preserveAspectRatio="none" aria-hidden="true">
             <defs>
               <marker id="gbmArrowSwap" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="${isLight ? '#b45309' : '#f59e0b'}" />
               </marker>
               <marker id="gbmArrowGold" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#f2d591" />
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="${isLight ? '#9a6e1f' : '#f2d591'}" />
               </marker>
             </defs>
             ${svgOverlayInner}
           </svg>
 
-          <div class="gbm-center-vault">
+          <div class="gbm-center-vault" data-motion-key="gbm-center-vault">
             <div class="gbm-vault-label">
               <span>◆ ${lang === 'zh' ? '地下黑市展台' : 'BLACK MARKET PEDESTALS'} ◆</span>
               ${
                 mustSwapPlayer
-                  ? `<span style="color:#fb7185;">(${lang === 'zh' ? '炸弹禁换' : 'BOMB LOCKED'})</span>`
+                  ? `<span style="color:var(--gbm-neg);">(${lang === 'zh' ? '炸弹禁换' : 'BOMB LOCKED'})</span>`
                   : ''
               }
             </div>
-            <div class="gbm-pedestals-row">
+            <div class="gbm-pedestals-row" data-motion-key="gbm-pedestals">
               ${buyersHtml}
               ${trashHtml}
             </div>
           </div>
 
-          <div class="gbm-seats-layer">${seatsHtml}</div>
+          <div class="gbm-seats-layer" data-motion-key="gbm-seats-layer">${seatsHtml}</div>
         </div>
 
-        <aside class="gbm-side-panel">
-          <section class="gbm-hand-panel">
+        <aside class="gbm-side-panel" data-motion-key="gbm-side-panel">
+          <section class="gbm-hand-panel" data-motion-key="gbm-hand-panel">
             <div style="display:flex;align-items:center;justify-content:space-between;">
               <span style="font-size:12px;font-weight:700;letter-spacing:0.1em;color:var(--dp-brass);text-transform:uppercase;">
                 ${lang === 'zh' ? '我的当前手牌' : 'YOUR CURRENT HAND'}
@@ -799,6 +1063,7 @@ function renderVault(container, ctx) {
 
             <div class="gbm-hand-stage">
               ${renderCardHtml(state.myCard, {
+                motionKey: 'card-my-hand',
                 faceUp: Boolean(state.myCard && state.myCardKnown),
                 size: 'large',
                 lang,
@@ -826,7 +1091,7 @@ function renderVault(container, ctx) {
                     `
                     : isMyTurn
                     ? `
-                      <div style="font-size:12.5px;color:${mustSwapPlayer ? '#fca5a5' : 'var(--dp-ink-muted)'};">
+                      <div style="font-size:12.5px;color:${mustSwapPlayer ? 'var(--gbm-neg)' : 'var(--dp-ink-muted)'};">
                         ${
                           mustSwapPlayer
                             ? lang === 'zh'
@@ -854,7 +1119,7 @@ function renderVault(container, ctx) {
                       }
                     `
                     : state.myCardDirty && !state.myCardKnown
-                    ? `<div style="font-size:12.5px;color:#fbbf24;">
+                    ? `<div style="font-size:12.5px;color:var(--gbm-warn-ink);">
                         ${lang === 'zh' ? '刚才有玩家与你换了牌！按剧集规则，轮到你的回合时才能揭开查看新牌。' : 'Someone swapped with you! Per show rules, your new card remains hidden until your turn.'}
                       </div>`
                     : `<div style="font-size:12.5px;color:var(--dp-ink-muted);">
@@ -873,7 +1138,7 @@ function renderVault(container, ctx) {
             </div>
           </section>
 
-          <section class="gbm-order-panel">
+          <section class="gbm-order-panel" data-motion-key="gbm-order-panel">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;color:var(--dp-brass);text-transform:uppercase;">
                 ${
@@ -886,14 +1151,14 @@ function renderVault(container, ctx) {
                     : 'FORWARD ORDER (PASS 1 ↻)'
                 }
               </span>
-              <span style="font-family:var(--dp-font-mono);font-size:11px;color:var(--dp-ink-faint);">
+              <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:11px;color:var(--dp-ink-faint);">
                 R${state.round}/${state.totalRounds}
               </span>
             </div>
             <div class="gbm-order-strip">${orderHtml}</div>
           </section>
 
-          <section class="gbm-log-panel">
+          <section class="gbm-log-panel" data-motion-key="gbm-log-panel">
             <div style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;color:var(--dp-brass);text-transform:uppercase;">
               ${lang === 'zh' ? '本轮黑市换牌轨迹' : 'ROUND SWAP TRAIL'}
             </div>
@@ -904,109 +1169,58 @@ function renderVault(container, ctx) {
     </div>
   `;
 
-  // Wire Manito dossier toggle
-  container.querySelector('#gbm-toggle-manito')?.addEventListener('click', () => {
-    sfx.play('click');
-    uiState.manitoRevealed = !uiState.manitoRevealed;
-    renderVault(container, ctx);
-  });
+  // Keyed DOM Patch — preserves .gbm-card-inner so 3D card flips animate cleanly at 380ms!
+  Motion.patchDOM(container, html);
 
-  // Confirm initial deal peek
-  container.querySelector('#gbm-confirm-peek')?.addEventListener('click', async () => {
-    sfx.play('click');
-    const res = await dispatch({ type: 'CONFIRM_PEEK', payload: {} });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
+  // Animate seat scores & player standing with directional emerald/crimson delta tint
+  if (me) {
+    if (uiState.prevMyScore !== null && uiState.prevMyScore !== me.score) {
+      const unit = lang === 'zh' ? '分' : 'pts';
+      Motion.animateNumber(container.querySelector('#gbm-my-score'), uiState.prevMyScore, me.score, {
+        duration: 280,
+        format: (v) => `${fmtSigned(v)} ${unit}`,
+        flash: true,
+      });
+    }
+    uiState.prevMyScore = me.score;
+  }
 
-  // Toggle Piece Peek mode
-  container.querySelector('#gbm-toggle-peek')?.addEventListener('click', () => {
-    sfx.play('click');
-    uiState.peekMode = !uiState.peekMode;
-    renderVault(container, ctx);
-  });
+  for (const p of state.players) {
+    const prevS = uiState.prevScores[p.seatId];
+    if (prevS !== undefined && prevS !== p.score) {
+      Motion.animateNumber(container.querySelector(`#gbm-score-${CSS.escape(p.seatId)}`), prevS, p.score, {
+        duration: 280,
+        format: fmtSigned,
+        flash: true,
+      });
+    }
+    uiState.prevScores[p.seatId] = p.score;
+  }
 
-  // Swap with another player
-  container.querySelectorAll('[data-swap-player]').forEach((el) => {
-    el.addEventListener('click', async () => {
-      const targetId = el.dataset.swapPlayer;
-      sfx.play('cardFlip');
-      const res = await dispatch({ type: 'SWAP', payload: { kind: 'player', seatId: targetId } });
-      if (!res.ok) ui.toast(res.reason, 'error');
+  // Animate Finale Manito multiplication reveals (0 -> Own x Manito = Final)
+  if (isFinale && state.finaleEntries && !uiState.finaleAnimated) {
+    uiState.finaleAnimated = true;
+    state.finaleEntries.forEach((e, idx) => {
+      const el = container.querySelector(`#gbm-finale-val-${CSS.escape(e.seatId)}`);
+      if (!el) return;
+      setTimeout(() => {
+        if (!el.isConnected) return;
+        Motion.animateNumber(el, 0, e.finalScore, {
+          duration: 380,
+          format: (v) => `= ${fmtSigned(v)}`,
+          flash: true,
+        });
+      }, idx * 75);
     });
-  });
-
-  // Swap with Buyer slot
-  container.querySelectorAll('[data-swap-buyer]').forEach((el) => {
-    el.addEventListener('click', async () => {
-      const index = Number(el.dataset.swapBuyer);
-      sfx.play('cardFlip');
-      const res = await dispatch({ type: 'SWAP', payload: { kind: 'buyer', index } });
-      if (!res.ok) ui.toast(res.reason, 'error');
-    });
-  });
-
-  // Swap with Trash slot
-  container.querySelectorAll('[data-swap-trash]').forEach((el) => {
-    el.addEventListener('click', async () => {
-      sfx.play('cardFlip');
-      const res = await dispatch({ type: 'SWAP', payload: { kind: 'trash' } });
-      if (!res.ok) ui.toast(res.reason, 'error');
-    });
-  });
-
-  // Piece Peek Buyer slot
-  container.querySelectorAll('[data-peek-buyer]').forEach((el) => {
-    el.addEventListener('click', async () => {
-      const index = Number(el.dataset.peekBuyer);
-      const res = await dispatch({ type: 'PEEK_SLOT', payload: { kind: 'buyer', index } });
-      if (res.ok) {
-        uiState.peekMode = false;
-        sfx.play('pieceGain');
-        ui.toast(
-          lang === 'zh'
-            ? `◆1 密查成功！仅你可见【买家 ${index + 1}】底牌！`
-            : `◆1 Intel Peek! Buyer ${index + 1} privately revealed to you!`,
-          'success'
-        );
-      } else {
-        ui.toast(res.reason, 'error');
-      }
-    });
-  });
-
-  // Piece Peek Trash slot
-  container.querySelectorAll('[data-peek-trash]').forEach((el) => {
-    el.addEventListener('click', async () => {
-      const res = await dispatch({ type: 'PEEK_SLOT', payload: { kind: 'trash' } });
-      if (res.ok) {
-        uiState.peekMode = false;
-        sfx.play('pieceGain');
-        ui.toast(
-          lang === 'zh'
-            ? '◆1 密查成功！仅你可见【垃圾桶】底牌！'
-            : '◆1 Intel Peek! Trash card privately revealed to you!',
-          'success'
-        );
-      } else {
-        ui.toast(res.reason, 'error');
-      }
-    });
-  });
-
-  // Advance after Round Showdown
-  container.querySelector('#gbm-advance-round')?.addEventListener('click', async () => {
-    sfx.play('bid');
-    const res = await dispatch({ type: 'ADVANCE_ROUND', payload: {} });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
-
-  // Conclude Match from Finale
-  container.querySelector('#gbm-conclude-btn')?.addEventListener('click', async () => {
-    sfx.play('victory');
-    const res = await dispatch({ type: 'CONCLUDE_MATCH', payload: {} });
-    if (!res.ok) ui.toast(res.reason, 'error');
-  });
+  }
 }
+
+// Re-render SVG beam palette cleanly on live Dark <-> Light Theme toggle
+Theme.onChange(() => {
+  if (uiState.lastContainer && uiState.lastCtx) {
+    renderVault(uiState.lastContainer, uiState.lastCtx);
+  }
+});
 
 mountGame({
   config: {

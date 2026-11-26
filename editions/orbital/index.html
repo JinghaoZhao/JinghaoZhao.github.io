@@ -1109,15 +1109,53 @@
                 </div>
               </article>
             </div>
-            <div
-              style="margin-top:26px;padding:24px 28px;border-radius:16px;border:1px solid rgba(212,175,106,0.42);background:radial-gradient(circle at 92% 10%,rgba(220,53,69,0.22),transparent 55%),linear-gradient(135deg,rgba(10,12,22,0.92),rgba(20,24,40,0.88));display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;"
-            >
+            <style>
+              .dp-entry-card {
+                margin-top: 26px;
+                padding: 24px 28px;
+                border-radius: 16px;
+                border: 1px solid rgba(212, 175, 106, 0.42);
+                background:
+                  radial-gradient(circle at 92% 10%, rgba(220, 53, 69, 0.22), transparent 55%),
+                  linear-gradient(135deg, rgba(10, 12, 22, 0.92), rgba(20, 24, 40, 0.88));
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 18px;
+                transition:
+                  transform 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                  border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+              }
+              .dp-entry-card:hover { transform: translate3d(0, -2px, 0); border-color: rgba(251, 191, 36, 0.72); }
+              .dp-entry-cta {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 11px 20px;
+                border-radius: 999px;
+                background: linear-gradient(135deg, #f0d08a, #c49746);
+                color: #0b0d14;
+                font-weight: 700;
+                font-size: 13.5px;
+                white-space: nowrap;
+                transition: transform 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
+              }
+              .dp-entry-cta:active { transform: scale(0.98); transition-duration: 90ms; }
+              .dp-entry-cta:focus-visible { outline: 2px solid #fbbf24; outline-offset: 3px; }
+              .dp-entry-arrow { display: inline-block; transition: transform 160ms cubic-bezier(0.25, 0.1, 0.25, 1); }
+              .dp-entry-card:hover .dp-entry-arrow { transform: translate3d(3px, 0, 0); }
+              @media (prefers-reduced-motion: reduce) {
+                .dp-entry-card:hover, .dp-entry-cta:active, .dp-entry-card:hover .dp-entry-arrow { transform: none !important; }
+              }
+            </style>
+            <div class="dp-entry-card" id="devils-plan-s3">
               <div style="max-width:620px;">
                 <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.14em;color:#fbbf24;">◆ ORBITAL ARCADE · 19 PLAYABLE MIND GAMES</p>
                 <h3 style="margin:0 0 6px;font-size:21px;color:#fff8e7;">The Devil’s Plan Season 3: Dead Again</h3>
                 <p style="margin:0;font-size:14px;color:#b4bcd0;">Online P2P rooms, encrypted WSS fallback, AI bots &amp; pass-and-play across every Ep 1–10 match.</p>
               </div>
-              <a href="../../devils-plan-s3/" style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;background:linear-gradient(135deg,#f0d08a,#c49746);color:#0b0d14;font-weight:700;font-size:13.5px;white-space:nowrap;">Enter Game Hub <span aria-hidden="true">↗</span></a>
+              <a class="dp-entry-cta" href="../../devils-plan-s3/">Enter Game Hub <span class="dp-entry-arrow" aria-hidden="true">↗</span></a>
             </div>
             <div
               style="margin-top:18px;padding:24px 28px;border-radius:16px;border:1px solid rgba(255,46,84,0.45);background:radial-gradient(circle at 92% 10%,rgba(217,27,58,0.28),transparent 55%),linear-gradient(135deg,rgba(8,10,18,0.94),rgba(24,14,28,0.9));display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;"

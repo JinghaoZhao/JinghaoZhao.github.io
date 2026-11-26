@@ -1,4 +1,4 @@
-import { mountGame, SFX, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, UI, Motion } from '../../shared/sdk.js';
 import { GameRules, RANK_LABELS, SUIT_META } from './rules.js';
 
 const ui = {
@@ -7,11 +7,10 @@ const ui = {
   lastPhase: '',
   barTimer: null,
   lastCtx: null,
+  delegated: false,
 };
 
-let svgUid = 0;
-
-function suitSvg(suit, className = '', glossy = false) {
+function suitSvg(suit, className = '', glossyId = null) {
   const paths = {
     S: 'M12 1.8C9.2 6.5 3.6 10.3 3.6 14.6c0 2.7 2 4.5 4.4 4.5 1.5 0 2.7-.8 3.3-1.8-.1 1.8-.7 3.3-2.2 4.5h5.8c-1.5-1.2-2.1-2.7-2.2-4.5.6 1 1.8 1.8 3.3 1.8 2.4 0 4.4-1.8 4.4-4.5 0-4.3-5.6-8.1-8.4-12.8z',
     H: 'M12 21.6C11.4 21.1 3 15 3 8.6 3 5.2 5.6 2.7 8.6 2.7c1.7 0 2.9.9 3.4 2.2.5-1.3 1.7-2.2 3.4-2.2 3 0 5.6 2.5 5.6 5.9 0 6.4-8.4 12.5-9 13z',
@@ -19,21 +18,20 @@ function suitSvg(suit, className = '', glossy = false) {
     C: 'M12 2.4a3.9 3.9 0 0 0-3.3 5.9 4 4 0 1 0-1.2 7.8c1.6 0 2.9-.8 3.7-2.1-.1 2.1-.8 4-2.4 5.4h6.4c-1.6-1.4-2.3-3.3-2.4-5.4.8 1.3 2.1 2.1 3.7 2.1a4 4 0 1 0-1.2-7.8 3.9 3.9 0 0 0-3.3-5.9z',
   };
   const d = paths[suit] || paths.S;
-  if (!glossy) {
+  if (!glossyId) {
     return `<svg class="${className}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`;
   }
-  const gid = `mp-sg-${++svgUid}`;
   const isRed = suit === 'H' || suit === 'D';
   const c1 = isRed ? '#f42c44' : '#2c3344';
   const c2 = isRed ? '#b31227' : '#090b10';
   return `<svg class="${className}" viewBox="0 0 24 24" aria-hidden="true">
     <defs>
-      <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="${glossyId}" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="${c1}"/>
         <stop offset="100%" stop-color="${c2}"/>
       </linearGradient>
     </defs>
-    <path d="${d}" fill="url(#${gid})"/>
+    <path d="${d}" fill="url(#${glossyId})"/>
   </svg>`;
 }
 
@@ -66,9 +64,9 @@ function cardText(card) {
   return `${r}${sym}`;
 }
 
-function renderCardFrontHtml(card, coordLabel, isCommunity = false) {
+function renderCardFrontHtml(card, coordLabel, stableKey, isCommunity = false) {
   if (!card) {
-    return `<div class="mp-card-face mp-card-front ${isCommunity ? 'is-community-face' : ''}"></div>`;
+    return `<div class="mp-card-face mp-card-front ${isCommunity ? 'is-community-face' : ''}" data-motion-key="${stableKey}-f"></div>`;
   }
   const meta = SUIT_META[card.suit] || SUIT_META.S;
   const suitCls = meta.color === 'red' ? 'is-suit-red' : 'is-suit-black';
@@ -76,23 +74,23 @@ function renderCardFrontHtml(card, coordLabel, isCommunity = false) {
   const isRoyalOrAce = card.rank >= 11;
 
   return `
-    <div class="mp-card-face mp-card-front ${suitCls} ${isCommunity ? 'is-community-face' : ''}">
+    <div class="mp-card-face mp-card-front ${suitCls} ${isCommunity ? 'is-community-face' : ''}" data-motion-key="${stableKey}-f">
       <div class="mp-jumbo-index">
         <span class="mp-jumbo-rank">${rLabel}</span>
-        ${suitSvg(card.suit, 'mp-jumbo-pip', false)}
+        ${suitSvg(card.suit, 'mp-jumbo-pip', null)}
       </div>
       ${isRoyalOrAce ? ROYAL_WATERMARK_SVG : ''}
       <div class="mp-hero-suit-wrap">
-        ${suitSvg(card.suit, 'mp-hero-suit', true)}
+        ${suitSvg(card.suit, 'mp-hero-suit', `mp-sg-${stableKey}`)}
       </div>
       ${coordLabel && !isCommunity ? `<span class="mp-card-coord">${coordLabel}</span>` : ''}
     </div>
   `;
 }
 
-function renderCardBackHtml(label) {
+function renderCardBackHtml(label, stableKey) {
   return `
-    <div class="mp-card-face mp-card-back">
+    <div class="mp-card-face mp-card-back" data-motion-key="${stableKey}-b">
       ${CARD_BACK_FILIGREE_SVG}
       <span class="mp-back-crest">${label}</span>
     </div>
@@ -106,7 +104,7 @@ function renderMiniCardHtml(card, isPicked = false) {
   return `
     <span class="mp-mini-card ${suitCls} ${isPicked ? 'is-picked' : ''}" title="${cardText(card)}">
       <span>${rLabel}</span>
-      ${suitSvg(card.suit, 'mp-mini-suit', false)}
+      ${suitSvg(card.suit, 'mp-mini-suit', null)}
     </span>
   `;
 }
@@ -208,9 +206,9 @@ mountGame({
 
     const optPair = isShowdown && state.optimal ? state.optimal.pair : [];
 
-    container.innerHTML = `
-      <div class="mp-arena">
-        <section class="mp-table ${isSelect ? 'is-darkened' : ''}">
+    const html = `
+      <div class="mp-arena" data-motion-key="mp-arena">
+        <section class="mp-table ${isSelect ? 'is-darkened' : ''}" data-motion-key="mp-table">
           <div class="mp-phase-strip">
             <span class="mp-phase-pill ${isMemorize ? 'is-urgent' : ''}">
               ${lang === 'zh' ? `第 ${state.round}/${state.totalRounds} 局` : `ROUND ${state.round}/${state.totalRounds}`}
@@ -224,7 +222,7 @@ mountGame({
                       : (lang === 'zh' ? '我已记牢 · 立刻翻牌 →' : 'Memorized! Flip Now →')}
                    </button>`
                 : isSelect
-                ? `<span style="font-size:12px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
+                ? `<span class="dp-tabular" style="font-size:12px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
                     ${pickedCount}/${state.seats.length} ${lang === 'zh' ? '已锁定' : 'LOCKED'}
                    </span>`
                 : ''
@@ -233,11 +231,11 @@ mountGame({
 
           ${
             isMemorize
-              ? `<div class="mp-mem-bar-wrap"><div class="mp-mem-bar-fill" id="mp-mem-bar" style="width:100%;"></div></div>`
+              ? `<div class="mp-mem-bar-wrap" data-motion-key="mp-mem-wrap"><div class="mp-mem-bar-fill" id="mp-mem-bar"></div></div>`
               : ''
           }
 
-          <div class="mp-community-zone">
+          <div class="mp-community-zone" data-motion-key="mp-comm-zone">
             <div class="mp-community-meta">
               <span class="mp-community-label">✦ ${lang === 'zh' ? '公共牌 (3)' : 'COMMUNITY (3)'}</span>
               <span class="mp-community-sub">
@@ -246,13 +244,14 @@ mountGame({
             </div>
             <div class="mp-community-row">
               ${state.community
-                .map((card) => {
+                .map((card, i) => {
                   const facedown = card == null;
+                  const cKey = `comm-${i}`;
                   return `
-                    <div class="mp-card-slot is-community">
-                      <div class="mp-card ${facedown ? 'is-facedown' : ''}">
-                        ${renderCardFrontHtml(card, '', true)}
-                        ${renderCardBackHtml('?')}
+                    <div class="mp-card-slot is-community" data-motion-key="slot-${cKey}">
+                      <div class="mp-card ${facedown ? 'is-facedown' : ''}" data-motion-key="${cKey}">
+                        ${renderCardFrontHtml(card, '', cKey, true)}
+                        ${renderCardBackHtml('?', cKey)}
                       </div>
                     </div>
                   `;
@@ -261,21 +260,22 @@ mountGame({
             </div>
           </div>
 
-          <div class="mp-grid">
+          <div class="mp-grid" data-motion-key="mp-grid">
             ${state.grid
               .map((card, idx) => {
                 const facedown = isSelect;
                 const isSel = activePick.includes(idx);
                 const isOpt = isShowdown && optPair.includes(idx);
                 const canClick = isSelect && mySeatId && !myLockedPick;
+                const gKey = `card-${idx}`;
                 return `
-                  <div class="mp-card-slot ${isSel ? 'is-selected' : ''} ${isOpt ? 'is-optimal' : ''}">
-                    <div class="mp-card ${facedown ? 'is-facedown' : ''} ${canClick ? 'is-clickable' : ''}" data-slot="${idx}">
-                      ${renderCardFrontHtml(card, state.coords[idx], false)}
-                      ${renderCardBackHtml(state.coords[idx])}
+                  <div class="mp-card-slot ${isSel ? 'is-selected' : ''} ${isOpt ? 'is-optimal' : ''}" data-motion-key="slot-${gKey}">
+                    <div class="mp-card ${facedown ? 'is-facedown' : ''} ${canClick ? 'is-clickable' : ''}" data-motion-key="${gKey}" data-slot="${idx}">
+                      ${renderCardFrontHtml(card, state.coords[idx], gKey, false)}
+                      ${renderCardBackHtml(state.coords[idx], gKey)}
                     </div>
-                    ${isSel ? `<span class="mp-pick-tag">${lang === 'zh' ? '已选' : 'PICK'}</span>` : ''}
-                    ${isOpt && !isSel ? `<span class="mp-pick-tag" style="background:#38bdf8;">MAX</span>` : ''}
+                    ${isSel ? `<span class="mp-pick-tag" data-motion-key="tag-${idx}">${lang === 'zh' ? '已选' : 'PICK'}</span>` : ''}
+                    ${isOpt && !isSel ? `<span class="mp-pick-tag is-opt" data-motion-key="opt-${idx}">MAX</span>` : ''}
                   </div>
                 `;
               })
@@ -285,11 +285,11 @@ mountGame({
           ${
             isSelect && mySeatId && !myLockedPick
               ? `
-                <div class="mp-action-bar">
+                <div class="mp-action-bar" id="mp-action-bar" data-motion-key="mp-action-bar">
                   <span style="font-size:13px;color:var(--dp-ink-muted);">
                     ${lang === 'zh'
-                      ? `已选位置 (${ui.selected.length}/2)：<strong id="mp-sel-readout" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || '请点击 2 张暗牌'}</strong>`
-                      : `Selected (${ui.selected.length}/2): <strong id="mp-sel-readout" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || 'Click 2 hidden cards'}</strong>`}
+                      ? `已选位置 (${ui.selected.length}/2)：<strong id="mp-sel-readout" class="dp-tabular" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || '请点击 2 张暗牌'}</strong>`
+                      : `Selected (${ui.selected.length}/2): <strong id="mp-sel-readout" class="dp-tabular" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${ui.selected.map((i) => state.coords[i]).join(' + ') || 'Click 2 hidden cards'}</strong>`}
                   </span>
                   <button type="button" class="dp-btn dp-btn-sm dp-btn-primary" id="mp-confirm-pick" ${ui.selected.length !== 2 ? 'disabled' : ''}>
                     ${lang === 'zh' ? '锁定 2 张暗牌 →' : 'Lock 2 Cards →'}
@@ -297,7 +297,7 @@ mountGame({
                 </div>
               `
               : isSelect && myLockedPick
-              ? `<div style="text-align:center;font-size:12.5px;color:#86efac;padding:4px;">
+              ? `<div style="text-align:center;font-size:12.5px;color:var(--dp-emerald);padding:4px;" data-motion-key="mp-locked-note">
                   ✓ ${lang === 'zh'
                     ? `已锁定位置 ${myLockedPick.map((i) => state.coords[i]).join(' & ')}，等待其他选手提交...`
                     : `Locked ${myLockedPick.map((i) => state.coords[i]).join(' & ')} — waiting for other players...`}
@@ -306,8 +306,8 @@ mountGame({
           }
         </section>
 
-        <aside class="mp-side">
-          <div class="mp-panel">
+        <aside class="mp-side" data-motion-key="mp-side">
+          <div class="mp-panel" data-motion-key="mp-standings-panel">
             <div style="font-size:11.5px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
               ${isShowdown
                 ? (lang === 'zh' ? '本局亮牌结算' : 'ROUND SHOWDOWN')
@@ -319,25 +319,25 @@ mountGame({
                 ? `
                   ${
                     state.optimal
-                      ? `<div style="margin-top:9px;padding:8px 10px;border-radius:10px;border:1px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.09);font-size:12px;">
-                          <strong style="color:#7dd3fc;">✦ ${lang === 'zh' ? '牌桌理论最强解' : 'THEORETICAL BEST'}:</strong>
+                      ? `<div style="margin-top:9px;padding:8px 10px;border-radius:10px;border:1px solid var(--dp-cyan);background:rgba(56,189,248,0.10);font-size:12px;">
+                          <strong style="color:var(--dp-cyan);">✦ ${lang === 'zh' ? '牌桌理论最强解' : 'THEORETICAL BEST'}:</strong>
                           ${UI.escapeHtml(state.optimal.eval.name[lang] || state.optimal.eval.name.en)}
                           (${state.optimal.pair.map((i) => `${state.coords[i]}[${cardText(state.grid[i])}]`).join(' + ')})
                          </div>`
                       : ''
                   }
-                  <div class="mp-showdown-list">
+                  <div class="mp-showdown-list" id="mp-stand-list">
                     ${state.roundResults
                       .map((entry) => {
                         const isMe = entry.seatId === mySeatId;
                         return `
-                          <div class="mp-showdown-row ${entry.rank === 1 ? 'is-winner' : ''} ${isMe ? 'is-me' : ''}">
+                          <div class="mp-showdown-row ${entry.rank === 1 ? 'is-winner' : ''} ${isMe ? 'is-me' : ''}" data-motion-key="mp-sd-${UI.escapeHtml(entry.seatId)}">
                             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                               <span style="font-size:13px;font-weight:700;">
                                 <strong style="color:var(--dp-brass);margin-right:6px;">#${entry.rank}</strong>
                                 ${UI.escapeHtml(nameOf(entry.seatId))}
                               </span>
-                              <span style="font-family:var(--dp-font-mono);font-size:12px;color:#86efac;">
+                              <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:12px;color:var(--dp-emerald);">
                                 +${entry.pointsEarned}pt · <strong>${state.scores[entry.seatId]}pt</strong>
                               </span>
                             </div>
@@ -366,17 +366,17 @@ mountGame({
                   }
                 `
                 : `
-                  <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px;">
+                  <div id="mp-stand-list" style="display:flex;flex-direction:column;gap:6px;margin-top:9px;">
                     ${[...state.seats]
                       .sort((a, b) => (state.scores[b.seatId] || 0) - (state.scores[a.seatId] || 0))
                       .map((s) => {
                         const locked = Boolean(state.picks[s.seatId]);
                         return `
-                          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:9px;border:1px solid ${s.seatId === mySeatId ? 'var(--dp-border-strong)' : 'var(--dp-border-subtle)'};background:rgba(255,255,255,0.025);font-size:12.5px;">
+                          <div class="mp-stand-row ${s.seatId === mySeatId ? 'is-me' : ''}" data-motion-key="mp-st-${UI.escapeHtml(s.seatId)}">
                             <span><strong style="color:var(--dp-brass);margin-right:5px;">${UI.escapeHtml(s.avatar || '◆')}</strong>${UI.escapeHtml(s.name)}</span>
                             <span style="display:flex;align-items:center;gap:8px;">
-                              ${isSelect ? `<span style="font-size:11px;color:${locked ? '#86efac' : 'var(--dp-ink-faint)'};">${locked ? '✓' : '...'}</span>` : ''}
-                              <strong style="font-family:var(--dp-font-mono);color:var(--dp-brass-bright);">${state.scores[s.seatId] || 0}pt</strong>
+                              ${isSelect ? `<span style="font-size:11px;color:${locked ? 'var(--dp-emerald)' : 'var(--dp-ink-faint)'};">${locked ? '✓' : '...'}</span>` : ''}
+                              <strong class="dp-tabular" style="font-family:var(--dp-font-mono);color:var(--dp-brass-bright);">${state.scores[s.seatId] || 0}pt</strong>
                             </span>
                           </div>
                         `;
@@ -387,7 +387,7 @@ mountGame({
             }
           </div>
 
-          <div class="mp-panel">
+          <div class="mp-panel" data-motion-key="mp-ladder-panel">
             <div style="font-size:11px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
               ${includeFlushes
                 ? (lang === 'zh' ? '9 级完整扑克牌型 (含同花)' : '9-TIER POKER RANKING (FLUSHES ON)')
@@ -423,25 +423,38 @@ mountGame({
       </div>
     `;
 
-    container.querySelector('#mp-ready-mem')?.addEventListener('click', () => {
-      sfx.play('click');
-      dispatch({ type: 'READY_MEMORIZE' });
-    });
+    const listBefore = container.querySelector('#mp-stand-list');
+    const prevRects = listBefore ? Motion.captureFlip(listBefore) : null;
 
-    container.querySelectorAll('[data-slot]').forEach((cardEl) => {
-      cardEl.addEventListener('click', () => {
-        if (!isSelect || !mySeatId || myLockedPick) return;
+    Motion.patchDOM(container, html);
+
+    const listAfter = container.querySelector('#mp-stand-list');
+    if (listAfter && prevRects && prevRects.size > 0) {
+      Motion.playFlip(listAfter, prevRects);
+    }
+
+    if (!ui.delegated) {
+      ui.delegated = true;
+
+      Motion.delegate(container, 'click', '#mp-ready-mem', () => {
+        ui.lastCtx?.sfx.play('click');
+        ui.lastCtx?.dispatch({ type: 'READY_MEMORIZE' });
+      }, 'mp-ready');
+
+      Motion.delegate(container, 'click', '[data-slot]', (e, cardEl) => {
+        const c = ui.lastCtx;
+        if (!c || c.state.phase !== 'select' || !c.mySeatId) return;
+        const locked = Array.isArray(c.state.picks[c.mySeatId]);
+        if (locked) return;
         const idx = Number(cardEl.dataset.slot);
         const pos = ui.selected.indexOf(idx);
-        if (pos >= 0) {
-          ui.selected.splice(pos, 1);
-        } else if (ui.selected.length < 2) {
-          ui.selected.push(idx);
-        } else {
+        if (pos >= 0) ui.selected.splice(pos, 1);
+        else if (ui.selected.length < 2) ui.selected.push(idx);
+        else {
           ui.selected.shift();
           ui.selected.push(idx);
         }
-        sfx.play('click');
+        c.sfx.play('click');
         container.querySelectorAll('.mp-card-slot').forEach((slotEl) => {
           const inner = slotEl.querySelector('[data-slot]');
           if (!inner) return;
@@ -452,7 +465,8 @@ mountGame({
           if (sel && !oldTag) {
             const tag = document.createElement('span');
             tag.className = 'mp-pick-tag';
-            tag.textContent = lang === 'zh' ? '已选' : 'PICK';
+            tag.dataset.motionKey = `tag-${sIdx}`;
+            tag.textContent = c.lang === 'zh' ? '已选' : 'PICK';
             slotEl.appendChild(tag);
           } else if (!sel && oldTag) {
             oldTag.remove();
@@ -463,37 +477,49 @@ mountGame({
         const readout = container.querySelector('#mp-sel-readout');
         if (readout) {
           readout.textContent =
-            ui.selected.map((i) => state.coords[i]).join(' + ') ||
-            (lang === 'zh' ? '请点击 2 张暗牌' : 'Click 2 hidden cards');
+            ui.selected.map((i) => c.state.coords[i]).join(' + ') ||
+            (c.lang === 'zh' ? '请点击 2 张暗牌' : 'Click 2 hidden cards');
         }
-      });
-    });
+      }, 'mp-slot');
 
-    container.querySelector('#mp-confirm-pick')?.addEventListener('click', () => {
-      if (ui.selected.length !== 2) return;
-      sfx.play('bid');
-      const pair = [...ui.selected];
-      ui.selected = [];
-      dispatch({ type: 'SUBMIT_PICK', payload: { pair } });
-    });
+      Motion.delegate(container, 'click', '#mp-confirm-pick', async () => {
+        const c = ui.lastCtx;
+        if (!c) return;
+        if (ui.selected.length !== 2) {
+          Motion.shake(container.querySelector('#mp-action-bar'));
+          return;
+        }
+        c.sfx.play('bid');
+        const pair = [...ui.selected];
+        ui.selected = [];
+        const res = await c.dispatch({ type: 'SUBMIT_PICK', payload: { pair } });
+        if (!res.ok) {
+          Motion.shake(container.querySelector('#mp-action-bar'));
+          if (res.reason) UI.toast(res.reason, 'error');
+        }
+      }, 'mp-confirm');
 
-    container.querySelector('#mp-next-round')?.addEventListener('click', () => {
-      sfx.play('click');
-      dispatch({ type: 'NEXT_ROUND' });
-    });
+      Motion.delegate(container, 'click', '#mp-next-round', () => {
+        ui.lastCtx?.sfx.play('click');
+        ui.lastCtx?.dispatch({ type: 'NEXT_ROUND' });
+      }, 'mp-next');
+    }
 
+    // Pure GPU scaleX memory bar update (never triggers layout!)
     clearInterval(ui.barTimer);
     if (isMemorize) {
-      ui.barTimer = setInterval(() => {
+      const updateBar = () => {
         const bar = document.getElementById('mp-mem-bar');
         if (!bar || !ui.lastCtx || ui.lastCtx.state.phase !== 'memorize') {
           clearInterval(ui.barTimer);
           return;
         }
         const elapsed = Date.now() - ui.lastCtx.state.phaseStartedAt;
-        const pct = Math.max(0, 100 * (1 - elapsed / ui.lastCtx.state.memoryMs));
-        bar.style.width = `${pct}%`;
-      }, 100);
+        const ratio = Math.max(0, 1 - elapsed / ui.lastCtx.state.memoryMs);
+        Motion.setProgress(bar, ratio);
+      };
+      updateBar();
+      ui.barTimer = setInterval(updateBar, 100);
     }
   },
 });

@@ -1,5 +1,6 @@
 /* ==========================================================================
- * Prison Match 3: Piggy Bank — Tactile Obsidian Coin-Counting Arena
+ * Prison Match 3: Piggy Bank — Dual-Theme Tactile Coin-Counting Arena
+ * Unified Apple-Grade Motion · GPU-Composited · Dark Obsidian & Light Porcelain
  * ========================================================================== */
 
 .pb-arena {
@@ -15,6 +16,7 @@
 /* Top Telemetry Banner */
 .pb-banner {
   grid-column: 1 / -1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,20 +24,30 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: var(--dp-radius-md);
-  background: linear-gradient(135deg, rgba(16, 19, 30, 0.92), rgba(22, 18, 28, 0.9));
+  background: var(--dp-surface-card);
   border: 1px solid var(--dp-border);
   box-shadow: var(--dp-shadow-card);
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .pb-banner.is-doubt {
-  border-color: rgba(220, 53, 69, 0.72);
-  box-shadow: 0 0 32px rgba(220, 53, 69, 0.28);
-  animation: pbDoubtPulse 1.1s ease-in-out infinite;
+  border-color: var(--dp-crimson);
 }
 
-@keyframes pbDoubtPulse {
-  0%, 100% { box-shadow: 0 0 22px rgba(220, 53, 69, 0.22); }
-  50% { box-shadow: 0 0 38px rgba(220, 53, 69, 0.48); }
+/* GPU-composited opacity ring pulse (replaces box-shadow animation!) */
+.pb-banner.is-doubt::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid var(--dp-crimson);
+  pointer-events: none;
+  animation: pbRingPulse 1.15s var(--dp-ease-apple) infinite;
+}
+
+@keyframes pbRingPulse {
+  0%, 100% { opacity: 0.22; transform: scale(1); }
+  50% { opacity: 0.82; transform: scale(1.005); }
 }
 
 .pb-color-beacon {
@@ -51,17 +63,15 @@
 }
 
 .pb-color-beacon.is-black {
-  background: linear-gradient(135deg, #1f2433, #090b12);
+  background: linear-gradient(135deg, #272d3f, #0d1018);
   border: 1.5px solid #94a3b8;
-  color: #e2e8f0;
-  box-shadow: 0 0 18px rgba(148, 163, 184, 0.28);
+  color: #f1f5f9;
 }
 
 .pb-color-beacon.is-white {
-  background: linear-gradient(135deg, #f8fafc, #cbd5e1);
-  border: 1.5px solid #ffffff;
-  color: #0b0e16;
-  box-shadow: 0 0 20px rgba(248, 250, 252, 0.42);
+  background: linear-gradient(135deg, #ffffff, #e2e8f0);
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
 }
 
 .pb-coin-dot {
@@ -75,13 +85,11 @@
 .pb-coin-dot.black {
   background: radial-gradient(circle at 35% 30%, #525c73, #111521 68%, #040508);
   border: 1.5px solid rgba(255, 255, 255, 0.42);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.28);
 }
 
 .pb-coin-dot.white {
   background: radial-gradient(circle at 35% 30%, #ffffff, #e2e8f0 68%, #94a3b8);
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.45);
+  border: 1.5px solid #cbd5e1;
 }
 
 /* Main Spotlighted Prison Table */
@@ -89,14 +97,15 @@
   position: relative;
   border-radius: var(--dp-radius-lg);
   background:
-    radial-gradient(ellipse 68% 54% at 50% 42%, rgba(212, 175, 106, 0.13) 0%, rgba(16, 19, 29, 0.96) 62%, rgba(6, 7, 12, 0.99) 100%);
+    radial-gradient(ellipse 68% 54% at 50% 42%, var(--dp-brass-glow) 0%, transparent 62%),
+    var(--dp-surface-card);
   border: 1px solid var(--dp-border);
-  box-shadow: var(--dp-shadow-card), inset 0 0 70px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--dp-shadow-card);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 490px;
+  min-height: 560px;
 }
 
 /* Seat Cards Grid around the Table */
@@ -110,38 +119,36 @@
   position: relative;
   border-radius: 14px;
   padding: 13px;
-  background: rgba(11, 14, 22, 0.86);
+  background: var(--dp-surface-tile);
   border: 1px solid var(--dp-border-subtle);
-  transition: border-color 0.22s, box-shadow 0.22s, transform 0.2s;
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple),
+    background-color var(--dp-dur-base) var(--dp-ease-apple),
+    transform var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .pb-seat-zone.is-active {
   border-color: var(--dp-brass-bright);
-  box-shadow: 0 0 24px rgba(212, 175, 106, 0.22);
 }
 
 .pb-seat-zone.is-receiver {
   border-color: var(--dp-cyan);
-  box-shadow: 0 0 24px rgba(56, 189, 248, 0.24);
 }
 
 .pb-seat-zone.is-targetable {
   cursor: pointer;
   border-style: dashed;
-  border-color: rgba(212, 175, 106, 0.55);
+  border-color: var(--dp-border-strong);
 }
 
 .pb-seat-zone.is-targetable:hover {
   transform: translateY(-2px);
   border-color: var(--dp-brass-bright);
-  background: rgba(212, 175, 106, 0.08);
 }
 
 .pb-seat-zone.is-target-selected {
   border-style: solid;
   border-color: var(--dp-brass-bright);
-  background: rgba(212, 175, 106, 0.14);
-  box-shadow: 0 0 22px rgba(212, 175, 106, 0.34);
+  background: var(--dp-surface-card);
 }
 
 .pb-seat-head {
@@ -155,6 +162,7 @@
 .pb-seat-name {
   font-weight: 700;
   font-size: 13.5px;
+  color: var(--dp-ink);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -165,20 +173,21 @@
 
 .pb-score-badge {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 800;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(212, 175, 106, 0.14);
+  background: var(--dp-brass-glow);
   border: 1px solid var(--dp-border-strong);
   color: var(--dp-brass-bright);
   flex-shrink: 0;
 }
 
 .pb-score-badge.is-neg {
-  background: rgba(220, 53, 69, 0.16);
+  background: rgba(220, 53, 69, 0.14);
   border-color: rgba(220, 53, 69, 0.5);
-  color: #fca5a5;
+  color: var(--dp-crimson-bright);
 }
 
 /* Top & Bottom Piggy Bank Slots */
@@ -191,14 +200,16 @@
 .pb-slot {
   border-radius: 11px;
   padding: 9px 8px;
-  background: rgba(6, 8, 13, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--dp-surface-input);
+  border: 1px solid var(--dp-border-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 112px;
   position: relative;
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple),
+    background-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .pb-slot-label {
@@ -214,13 +225,12 @@
 
 .pb-slot.is-empty {
   border-style: dashed;
-  opacity: 0.45;
+  opacity: 0.55;
 }
 
 .pb-slot.is-hot {
-  border-color: rgba(56, 189, 248, 0.65);
+  border-color: var(--dp-cyan);
   background: rgba(56, 189, 248, 0.08);
-  box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.12);
 }
 
 /* Bespoke Sculptural Ceramic/Obsidian Piggy Bank SVG */
@@ -236,18 +246,17 @@
 .pb-bank-svg {
   width: 82px;
   height: 62px;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.65));
-  transition: transform 0.35s var(--dp-ease);
+  transition: transform var(--dp-dur-base) var(--dp-ease-spring);
 }
 
 .pb-bank-wrap.is-dropping .pb-bank-svg {
-  animation: pbBankBounce 0.55s ease;
+  animation: pbBankBounce 460ms var(--dp-ease-spring);
 }
 
 @keyframes pbBankBounce {
   0%, 100% { transform: scale(1, 1); }
-  30% { transform: scale(1.07, 0.92); }
-  65% { transform: scale(0.97, 1.04); }
+  32% { transform: scale(1.06, 0.93); }
+  66% { transform: scale(0.98, 1.03); }
 }
 
 .pb-falling-coins {
@@ -264,18 +273,19 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  animation: pbCoinDrop 0.72s cubic-bezier(0.55, 0.05, 0.68, 0.53) forwards;
+  animation: pbCoinDrop 620ms var(--dp-ease-apple) forwards;
 }
 
 @keyframes pbCoinDrop {
-  0% { opacity: 0; transform: translateY(-20px) scale(0.8); }
-  25% { opacity: 1; transform: translateY(-8px) scale(1.1); }
-  85% { opacity: 1; transform: translateY(14px) scale(0.95); }
-  100% { opacity: 0; transform: translateY(20px) scale(0.6); }
+  0% { opacity: 0; transform: translate3d(0, -18px, 0) scale(0.8); }
+  25% { opacity: 1; transform: translate3d(0, -6px, 0) scale(1.08); }
+  85% { opacity: 1; transform: translate3d(0, 14px, 0) scale(0.95); }
+  100% { opacity: 0; transform: translate3d(0, 20px, 0) scale(0.6); }
 }
 
 .pb-bank-meta {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 10.5px;
   color: var(--dp-ink-muted);
 }
@@ -284,7 +294,7 @@
 .pb-center-stage {
   border-radius: 14px;
   padding: 16px;
-  background: rgba(8, 10, 17, 0.9);
+  background: var(--dp-surface-input);
   border: 1px solid var(--dp-border-strong);
   text-align: center;
   position: relative;
@@ -293,6 +303,7 @@
 
 .pb-announcement-big {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: clamp(26px, 4vw, 38px);
   font-weight: 800;
   color: var(--dp-brass-bright);
@@ -300,8 +311,9 @@
   margin: 4px 0;
 }
 
-/* Giant Pulsing Crimson DOUBT Buzzer */
+/* Giant Pulsing Crimson DOUBT Buzzer — GPU opacity/scale ring, zero box-shadow animation! */
 .pb-doubt-buzzer {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -311,53 +323,64 @@
   min-height: 76px;
   padding: 14px 24px;
   border-radius: 18px;
-  background: radial-gradient(circle at 50% 30%, #ff5a6b 0%, #dc2626 52%, #7f1d1d 100%);
+  background: radial-gradient(circle at 50% 30%, #ff5a6b 0%, #dc2626 52%, #88131d 100%);
   border: 2px solid #fca5a5;
   color: #ffffff;
   font-weight: 900;
   font-size: 20px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  box-shadow: 0 12px 32px rgba(220, 38, 38, 0.55), inset 0 2px 10px rgba(255, 255, 255, 0.35);
-  transition: transform 0.12s, box-shadow 0.15s;
-  animation: pbBuzzerGlow 0.9s ease-in-out infinite;
+  box-shadow: 0 10px 26px rgba(220, 38, 38, 0.36);
+  transition: transform var(--dp-dur-instant) var(--dp-ease-apple);
+}
+
+.pb-doubt-buzzer::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 22px;
+  border: 2px solid rgba(239, 68, 68, 0.8);
+  pointer-events: none;
+  animation: pbBuzzerRing 1.05s var(--dp-ease-out) infinite;
+}
+
+@keyframes pbBuzzerRing {
+  0% { opacity: 0.85; transform: scale(0.98); }
+  100% { opacity: 0; transform: scale(1.08); }
 }
 
 .pb-doubt-buzzer:hover:not(:disabled) {
-  transform: scale(1.03);
-  box-shadow: 0 16px 42px rgba(220, 38, 38, 0.72), inset 0 2px 14px rgba(255, 255, 255, 0.45);
+  transform: scale(1.025);
 }
 
 .pb-doubt-buzzer:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-@keyframes pbBuzzerGlow {
-  0%, 100% { box-shadow: 0 10px 28px rgba(220, 38, 38, 0.48), 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  50% { box-shadow: 0 14px 38px rgba(220, 38, 38, 0.74), 0 0 0 12px rgba(239, 68, 68, 0); }
+  transform: scale(0.965);
 }
 
 /* X-Ray Smash Verification Animation */
 .pb-xray-stage {
   border-radius: 14px;
   padding: 18px;
-  background: radial-gradient(circle at 50% 30%, rgba(56, 189, 248, 0.16), rgba(10, 12, 20, 0.96) 72%);
-  border: 1.5px solid rgba(56, 189, 248, 0.65);
-  box-shadow: 0 0 36px rgba(56, 189, 248, 0.2);
+  background:
+    radial-gradient(circle at 50% 28%, rgba(56, 189, 248, 0.14), transparent 70%),
+    var(--dp-surface-card);
+  border: 1.5px solid var(--dp-cyan);
   text-align: center;
-  animation: pbSmashShake 0.42s ease;
+  animation: pbSmashShake 360ms var(--dp-ease-out);
 }
 
 .pb-xray-stage.is-caught {
-  background: radial-gradient(circle at 50% 30%, rgba(220, 53, 69, 0.2), rgba(12, 10, 16, 0.97) 72%);
-  border-color: rgba(239, 68, 68, 0.75);
+  background:
+    radial-gradient(circle at 50% 28%, rgba(220, 53, 69, 0.16), transparent 70%),
+    var(--dp-surface-card);
+  border-color: var(--dp-crimson);
 }
 
 @keyframes pbSmashShake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px) rotate(-1deg); }
-  45% { transform: translateX(6px) rotate(1deg); }
-  70% { transform: translateX(-3px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  22% { transform: translate3d(-5px, 0, 0); }
+  48% { transform: translate3d(5px, 0, 0); }
+  74% { transform: translate3d(-2px, 0, 0); }
 }
 
 .pb-poured-coins {
@@ -377,10 +400,11 @@
   align-items: center;
   justify-content: center;
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 800;
   opacity: 0;
-  animation: pbCoinPop 0.36s var(--dp-ease) forwards;
+  animation: pbCoinPop 320ms var(--dp-ease-spring) forwards;
 }
 
 .pb-poured-coin.is-black {
@@ -391,19 +415,19 @@
 
 .pb-poured-coin.is-white {
   background: radial-gradient(circle at 35% 30%, #ffffff, #e2e8f0 72%, #94a3b8);
-  border: 2px solid #ffffff;
+  border: 2px solid #cbd5e1;
   color: #0f172a;
 }
 
 .pb-poured-coin.is-target {
-  box-shadow: 0 0 14px rgba(242, 213, 145, 0.85);
-  border-color: #f2d591;
+  border-color: var(--dp-brass-bright);
+  transform: scale(1.06);
 }
 
 @keyframes pbCoinPop {
-  0% { opacity: 0; transform: translateY(-18px) scale(0.5); }
-  70% { opacity: 1; transform: translateY(2px) scale(1.12); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% { opacity: 0; transform: translate3d(0, -14px, 0) scale(0.6); }
+  70% { opacity: 1; transform: translate3d(0, 2px, 0) scale(1.08); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
 /* Right Control Column */
@@ -420,6 +444,13 @@
   padding: 15px;
   box-shadow: var(--dp-shadow-card);
   backdrop-filter: blur(10px);
+}
+
+/* Reserve stable height on Action Console so Memory Feed underneath never shifts across phases (CLS -> 0) */
+.pb-card[data-motion-key="pb-action-card"] {
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
 }
 
 .pb-card-title {
@@ -441,7 +472,7 @@
   gap: 10px;
   padding: 9px 11px;
   border-radius: 10px;
-  background: rgba(8, 10, 16, 0.8);
+  background: var(--dp-surface-input);
   border: 1px solid var(--dp-border-subtle);
   margin-bottom: 8px;
 }
@@ -454,6 +485,7 @@
 
 .pb-stepper-val {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 18px;
   font-weight: 800;
   min-width: 24px;
@@ -472,21 +504,30 @@
   min-height: 38px;
   border-radius: 8px;
   border: 1px solid var(--dp-border);
-  background: rgba(20, 24, 36, 0.85);
+  background: var(--dp-surface-btn);
+  color: var(--dp-ink);
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 14px;
   font-weight: 700;
-  transition: all 0.15s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-instant) var(--dp-ease-apple);
 }
 
 .pb-num-btn:hover {
   border-color: var(--dp-brass);
 }
 
+.pb-num-btn:active {
+  transform: scale(0.96);
+}
+
 .pb-num-btn.is-selected {
   border-color: var(--dp-cyan);
-  background: rgba(56, 189, 248, 0.22);
-  color: #e0f2fe;
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--dp-cyan);
 }
 
 .pb-target-chips {
@@ -502,16 +543,28 @@
   padding: 8px 10px;
   border-radius: 9px;
   border: 1px solid var(--dp-border);
-  background: rgba(20, 24, 36, 0.88);
+  background: var(--dp-surface-btn);
+  color: var(--dp-ink);
   font-size: 12.5px;
   font-weight: 600;
   text-align: center;
-  transition: all 0.16s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-instant) var(--dp-ease-apple);
+}
+
+.pb-target-chip:hover {
+  border-color: var(--dp-border-strong);
+}
+
+.pb-target-chip:active {
+  transform: scale(0.97);
 }
 
 .pb-target-chip.is-selected {
   border-color: var(--dp-brass-bright);
-  background: rgba(212, 175, 106, 0.2);
+  background: var(--dp-brass-glow);
   color: var(--dp-brass-bright);
 }
 
@@ -527,7 +580,7 @@
 .pb-log-row {
   padding: 6px 9px;
   border-radius: 7px;
-  background: rgba(8, 10, 16, 0.72);
+  background: var(--dp-surface-row);
   border-left: 2px solid var(--dp-border-strong);
   color: var(--dp-ink-muted);
 }
@@ -535,13 +588,34 @@
 .pb-log-row.is-alert {
   border-left-color: var(--dp-crimson);
   background: rgba(220, 53, 69, 0.1);
-  color: #fecaca;
+  color: var(--dp-crimson-bright);
 }
 
 .pb-log-row.is-good {
   border-left-color: var(--dp-emerald);
   background: rgba(34, 197, 94, 0.1);
-  color: #bbf7d0;
+  color: var(--dp-emerald);
+}
+
+/* Light Porcelain Studio Refinements */
+:root[data-theme="light"] .pb-table {
+  background:
+    radial-gradient(ellipse 68% 54% at 50% 42%, rgba(154, 110, 31, 0.1) 0%, transparent 62%),
+    linear-gradient(165deg, #ffffff 0%, #f3f0e8 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-banner.is-doubt::after,
+  .pb-doubt-buzzer::after,
+  .pb-xray-stage,
+  .pb-bank-wrap.is-dropping .pb-bank-svg,
+  .pb-falling-coin {
+    animation: none !important;
+  }
+  .pb-poured-coin {
+    animation: none !important;
+    opacity: 1 !important;
+  }
 }
 
 @media (max-width: 960px) {

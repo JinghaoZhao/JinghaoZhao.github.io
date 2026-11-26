@@ -1,5 +1,6 @@
 /* ==========================================================================
- * Prison Match 4: Wall Go II — Magnetic Slate & Laser-Wall Architectural Board
+ * Prison Match 4: Wall Go II — Dual-Theme Architectural Slate & Laser-Wall Board
+ * Dark Obsidian Slate & Light Architectural Limestone · 60fps Piece Glides
  * ========================================================================== */
 
 .wg-arena {
@@ -21,14 +22,14 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: var(--dp-radius-md);
-  background: linear-gradient(135deg, rgba(16, 19, 30, 0.94), rgba(14, 22, 32, 0.9));
+  background: var(--dp-surface-card);
   border: 1px solid var(--dp-border);
   box-shadow: var(--dp-shadow-card);
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .wg-banner.is-break-active {
-  border-color: rgba(245, 158, 11, 0.75);
-  box-shadow: 0 0 28px rgba(245, 158, 11, 0.25);
+  border-color: var(--dp-amber);
 }
 
 /* Main Slate Board Frame */
@@ -36,9 +37,10 @@
   position: relative;
   border-radius: var(--dp-radius-lg);
   background:
-    radial-gradient(circle at 50% 45%, rgba(212, 175, 106, 0.1) 0%, rgba(12, 15, 23, 0.97) 64%, rgba(5, 6, 10, 0.99) 100%);
+    radial-gradient(circle at 50% 45%, var(--dp-brass-glow) 0%, transparent 62%),
+    var(--dp-surface-card);
   border: 1px solid var(--dp-border);
-  box-shadow: var(--dp-shadow-card), inset 0 0 70px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--dp-shadow-card);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -62,7 +64,9 @@
 
 /* Cells & Legal Highlights */
 .wg-cell {
-  transition: fill 0.18s, stroke 0.18s;
+  transition: fill var(--dp-dur-fast) var(--dp-ease-apple),
+    stroke var(--dp-dur-fast) var(--dp-ease-apple),
+    opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .wg-cell.is-clickable {
@@ -70,7 +74,7 @@
 }
 
 .wg-cell.is-clickable:hover {
-  stroke: rgba(242, 213, 145, 0.85);
+  stroke: var(--dp-brass-bright);
   stroke-width: 2;
 }
 
@@ -79,80 +83,95 @@
 }
 
 .wg-cell.is-legal-dest:hover {
-  filter: brightness(1.32);
+  stroke-width: 2.8;
+  opacity: 0.9;
 }
 
 .wg-dest-pulse {
-  animation: wgDestPulse 1.3s ease-in-out infinite;
+  animation: wgDestPulse 1.3s var(--dp-ease-apple) infinite;
   pointer-events: none;
 }
 
 @keyframes wgDestPulse {
-  0%, 100% { opacity: 0.55; }
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
 
-/* Hoverable Brass Wall Slots */
+/* Hoverable Brass Wall Slots (zero filter transitions!) */
 .wg-wall-slot {
   cursor: pointer;
 }
 
 .wg-wall-slot .wg-wall-preview {
-  fill: rgba(242, 213, 145, 0.24);
-  stroke: rgba(242, 213, 145, 0.72);
-  stroke-width: 1.4;
+  fill: var(--dp-brass-glow);
+  stroke: var(--dp-brass-bright);
+  stroke-width: 1.5;
   stroke-dasharray: 4 3;
-  transition: fill 0.16s, stroke 0.16s, filter 0.16s;
-  animation: wgWallSlotGlow 1.15s ease-in-out infinite;
+  transition: fill var(--dp-dur-fast) var(--dp-ease-apple),
+    stroke var(--dp-dur-fast) var(--dp-ease-apple),
+    opacity var(--dp-dur-fast) var(--dp-ease-apple);
+  animation: wgWallSlotGlow 1.15s var(--dp-ease-apple) infinite;
 }
 
 .wg-wall-slot:hover .wg-wall-preview {
-  fill: #f2d591;
-  stroke: #ffffff;
+  fill: var(--dp-brass-bright);
+  stroke: var(--dp-ink);
   stroke-dasharray: none;
-  filter: drop-shadow(0 0 10px rgba(242, 213, 145, 0.9));
+  opacity: 1;
 }
 
 @keyframes wgWallSlotGlow {
-  0%, 100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.56; }
   50% { opacity: 1; }
 }
 
-/* Placed Laser Walls */
+/* Placed Laser Walls (GPU transform + opacity snap) */
 .wg-wall-placed {
-  animation: wgWallSnap 0.24s cubic-bezier(0.22, 1.3, 0.36, 1);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wgWallSnap var(--dp-dur-base) var(--dp-ease-spring);
 }
 
 @keyframes wgWallSnap {
-  0% { opacity: 0.2; transform: scale(0.85); }
+  0% { opacity: 0.25; transform: scale(0.84); }
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Wall Break Shockwave */
+/* Wall Break Shockwave — 100% GPU transform scale + opacity (zero r/width thrash!) */
 .wg-shatter-ring {
   fill: none;
-  stroke: #f59e0b;
-  stroke-width: 4;
-  animation: wgShatterBurst 0.75s ease-out forwards;
+  stroke: var(--dp-amber);
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wgShatterBurst 620ms var(--dp-ease-out) forwards;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 @keyframes wgShatterBurst {
-  0% { r: 6; opacity: 1; stroke-width: 6; }
-  100% { r: 44; opacity: 0; stroke-width: 1; }
+  0% { transform: scale(0.25); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
 }
 
-/* Pieces */
+/* Persistent Keyed Pieces — smooth 220ms SVG glides across the 7x7 grid! */
 .wg-piece-group {
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 220ms var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .wg-piece-group.is-selectable {
   cursor: pointer;
 }
 
-.wg-piece-group.is-selectable:hover {
-  filter: drop-shadow(0 0 12px rgba(242, 213, 145, 0.75));
+.wg-piece-group.is-selectable:hover .wg-piece-hover-ring {
+  opacity: 0.72;
+}
+
+.wg-piece-hover-ring {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .wg-piece-selected-halo {
@@ -207,14 +226,16 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(10, 13, 22, 0.85);
+  background: var(--dp-surface-row);
   border: 1px solid var(--dp-border-subtle);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  color: var(--dp-ink);
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple),
+    background-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .wg-faction-row.is-turn {
   border-color: var(--dp-brass-bright);
-  box-shadow: 0 0 18px rgba(212, 175, 106, 0.2);
+  background: var(--dp-brass-glow);
 }
 
 .wg-faction-swatch {
@@ -222,6 +243,14 @@
   height: 12px;
   border-radius: 3px;
   flex-shrink: 0;
+}
+
+.wg-score-num {
+  font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .wg-break-btn {
@@ -232,24 +261,31 @@
   gap: 10px;
   padding: 11px 14px;
   border-radius: 11px;
-  border: 1.5px solid rgba(245, 158, 11, 0.55);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(120, 53, 15, 0.24));
-  color: #fef3c7;
+  border: 1.5px solid rgba(245, 158, 11, 0.52);
+  background: rgba(245, 158, 11, 0.14);
+  color: var(--dp-amber);
   font-weight: 700;
   font-size: 13.5px;
-  transition: all 0.18s;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple),
+    background-color var(--dp-dur-fast) var(--dp-ease-apple),
+    color var(--dp-dur-fast) var(--dp-ease-apple),
+    transform var(--dp-dur-instant) var(--dp-ease-apple);
 }
 
 .wg-break-btn:hover:not(:disabled) {
-  border-color: #fbbf24;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+  border-color: var(--dp-amber);
+  background: rgba(245, 158, 11, 0.22);
+  transform: translateY(-1px);
+}
+
+.wg-break-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .wg-break-btn.is-armed {
   background: linear-gradient(135deg, #f59e0b, #b45309);
-  color: #0b0d14;
-  border-color: #fef08a;
-  box-shadow: 0 0 26px rgba(245, 158, 11, 0.58);
+  color: #ffffff;
+  border-color: #fde68a;
 }
 
 .wg-legend-grid {
@@ -261,7 +297,7 @@
 .wg-legend-item {
   padding: 9px 10px;
   border-radius: 9px;
-  background: rgba(8, 10, 16, 0.76);
+  background: var(--dp-surface-row);
   border: 1px solid var(--dp-border-subtle);
   font-size: 12px;
 }
@@ -289,15 +325,35 @@
 .wg-log-row {
   padding: 6px 9px;
   border-radius: 7px;
-  background: rgba(8, 10, 16, 0.72);
+  background: var(--dp-surface-row);
   border-left: 2px solid var(--dp-border-strong);
   color: var(--dp-ink-muted);
 }
 
 .wg-log-row.is-break {
   border-left-color: var(--dp-amber);
-  background: rgba(245, 158, 11, 0.1);
-  color: #fef3c7;
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--dp-amber);
+}
+
+/* Light Porcelain Studio — Architectural Honed Limestone Slate */
+:root[data-theme="light"] .wg-board-stage {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(154, 110, 31, 0.08) 0%, transparent 62%),
+    linear-gradient(165deg, #ffffff 0%, #f1eee7 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wg-dest-pulse,
+  .wg-wall-slot .wg-wall-preview,
+  .wg-piece-selected-halo,
+  .wg-shatter-ring,
+  .wg-wall-placed {
+    animation: none !important;
+  }
+  .wg-piece-group {
+    transition-duration: 100ms;
+  }
 }
 
 @media (max-width: 960px) {

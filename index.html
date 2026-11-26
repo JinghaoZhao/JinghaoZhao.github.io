@@ -2127,26 +2127,71 @@
               <p class="map-status" role="status"></p>
             </div>
           </article>
-          <article
-            class="reveal"
-            id="devils-plan-s3"
-            style="margin-top:32px;padding:28px 32px;border-radius:16px;background:radial-gradient(ellipse 80% 100% at 95% 0%,rgba(220,53,69,0.2),transparent 58%),linear-gradient(135deg,#0c0e15 0%,#151926 100%);border:1px solid rgba(212,175,106,0.38);color:#f4f1ea;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;box-shadow:0 18px 42px rgba(7,22,43,0.18);"
-          >
+          <style>
+            .dp-entry-card {
+              margin-top: 32px;
+              padding: 28px 32px;
+              border-radius: 16px;
+              background:
+                radial-gradient(ellipse 72% 95% at 96% 0%, rgba(196, 35, 52, 0.08), transparent 56%),
+                radial-gradient(ellipse 60% 80% at 6% 100%, rgba(154, 110, 31, 0.09), transparent 58%),
+                linear-gradient(135deg, #ffffff 0%, #f8f5ee 100%);
+              border: 1px solid rgba(148, 108, 36, 0.28);
+              color: #14171f;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 20px;
+              box-shadow: 0 10px 28px rgba(20, 23, 31, 0.06), 0 1px 2px rgba(20, 23, 31, 0.04);
+              transition:
+                transform 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-card:hover {
+              transform: translate3d(0, -2px, 0);
+              border-color: rgba(148, 108, 36, 0.52);
+            }
+            .dp-entry-cta {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              padding: 12px 22px;
+              border-radius: 10px;
+              background: linear-gradient(135deg, #b5872e 0%, #8e6416 100%);
+              color: #ffffff;
+              font-weight: 700;
+              font-size: 14px;
+              white-space: nowrap;
+              box-shadow: 0 6px 18px rgba(142, 100, 22, 0.24);
+              transition: transform 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-cta:active { transform: scale(0.98); transition-duration: 90ms; }
+            .dp-entry-cta:focus-visible { outline: 2px solid #8e6416; outline-offset: 3px; }
+            .dp-entry-arrow { display: inline-block; transition: transform 160ms cubic-bezier(0.25, 0.1, 0.25, 1); }
+            .dp-entry-card:hover .dp-entry-arrow,
+            .dp-entry-cta:hover .dp-entry-arrow { transform: translate3d(3px, 0, 0); }
+            @media (prefers-reduced-motion: reduce) {
+              .dp-entry-card:hover,
+              .dp-entry-cta:active,
+              .dp-entry-card:hover .dp-entry-arrow,
+              .dp-entry-cta:hover .dp-entry-arrow { transform: none !important; }
+            }
+          </style>
+          <article class="dp-entry-card reveal" id="devils-plan-s3">
             <div style="max-width:640px;">
-              <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#f2d591;">
+              <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#8e6416;">
                 ◆ INTERACTIVE ARCADE · ONLINE P2P &amp; AI
               </p>
-              <h3 style="margin:0 0 8px;font-size:24px;line-height:1.25;color:#fff8e7;">
+              <h3 style="margin:0 0 8px;font-size:24px;line-height:1.25;color:#14171f;">
                 The Devil’s Plan Season 3: Dead Again
               </h3>
-              <p style="margin:0;font-size:15px;line-height:1.6;color:#b2b8c9;">
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#52596b;">
                 Play all 19 mind games from Episodes 1–10 — Main Matches, Prison Matches, Exile Trials &amp; Hidden Stages — with zero-install room-code multiplayer, smart AI bots, and local pass-and-play.
               </p>
             </div>
-            <a
-              href="devils-plan-s3/"
-              style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;background:linear-gradient(135deg,#f0d08a,#c49746);color:#0b0d14;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 8px 24px rgba(212,175,106,0.3);"
-              >Enter Game Hub <span aria-hidden="true">↗</span></a
+            <a class="dp-entry-cta" href="devils-plan-s3/"
+              >Enter Game Hub <span class="dp-entry-arrow" aria-hidden="true">↗</span></a
             >
           </article>
           <article

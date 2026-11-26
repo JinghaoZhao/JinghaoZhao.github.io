@@ -1,14 +1,72 @@
 /* ==========================================================================
  * Exile Match 4: Loop Fence Puzzle / Slitherlink (围栏环路 / 울타리 치기)
- * Carved Obsidian Dot-Lattice · Molten Gold Laser Fence · Red X Marks
+ * Dual-Theme: Dark Obsidian Temple & Light Carved Sandstone/Porcelain Temple
+ * GPU-Composited Opacity Shimmer & ScaleX Progress · GPU keyframes only
  * ========================================================================== */
+
+:root,
+:root[data-theme="dark"] {
+  --lf-bg-top: rgba(245, 158, 11, 0.14);
+  --lf-bg-bl: rgba(217, 119, 6, 0.10);
+  --lf-bg-br: rgba(220, 53, 69, 0.11);
+  --lf-temple-surface: linear-gradient(135deg, rgba(35, 25, 16, 0.94), rgba(16, 13, 11, 0.96));
+  --lf-tablet-surface: linear-gradient(160deg, #1e1813 0%, #110d0a 100%);
+  --lf-racer-bg: rgba(12, 10, 9, 0.74);
+  --lf-racer-survived: rgba(16, 36, 24, 0.48);
+  --lf-racer-elim: rgba(42, 14, 18, 0.48);
+  --lf-solved-bg: linear-gradient(135deg, rgba(20, 52, 32, 0.88), rgba(14, 28, 19, 0.94));
+  --lf-solved-ink: #bbf7d0;
+  --lf-frieze-ink: rgba(212, 175, 106, 0.18);
+  --lf-svg-bg: #0f0c09;
+  --lf-cell-bg: rgba(255, 255, 255, 0.018);
+  --lf-cell-ok-bg: rgba(34, 197, 94, 0.10);
+  --lf-cell-over-bg: rgba(239, 68, 68, 0.14);
+  --lf-clue-neutral: #f3d692;
+  --lf-clue-ok: #4ade80;
+  --lf-clue-over: #ff5868;
+  --lf-edge-guide: rgba(212, 175, 106, 0.16);
+  --lf-edge-hover: rgba(245, 185, 86, 0.58);
+  --lf-fence-stroke: #fbbf24;
+  --lf-fence-solved: #fef08a;
+  --lf-dot-idle: #a17a36;
+  --lf-dot-active: #fde68a;
+  --lf-dot-ring: #140f0a;
+}
+
+:root[data-theme="light"] {
+  --lf-bg-top: rgba(180, 122, 30, 0.10);
+  --lf-bg-bl: rgba(180, 122, 30, 0.06);
+  --lf-bg-br: rgba(196, 35, 52, 0.05);
+  --lf-temple-surface: linear-gradient(135deg, #fffdf9 0%, #f5efe4 100%);
+  --lf-tablet-surface: linear-gradient(160deg, #ffffff 0%, #f4ede0 100%);
+  --lf-racer-bg: rgba(255, 255, 255, 0.82);
+  --lf-racer-survived: rgba(21, 128, 61, 0.10);
+  --lf-racer-elim: rgba(196, 35, 52, 0.10);
+  --lf-solved-bg: linear-gradient(135deg, rgba(21, 128, 61, 0.12), rgba(240, 253, 244, 0.96));
+  --lf-solved-ink: #14532d;
+  --lf-frieze-ink: rgba(148, 108, 36, 0.20);
+  --lf-svg-bg: #f8f3ea;
+  --lf-cell-bg: rgba(148, 108, 36, 0.04);
+  --lf-cell-ok-bg: rgba(21, 128, 61, 0.10);
+  --lf-cell-over-bg: rgba(196, 35, 52, 0.10);
+  --lf-clue-neutral: #2d2112;
+  --lf-clue-ok: #15803d;
+  --lf-clue-over: #b91c2c;
+  --lf-edge-guide: rgba(148, 108, 36, 0.24);
+  --lf-edge-hover: rgba(180, 83, 9, 0.65);
+  --lf-fence-stroke: #b45309;
+  --lf-fence-solved: #15803d;
+  --lf-dot-idle: #9a6e1f;
+  --lf-dot-active: #78350f;
+  --lf-dot-ring: #f8f3ea;
+}
 
 body.exile-temple-body {
   background:
-    radial-gradient(ellipse 65% 42% at 50% 0%, rgba(245, 158, 11, 0.16), transparent 65%),
-    radial-gradient(ellipse 45% 45% at 10% 88%, rgba(217, 119, 6, 0.11), transparent 60%),
-    radial-gradient(ellipse 45% 45% at 90% 88%, rgba(220, 53, 69, 0.12), transparent 60%),
-    #0a0807;
+    radial-gradient(ellipse 65% 42% at 50% 0%, var(--lf-bg-top), transparent 65%),
+    radial-gradient(ellipse 45% 45% at 10% 88%, var(--lf-bg-bl), transparent 60%),
+    radial-gradient(ellipse 45% 45% at 90% 88%, var(--lf-bg-br), transparent 60%),
+    var(--dp-bg-void);
 }
 
 .lf-root {
@@ -24,9 +82,9 @@ body.exile-temple-body {
   position: relative;
   padding: 12px 16px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(35, 25, 16, 0.92), rgba(16, 13, 11, 0.95));
-  border: 1px solid rgba(212, 175, 106, 0.34);
-  box-shadow: inset 0 1px 0 rgba(255, 219, 148, 0.12), 0 12px 30px rgba(0, 0, 0, 0.55);
+  background: var(--lf-temple-surface);
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   overflow: hidden;
 }
 
@@ -39,7 +97,7 @@ body.exile-temple-body {
   text-align: center;
   font-size: 9px;
   letter-spacing: 0.45em;
-  color: rgba(212, 175, 106, 0.16);
+  color: var(--lf-frieze-ink);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -70,14 +128,14 @@ body.exile-temple-body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f59e0b;
-  box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.6);
-  animation: lf-flicker 2.2s ease-in-out infinite;
+  background: var(--dp-amber);
+  box-shadow: 0 0 10px var(--dp-amber);
+  animation: lf-flicker 2.2s var(--dp-ease-apple) infinite;
 }
 
 @keyframes lf-flicker {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.68; }
+  50% { opacity: 0.65; }
 }
 
 .lf-race-grid {
@@ -89,26 +147,26 @@ body.exile-temple-body {
 .lf-racer-card {
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(12, 10, 9, 0.72);
-  border: 1px solid rgba(212, 175, 106, 0.18);
+  background: var(--lf-racer-bg);
+  border: 1px solid var(--dp-border);
   display: flex;
   flex-direction: column;
   gap: 5px;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), background-color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .lf-racer-card.is-me {
-  border-color: rgba(245, 185, 86, 0.55);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.14);
+  border-color: var(--dp-border-strong);
 }
 
 .lf-racer-card.is-survived {
-  border-color: rgba(34, 197, 94, 0.55);
-  background: rgba(16, 36, 24, 0.45);
+  border-color: var(--dp-emerald);
+  background: var(--lf-racer-survived);
 }
 
 .lf-racer-card.is-eliminated {
-  border-color: rgba(220, 53, 69, 0.55);
-  background: rgba(42, 14, 18, 0.45);
+  border-color: var(--dp-crimson);
+  background: var(--lf-racer-elim);
 }
 
 .lf-racer-top {
@@ -121,6 +179,7 @@ body.exile-temple-body {
 
 .lf-racer-stat {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--dp-brass-bright);
   flex-shrink: 0;
@@ -129,15 +188,19 @@ body.exile-temple-body {
 .lf-bar-track {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--dp-border-subtle);
   overflow: hidden;
 }
 
 .lf-bar-fill {
+  width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #b45309, #f59e0b, #fde68a);
-  transition: width 0.35s var(--dp-ease);
+  background: linear-gradient(90deg, #b45309, #f59e0b, #fbbf24);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--dp-dur-base) var(--dp-ease-apple);
+  will-change: transform;
 }
 
 .lf-racer-card.is-survived .lf-bar-fill {
@@ -155,20 +218,18 @@ body.exile-temple-body {
 .lf-tablet {
   padding: 18px;
   border-radius: 16px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.09), transparent 65%),
-    linear-gradient(160deg, #1e1813 0%, #110d0a 100%);
-  border: 2px solid rgba(196, 154, 78, 0.4);
-  box-shadow: inset 0 0 34px rgba(0, 0, 0, 0.75), 0 18px 42px rgba(0, 0, 0, 0.65);
+  background: var(--lf-tablet-surface);
+  border: 2px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-card);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  transition: border-color var(--dp-dur-base) var(--dp-ease-apple);
 }
 
 .lf-tablet.is-solved {
-  border-color: rgba(250, 204, 21, 0.85);
-  box-shadow: inset 0 0 40px rgba(245, 158, 11, 0.16), 0 0 36px rgba(245, 158, 11, 0.25);
+  border-color: var(--dp-emerald);
 }
 
 .lf-svg-container {
@@ -194,52 +255,54 @@ body.exile-temple-body {
 }
 
 .lf-edge-hit:hover + .lf-edge-guide {
-  stroke: rgba(245, 185, 86, 0.55);
+  stroke: var(--lf-edge-hover);
   stroke-width: 4;
 }
 
 .lf-edge-guide {
   pointer-events: none;
-  stroke: rgba(212, 175, 106, 0.14);
+  stroke: var(--lf-edge-guide);
   stroke-width: 2;
   stroke-dasharray: 4 6;
-  transition: stroke 0.12s, stroke-width 0.12s;
+  transition: stroke var(--dp-dur-fast) var(--dp-ease-apple), stroke-width var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .lf-edge-fence {
   pointer-events: none;
-  stroke: #fbbf24;
+  stroke: var(--lf-fence-stroke);
   stroke-width: 6.5;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 7px rgba(245, 158, 11, 0.85));
+  transition: stroke var(--dp-dur-fast) var(--dp-ease-apple), opacity var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .lf-tablet.is-solved .lf-edge-fence {
-  stroke: #fef08a;
+  stroke: var(--lf-fence-solved);
   stroke-width: 7.5;
-  animation: lf-loop-pulse 1.3s ease-in-out infinite;
+  animation: lf-loop-shimmer 1.6s var(--dp-ease-apple) infinite;
 }
 
-@keyframes lf-loop-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.9)); }
-  50% { filter: drop-shadow(0 0 18px rgba(253, 224, 71, 1)); }
+/* Pure GPU opacity shimmer (replaces filter animation!) */
+@keyframes lf-loop-shimmer {
+  0%, 100% { opacity: 0.78; }
+  50% { opacity: 1; }
 }
 
 .lf-clue-text {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 800;
   pointer-events: none;
   user-select: none;
-  transition: fill 0.18s;
+  transition: fill var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 /* Side Control Panel */
 .lf-panel {
   padding: 16px;
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(28, 22, 16, 0.92), rgba(14, 11, 9, 0.96));
-  border: 1px solid rgba(212, 175, 106, 0.32);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+  background: var(--dp-surface-card);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-card);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -254,13 +317,14 @@ body.exile-temple-body {
 .lf-stat-box {
   padding: 10px;
   border-radius: 10px;
-  background: rgba(10, 8, 7, 0.8);
-  border: 1px solid rgba(212, 175, 106, 0.2);
+  background: var(--dp-surface-row);
+  border: 1px solid var(--dp-border-subtle);
   text-align: center;
 }
 
 .lf-stat-val {
   font-family: var(--dp-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 20px;
   font-weight: 800;
   color: var(--dp-brass-bright);
@@ -281,36 +345,45 @@ body.exile-temple-body {
 .lf-check-pill {
   padding: 9px 12px;
   border-radius: 10px;
-  background: rgba(12, 10, 8, 0.78);
-  border: 1px solid rgba(212, 175, 106, 0.22);
+  background: var(--dp-surface-row);
+  border: 1px solid var(--dp-border-subtle);
   font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  transition: border-color var(--dp-dur-fast) var(--dp-ease-apple), color var(--dp-dur-fast) var(--dp-ease-apple);
 }
 
 .lf-check-pill.is-ok {
-  border-color: rgba(34, 197, 94, 0.55);
-  color: #86efac;
+  border-color: var(--dp-emerald);
+  color: var(--dp-emerald);
 }
 
 .lf-check-pill.is-warn {
-  border-color: rgba(239, 68, 68, 0.55);
-  color: #fca5a5;
+  border-color: var(--dp-crimson);
+  color: var(--dp-crimson-bright);
 }
 
 .lf-solved-banner {
   padding: 13px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(20, 52, 32, 0.85), rgba(14, 28, 19, 0.92));
-  border: 1.5px solid rgba(74, 222, 128, 0.6);
-  color: #bbf7d0;
+  background: var(--lf-solved-bg);
+  border: 1.5px solid var(--dp-emerald);
+  color: var(--lf-solved-ink);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lf-torch-dot,
+  .lf-tablet.is-solved .lf-edge-fence {
+    animation: none;
+  }
 }
 
 @media (max-width: 880px) {

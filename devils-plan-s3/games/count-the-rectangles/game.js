@@ -1,4 +1,4 @@
-import { mountGame, SFX, UI } from '../../shared/sdk.js';
+import { mountGame, SFX, UI, Motion } from '../../shared/sdk.js';
 import { GameRules } from './rules.js';
 
 const uiState = {
@@ -6,16 +6,15 @@ const uiState = {
   lastRound: 0,
   lastPhase: '',
   lastEvSig: '',
-  // Personal drag scratchpad (during playing)
   dragStart: null,
   dragEnd: null,
-  markedBoxes: [], // array of "r1,c1,r2,c2"
-  // Animated verification playback (during reveal)
+  markedBoxes: [],
   solIndex: 0,
   autoPlay: true,
   playTimer: null,
   tickTimer: null,
   lastCtx: null,
+  delegated: false,
 };
 
 function policyBadge(policy, size, lang) {
@@ -28,26 +27,34 @@ function policyBadge(policy, size, lang) {
   return lang === 'zh' ? `独食方案 (${split})` : `MONOPOLY (${split})`;
 }
 
-function positionLaserOverlay(gridEl, laserEl, box) {
-  if (!gridEl || !laserEl || !box) {
-    if (laserEl) laserEl.hidden = true;
+/**
+ * Pure GPU-composited SVG transform positioning (translate3d + scale on <g>, zero layout thrash!).
+ */
+function positionLaserOverlay(gridEl, laserGroup, box, isDrag = false) {
+  if (!gridEl || !laserGroup) return;
+  if (!box) {
+    laserGroup.style.opacity = '0';
     return;
   }
   const a = gridEl.querySelector(`[data-rc="${box.r1}-${box.c1}"]`);
   const b = gridEl.querySelector(`[data-rc="${box.r2}-${box.c2}"]`);
   if (!a || !b) {
-    laserEl.hidden = true;
+    laserGroup.style.opacity = '0';
     return;
   }
   const gr = gridEl.getBoundingClientRect();
   const ar = a.getBoundingClientRect();
   const br = b.getBoundingClientRect();
+  if (gr.width <= 0 || gr.height <= 0) return;
   const pad = 4;
-  laserEl.hidden = false;
-  laserEl.style.left = `${ar.left - gr.left - pad}px`;
-  laserEl.style.top = `${ar.top - gr.top - pad}px`;
-  laserEl.style.width = `${br.right - ar.left + pad * 2}px`;
-  laserEl.style.height = `${br.bottom - ar.top + pad * 2}px`;
+  const x = ar.left - gr.left - pad;
+  const y = ar.top - gr.top - pad;
+  const w = Math.max(1, br.right - ar.left + pad * 2);
+  const h = Math.max(1, br.bottom - ar.top + pad * 2);
+
+  laserGroup.classList.toggle('is-drag-box', isDrag);
+  laserGroup.style.opacity = '1';
+  laserGroup.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${w.toFixed(1)}, ${h.toFixed(1)})`;
 }
 
 mountGame({
@@ -133,16 +140,253 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
     }
 
     const evSig = lastEvent ? JSON.stringify(lastEvent) : '';
+    let shouldShake = false;
     if (evSig && evSig !== uiState.lastEvSig) {
       uiState.lastEvSig = evSig;
       if (lastEvent.type === 'SOLVED' && lastEvent.seatId === mySeatId) sfx.play('pieceGain');
-      if (lastEvent.type === 'LOCKOUT' && lastEvent.seatId === mySeatId) sfx.play('eliminate');
+      if (lastEvent.type === 'LOCKOUT' && lastEvent.seatId === mySeatId) {
+        sfx.play('eliminate');
+        shouldShake = true;
+      }
     }
 
     clearInterval(uiState.playTimer);
     clearInterval(uiState.tickTimer);
 
     const nameOf = (sid) => state.seats.find((s) => s.seatId === sid)?.name || sid;
+
+    const jumpToSolution = (idx) => {
+      const c = uiState.lastCtx;
+      if (!c) return;
+      const sols = Array.isArray(c.state.puzzle?.solutions) ? c.state.puzzle.solutions : [];
+      if (!sols.length) return;
+      uiState.solIndex = ((idx % sols.length) + sols.length) % sols.length;
+      const s = sols[uiState.solIndex];
+      const gridEl = container.querySelector('#ctr-grid');
+      const laserG = container.querySelector('#ctr-laser-g');
+      if (gridEl) {
+        gridEl.querySelectorAll('.ctr-cell').forEach((cell) => {
+          const r = Number(cell.dataset.r);
+          const col = Number(cell.dataset.c);
+          cell.classList.toggle('is-sol', r >= s.r1 && r <= s.r2 && col >= s.c1 && col <= s.c2);
+        });
+        positionLaserOverlay(gridEl, laserG, s, false);
+      }
+      const eq = container.querySelector('#ctr-eq-line');
+      if (eq) eq.textContent = `#${s.id}/${sols.length} · (${s.r1 + 1},${s.c1 + 1})→(${s.r2 + 1},${s.c2 + 1}) : ${s.values.join(' + ')} = ${s.sum} ✓`;
+      container.querySelectorAll('[data-sol-idx]').forEach((p) => {
+        p.classList.toggle('is-active', Number(p.dataset.solIdx) === uiState.solIndex);
+      });
+    };
+
+    // Bind delegated event listeners ONCE on container
+    if (!uiState.delegated) {
+      uiState.delegated = true;
+
+      const syncDisplay = () => {
+        const c = uiState.lastCtx;
+        if (!c) return;
+        const myT = c.mySeatId ? c.state.teams.find((t) => t.members.includes(c.mySeatId)) : null;
+        const myTs = myT ? c.state.teamStates[myT.teamId] : null;
+        const el = container.querySelector('#ctr-display-num');
+        if (el) el.textContent = uiState.inputVal || '—';
+        const sub = container.querySelector('#ctr-submit');
+        if (sub) sub.disabled = !uiState.inputVal || (myTs && myTs.lockedUntil > Date.now());
+      };
+
+      const doSubmit = async () => {
+        const c = uiState.lastCtx;
+        if (!c || !uiState.inputVal) return;
+        const g = Number(uiState.inputVal);
+        uiState.inputVal = '';
+        syncDisplay();
+        c.sfx.play('bid');
+        const res = await c.dispatch({ type: 'SUBMIT_GUESS', payload: { guess: g } });
+        if (!res.ok) {
+          Motion.shake(container.querySelector('#ctr-terminal'));
+          if (res.reason) UI.toast(res.reason, 'error');
+        }
+      };
+
+      // Setup actions
+      Motion.delegate(container, 'click', '[data-policy]', (e, btn) => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.lastCtx?.dispatch({ type: 'SET_CONTRACT', payload: { policy: btn.dataset.policy } });
+      }, 'ctr-policy');
+
+      Motion.delegate(container, 'click', '[data-join-team]', (e, btn) => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.lastCtx?.dispatch({ type: 'JOIN_TEAM', payload: { teamId: btn.dataset.joinTeam } });
+      }, 'ctr-join');
+
+      Motion.delegate(container, 'click', '#ctr-recruit-bot', () => {
+        uiState.lastCtx?.sfx.play('bid');
+        uiState.lastCtx?.dispatch({ type: 'RECRUIT_BOT' });
+      }, 'ctr-bot');
+
+      Motion.delegate(container, 'click', '#ctr-lock-setup', () => {
+        uiState.lastCtx?.sfx.play('reveal');
+        uiState.lastCtx?.dispatch({ type: 'LOCK_SETUP' });
+      }, 'ctr-lock');
+
+      // Keypad & hunt controls
+      Motion.delegate(container, 'click', '[data-key]', (e, btn) => {
+        uiState.lastCtx?.sfx.play('click');
+        const k = btn.dataset.key;
+        if (k === 'CLR') uiState.inputVal = '';
+        else if (k === '⌫') uiState.inputVal = uiState.inputVal.slice(0, -1);
+        else if (uiState.inputVal.length < 3) uiState.inputVal += k;
+        syncDisplay();
+      }, 'ctr-key');
+
+      Motion.delegate(container, 'click', '#ctr-submit', () => doSubmit(), 'ctr-sub');
+      Motion.delegate(container, 'click', '#ctr-giveup', () => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.lastCtx?.dispatch({ type: 'GIVE_UP' });
+      }, 'ctr-giveup');
+      Motion.delegate(container, 'click', '#ctr-next-round', () => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.lastCtx?.dispatch({ type: 'NEXT_ROUND' });
+      }, 'ctr-next');
+
+      Motion.delegate(container, 'click', '#ctr-clear-marks', () => {
+        uiState.markedBoxes = [];
+        uiState.lastCtx?.sfx.play('click');
+        const barStrong = container.querySelector('.ctr-scratch-bar strong');
+        if (barStrong) barStrong.textContent = '0';
+      }, 'ctr-clr-marks');
+
+      // Reveal playback
+      Motion.delegate(container, 'click', '#ctr-sol-prev', () => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.autoPlay = false;
+        clearInterval(uiState.playTimer);
+        const pb = container.querySelector('#ctr-sol-play');
+        if (pb) pb.textContent = '▶';
+        jumpToSolution(uiState.solIndex - 1);
+      }, 'ctr-prev');
+
+      Motion.delegate(container, 'click', '#ctr-sol-next', () => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.autoPlay = false;
+        clearInterval(uiState.playTimer);
+        const pb = container.querySelector('#ctr-sol-play');
+        if (pb) pb.textContent = '▶';
+        jumpToSolution(uiState.solIndex + 1);
+      }, 'ctr-nxt');
+
+      Motion.delegate(container, 'click', '#ctr-sol-play', (e, pb) => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.autoPlay = !uiState.autoPlay;
+        pb.textContent = uiState.autoPlay ? '❚❚' : '▶';
+        clearInterval(uiState.playTimer);
+        if (uiState.autoPlay) {
+          uiState.playTimer = setInterval(() => jumpToSolution(uiState.solIndex + 1), 1350);
+        }
+      }, 'ctr-play');
+
+      Motion.delegate(container, 'click', '[data-sol-idx]', (e, btn) => {
+        uiState.lastCtx?.sfx.play('click');
+        uiState.autoPlay = false;
+        clearInterval(uiState.playTimer);
+        const pb = container.querySelector('#ctr-sol-play');
+        if (pb) pb.textContent = '▶';
+        jumpToSolution(Number(btn.dataset.solIdx));
+      }, 'ctr-sol-pill');
+
+      // Interactive drag-to-mark scratchpad (zero layout thrash via SVG transform)
+      const updateDragVisual = () => {
+        const gridEl = container.querySelector('#ctr-grid');
+        const laserG = container.querySelector('#ctr-laser-g');
+        if (!gridEl) return;
+        if (!uiState.dragStart || !uiState.dragEnd) {
+          gridEl.querySelectorAll('.ctr-cell').forEach((el) => el.classList.remove('is-drag'));
+          positionLaserOverlay(gridEl, laserG, null, true);
+          return;
+        }
+        const box = {
+          r1: Math.min(uiState.dragStart.r, uiState.dragEnd.r),
+          c1: Math.min(uiState.dragStart.c, uiState.dragEnd.c),
+          r2: Math.max(uiState.dragStart.r, uiState.dragEnd.r),
+          c2: Math.max(uiState.dragStart.c, uiState.dragEnd.c),
+        };
+        gridEl.querySelectorAll('.ctr-cell').forEach((el) => {
+          const r = Number(el.dataset.r);
+          const c = Number(el.dataset.c);
+          el.classList.toggle('is-drag', r >= box.r1 && r <= box.r2 && c >= box.c1 && c <= box.c2);
+        });
+        positionLaserOverlay(gridEl, laserG, box, true);
+      };
+
+      const cellFromEvent = (e) => {
+        const el = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.ctr-cell');
+        if (!el) return null;
+        return { r: Number(el.dataset.r), c: Number(el.dataset.c) };
+      };
+
+      const finishDrag = () => {
+        if (!uiState.dragStart || !uiState.dragEnd) return;
+        const key = [
+          Math.min(uiState.dragStart.r, uiState.dragEnd.r),
+          Math.min(uiState.dragStart.c, uiState.dragEnd.c),
+          Math.max(uiState.dragStart.r, uiState.dragEnd.r),
+          Math.max(uiState.dragStart.c, uiState.dragEnd.c),
+        ].join(',');
+        const idx = uiState.markedBoxes.indexOf(key);
+        if (idx === -1) uiState.markedBoxes.push(key);
+        else uiState.markedBoxes.splice(idx, 1);
+        uiState.lastCtx?.sfx.play('click');
+        uiState.dragStart = null;
+        uiState.dragEnd = null;
+        updateDragVisual();
+        const barStrong = container.querySelector('.ctr-scratch-bar strong');
+        if (barStrong) barStrong.textContent = String(uiState.markedBoxes.length);
+      };
+
+      Motion.delegate(container, 'pointerdown', '#ctr-grid', (e) => {
+        if (uiState.lastCtx?.state.phase !== 'playing') return;
+        const cell = cellFromEvent(e);
+        if (!cell) return;
+        uiState.dragStart = cell;
+        uiState.dragEnd = cell;
+        updateDragVisual();
+      }, 'ctr-g-pd');
+
+      Motion.delegate(container, 'pointermove', '#ctr-grid', (e) => {
+        if (!uiState.dragStart || uiState.lastCtx?.state.phase !== 'playing') return;
+        const cell = cellFromEvent(e);
+        if (cell) {
+          uiState.dragEnd = cell;
+          updateDragVisual();
+        }
+      }, 'ctr-g-pm');
+
+      Motion.delegate(container, 'pointerup', '#ctr-grid', () => finishDrag(), 'ctr-g-pu');
+      Motion.delegate(container, 'pointerleave', '#ctr-grid', () => {
+        if (uiState.dragStart) finishDrag();
+      }, 'ctr-g-pl');
+
+      if (window._ctrKeyHandler) window.removeEventListener('keydown', window._ctrKeyHandler);
+      window._ctrKeyHandler = (e) => {
+        const c = uiState.lastCtx;
+        if (!c) return;
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        const myT = c.mySeatId ? c.state.teams.find((t) => t.members.includes(c.mySeatId)) : null;
+        const myTs = myT ? c.state.teamStates[myT.teamId] : null;
+        if (c.state.phase !== 'playing' || !myTs || myTs.solvedAt || myTs.lockedUntil > Date.now()) return;
+        if (e.key >= '0' && e.key <= '9' && uiState.inputVal.length < 3) {
+          uiState.inputVal += e.key;
+          c.sfx.play('click');
+          syncDisplay();
+        } else if (e.key === 'Backspace') {
+          uiState.inputVal = uiState.inputVal.slice(0, -1);
+          syncDisplay();
+        } else if (e.key === 'Enter' && uiState.inputVal) {
+          doSubmit();
+        }
+      };
+      window.addEventListener('keydown', window._ctrKeyHandler);
+    }
 
     // -----------------------------------------------------------------------
     // PHASE 1: ALLIANCE & 7-POINT SPLIT SETUP
@@ -153,11 +397,11 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
       const assignedIds = new Set(state.teams.flatMap((t) => t.members));
       const freeBots = state.seats.filter((s) => s.isBot && !assignedIds.has(s.seatId));
 
-      container.innerHTML = `
-        <div class="ctr-alliance-wrap">
+      const html = `
+        <div class="ctr-alliance-wrap" data-motion-key="ctr-setup-root">
           <div class="ctr-alliance-hero">
             <div>
-              <span class="dp-badge">${lang === 'zh' ? `第 ${state.round}/${state.totalRounds} 轮 · 赛前组队` : `ROUND ${state.round}/${state.totalRounds} · ALLIANCE SETUP`}</span>
+              <span class="dp-badge dp-tabular">${lang === 'zh' ? `第 ${state.round}/${state.totalRounds} 轮 · 赛前组队` : `ROUND ${state.round}/${state.totalRounds} · ALLIANCE SETUP`}</span>
               <h2 style="font-family:var(--dp-font-display);margin:8px 0 4px;font-size:24px;color:var(--dp-brass-bright);">
                 ${lang === 'zh' ? '选择 7 分胜利契约：单打独斗，还是结盟分赃？' : 'Choose Your 7-Point Contract: Solo, Monopoly, or Devotion'}
               </h2>
@@ -178,7 +422,7 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
             mySeatId
               ? `
                 <div class="ctr-contract-grid">
-                  <button type="button" class="ctr-contract-card ${myTeam?.policy === 'solo' ? 'is-selected' : ''}" data-policy="solo" style="text-align:left;">
+                  <button type="button" class="ctr-contract-card ${myTeam?.policy === 'solo' ? 'is-selected' : ''}" data-motion-key="ctr-pol-solo" data-policy="solo" style="text-align:left;">
                     <strong style="color:var(--dp-brass-bright);font-size:16px;">${lang === 'zh' ? '单人独享 · SOLO' : 'SOLO CONTRACT'}</strong>
                     <div class="ctr-split-visual"><span class="ctr-split-chip">+7 PTS</span></div>
                     <span style="font-size:12.5px;color:var(--dp-ink-muted);">
@@ -186,10 +430,10 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                     </span>
                   </button>
 
-                  <button type="button" class="ctr-contract-card ${myTeam?.policy === 'monopoly' ? 'is-selected' : ''}" data-policy="monopoly" style="text-align:left;">
-                    <strong style="color:#ff8e99;font-size:16px;">${lang === 'zh' ? '独食方案 · MONOPOLY' : 'MONOPOLY SQUAD'}</strong>
+                  <button type="button" class="ctr-contract-card ${myTeam?.policy === 'monopoly' ? 'is-selected' : ''}" data-motion-key="ctr-pol-mono" data-policy="monopoly" style="text-align:left;">
+                    <strong style="color:var(--dp-crimson-bright);font-size:16px;">${lang === 'zh' ? '独食方案 · MONOPOLY' : 'MONOPOLY SQUAD'}</strong>
                     <div class="ctr-split-visual">
-                      <span class="ctr-split-chip" style="border-color:rgba(220,53,69,0.5);color:#ffb3bc;">★ 5</span>
+                      <span class="ctr-split-chip" style="border-color:var(--dp-crimson);color:var(--dp-crimson-bright);">★ 5</span>
                       <span class="ctr-split-chip">1</span>
                       <span class="ctr-split-chip">1</span>
                     </div>
@@ -198,12 +442,12 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                     </span>
                   </button>
 
-                  <button type="button" class="ctr-contract-card ${myTeam?.policy === 'devotion' ? 'is-selected' : ''}" data-policy="devotion" style="text-align:left;">
-                    <strong style="color:#86efac;font-size:16px;">${lang === 'zh' ? '奉献方案 · DEVOTION' : 'DEVOTION SQUAD'}</strong>
+                  <button type="button" class="ctr-contract-card ${myTeam?.policy === 'devotion' ? 'is-selected' : ''}" data-motion-key="ctr-pol-dev" data-policy="devotion" style="text-align:left;">
+                    <strong style="color:var(--dp-emerald);font-size:16px;">${lang === 'zh' ? '奉献方案 · DEVOTION' : 'DEVOTION SQUAD'}</strong>
                     <div class="ctr-split-visual">
                       <span class="ctr-split-chip">★ 1</span>
-                      <span class="ctr-split-chip" style="border-color:rgba(34,197,94,0.5);color:#86efac;">3</span>
-                      <span class="ctr-split-chip" style="border-color:rgba(34,197,94,0.5);color:#86efac;">3</span>
+                      <span class="ctr-split-chip" style="border-color:var(--dp-emerald);color:var(--dp-emerald);">3</span>
+                      <span class="ctr-split-chip" style="border-color:var(--dp-emerald);color:var(--dp-emerald);">3</span>
                     </div>
                     <span style="font-size:12.5px;color:var(--dp-ink-muted);">
                       ${lang === 'zh' ? '队长仅拿 1 分，将 3/3 高分让给盟友（吴贤旻名场面！）。' : 'Captain takes 1 pt, gifting 3 pts each to allies!'}
@@ -233,10 +477,10 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                 const isMine = myTeam?.teamId === t.teamId;
                 const canJoin = mySeatId && !isMine && t.policy !== 'solo' && t.members.length < 3;
                 return `
-                  <div class="ctr-squad-card ${isMine ? 'is-mine' : ''}">
+                  <div class="ctr-squad-card ${isMine ? 'is-mine' : ''}" data-motion-key="ctr-sq-${UI.escapeHtml(t.teamId)}">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                       <strong style="font-size:13px;color:var(--dp-brass-bright);">${UI.escapeHtml(policyBadge(t.policy, Math.max(t.members.length, t.policy === 'solo' ? 1 : 3), lang))}</strong>
-                      <span style="font-family:var(--dp-font-mono);font-size:11px;color:var(--dp-ink-muted);">${t.members.length}/3</span>
+                      <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:11px;color:var(--dp-ink-muted);">${t.members.length}/3</span>
                     </div>
                     <div style="font-size:13px;color:var(--dp-ink);">
                       ${t.members.map((id, i) => `${i === 0 ? '★ ' : ''}${UI.escapeHtml(nameOf(id))}`).join(' · ')}
@@ -254,26 +498,7 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
         </div>
       `;
 
-      container.querySelectorAll('[data-policy]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          sfx.play('click');
-          dispatch({ type: 'SET_CONTRACT', payload: { policy: btn.dataset.policy } });
-        });
-      });
-      container.querySelectorAll('[data-join-team]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          sfx.play('click');
-          dispatch({ type: 'JOIN_TEAM', payload: { teamId: btn.dataset.joinTeam } });
-        });
-      });
-      container.querySelector('#ctr-recruit-bot')?.addEventListener('click', () => {
-        sfx.play('bid');
-        dispatch({ type: 'RECRUIT_BOT' });
-      });
-      container.querySelector('#ctr-lock-setup')?.addEventListener('click', () => {
-        sfx.play('reveal');
-        dispatch({ type: 'LOCK_SETUP' });
-      });
+      Motion.patchDOM(container, html);
       return;
     }
 
@@ -290,18 +515,18 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
     const sols = isReveal && Array.isArray(puzzle.solutions) ? puzzle.solutions : [];
     const activeSol = sols.length > 0 ? sols[uiState.solIndex % sols.length] : null;
 
-    container.innerHTML = `
-      <div class="ctr-layout">
-        <section class="ctr-matrix-panel">
+    const html = `
+      <div class="ctr-layout" data-motion-key="ctr-play-root">
+        <section class="ctr-matrix-panel" data-motion-key="ctr-matrix-panel">
           <div class="ctr-matrix-header">
             <div style="display:flex;align-items:center;gap:10px;">
-              <span class="dp-badge">${lang === 'zh' ? `第 ${state.round}/${state.totalRounds} 轮` : `ROUND ${state.round}/${state.totalRounds}`}</span>
-              <span style="font-size:12.5px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
+              <span class="dp-badge dp-tabular">${lang === 'zh' ? `第 ${state.round}/${state.totalRounds} 轮` : `ROUND ${state.round}/${state.totalRounds}`}</span>
+              <span class="dp-tabular" style="font-size:12.5px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
                 ${puzzle.size}×${puzzle.size} MATRIX
               </span>
             </div>
             <div class="ctr-target-hero">
-              <span style="font-size:11px;letter-spacing:0.12em;color:#fde68a;font-weight:700;">
+              <span style="font-size:11px;letter-spacing:0.12em;color:var(--dp-brass-bright);font-weight:700;">
                 ${lang === 'zh' ? '目标和 TARGET' : 'TARGET SUM'}
               </span>
               <span class="ctr-target-num">${puzzle.target}</span>
@@ -309,26 +534,30 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
           </div>
 
           <div class="ctr-grid-stage">
-            <div class="ctr-grid-frame" id="ctr-grid-frame">
+            <div class="ctr-grid-frame" id="ctr-grid-frame" data-motion-key="ctr-grid-frame">
               <div class="ctr-grid" id="ctr-grid" style="grid-template-columns:repeat(${puzzle.size},1fr);grid-template-rows:repeat(${puzzle.size},1fr);">
                 ${puzzle.grid
                   .map((row, r) =>
                     row
                       .map((val, c) => {
                         const inSol = activeSol && r >= activeSol.r1 && r <= activeSol.r2 && c >= activeSol.c1 && c <= activeSol.c2;
-                        return `<div class="ctr-cell ${inSol ? 'is-sol' : ''}" data-rc="${r}-${c}" data-r="${r}" data-c="${c}">${val}</div>`;
+                        return `<div class="ctr-cell ${inSol ? 'is-sol' : ''}" data-motion-key="ctr-cell-${r}-${c}" data-rc="${r}-${c}" data-r="${r}" data-c="${c}">${val}</div>`;
                       })
                       .join('')
                   )
                   .join('')}
-                <div class="ctr-rect-laser ${isReveal ? '' : 'is-drag-box'}" id="ctr-rect-laser" hidden></div>
+                <svg class="ctr-laser-svg" data-motion-key="ctr-laser-svg" aria-hidden="true">
+                  <g class="ctr-laser-group ${isReveal ? '' : 'is-drag-box'}" id="ctr-laser-g" data-motion-key="ctr-laser-g" style="opacity:0;">
+                    <rect class="ctr-laser-rect" x="0" y="0" width="1" height="1" rx="0.06" vector-effect="non-scaling-stroke" />
+                  </g>
+                </svg>
               </div>
             </div>
 
             ${
               !isReveal
                 ? `
-                  <div class="ctr-scratch-bar">
+                  <div class="ctr-scratch-bar" data-motion-key="ctr-scratch-bar">
                     <span>
                       ${lang === 'zh'
                         ? `拖拽框选可记录草稿矩形（不验算答案）· 已标记：<strong>${uiState.markedBoxes.length}</strong> 个`
@@ -340,7 +569,7 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                   </div>
                 `
                 : `
-                  <div class="ctr-verify-box">
+                  <div class="ctr-verify-box" data-motion-key="ctr-verify-box">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
                       <strong style="color:var(--dp-brass-bright);font-size:13.5px;">
                         ${lang === 'zh'
@@ -365,7 +594,7 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                       ${sols
                         .map(
                           (s, i) =>
-                            `<button type="button" class="ctr-sol-pill ${i === uiState.solIndex % sols.length ? 'is-active' : ''}" data-sol-idx="${i}">#${s.id}</button>`
+                            `<button type="button" class="ctr-sol-pill ${i === uiState.solIndex % sols.length ? 'is-active' : ''}" data-motion-key="ctr-sp-${s.id}" data-sol-idx="${i}">#${s.id}</button>`
                         )
                         .join('')}
                     </div>
@@ -375,13 +604,13 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
           </div>
         </section>
 
-        <aside class="ctr-side-stack">
-          <div class="ctr-terminal">
+        <aside class="ctr-side-stack" data-motion-key="ctr-side-stack">
+          <div class="ctr-terminal" id="ctr-terminal" data-motion-key="ctr-terminal">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
               <span style="font-size:11px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;">
                 ${myTeam ? UI.escapeHtml(policyBadge(myTeam.policy, myTeam.members.length, lang)) : (lang === 'zh' ? '观战终端' : 'SPECTATOR')}
               </span>
-              <span style="font-size:11.5px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
+              <span class="dp-tabular" style="font-size:11.5px;color:var(--dp-ink-muted);font-family:var(--dp-font-mono);">
                 ${myTs ? (lang === 'zh' ? `错 ${myTs.wrongAttempts}` : `Miss: ${myTs.wrongAttempts}`) : ''}
               </span>
             </div>
@@ -389,11 +618,11 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
             ${
               isReveal
                 ? `
-                  <div style="text-align:center;padding:12px 4px;">
+                  <div style="text-align:center;padding:12px 4px;" data-motion-key="ctr-term-rev">
                     <div style="font-size:11.5px;letter-spacing:0.12em;color:var(--dp-brass);font-weight:700;">
                       ${lang === 'zh' ? '精确矩形总数' : 'EXACT RECTANGLE COUNT'}
                     </div>
-                    <div style="font-family:var(--dp-font-mono);font-size:48px;font-weight:800;color:#fde68a;line-height:1.1;margin:4px 0 12px;">
+                    <div class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:48px;font-weight:800;color:var(--dp-brass-bright);line-height:1.1;margin:4px 0 12px;">
                       ${puzzle.totalRects}
                     </div>
                     ${
@@ -411,29 +640,31 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                 ? `<p style="color:var(--dp-ink-muted);text-align:center;font-size:13px;">${lang === 'zh' ? '观战进行中...' : 'Spectating live hunt...'}</p>`
                 : myTs.solvedAt
                 ? `
-                  <div style="text-align:center;padding:14px;border-radius:12px;border:1px solid rgba(34,197,94,0.5);background:rgba(34,197,94,0.12);">
-                    <div style="color:#86efac;font-weight:700;font-size:12px;letter-spacing:0.1em;">✓ ${lang === 'zh' ? '命中精确数量！' : 'EXACT COUNT LOCKED!'}</div>
-                    <div style="font-family:var(--dp-font-mono);font-size:30px;font-weight:800;color:#fff;margin:6px 0;">
+                  <div style="text-align:center;padding:14px;border-radius:12px;border:1px solid var(--dp-emerald);background:rgba(34,197,94,0.12);" data-motion-key="ctr-term-solved">
+                    <div style="color:var(--dp-emerald);font-weight:700;font-size:12px;letter-spacing:0.1em;">✓ ${lang === 'zh' ? '命中精确数量！' : 'EXACT COUNT LOCKED!'}</div>
+                    <div class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:30px;font-weight:800;color:var(--dp-ink);margin:6px 0;">
                       #${state.teamSolvedOrder.indexOf(myTeam.teamId) + 1} · ${(myTs.solveTimeMs / 1000).toFixed(1)}s
                     </div>
                   </div>
                 `
                 : `
-                  <div class="ctr-display">
-                    <span style="font-size:11px;color:var(--dp-ink-faint);letter-spacing:0.08em;">RECTS</span>
-                    <span class="ctr-display-num" id="ctr-display-num">${uiState.inputVal || '—'}</span>
-                  </div>
-                  <div class="ctr-keypad">
-                    ${['1', '2', '3', '4', '5', '6', '7', '8', '9', 'CLR', '0', '⌫']
-                      .map((k) => `<button type="button" class="ctr-key" data-key="${k}" ${lockRem > 0 ? 'disabled' : ''}>${k}</button>`)
-                      .join('')}
-                  </div>
-                  <button type="button" class="dp-btn dp-btn-primary" id="ctr-submit" style="width:100%;margin-top:10px;min-height:46px;" ${lockRem > 0 || !uiState.inputVal ? 'disabled' : ''}>
-                    ${lang === 'zh' ? '提交矩形总数' : 'SUBMIT COUNT'}
-                  </button>
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-                    <span style="font-size:11.5px;color:var(--dp-ink-faint);">${lang === 'zh' ? '答错将锁定 20 秒' : '20s lockout on error'}</span>
-                    <button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" id="ctr-giveup">${lang === 'zh' ? '直接揭晓' : 'Reveal'}</button>
+                  <div data-motion-key="ctr-term-input">
+                    <div class="ctr-display">
+                      <span style="font-size:11px;color:var(--dp-ink-faint);letter-spacing:0.08em;">RECTS</span>
+                      <span class="ctr-display-num" id="ctr-display-num">${uiState.inputVal || '—'}</span>
+                    </div>
+                    <div class="ctr-keypad">
+                      ${['1', '2', '3', '4', '5', '6', '7', '8', '9', 'CLR', '0', '⌫']
+                        .map((k) => `<button type="button" class="ctr-key" data-key="${k}" ${lockRem > 0 ? 'disabled' : ''}>${k}</button>`)
+                        .join('')}
+                    </div>
+                    <button type="button" class="dp-btn dp-btn-primary" id="ctr-submit" style="width:100%;margin-top:10px;min-height:46px;" ${lockRem > 0 || !uiState.inputVal ? 'disabled' : ''}>
+                      ${lang === 'zh' ? '提交矩形总数' : 'SUBMIT COUNT'}
+                    </button>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                      <span style="font-size:11.5px;color:var(--dp-ink-faint);">${lang === 'zh' ? '答错将锁定 20 秒' : '20s lockout on error'}</span>
+                      <button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" id="ctr-giveup">${lang === 'zh' ? '直接揭晓' : 'Reveal'}</button>
+                    </div>
                   </div>
                 `
             }
@@ -441,9 +672,9 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
             ${
               lockRem > 0 && !isReveal && myTs && !myTs.solvedAt
                 ? `
-                  <div class="ctr-lockout" id="ctr-lockout">
+                  <div class="ctr-lockout" id="ctr-lockout" data-motion-key="ctr-lockout">
                     <div style="font-size:11px;letter-spacing:0.15em;color:#ff9ca6;font-weight:800;margin-bottom:8px;">⚠ ${lang === 'zh' ? '回答错误 · 20秒锁定' : 'WRONG COUNT · LOCKED'}</div>
-                    <div style="font-family:var(--dp-font-mono);font-size:44px;font-weight:800;color:#fff;" id="ctr-lockout-sec">${(lockRem / 1000).toFixed(1)}s</div>
+                    <div class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:44px;font-weight:800;color:#fff;" id="ctr-lockout-sec">${(lockRem / 1000).toFixed(1)}s</div>
                     <div style="font-size:12px;color:#ffd0d5;margin-top:8px;">${lang === 'zh' ? `上次提交 ${myTs.lastGuess} 不正确` : `Last guess (${myTs.lastGuess}) was incorrect`}</div>
                   </div>
                 `
@@ -451,7 +682,7 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
             }
           </div>
 
-          <div style="border-radius:var(--dp-radius-lg);border:1px solid var(--dp-border);background:rgba(14,17,26,0.86);padding:14px 16px;">
+          <div class="ctr-standings-card" data-motion-key="ctr-standings-card">
             <div style="font-size:11.5px;letter-spacing:0.1em;color:var(--dp-brass);font-weight:700;margin-bottom:10px;">
               ${lang === 'zh' ? '阵营战况与总分榜' : 'SQUAD STATUS & STANDINGS'}
             </div>
@@ -463,10 +694,10 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                   const locked = ts && ts.lockedUntil > now && !ts.solvedAt;
                   const rankIdx = state.teamSolvedOrder.indexOf(t.teamId);
                   return `
-                    <div style="padding:9px 11px;border-radius:10px;border:1px solid ${ts?.solvedAt ? 'rgba(34,197,94,0.48)' : isMine ? 'var(--dp-border-strong)' : 'var(--dp-border-subtle)'};background:${ts?.solvedAt ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.025)'};">
+                    <div class="ctr-team-row ${ts?.solvedAt ? 'is-solved' : isMine ? 'is-mine' : ''}" data-motion-key="ctr-tr-${UI.escapeHtml(t.teamId)}">
                       <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
                         <strong style="color:var(--dp-brass-bright);">${UI.escapeHtml(policyBadge(t.policy, t.members.length, lang))}</strong>
-                        <span style="font-family:var(--dp-font-mono);font-size:11px;color:${ts?.solvedAt ? '#86efac' : locked ? '#ff9ca6' : 'var(--dp-ink-muted)'};">
+                        <span class="dp-tabular" style="font-family:var(--dp-font-mono);font-size:11px;color:${ts?.solvedAt ? 'var(--dp-emerald)' : locked ? 'var(--dp-crimson-bright)' : 'var(--dp-ink-muted)'};">
                           ${ts?.solvedAt ? `#${rankIdx + 1} · ${(ts.solveTimeMs / 1000).toFixed(1)}s` : locked ? `LOCK ${Math.ceil((ts.lockedUntil - now) / 1000)}s` : (lang === 'zh' ? '搜索中' : 'HUNTING')}
                         </span>
                       </div>
@@ -474,7 +705,7 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
                         ${t.members
                           .map((id) => {
                             const gained = ts?.payouts?.[id];
-                            return `<span>${UI.escapeHtml(nameOf(id))} <strong style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${state.scores[id] || 0}pt${gained ? ` (+${gained})` : ''}</strong></span>`;
+                            return `<span>${UI.escapeHtml(nameOf(id))} <strong class="dp-tabular" style="color:var(--dp-brass-bright);font-family:var(--dp-font-mono);">${state.scores[id] || 0}pt${gained ? ` (+${gained})` : ''}</strong></span>`;
                           })
                           .join(' · ')}
                       </div>
@@ -488,195 +719,21 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
       </div>
     `;
 
+    Motion.patchDOM(container, html);
+
+    if (shouldShake) {
+      Motion.shake(container.querySelector('#ctr-terminal'));
+    }
+
     const gridEl = container.querySelector('#ctr-grid');
-    const laserEl = container.querySelector('#ctr-rect-laser');
+    const laserG = container.querySelector('#ctr-laser-g');
 
-    // Reveal mode: position golden laser & bind playback
     if (isReveal && activeSol) {
-      requestAnimationFrame(() => positionLaserOverlay(gridEl, laserEl, activeSol));
-
-      const jumpTo = (idx) => {
-        if (!sols.length) return;
-        uiState.solIndex = ((idx % sols.length) + sols.length) % sols.length;
-        const s = sols[uiState.solIndex];
-        gridEl.querySelectorAll('.ctr-cell').forEach((cell) => {
-          const r = Number(cell.dataset.r);
-          const c = Number(cell.dataset.c);
-          cell.classList.toggle('is-sol', r >= s.r1 && r <= s.r2 && c >= s.c1 && c <= s.c2);
-        });
-        positionLaserOverlay(gridEl, laserEl, s);
-        const eq = container.querySelector('#ctr-eq-line');
-        if (eq) eq.textContent = `#${s.id}/${sols.length} · (${s.r1 + 1},${s.c1 + 1})→(${s.r2 + 1},${s.c2 + 1}) : ${s.values.join(' + ')} = ${s.sum} ✓`;
-        container.querySelectorAll('[data-sol-idx]').forEach((p) => {
-          p.classList.toggle('is-active', Number(p.dataset.solIdx) === uiState.solIndex);
-        });
-      };
-
-      container.querySelector('#ctr-sol-prev')?.addEventListener('click', () => {
-        sfx.play('click');
-        uiState.autoPlay = false;
-        clearInterval(uiState.playTimer);
-        jumpTo(uiState.solIndex - 1);
-      });
-      container.querySelector('#ctr-sol-next')?.addEventListener('click', () => {
-        sfx.play('click');
-        uiState.autoPlay = false;
-        clearInterval(uiState.playTimer);
-        jumpTo(uiState.solIndex + 1);
-      });
-      container.querySelector('#ctr-sol-play')?.addEventListener('click', (e) => {
-        sfx.play('click');
-        uiState.autoPlay = !uiState.autoPlay;
-        e.currentTarget.textContent = uiState.autoPlay ? '❚❚' : '▶';
-        clearInterval(uiState.playTimer);
-        if (uiState.autoPlay) {
-          uiState.playTimer = setInterval(() => jumpTo(uiState.solIndex + 1), 1350);
-        }
-      });
-      container.querySelectorAll('[data-sol-idx]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          sfx.play('click');
-          uiState.autoPlay = false;
-          clearInterval(uiState.playTimer);
-          const pb = container.querySelector('#ctr-sol-play');
-          if (pb) pb.textContent = '▶';
-          jumpTo(Number(btn.dataset.solIdx));
-        });
-      });
-
+      requestAnimationFrame(() => positionLaserOverlay(gridEl, laserG, activeSol, false));
       if (uiState.autoPlay && sols.length > 1) {
-        uiState.playTimer = setInterval(() => jumpTo(uiState.solIndex + 1), 1350);
+        uiState.playTimer = setInterval(() => jumpToSolution(uiState.solIndex + 1), 1350);
       }
     }
-
-    // Playing mode: interactive drag-to-mark scratchpad
-    if (!isReveal && gridEl) {
-      const updateDragVisual = () => {
-        if (!uiState.dragStart || !uiState.dragEnd) {
-          gridEl.querySelectorAll('.ctr-cell').forEach((el) => el.classList.remove('is-drag'));
-          if (laserEl) laserEl.hidden = true;
-          return;
-        }
-        const box = {
-          r1: Math.min(uiState.dragStart.r, uiState.dragEnd.r),
-          c1: Math.min(uiState.dragStart.c, uiState.dragEnd.c),
-          r2: Math.max(uiState.dragStart.r, uiState.dragEnd.r),
-          c2: Math.max(uiState.dragStart.c, uiState.dragEnd.c),
-        };
-        gridEl.querySelectorAll('.ctr-cell').forEach((el) => {
-          const r = Number(el.dataset.r);
-          const c = Number(el.dataset.c);
-          el.classList.toggle('is-drag', r >= box.r1 && r <= box.r2 && c >= box.c1 && c <= box.c2);
-        });
-        positionLaserOverlay(gridEl, laserEl, box);
-      };
-
-      const cellFromEvent = (e) => {
-        const el = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.ctr-cell');
-        if (!el) return null;
-        return { r: Number(el.dataset.r), c: Number(el.dataset.c) };
-      };
-
-      gridEl.addEventListener('pointerdown', (e) => {
-        const cell = cellFromEvent(e);
-        if (!cell) return;
-        uiState.dragStart = cell;
-        uiState.dragEnd = cell;
-        updateDragVisual();
-      });
-      gridEl.addEventListener('pointermove', (e) => {
-        if (!uiState.dragStart) return;
-        const cell = cellFromEvent(e);
-        if (cell) {
-          uiState.dragEnd = cell;
-          updateDragVisual();
-        }
-      });
-      const finishDrag = () => {
-        if (!uiState.dragStart || !uiState.dragEnd) return;
-        const key = [
-          Math.min(uiState.dragStart.r, uiState.dragEnd.r),
-          Math.min(uiState.dragStart.c, uiState.dragEnd.c),
-          Math.max(uiState.dragStart.r, uiState.dragEnd.r),
-          Math.max(uiState.dragStart.c, uiState.dragEnd.c),
-        ].join(',');
-        const idx = uiState.markedBoxes.indexOf(key);
-        if (idx === -1) uiState.markedBoxes.push(key);
-        else uiState.markedBoxes.splice(idx, 1);
-        sfx.play('click');
-        uiState.dragStart = null;
-        uiState.dragEnd = null;
-        updateDragVisual();
-        const barStrong = container.querySelector('.ctr-scratch-bar strong');
-        if (barStrong) barStrong.textContent = String(uiState.markedBoxes.length);
-      };
-      gridEl.addEventListener('pointerup', finishDrag);
-      gridEl.addEventListener('pointerleave', () => {
-        if (uiState.dragStart) finishDrag();
-      });
-
-      container.querySelector('#ctr-clear-marks')?.addEventListener('click', () => {
-        uiState.markedBoxes = [];
-        sfx.play('click');
-        const barStrong = container.querySelector('.ctr-scratch-bar strong');
-        if (barStrong) barStrong.textContent = '0';
-      });
-    }
-
-    // Keypad & Actions
-    const syncDisplay = () => {
-      const el = container.querySelector('#ctr-display-num');
-      if (el) el.textContent = uiState.inputVal || '—';
-      const sub = container.querySelector('#ctr-submit');
-      if (sub) sub.disabled = !uiState.inputVal || (myTs && myTs.lockedUntil > Date.now());
-    };
-
-    const doSubmit = async () => {
-      if (!uiState.inputVal) return;
-      const g = Number(uiState.inputVal);
-      uiState.inputVal = '';
-      sfx.play('bid');
-      const res = await dispatch({ type: 'SUBMIT_GUESS', payload: { guess: g } });
-      if (!res.ok && res.reason) UI.toast(res.reason, 'error');
-    };
-
-    container.querySelectorAll('[data-key]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        sfx.play('click');
-        const k = btn.dataset.key;
-        if (k === 'CLR') uiState.inputVal = '';
-        else if (k === '⌫') uiState.inputVal = uiState.inputVal.slice(0, -1);
-        else if (uiState.inputVal.length < 3) uiState.inputVal += k;
-        syncDisplay();
-      });
-    });
-
-    container.querySelector('#ctr-submit')?.addEventListener('click', doSubmit);
-    container.querySelector('#ctr-giveup')?.addEventListener('click', () => {
-      sfx.play('click');
-      dispatch({ type: 'GIVE_UP' });
-    });
-    container.querySelector('#ctr-next-round')?.addEventListener('click', () => {
-      sfx.play('click');
-      dispatch({ type: 'NEXT_ROUND' });
-    });
-
-    if (window._ctrKeyHandler) window.removeEventListener('keydown', window._ctrKeyHandler);
-    window._ctrKeyHandler = (e) => {
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (state.phase !== 'playing' || !myTs || myTs.solvedAt || myTs.lockedUntil > Date.now()) return;
-      if (e.key >= '0' && e.key <= '9' && uiState.inputVal.length < 3) {
-        uiState.inputVal += e.key;
-        sfx.play('click');
-        syncDisplay();
-      } else if (e.key === 'Backspace') {
-        uiState.inputVal = uiState.inputVal.slice(0, -1);
-        syncDisplay();
-      } else if (e.key === 'Enter' && uiState.inputVal) {
-        doSubmit();
-      }
-    };
-    window.addEventListener('keydown', window._ctrKeyHandler);
 
     let botTick = 0;
     uiState.tickTimer = setInterval(() => {
@@ -690,8 +747,8 @@ Find the **exact total number of axis-aligned sub-rectangles** (squares, rectang
         const rem = ts.lockedUntil - nowMs;
         if (rem > 0 && secEl) secEl.textContent = (rem / 1000).toFixed(1) + 's';
         else if (rem <= 0 && document.getElementById('ctr-lockout')) {
-          document.getElementById('ctr-lockout')?.remove();
-          document.querySelectorAll('.ctr-key').forEach((b) => (b.disabled = false));
+          Motion.exit(document.getElementById('ctr-lockout'), { variant: 'fade', remove: true, timeoutMs: 160 });
+          container.querySelectorAll('.ctr-key').forEach((b) => (b.disabled = false));
           const sub = document.getElementById('ctr-submit');
           if (sub) sub.disabled = !uiState.inputVal;
         }

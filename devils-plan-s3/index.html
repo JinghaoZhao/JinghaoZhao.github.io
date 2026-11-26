@@ -7,7 +7,7 @@
     <title>The Devil's Plan S3: Dead Again · 魔鬼的计谋3 在线联机游戏合集</title>
     <meta
       name="description"
-      content="Play every mind game from The Devil's Plan Season 3: Dead Again online with friends (P2P rooms), solo against smart AI, or local pass-and-play — directly in your browser."
+      content="Play all 19 mind games from The Devil's Plan Season 3: Dead Again online with friends (P2P rooms), solo against smart AI, or local pass-and-play — directly in your browser."
     />
     <link rel="canonical" href="https://zhaojinghao.com/devils-plan-s3/" />
     <link rel="icon" href="../images/favicon.svg" type="image/svg+xml" />
@@ -35,8 +35,9 @@
             <span class="dp-profile-pill-edit" aria-hidden="true">✎</span>
           </button>
           <button type="button" class="dp-btn dp-btn-sm dp-btn-ghost" id="hub-lang-btn">中 / EN</button>
-          <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="hub-amb-btn" title="Studio Ambience">〰</button>
-          <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="hub-mute-btn" title="Toggle Sound">🔊</button>
+          <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="hub-theme-btn" aria-label="Toggle Theme"></button>
+          <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="hub-amb-btn" aria-label="Studio Ambience"></button>
+          <button type="button" class="dp-btn dp-btn-icon dp-btn-ghost" id="hub-mute-btn" aria-label="Toggle Sound"></button>
         </div>
       </div>
     </header>
@@ -65,7 +66,6 @@
                 class="dp-input dp-input-mono"
                 id="hub-qj-code"
                 type="text"
-                maxlength="6"
                 placeholder="ROOM CODE"
                 aria-label="Room code"
               />
@@ -85,7 +85,14 @@
             <div class="hub-filters" id="hub-filters" role="tablist"></div>
           </div>
 
-          <div class="hub-grid" id="hub-grid" aria-live="polite"></div>
+          <div class="hub-grid" id="hub-grid" aria-live="polite">
+            <div class="hub-skeleton-card" aria-hidden="true"></div>
+            <div class="hub-skeleton-card" aria-hidden="true"></div>
+            <div class="hub-skeleton-card" aria-hidden="true"></div>
+            <div class="hub-skeleton-card" aria-hidden="true"></div>
+            <div class="hub-skeleton-card" aria-hidden="true"></div>
+            <div class="hub-skeleton-card" aria-hidden="true"></div>
+          </div>
         </div>
       </section>
     </main>

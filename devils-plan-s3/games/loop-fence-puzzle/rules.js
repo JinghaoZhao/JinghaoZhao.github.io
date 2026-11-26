@@ -253,8 +253,10 @@ export function generateSlitherlinkPuzzle(N, rng) {
         }
       }
       if (!cands.length) break;
-      // Pick weighted random candidate
-      const shuffled = shuffle(cands, rng).sort((a, b) => (rng() < 0.65 ? b.weight - a.weight : 0));
+      // Pick weighted random candidate deterministically (never call rng inside sort comparator!)
+      const shuffled = shuffle(cands, rng)
+        .map((c) => ({ ...c, _sk: (rng() < 0.65 ? c.weight : 1) + rng() * 0.5 }))
+        .sort((a, b) => b._sk - a._sk);
       let added = false;
       for (const cand of shuffled) {
         inside[cand.r][cand.c] = true;

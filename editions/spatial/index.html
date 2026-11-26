@@ -1388,15 +1388,56 @@
               </div>
             </article>
           </div>
-          <div
-            style="margin-top:26px;padding:24px 28px;border-radius:16px;background:radial-gradient(ellipse 80% 100% at 95% 0%,rgba(220,53,69,0.2),transparent 58%),linear-gradient(135deg,#0c0e15,#161b29);border:1px solid rgba(212,175,106,0.4);color:#f4f1ea;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;"
-          >
+          <style>
+            .dp-entry-card {
+              margin-top: 26px;
+              padding: 24px 28px;
+              border-radius: 16px;
+              background:
+                radial-gradient(ellipse 72% 95% at 96% 0%, rgba(196, 35, 52, 0.08), transparent 56%),
+                linear-gradient(135deg, #ffffff 0%, #f6f4ee 100%);
+              border: 1px solid rgba(148, 108, 36, 0.28);
+              color: #14171f;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 18px;
+              box-shadow: 0 10px 26px rgba(20, 23, 31, 0.06);
+              transition:
+                transform 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-card:hover { transform: translate3d(0, -2px, 0); border-color: rgba(148, 108, 36, 0.52); }
+            .dp-entry-cta {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              padding: 11px 20px;
+              border-radius: 10px;
+              background: linear-gradient(135deg, #b5872e 0%, #8e6416 100%);
+              color: #ffffff;
+              font-weight: 700;
+              font-size: 13.5px;
+              white-space: nowrap;
+              text-decoration: none;
+              transition: transform 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-cta:active { transform: scale(0.98); transition-duration: 90ms; }
+            .dp-entry-cta:focus-visible { outline: 2px solid #8e6416; outline-offset: 3px; }
+            .dp-entry-arrow { display: inline-block; transition: transform 160ms cubic-bezier(0.25, 0.1, 0.25, 1); }
+            .dp-entry-card:hover .dp-entry-arrow { transform: translate3d(3px, 0, 0); }
+            @media (prefers-reduced-motion: reduce) {
+              .dp-entry-card:hover, .dp-entry-cta:active, .dp-entry-card:hover .dp-entry-arrow { transform: none !important; }
+            }
+          </style>
+          <div class="dp-entry-card" id="devils-plan-s3">
             <div style="max-width:620px;">
-              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.14em;color:#f2d591;">◆ INTERACTIVE PLAYGROUND · 19 GAMES</p>
-              <h3 style="margin:0 0 6px;font-size:21px;color:#fff8e7;">The Devil’s Plan Season 3: Dead Again</h3>
-              <p style="margin:0;font-size:14px;color:#b2b8c9;">Play all 19 Season 3 mind games (Ep 1–10) with live P2P rooms, AI rivals, and pass-and-play privacy shield.</p>
+              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.14em;color:#8e6416;">◆ INTERACTIVE PLAYGROUND · 19 GAMES</p>
+              <h3 style="margin:0 0 6px;font-size:21px;color:#14171f;">The Devil’s Plan Season 3: Dead Again</h3>
+              <p style="margin:0;font-size:14px;color:#52596b;">Play all 19 Season 3 mind games (Ep 1–10) with live P2P rooms, AI rivals, and pass-and-play privacy shield.</p>
             </div>
-            <a href="../../devils-plan-s3/" style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;background:linear-gradient(135deg,#f0d08a,#c49746);color:#0b0d14;font-weight:700;font-size:13.5px;white-space:nowrap;">Enter Game Hub <span aria-hidden="true">↗</span></a>
+            <a class="dp-entry-cta" href="../../devils-plan-s3/">Enter Game Hub <span class="dp-entry-arrow" aria-hidden="true">↗</span></a>
           </div>
           <div
             style="margin-top:18px;padding:24px 28px;border-radius:16px;background:radial-gradient(ellipse 80% 100% at 95% 0%,rgba(217,27,58,0.28),transparent 58%),linear-gradient(135deg,#090a12,#191020);border:1px solid rgba(255,46,84,0.44);color:#f6f3ec;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;"

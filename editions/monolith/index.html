@@ -1350,15 +1350,52 @@ BUS  ::PCIE-LANE [██████████░░] DETERMINISTIC BOUNDARY L
               </div>
             </article>
           </div>
-          <div
-            style="margin-top:28px;padding:24px 28px;border:2px solid #d4af6a;background:#0b0b0c;color:#f4f1ea;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;"
-          >
+          <style>
+            .dp-entry-card {
+              margin-top: 28px;
+              padding: 24px 28px;
+              border: 2px solid #d4af6a;
+              background: #0b0b0c;
+              color: #f4f1ea;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 18px;
+              transition:
+                transform 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+                border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-card:hover { transform: translate3d(0, -2px, 0); border-color: #c8ff00; }
+            .dp-entry-cta {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              padding: 12px 22px;
+              background: #c8ff00;
+              color: #0b0b0c;
+              font-weight: 800;
+              font-size: 13.5px;
+              letter-spacing: 0.06em;
+              text-transform: uppercase;
+              white-space: nowrap;
+              transition: transform 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .dp-entry-cta:active { transform: scale(0.98); transition-duration: 90ms; }
+            .dp-entry-cta:focus-visible { outline: 2px solid #c8ff00; outline-offset: 3px; }
+            .dp-entry-arrow { display: inline-block; transition: transform 160ms cubic-bezier(0.25, 0.1, 0.25, 1); }
+            .dp-entry-card:hover .dp-entry-arrow { transform: translate3d(3px, 0, 0); }
+            @media (prefers-reduced-motion: reduce) {
+              .dp-entry-card:hover, .dp-entry-cta:active, .dp-entry-card:hover .dp-entry-arrow { transform: none !important; }
+            }
+          </style>
+          <div class="dp-entry-card" id="devils-plan-s3">
             <div style="max-width:640px;">
               <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.14em;color:#c8ff00;">◆ INTERACTIVE ARCADE // ONLINE P2P + AI</p>
               <h3 style="margin:0 0 6px;font-size:22px;color:#fff8e7;">THE DEVIL’S PLAN S3: DEAD AGAIN</h3>
               <p style="margin:0;font-size:14px;color:#b2b8c9;">19 playable Season 3 mind games (Ep 1–10) with instant 5-char room codes, AI opponents &amp; pass-and-play.</p>
             </div>
-            <a href="../../devils-plan-s3/" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:#c8ff00;color:#0b0b0c;font-weight:800;font-size:13.5px;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;">OPEN ARCADE <span aria-hidden="true">↗</span></a>
+            <a class="dp-entry-cta" href="../../devils-plan-s3/">OPEN ARCADE <span class="dp-entry-arrow" aria-hidden="true">↗</span></a>
           </div>
           <div
             style="margin-top:18px;padding:24px 28px;border:2px solid #ff2e54;background:#0b0b0c;color:#f6f3ec;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;"
