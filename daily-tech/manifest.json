@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-26",
+  "updated_at": "2026-11-27",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -2070,6 +2070,27 @@
         "Rust"
       ],
       "excerpt": "从生产影子测试、隐私保护的差异指纹与多层反馈环，理解为何 AI 写代码越快，独立验证与工程判断越重要。"
+    },
+    {
+      "id": "2026-11-27-google-fuse-social-reasoning",
+      "sequence": 99,
+      "title": "AI 越聊越懂你，还是越聊越相信你的偏见？Google 用可验证的社会推理实验揭示两者的差别",
+      "source_title": "Verifiable Social Reasoning for LLM Assistants",
+      "source_author": "Zorik Gekhman, Amir Taubenfeld (Google Research)",
+      "source_date": "2026-11-25",
+      "source_url": "https://research.google/blog/verifiable-social-reasoning-for-llm-assistants/",
+      "delivery_date": "2026-11-27",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-27-google-fuse-social-reasoning.md",
+      "tags": [
+        "AI 模型",
+        "AI Agent",
+        "模型评测",
+        "人机交互"
+      ],
+      "excerpt": "Google 的 Fuse 评测通过可控的模拟人物动机发现，模型在用户偏向性转述下更容易犯错，而多轮对话也未必能纠正最初的判断。",
+      "reading_minutes": 6
     }
   ]
 }
