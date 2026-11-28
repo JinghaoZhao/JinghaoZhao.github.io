@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "每日科技长文",
-  "updated_at": "2026-11-27",
+  "updated_at": "2026-11-28",
   "archive_notice": "历史中文正文已归档。原对话中的图片与交互组件不在此展示；合并回复中无法确认的独立发送日期保留为空。",
   "posts": [
     {
@@ -2091,6 +2091,28 @@
       ],
       "excerpt": "Google 的 Fuse 评测通过可控的模拟人物动机发现，模型在用户偏向性转述下更容易犯错，而多轮对话也未必能纠正最初的判断。",
       "reading_minutes": 6
+    },
+    {
+      "id": "2026-11-28-nvidia-sparse-attention-codesign",
+      "sequence": 100,
+      "title": "长上下文推理的真正瓶颈：稀疏注意力省下的算力，为什么又被索引和显存吃掉？",
+      "source_title": "Co-Designing Sparse Attention for Efficient Long-Context Inference",
+      "source_author": "Timmy Liu, Nidhi Bhatia, Samkit Jain, Makesh Tarun Chandran, Bita Darvish Rouhani",
+      "source_date": "2026-11-17",
+      "source_url": "https://developer.nvidia.com/blog/co-designing-sparse-attention-for-efficient-long-context-inference/",
+      "delivery_date": "2026-11-28",
+      "kind": "daily",
+      "status": "full",
+      "file": "posts/2026-11-28-nvidia-sparse-attention-codesign.md",
+      "tags": [
+        "AI 推理",
+        "稀疏注意力",
+        "GPU",
+        "长上下文",
+        "模型架构"
+      ],
+      "excerpt": "NVIDIA 的算子微基准揭示长上下文稀疏化之后的成本迁移：索引器扫描、Top-k 选择与显存数据复用决定实际推理效率。",
+      "reading_minutes": 8
     }
   ]
 }
